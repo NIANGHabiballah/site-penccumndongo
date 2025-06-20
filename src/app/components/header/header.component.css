@@ -1,0 +1,59 @@
+/* header.component.css */
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin-right: 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #000;
+    font-weight: 100;
+    cursor: pointer !important;
+}
+
+nav ul li a:hover {
+    color: #007BFF;
+}
+
+/* Langue francais Anglais */
+.lang-switcher {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-left: 1.5rem;
+}
+
+.lang-switcher button {
+  background: #fff;
+  color: #0380C2;
+  border: 2px solid #0380C2;
+  border-radius: 1.2em;
+  padding: 0.3em 1.1em;
+  font-weight: 600;
+  font-family: 'Montserrat', 'Poppins', Arial, sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+}
+
+.lang-switcher button.active,
+.lang-switcher button:hover {
+  background: #0380C2;
+  color: #fff;
+  border-color: #FF7F1A;
+}
+
+/* Boutton Active */
+nav ul li a.active {
+  color: #FF7F1A;
+  font-weight: bold;
+  border-bottom: 2px solid #FF7F1A;
+  background: transparent;
+}
+

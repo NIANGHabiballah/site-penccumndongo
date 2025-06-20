@@ -1,1 +1,57 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Overpass:wght@400;700&family=Poppins:wght@400;700&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Poppins', 'Montserrat', sans-serif;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.header {
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+}
+
+.header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding:1rem 1rem;
+  cursor: pointer;
+}
+
+.header .logo {
+  height: 50px;
+}
+
+.header .nav a {
+  white-space: nowrap;
+}
+
+.header .nav a {
+  color: black;
+  margin-left: 2rem;
+  text-decoration: none;
+  font-weight: 200;
+  font-size: 1.09rem;
+  transition: color 0.3s ease;
+}
+
+.header .nav a:hover {
+  color: #FF7F1A;
+}
+.header .logo {
+  margin-right: 6rem;
+}
+.header .nav {
+  margin-left: 1%;
+  display: flex;
+  align-items: center;
+}
+
+.header .nav .active {
+  border-bottom: 2px solid #FF7F1A;
+}

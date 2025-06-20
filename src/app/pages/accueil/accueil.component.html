@@ -1,0 +1,318 @@
+  <div class="home">
+  <app-banner></app-banner>
+
+<!-- Section Services -->
+<section id="services" class="services-section scroll-section">
+  <div class="services-header">
+    <div class="services-title">Nos Services</div>
+    <div class="services-desc">
+      Découvrez nos expertises pour booster votre présence digitale et votre performance.
+    </div>
+  </div>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-laptop-code"></i></div>
+      <h3>Développement web & mobile</h3>
+      <p>Sites web, applications mobiles modernes et performants, adaptés à vos besoins.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-users"></i></div>
+      <h3>Community management & réseaux sociaux</h3>
+      <p>Gestion de vos réseaux sociaux, animation de communauté et création de contenus engageants.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-bullhorn"></i></div>
+      <h3>Communication & marketing digital</h3>
+      <p>Stratégies digitales, campagnes publicitaires et optimisation de votre visibilité en ligne.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-paint-brush"></i></div>
+      <h3>Design graphique & sérigraphie</h3>
+      <p>Identité visuelle, supports de communication, sérigraphie personnalisée sur tous supports.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+      <h3>Formations professionnelles</h3>
+      <p>Formations en digital, communication, design, réseaux sociaux et outils numériques.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-star"></i></div>
+      <h3>Promotion de la culture & jeunes talents</h3>
+      <p>Valorisation de la culture locale et accompagnement des jeunes talents dans leur développement digital.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Section Vision & Mission -->
+<section class="vision-mission-section">
+  <div class="tabs">
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'mission'" 
+      (click)="setTab('mission')">
+      Mission
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'vision'" 
+      (click)="setTab('vision')">
+      Vision
+    </button>
+  </div>
+  <div class="tab-content">
+    <div 
+      class="tab-panel" 
+      *ngIf="activeTab === 'mission'" 
+      [@fadeIn]>
+      <h2>Notre Mission</h2>
+      <p>
+        <!-- Remplace ce texte par ta mission -->
+        Accompagner les entreprises et organisations dans leur transformation digitale, en proposant des solutions innovantes et adaptées à leurs besoins.
+      </p>
+    </div>
+    <div 
+      class="tab-panel" 
+      *ngIf="activeTab === 'vision'" 
+      [@fadeIn]>
+      <h2>Notre Vision</h2>
+      <p>
+        <!-- Remplace ce texte par ta vision -->
+        Être un acteur de référence dans la promotion de la culture digitale et l’émergence des talents en Afrique.
+      </p>
+    </div>
+  </div>
+</section>
+
+  <!-- Section Réalisations -->
+    <section id="portfolio" class="portfolio scroll-section">
+      <div class="blue-subtitle">Nos Réalisations</div>
+    <div class="portfolio-cards">
+      <div class="card">
+        <div class="icon"><i class="fas fa-globe"></i></div>
+        <h3>Site Vitrine</h3>
+        <p>Création d’un site web moderne pour une entreprise locale.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><i class="fas fa-mobile-alt"></i></div>
+        <h3>Application Mobile</h3>
+        <p>Développement d’une application mobile intuitive et performante.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><i class="fas fa-store"></i></div>
+        <h3>Boutique en ligne</h3>
+        <p>Lancement d’une plateforme e-commerce sur-mesure.</p>
+      </div>
+    </div>
+  </section>
+
+<!-- Section Actualités -->
+<section id="news" class="news scroll-section">
+  <div class="blue-subtitle">Actualités</div>
+  <div class="news-cards">
+    <div class="news-card">
+      <iframe
+        src="https://www.linkedin.com/embed/feed/update/urn:li:share:7336779628230893571?collapsed=1"
+        height="670"
+        width="504"
+        frameborder="0"
+        allowfullscreen=""
+        title="Post intégré"></iframe>
+      <a class="news-link" href="https://www.linkedin.com/feed/update/urn:li:share:7336779628230893571?collapsed=1" target="_blank" rel="noopener">
+        Voir plus
+      </a>
+    </div>
+
+    <div class="news-card">
+      <iframe
+        src="https://www.linkedin.com/embed/feed/update/urn:li:share:7328857368157421568?collapsed=1"
+        height="670"
+        width="504"
+        frameborder="0"
+        allowfullscreen=""
+        title="Post intégrén"></iframe>
+      <a class="news-link" href="https://www.linkedin.com/feed/update/urn:li:share:7328857368157421568?collapsed=1" target="_blank" rel="noopener">
+        Voir plus
+      </a>
+    </div>
+
+    <div class="news-card">
+        <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7327362470505836544?collapsed=1"
+        height="670"
+        width="504"
+        frameborder="0"
+        allowfullscreen=""
+        title="Post intégré"></iframe>
+        <a class="news-link" href="https://www.linkedin.com/feed/update/urn:li:share:7328857368157421568?compact=0" target="_blank" rel="noopener">
+          Voir plus
+        </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- Section Chiffres Clés -->
+<section class="key-numbers">
+  <div class="white-subtitle">Chiffres Clés</div>
+  <div class="numbers-cards">
+    
+    <div class="number-card">
+      <div class="number" data-target="50">0</div>
+      <div class="number-label">Clients accompagnés</div>
+    </div>
+
+    <div class="number-card">
+  <div class="number" data-target="120">0</div>
+      <div class="number-label">Projets réalisés</div>
+    </div>
+
+    <div class="number-card">
+  <div class="number" data-target="11">0</div>
+      <div class="number-label">Partenaires</div>
+    </div>
+
+    <div class="number-card">
+  <div class="number" data-target="8">0</div>
+      <div class="number-label">Années d’expérience</div>
+    </div>
+  </div>
+</section>
+
+  <!-- Section Témoignages -->
+  <section class="testimonials">
+  <div class="blue-subtitle">Témoignages</div>
+  <div class="testimonial-cards">
+    
+    <div class="testimonial-card">
+      <img class="testimonial-photo" src="T2.jpg" alt="Tafsir Haby NIANG">
+      <div class="testimonial-content">
+        <p class="testimonial-text"> "Penccum Ndongo a transformé notre présence en ligne. Nous sommes très satisfaits de leurs services."</p>
+        <div class="testimonial-profile">
+          <span class="testimonial-name">Tafsir Haby NIANG</span>
+          <span class="testimonial-title">Fondateur de PENCCUM NDONGO</span>
+        </div>
+      </div>
+    </div>
+
+     <div class="testimonial-card">
+      <img class="testimonial-photo" src="T2.jpg" alt="Tafsir Haby NIANG">
+      <div class="testimonial-content">
+        <p class="testimonial-text"> "Penccum Ndongo a transformé notre présence en ligne. Nous sommes très satisfaits de leurs services."</p>
+        <div class="testimonial-profile">
+          <span class="testimonial-name">Tafsir Haby NIANG</span>
+          <span class="testimonial-title">Fondateur de PENCCUM NDONGO</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial-card">
+      <img class="testimonial-photo" src="T2.jpg" alt="Tafsir Haby NIANG">
+      <div class="testimonial-content">
+        <p class="testimonial-text"> "Penccum Ndongo a transformé notre présence en ligne. Nous sommes très satisfaits de leurs services."</p>
+        <div class="testimonial-profile">
+          <span class="testimonial-name">Tafsir Haby NIANG</span>
+          <span class="testimonial-title">Fondateur de PENCCUM NDONGO</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+  <!-- Section Partenaires -->
+<section class="partners">
+  <h2 class="orange-title">Ils nous font confiance</h2>
+  <div class="blue-subtitle">Nos Clients & Partenaires</div>
+  <div class="partner-logos-carousel">
+    <div class="logos-track">
+    <img src="P1.jpg" alt="Partenaire 1">
+    <img src="P2.png" alt="Partenaire 2">
+    <img src="P3.jpg" alt="Partenaire 3">
+    <img src="P4.jpeg" alt="Partenaire 4">
+    <img src="P5.png" alt="Partenaire 5">
+    <img src="P6.jpg" alt="Partenaire 6">
+    <img src="P7.jpg" alt="Partenaire 7">
+    <img src="P8.jpg" alt="Partenaire 8">
+    <img src="P9.jpg" alt="Partenaire 9">
+    <img src="P10.png" alt="Partenaire 9">
+    <!-- Dupliquez pour effet infini -->
+    <img src="P1.jpg" alt="Partenaire 1">
+    <img src="P2.png" alt="Partenaire 2">
+    <img src="P3.jpg" alt="Partenaire 3">
+    <img src="P4.jpeg" alt="Partenaire 4">
+    <img src="P5.png" alt="Partenaire 5">
+    <img src="P6.jpg" alt="Partenaire 6">
+    <img src="P7.jpg" alt="Partenaire 7">
+    <img src="P8.jpg" alt="Partenaire 8">
+    <img src="P9.jpg" alt="Partenaire 9">
+    <img src="P10.png" alt="Partenaire 9">
+    </div>
+  </div>
+  </section>
+
+  <!-- Section Contact -->
+<section id="contact" class="contact scroll-section">
+  <h2>Contactez-nous</h2>
+  <form (ngSubmit)="onSubmit()" #contactForm="ngForm" class="contact-form wide" novalidate>
+  <div class="form-row double">
+    <div class="form-group">
+      <label for="firstname">Prénom <span class="required">*</span></label>
+      <input id="firstname" type="text" placeholder="Ex : Malik ibrah"
+        [(ngModel)]="contactData.firstname" name="firstname" required #firstname="ngModel">
+      <div class="error" *ngIf="firstname.invalid && (firstname.dirty || firstname.touched)">
+        Le prénom est obligatoire.
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="lastname">Nom de famille <span class="required">*</span></label>
+      <input id="lastname" type="text" placeholder="Nom de famille"
+        [(ngModel)]="contactData.lastname" name="lastname" required #lastname="ngModel">
+      <div class="error" *ngIf="lastname.invalid && (lastname.dirty || lastname.touched)">
+        Le nom de famille est obligatoire.
+      </div>
+    </div>
+  </div>
+  <div class="form-row double">
+    <div class="form-group">
+      <label for="phone">Numéro de portable <span class="required">*</span></label>
+      <input id="phone" type="tel" placeholder="Numéro de portable"
+        [(ngModel)]="contactData.phone" name="phone" required #phone="ngModel">
+      <div class="error" *ngIf="phone.invalid && (phone.dirty || phone.touched)">
+        Le numéro de portable est obligatoire.
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="email">E-mail <span class="required">*</span></label>
+      <input id="email" type="email" placeholder="Ex : malik@ibrah.com"
+        [(ngModel)]="contactData.email" name="email" required email #email="ngModel">
+      <div class="error" *ngIf="email.invalid && (email.dirty || email.touched)">
+        Un e-mail valide est obligatoire.
+      </div>
+    </div>
+  </div>
+  <div class="form-row">
+    <label for="company">Entreprise / Organisation</label>
+    <input id="company" type="text" placeholder="Ex : Penccum Ndongo"
+      [(ngModel)]="contactData.company" name="company">
+  </div>
+  <div class="form-row">
+    <label for="message">Détaillez votre projet <span class="required">*</span></label>
+    <textarea id="message" placeholder="Saisissez votre message..."
+      [(ngModel)]="contactData.message" name="message" required #message="ngModel" rows="7"></textarea>
+    <div class="error" *ngIf="message.invalid && (message.dirty || message.touched)">
+      Merci de détailler votre projet.
+    </div>
+  </div>
+  <div class="recaptcha-container">
+    <re-captcha siteKey="6Lf5qmYrAAAAAEFbiCRWKcoorz4ga7r8V-pPGKpB" (resolved)="onCaptchaResolved($event)"></re-captcha>
+  </div>
+  <button type="submit" [disabled]="!contactForm.valid || !captchaResolved">Envoyer</button>
+</form>
+</section>
+
+<!-- Boutons de scroll haut/bas -->
+<button id="scrollTopBtn" class="scroll-btn" title="Haut">
+  <i class="fas fa-arrow-up"></i>
+</button>
+<button id="scrollBottomBtn" class="scroll-btn" title="Bas">
+  <i class="fas fa-arrow-down"></i>
+</button>

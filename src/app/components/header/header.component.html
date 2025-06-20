@@ -1,0 +1,17 @@
+<header class="header">
+  <div class="container">
+    <img src="logo.png" alt="Penccum Ndongo Logo" class="logo">
+    <nav class="nav">
+      <a (click)="scrollToSection('accueil')" [class.active]="activeSection === 'accueil'">{{ 'ACCUEIL' | translate }}</a>
+      <a routerLink="/apropos" routerLinkActive="active">{{ 'APROPOS' | translate }}</a>
+      <a (click)="scrollToSection('services')" [class.active]="activeSection === 'services'">{{ 'SERVICES' | translate }}</a>
+      <a (click)="scrollToSection('portfolio')" [class.active]="activeSection === 'portfolio'">{{ 'PORTFOLIO' | translate }}</a>
+      <a (click)="scrollToSection('news')" [class.active]="activeSection === 'news'">{{ 'NEWS' | translate }}</a>
+      <a (click)="scrollToSection('contact')" [class.active]="activeSection === 'contact'">{{ 'CONTACT' | translate }}</a>
+      <div class="lang-switcher">
+        <button (click)="setLang('fr')" [class.active]="translate.currentLang === 'fr'">FR</button>
+        <button (click)="setLang('en')" [class.active]="translate.currentLang === 'en'">EN</button>
+      </div>
+    </nav>
+  </div>
+</header>
