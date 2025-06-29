@@ -1,28 +1,37 @@
 <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-section about">
-          <h3>À propos</h3>
-          <p>Penccum Ndongo est une entreprise spécialisée dans le développement web et mobile, le marketing digital et la sérigraphie personnalisée.</p>
-        </div>
-        <div class="footer-section links">
-          <h3>Liens Utiles</h3>
-          <ul>
-            <li><a routerLink="/home">Accueil</a></li>
-            <li><a routerLink="/about">À propos</a></li>
-            <li><a routerLink="/services">Services</a></li>
-            <li><a routerLink="/portfolio">Réalisations</a></li>
-            <li><a routerLink="/contact">Contact</a></li>
-          </ul>
-        </div>
-        <div class="footer-section contact">
-          <h3>Contact</h3>
-          <p>Email: contact&#64;penccumndongo.com</p>
-          <p>Téléphone: +221 33 123 45 67</p>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2025 Penccum Ndongo. Tous droits réservés.</p>
+  <div class="footer-container">
+    <div class="footer-logo">
+      <img src="logo.png" alt="Penccum Ndongo Logo">
+      <p class="footer-baseline">Penccum Ndongo – Propulseur de communication et d'innovation digitale</p>
+    </div>
+    <div class="footer-links">
+      <h4>Navigation</h4>
+      <ul>
+        <li><a routerLink="/accueil">Accueil</a></li>
+        <li><a routerLink="/apropos">À propos</a></li>
+        <li><a routerLink="/devis">Obtenir un devis</a></li>
+        <li><a (click)="scrollToSection('services')">Services</a></li>
+        <li><a (click)="scrollToSection('portfolio')">Portfolio</a></li>
+        <li><a (click)="scrollToSection('contact')">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-contact">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:pencc@penccumndongo.com">pencc&#64;penccumndongo.com</a></li>
+        <li><a href="tel:+221771234567">+221 77 629 06 39 - 76 841 54 14</a></li>
+        <li>Yeumbeul, Comico Série B 156 - Dakar, Sénégal</li>
+      </ul>
+      <div class="footer-socials">
+        <a href="https://www.facebook.com/penccumndongo" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+        <a href="https://www.linkedin.com/company/penccumndongo" target="_blank" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+        <a href="https://www.instagram.com/penccumndongo" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://twitter.com/penccumndongo" target="_blank" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+        <a href="https://www.tiktok.com/@penccumndongo" target="_blank" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
       </div>
     </div>
-  </footer>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; {{ currentYear }} Penccum Ndongo. Tous droits réservés.</span>
+  </div>
+</footer>

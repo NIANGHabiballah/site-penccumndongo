@@ -36,3 +36,25 @@
     display: block;
     margin: 0 auto;
   }
+
+  /* boutton contact et devis */
+.btns {
+  display: flex;
+  gap: 1.2rem; /* Ajuste la valeur selon l'espacement désiré */
+  justify-content: center;
+  align-items: center;
+}
+
+.apropos-hero-btn {
+  display: inline-block;
+  background: #fff;
+  color: #0380C2;
+  font-weight: 700;
+  font-size: 1.08rem;
+  padding: 0.9rem 2.2rem;
+  border-radius: 2rem;
+  box-shadow: 0 2px 12px rgba(3,128,194,0.10);
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+  margin-top: 1.2rem;
+}

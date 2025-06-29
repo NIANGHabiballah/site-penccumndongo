@@ -84,26 +84,40 @@
 </section>
 
   <!-- Section Réalisations -->
-    <section id="portfolio" class="portfolio scroll-section">
-      <div class="blue-subtitle">Nos Réalisations</div>
-    <div class="portfolio-cards">
-      <div class="card">
-        <div class="icon"><i class="fas fa-globe"></i></div>
-        <h3>Site Vitrine</h3>
-        <p>Création d’un site web moderne pour une entreprise locale.</p>
-      </div>
-      <div class="card">
-        <div class="icon"><i class="fas fa-mobile-alt"></i></div>
-        <h3>Application Mobile</h3>
-        <p>Développement d’une application mobile intuitive et performante.</p>
-      </div>
-      <div class="card">
-        <div class="icon"><i class="fas fa-store"></i></div>
-        <h3>Boutique en ligne</h3>
-        <p>Lancement d’une plateforme e-commerce sur-mesure.</p>
-      </div>
-    </div>
-  </section>
+<section id="portfolio" class="portfolio scroll-section">
+  <div class="blue-subtitle">Nos Réalisations</div>
+  <div class="portfolio-categories">
+    <button 
+      *ngFor="let cat of portfolioCategories" 
+      [class.active]="cat === selectedCategory"
+      (click)="selectCategory(cat)">
+      {{ cat }}
+    </button>
+  </div>
+
+<div class="portfolio-cards">
+  <div class="portfolio-crea"
+       *ngFor="let proj of filteredPortfolio"
+       (click)="openRealisation(proj)">
+    <img [src]="proj.image" [alt]="proj.title" class="portfolio-img"/>
+  </div>
+</div>
+
+<!-- Overlay pour la créa sélectionnée -->
+<div 
+  class="realisation-modal" 
+  *ngIf="selectedRealisation" 
+  @fadeIn
+  (click)="closeRealisation()">
+  <div class="realisation-modal-content" (click)="$event.stopPropagation()">
+    <img [src]="selectedRealisation.image" [alt]="selectedRealisation.title" class="realisation-img"/>
+    <button class="close-modal" (click)="closeRealisation()">&times;</button>
+  </div>
+</div>
+  <div class="portfolio-cta">
+    <a (click)="scrollToSection('contact')"class="cta-btn">Vous avez un projet ? Contactez-nous</a>
+  </div>
+</section>
 
 <!-- Section Actualités -->
 <section id="news" class="news scroll-section">
@@ -146,6 +160,7 @@
           Voir plus
         </a>
     </div>
+    
 
   </div>
 </section>
@@ -179,44 +194,26 @@
 
   <!-- Section Témoignages -->
   <section class="testimonials">
-  <div class="blue-subtitle">Témoignages</div>
-  <div class="testimonial-cards">
-    
-    <div class="testimonial-card">
-      <img class="testimonial-photo" src="T2.jpg" alt="Tafsir Haby NIANG">
-      <div class="testimonial-content">
-        <p class="testimonial-text"> "Penccum Ndongo a transformé notre présence en ligne. Nous sommes très satisfaits de leurs services."</p>
-        <div class="testimonial-profile">
-          <span class="testimonial-name">Tafsir Haby NIANG</span>
-          <span class="testimonial-title">Fondateur de PENCCUM NDONGO</span>
+    <div class="blue-subtitle">Témoignages</div>
+    <div class="testimonial-cards">
+      <div 
+        class="testimonial-card" 
+        *ngFor="let t of testimonials.slice(currentIndex, currentIndex+2)">
+        <img class="testimonial-photo" [src]="t.photo" [alt]="t.name">
+        <div class="testimonial-content">
+          <p class="testimonial-text">{{ t.text }}</p>
+          <div class="testimonial-profile">
+            <span class="testimonial-name">{{ t.name }}</span>
+            <span class="testimonial-title">{{ t.title }}</span>
+          </div>
         </div>
       </div>
     </div>
-
-     <div class="testimonial-card">
-      <img class="testimonial-photo" src="T2.jpg" alt="Tafsir Haby NIANG">
-      <div class="testimonial-content">
-        <p class="testimonial-text"> "Penccum Ndongo a transformé notre présence en ligne. Nous sommes très satisfaits de leurs services."</p>
-        <div class="testimonial-profile">
-          <span class="testimonial-name">Tafsir Haby NIANG</span>
-          <span class="testimonial-title">Fondateur de PENCCUM NDONGO</span>
-        </div>
-      </div>
+    <div class="testimonial-arrows-container">
+      <button class="testimonial-arrow left" (click)="prevTestimonial()">&#8592;</button>
+      <button class="testimonial-arrow right" (click)="nextTestimonial()">&#8594;</button>
     </div>
-
-    <div class="testimonial-card">
-      <img class="testimonial-photo" src="T2.jpg" alt="Tafsir Haby NIANG">
-      <div class="testimonial-content">
-        <p class="testimonial-text"> "Penccum Ndongo a transformé notre présence en ligne. Nous sommes très satisfaits de leurs services."</p>
-        <div class="testimonial-profile">
-          <span class="testimonial-name">Tafsir Haby NIANG</span>
-          <span class="testimonial-title">Fondateur de PENCCUM NDONGO</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
+  </section>
 
   <!-- Section Partenaires -->
 <section class="partners">

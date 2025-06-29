@@ -4,6 +4,10 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, NavigationEnd } from '@angular/router';
+import { RouterModule } from '@angular/router';
+import { routes } from '../../app.routes';
+import { CommonModule } from '@angular/common';
+
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -13,16 +17,22 @@ export function HttpLoaderFactory(http: HttpClient) {
   selector: 'app-header',
   standalone: true,
   imports: [
-    TranslateModule
+    TranslateModule,
+    RouterModule,
+    CommonModule,
+
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
 
 export class HeaderComponent { 
+  
   activeSection: string = 'accueil';
+  menuOpen = false;
 
-   constructor(public translate: TranslateService) {
+
+   constructor(public translate: TranslateService, public router: Router) {
     translate.addLangs(['fr', 'en']);
     translate.setDefaultLang('fr');
     const browserLang = translate.getBrowserLang();
@@ -65,5 +75,10 @@ export class HeaderComponent {
     this.activeSection = '';
   }
 }
+
+  // Adaptabilité du menu
+  toggleMenu() {
+    this.menuOpen = !this.menuOpen;
+  }
 
 }

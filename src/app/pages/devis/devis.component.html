@@ -1,0 +1,91 @@
+<section class="devis-banner">
+  <h1>Obtenir un Devis !</h1>
+  <p>Remplissez ce formulaire pour recevoir une proposition personnalisée adaptée à vos besoins.</p>
+</section>
+
+<form class="devis-form" (ngSubmit)="onSubmit()" #devisForm="ngForm">
+  <div class="form-row">
+    <div class="form-group">
+      <label for="nom">Nom complet *</label>
+      <input type="text" id="nom" name="nom" ngModel required placeholder="Votre nom et prénom">
+    </div>
+    <div class="form-group">
+      <label for="email">Email *</label>
+      <input type="email" id="email" name="email" ngModel required placeholder="exemple@email.com">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="telephone">Téléphone *</label>
+      <input type="tel" id="telephone" name="telephone" ngModel required placeholder="Votre numéro de téléphone">
+    </div>
+    <div class="form-group">
+      <label for="entreprise">Entreprise / Organisation</label>
+      <input type="text" id="entreprise" name="entreprise" ngModel placeholder="Nom de l'entreprise (optionnel)">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="vousetes">Vous êtes ? *</label>
+    <select id="vousetes" name="vousetes" ngModel required>
+      <option value="" disabled selected>Sélectionnez votre profil</option>
+      <option>Particulier</option>
+      <option>Entreprise</option>
+      <option>Association</option>
+      <option>Institution</option>
+      <option>Autre</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="service">Service souhaité *</label>
+    <select id="service" name="service" ngModel required>
+      <option value="" disabled selected>Choisissez un service</option>
+      <option>Création de site web</option>
+      <option>Application mobile</option>
+      <option>Identité visuelle / Graphisme</option>
+      <option>Community management</option>
+      <option>Stratégie digitale</option>
+      <option>Autre</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="details">Détaillez votre besoin *</label>
+    <textarea id="details" name="details" rows="4" ngModel required placeholder="Décrivez votre projet, vos attentes, vos délais..."></textarea>
+  </div>
+  <div class="form-group">
+    <label for="budget">Budget estimé</label>
+    <input type="text" id="budget" name="budget" ngModel placeholder="Ex : 500 000 FCFA">
+  </div>
+  <div class="form-group">
+    <label for="connaissance">Comment avez-vous connu Penccum Ndongo ? *</label>
+    <select id="connaissance" name="connaissance" ngModel required>
+      <option value="" disabled selected>Sélectionnez une option</option>
+      <option>Bouche à oreille</option>
+      <option>Réseaux sociaux</option>
+      <option>Recherche Google</option>
+      <option>Événement / Salon</option>
+      <option>Publicité</option>
+      <option>Autre</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="canal">Par quel canal voulez-vous être recontacté ? *</label>
+    <select id="canal" name="canal" ngModel required>
+      <option value="" disabled selected>Sélectionnez un canal</option>
+      <option>Email</option>
+      <option>Téléphone</option>
+      <option>WhatsApp</option>
+      <option>SMS</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <button type="submit" class="devis-btn">Envoyer ma demande</button>
+  </div>
+</form>
+
+<!-- Boutons de scroll haut/bas -->
+<button id="scrollTopBtn" class="scroll-btn" title="Haut">
+  <i class="fas fa-arrow-up"></i>
+</button>
+<button id="scrollBottomBtn" class="scroll-btn" title="Bas">
+  <i class="fas fa-arrow-down"></i>
+</button>

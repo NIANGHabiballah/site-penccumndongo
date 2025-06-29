@@ -1,13 +1,33 @@
 <header class="header">
   <div class="container">
-    <img src="logo.png" alt="Penccum Ndongo Logo" class="logo">
-    <nav class="nav">
-      <a (click)="scrollToSection('accueil')" [class.active]="activeSection === 'accueil'">{{ 'ACCUEIL' | translate }}</a>
-      <a routerLink="/apropos" routerLinkActive="active">{{ 'APROPOS' | translate }}</a>
-      <a (click)="scrollToSection('services')" [class.active]="activeSection === 'services'">{{ 'SERVICES' | translate }}</a>
-      <a (click)="scrollToSection('portfolio')" [class.active]="activeSection === 'portfolio'">{{ 'PORTFOLIO' | translate }}</a>
-      <a (click)="scrollToSection('news')" [class.active]="activeSection === 'news'">{{ 'NEWS' | translate }}</a>
-      <a (click)="scrollToSection('contact')" [class.active]="activeSection === 'contact'">{{ 'CONTACT' | translate }}</a>
+    <img routerLink="/accueil" src="logo.png" alt="Penccum Ndongo Logo" class="logo">
+    
+     <!-- Icône hamburger visible sur mobile -->
+    <button class="menu-toggle" (click)="toggleMenu()" aria-label="Ouvrir le menu">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+
+    <nav class="nav" [class.open]="menuOpen" >
+  <!-- Si on est sur la page 'apropos' : afficher uniquement Accueil -->
+  <a *ngIf="router.url.includes('apropos')" routerLink="/accueil" class="active">{{ 'ACCUEIL' | translate }}</a>
+
+  <!-- Si on est sur la page 'devis' : afficher Accueil et À propos -->
+  <ng-container *ngIf="router.url.includes('devis')">
+    <a routerLink="/accueil" class="active">{{ 'ACCUEIL' | translate }}</a>
+    <a routerLink="/apropos" routerLinkActive="active">{{ 'APROPOS' | translate }}</a>
+  </ng-container>
+
+  <!-- Sinon, afficher tout le menu -->
+  <ng-container *ngIf="!router.url.includes('apropos') && !router.url.includes('devis')">
+        <a routerLink="/accueil" (click)="scrollToSection('accueil')" [class.active]="activeSection === 'accueil'">{{ 'ACCUEIL' | translate }}</a>
+        <a routerLink="/apropos" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ 'APROPOS' | translate }}</a>
+        <a (click)="scrollToSection('services')" [class.active]="activeSection === 'services'">{{ 'SERVICES' | translate }}</a>
+        <a (click)="scrollToSection('portfolio')" [class.active]="activeSection === 'portfolio'">{{ 'PORTFOLIO' | translate }}</a>
+        <a (click)="scrollToSection('news')" [class.active]="activeSection === 'news'">{{ 'NEWS' | translate }}</a>
+        <a (click)="scrollToSection('contact')" [class.active]="activeSection === 'contact'">{{ 'CONTACT' | translate }}</a>
+      </ng-container>
       <div class="lang-switcher">
         <button (click)="setLang('fr')" [class.active]="translate.currentLang === 'fr'">FR</button>
         <button (click)="setLang('en')" [class.active]="translate.currentLang === 'en'">EN</button>
