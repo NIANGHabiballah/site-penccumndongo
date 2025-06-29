@@ -1,0 +1,93 @@
+
+<section class="cp2i-banner">
+  <h1>CP2i – Concours de Poésie Inédit & Innovant</h1>
+  <p>Un concours unique pour révéler les talents poétiques et créatifs de la jeunesse africaine.</p>
+</section>
+
+<div class="cp2i-main cp2i-about">
+    <div class="cp2i-about card">
+        <h2>À Propos du CP2i</h2>
+        <img 
+        src="remerciements.jpg" 
+        alt="Remerciements CP2i" 
+        class="cp2i-about-img" 
+        style="max-width: 320px; border-radius: 1.1rem; margin: 1.2rem auto; display: block; cursor: pointer;"
+        (click)="openThanksLightbox()"
+        />
+
+        <!-- Ajoutez ce bloc juste après la div .cp2i-main (par exemple avant la galerie) -->
+        <div class="lightbox-backdrop" *ngIf="showThanksLightbox" (click)="closeThanksLightbox()">
+        <img 
+            class="lightbox-img"
+            src="remerciements.jpg"
+            alt="Remerciements CP2i"
+            (click)="$event.stopPropagation()"
+        />
+        <button class="lightbox-close" (click)="closeThanksLightbox()">&times;</button>
+        </div>
+
+        <p>
+            Le CP2i, organisé par Penccum Ndongo, célèbre l’originalité, l’innovation et la créativité des poètes africains. 
+            La 2<sup>e</sup> édition a permis la publication du recueil <strong>Vers Croisés</strong> : 64 textes en français, wolof, anglais et arabe, portés par des voix émergentes du continent.
+        </p>
+        <div class="cp2i-info">
+            <span><i class="fa-solid fa-calendar"></i> 14 mai 2025</span>
+            <span><i class="fa-solid fa-location-dot"></i> Institut Français de Saint-Louis</span>
+        </div>
+    </div>
+
+    <div class="cp2i-books card">
+        <h2>Le Recueil & Les Temps Forts</h2>
+        <div class="cp2i-books-gallery">
+            <ng-container *ngFor="let img of bookImages; let idx = index">
+                <img 
+                    [src]="img.src"
+                    [alt]="img.alt"
+                    (click)="openBookLightbox(idx)"
+                />
+            </ng-container>
+        </div>
+        <p class="cp2i-books-desc">
+        <strong>Vers Croisés</strong> : un ouvrage vibrant, carrefour d’idées et d’émotions, disponible à la commande.<br>
+        <span class="prix">Prix : 8 € / 5 000 FCFA</span>
+        </p>
+        <div class="center-btn">
+            <a href="mailto:pencc.penccumndongo@gmail.com" class="cta-btn">Commander le Recueil</a>
+        </div>
+</div>
+
+<!-- Lightbox pour les livres -->
+<div class="lightbox-backdrop" *ngIf="bookLightboxOpen" (click)="closeBookLightbox()">
+    <img 
+        class="lightbox-img"
+        [src]="bookImages[currentBookImg].src"
+        [alt]="bookImages[currentBookImg].alt"
+        (click)="$event.stopPropagation()"
+        />
+    <button class="lightbox-close" (click)="closeBookLightbox()">&times;</button>
+</div>
+
+<div class="cp2i-gallery-section">
+  <h2>Galerie de la Cérémonie 2025</h2>
+  <div class="cp2i-gallery">
+    <ng-container *ngFor="let idx of galleryIndexes">
+      <img 
+        [src]="'cp2i/galerie/' + idx + '.jpg'"
+        [alt]="'Photo cérémonie ' + (idx+1)"
+        loading="lazy"
+        (click)="openLightbox(idx)"
+      />
+    </ng-container>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox-backdrop" *ngIf="lightboxOpen" (click)="closeLightbox()">
+  <img 
+    class="lightbox-img"
+    [src]="'cp2i/galerie/' + currentImg + '.jpg'"
+    [alt]="'Photo cérémonie ' + (currentImg+1)"
+    (click)="$event.stopPropagation()"
+  />
+  <button class="lightbox-close" (click)="closeLightbox()">&times;</button>
+</div>

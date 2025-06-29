@@ -1,0 +1,109 @@
+.offre-banner, .formation-banner, .cp2i-banner {
+  background: linear-gradient(120deg, #0380C2 0%, #FF7F1A 100%);
+  color: #fff;
+  padding: 3.5rem 1rem 2rem 1rem;
+  border-radius: 0 0 2rem 2rem;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 4px 24px rgba(3,128,194,0.10);
+}
+.offre-cards, .formation-axes, .cp2i-ceremonie, .cp2i-recueil {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+.offre-card, .formation-details, .cp2i-presentation {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(3,128,194,0.08);
+  padding: 2rem 1.5rem;
+  max-width: 350px;
+  min-width: 250px;
+  flex: 1 1 250px;
+  text-align: left;
+}
+.cta-btn {
+  background: linear-gradient(90deg, #0380C2 60%, #FF7F1A 100%);
+  color: #fff;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.9rem 2.2rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+  display: inline-block;
+  margin-top: 1rem;
+}
+.cta-btn:hover {
+  background: linear-gradient(90deg, #FF7F1A 60%, #0380C2 100%);
+}
+@media (max-width: 900px) {
+  .offre-cards, .formation-axes, .cp2i-ceremonie, .cp2i-recueil {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.offre-banner{
+    padding-top: 6.5rem;
+}
+
+/* Offres Contact */
+.offre-contact {
+  background: #f6f8fa;
+  border-radius: 1.5rem;
+  box-shadow: 0 2px 12px rgba(3,128,194,0.08);
+  padding: 2.5rem 1.5rem 2rem 1.5rem;
+  text-align: center;
+  margin: 2.5rem auto 0 auto;
+  max-width: 600px;
+  margin-top: 3.5rem;
+  margin-bottom: 5.5rem;
+}
+
+.offre-contact h3 {
+  color: #0380C2;
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.offre-contact p {
+  font-size: 1.08rem;
+  color: #222;
+  margin-bottom: 1.2rem;
+}
+
+.offre-link {
+  color: #FF7F1A;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.offre-link:hover {
+  color: #0380C2;
+  text-decoration: underline;
+}
+
+.offre-socials {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+
+.offre-socials a {
+  color: #0380C2;
+  font-size: 1.7rem;
+  transition: color 0.2s;
+}
+.offre-socials a:hover {
+  color: #FF7F1A;
+}
+
+.offre-contact-form-link {
+  margin-top: 1.2rem;
+}

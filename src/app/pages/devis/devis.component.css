@@ -137,3 +137,11 @@ input:focus, select:focus, textarea:focus {
 #scrollTopBtn { bottom: 90px; }
 #scrollBottomBtn { bottom: 30px; }
 .scroll-btn:hover { background: #FF7F1A; transform: scale(1.08);}
+
+.devis-form-title {
+  text-align: center;
+  color: #FF7F1A;
+  font-size: 1.5rem;
+  margin-bottom: 1.2rem;
+  font-weight: 700;
+}

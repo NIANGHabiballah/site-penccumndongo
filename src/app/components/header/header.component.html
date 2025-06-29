@@ -28,6 +28,22 @@
         <a (click)="scrollToSection('news')" [class.active]="activeSection === 'news'">{{ 'NEWS' | translate }}</a>
         <a (click)="scrollToSection('contact')" [class.active]="activeSection === 'contact'">{{ 'CONTACT' | translate }}</a>
       </ng-container>
+
+        <!-- Onglet Offres avec menu déroulant -->
+      <div class="dropdown"
+        (mouseenter)="onDropdownHover(true)"
+        (mouseleave)="onDropdownHover(false)">
+        <button class="dropdown-btn" (click)="toggleDropdownMobile($event)">
+          Offres <span class="arrow">&#9662;</span>
+        </button>
+        <div class="dropdown-content" [class.show]="showDropdown">
+          <a routerLink="/opportunites">Opportunités</a>
+          <a routerLink="/formations">Formations</a>
+          <a routerLink="/cp2i">CP2i</a>
+          <a routerLink="/devis" class="devis-link">Obtenir un devis</a>
+        </div>
+      </div>
+
       <div class="lang-switcher">
         <button (click)="setLang('fr')" [class.active]="translate.currentLang === 'fr'">FR</button>
         <button (click)="setLang('en')" [class.active]="translate.currentLang === 'en'">EN</button>

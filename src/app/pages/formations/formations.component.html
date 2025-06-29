@@ -1,0 +1,122 @@
+<section class="formation-banner">
+  <h1>PENC’BOOST – Formations Professionnelles</h1>
+  <p class="formation-slogan">Développez vos compétences, boostez votre avenir !</p>
+</section>
+
+<div class="formation-main">
+  <div class="formation-presentation card highlight">
+    <img src="penccboost.png" alt="Logo Pencc'BOOST" class="penccboost-logo" />
+    <h2>Présentation du programme</h2>
+    <p>
+      <strong>PENC’BOOST</strong> est un programme de formations professionnelles conçu par Penccum Ndongo, dédié aux jeunes, professionnels et porteurs de projets.<br>
+      Modules courts, pratiques et impactants dans le leadership, la tech, le digital, le design, l’artisanat créatif, et plus encore.
+    </p>
+  </div>
+
+  <div class="formation-axes card axes-list">
+    <h2><i class="fa-solid fa-star"></i> Nos 7 axes stratégiques</h2>
+    <div class="axes-grid">
+      <div class="axe-card">
+        <i class="fa-solid fa-user-graduate"></i>
+        <span>Leadership & Développement personnel</span>
+      </div>
+      <div class="axe-card">
+        <i class="fa-solid fa-palette"></i>
+        <span>Création graphique & design visuel</span>
+      </div>
+      <div class="axe-card">
+        <i class="fa-solid fa-code"></i>
+        <span>Tech & Développement</span>
+      </div>
+      <div class="axe-card">
+        <i class="fa-solid fa-bullhorn"></i>
+        <span>Marketing digital & Présence en ligne</span>
+      </div>
+      <div class="axe-card">
+        <i class="fa-solid fa-briefcase"></i>
+        <span>Insertion professionnelle & employabilité</span>
+      </div>
+      <div class="axe-card">
+        <i class="fa-solid fa-heart-pulse"></i>
+        <span>Santé & Bien-être au travail</span>
+      </div>
+      <div class="axe-card">
+        <i class="fa-solid fa-feather-pointed"></i>
+        <span>Création artistique & expression poétique</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="formation-details card">
+  <h2>Pourquoi choisir PENC’BOOST ?</h2>
+  <ul>
+    <li>Modules concrets, animés par des experts</li>
+    <li>Approche pratique, axée sur l’action</li>
+    <li>Réseau de bénéficiaires engagés</li>
+    <li>Programme adaptable à vos besoins</li>
+  </ul>
+  <div class="formation-info">
+    <div>
+      <strong>Prochaine session :</strong><br>Juillet 2025 (vacances scolaires)
+    </div>
+    <div>
+      <strong>Format :</strong><br>En ligne & présentiel
+    </div>
+    <div class="center-btn">
+      <strong>Public cible :</strong><br>Étudiants, jeunes entrepreneurs, professionnels, associations…
+    </div>
+  </div>
+  <!-- <a href="mailto:pencc.penccumndongo@gmail.com" class="cta-btn">Je veux m’inscrire</a> -->
+    <div class="center-btn">
+    <button class="cta-btn" (click)="openInscriptionModal()">Je veux m'inscrire</button>
+    </div>
+</div>
+
+<!-- Modal d'inscription -->
+<div class="modal-backdrop" *ngIf="showInscriptionModal" (click)="closeInscriptionModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="closeInscriptionModal()">&times;</button>
+    <h2>Inscription PENC’BOOST</h2>
+    <form [formGroup]="inscriptionForm" (ngSubmit)="submitInscription()">
+  <input formControlName="nom" type="text" placeholder="Nom complet" required>
+  <input formControlName="prenom" type="text" placeholder="Prénom" required>
+  <input formControlName="dateNaissance" type="date" placeholder="Date de naissance" required>
+  <input formControlName="email" type="email" placeholder="Adresse email" required>
+  <input formControlName="telephone" type="tel" placeholder="Téléphone" required>
+  <input formControlName="adresse" type="text" placeholder="Adresse complète" required>
+  <input formControlName="ville" type="text" placeholder="Ville" required>
+<select formControlName="niveauEtudes" required>
+  <option value="" disabled selected hidden>Niveau d'études</option>
+  <option>Collège</option>
+  <option>Lycée</option>
+  <option>Baccalauréat</option>
+  <option>BTS / DUT</option>
+  <option>Licence</option>
+  <option>Master</option>
+  <option>Doctorat</option>
+  <option>Autre</option>
+</select>
+  <div class="form-section">
+    <label class="form-section-title">Modules/axes souhaités :</label>
+    <div class="checkbox-group">
+      <label *ngFor="let axe of axesList">
+        <input type="checkbox"
+               [value]="axe"
+               (change)="onAxeChange($event)"
+               [checked]="inscriptionForm.value.axes.includes(axe)">
+        {{ axe }}
+      </label>
+    </div>
+  </div>
+  <textarea formControlName="motivation" rows="3" placeholder="Motivation (facultatif)"></textarea>
+  <button type="submit" class="cta-btn" [disabled]="inscriptionForm.invalid">Envoyer l'inscription</button>
+</form>
+  </div>
+</div>
+
+<section class="formation-contact card">
+  <h3>Vous souhaitez devenir formateur ou partenaire ?</h3>
+  <p>Contactez-nous pour co-construire des sessions ou soutenir l’initiative !</p>
+  <a href="mailto:pencc.penccumndongo@gmail.com" class="cta-btn secondary">Proposer une collaboration</a>
+</section>

@@ -1,0 +1,274 @@
+.offre-banner, .formation-banner, .cp2i-banner {
+  background: linear-gradient(120deg, #0380C2 0%, #FF7F1A 100%);
+  color: #fff;
+  padding: 3.5rem 1rem 2rem 1rem;
+  border-radius: 0 0 2rem 2rem;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 4px 24px rgba(3,128,194,0.10);
+}
+.offre-cards, .formation-axes, .cp2i-ceremonie, .cp2i-recueil {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+.offre-card, .formation-details, .cp2i-presentation {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(3,128,194,0.08);
+  padding: 2rem 1.5rem;
+  max-width: 350px;
+  min-width: 250px;
+  flex: 1 1 250px;
+  text-align: left;
+}
+.cta-btn {
+  background: linear-gradient(90deg, #0380C2 60%, #FF7F1A 100%);
+  color: #fff;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.9rem 2.2rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+  display: inline-block;
+  margin-top: 1rem;
+}
+.cta-btn:hover {
+  background: linear-gradient(90deg, #FF7F1A 60%, #0380C2 100%);
+}
+
+.cp2i-banner {
+  background: linear-gradient(120deg, #0380C2 0%, #FF7F1A 100%);
+  color: #fff;
+  padding: 4rem 1rem 2.5rem 1rem;
+  border-radius: 0 0 2rem 2rem;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 4px 24px rgba(3,128,194,0.10);
+  padding-top: 6.5rem;
+
+}
+.cp2i-banner h1 {
+  font-size: 2.3rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.cp2i-main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+.card {
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 12px rgba(3,128,194,0.08);
+  padding: 2rem 1.5rem;
+  max-width: 480px;
+  min-width: 280px;
+  flex: 1 1 320px;
+  margin-bottom: 1.5rem;
+  transition: box-shadow 0.2s;
+}
+.card:hover {
+  box-shadow: 0 8px 32px rgba(3,128,194,0.13);
+}
+.cp2i-about h2,
+.cp2i-books h2 {
+  color: #FF7F1A;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.cp2i-info {
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+  margin-top: 1.2rem;
+  color: #0380C2;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+.cp2i-books-gallery {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+}
+.cp2i-books-gallery img {
+  width: 110px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 1.1rem;
+  box-shadow: 0 2px 12px rgba(3,128,194,0.10);
+  background: #f6f8fa;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+.cp2i-books-gallery img:hover {
+  transform: scale(1.07) rotate(-2deg);
+  box-shadow: 0 8px 32px rgba(3,128,194,0.13);
+}
+.cp2i-books-desc {
+  text-align: center;
+  margin-bottom: 1rem;
+  margin-top: 5rem;
+}
+.cp2i-books-desc .prix {
+  color: #0380C2;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.cta-btn {
+  background: linear-gradient(90deg, #0380C2 60%, #FF7F1A 100%);
+  color: #fff;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.9rem 2.2rem;
+  font-size: 1.08rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+  display: inline-block;
+  margin-top: 1rem;
+}
+.cta-btn:hover {
+  background: linear-gradient(90deg, #FF7F1A 60%, #0380C2 100%);
+}
+.cp2i-gallery-section {
+  margin: 3rem 0 2rem 0;
+  text-align: center;
+  padding-left: 3vw;
+  padding-right: 3vw;
+}
+.cp2i-gallery-section h2 {
+  color: #0380C2;
+  font-size: 2.4rem;
+  margin-bottom: 1.5rem;
+  font-weight: 800;
+}
+.cp2i-gallery {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  justify-items: center;
+  padding-left: 2vw;
+  padding-right: 2vw;
+}
+.cp2i-gallery img {
+  width: 100%;
+  max-width: 260px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 1.1rem;
+  box-shadow: 0 2px 12px rgba(3,128,194,0.10);
+  background: #f6f8fa;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+.cp2i-gallery img:hover {
+  transform: scale(1.07) rotate(1deg);
+  box-shadow: 0 8px 32px rgba(3,128,194,0.13);
+}
+
+/* Lightbox */
+.lightbox-backdrop {
+  position: fixed;
+  z-index: 2000;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(10, 20, 40, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s;
+}
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 85vh;
+  border-radius: 1.2rem;
+  box-shadow: 0 8px 32px rgba(3,128,194,0.25);
+  background: #fff;
+  object-fit: contain;
+}
+.lightbox-close {
+  position: absolute;
+  top: 2.5rem;
+  right: 3rem;
+  font-size: 2.5rem;
+  color: #fff;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 2100;
+  transition: color 0.2s;
+}
+.lightbox-close:hover {
+  color: #FF7F1A;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.cp2i-about-img {
+  max-width: 320px;
+  width: 100%;
+  border-radius: 1.1rem;
+  margin: 1.2rem auto;
+  display: block;
+  box-shadow: 0 2px 12px rgba(3,128,194,0.10);
+cursor: pointer;
+}
+
+.center-btn {
+  text-align: center;
+}
+
+
+/* Responsive : 6 par ligne sur très grand écran */
+@media (min-width: 1400px) {
+  .cp2i-gallery {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+@media (max-width: 1100px) {
+  .cp2i-gallery {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 700px) {
+  .cp2i-gallery {
+    grid-template-columns: repeat(2, 1fr);
+    padding-left: 1vw;
+    padding-right: 1vw;
+  }
+}
+@media (max-width: 480px) {
+  .cp2i-gallery {
+    grid-template-columns: 1fr;
+    padding-left: 0.5vw;
+    padding-right: 0.5vw;
+  }
+}
+
+@media (max-width: 900px) {
+  .cp2i-ceremonie, .cp2i-recueil {
+    flex-direction: column;
+    align-items: center;
+  }
+    .cp2i-main {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  .card {
+    max-width: 98vw;
+    min-width: unset;
+  }
+}

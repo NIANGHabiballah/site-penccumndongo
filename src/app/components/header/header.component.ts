@@ -30,6 +30,7 @@ export class HeaderComponent {
   
   activeSection: string = 'accueil';
   menuOpen = false;
+  showDropdown = false;
 
 
    constructor(public translate: TranslateService, public router: Router) {
@@ -81,4 +82,22 @@ export class HeaderComponent {
     this.menuOpen = !this.menuOpen;
   }
 
+    toggleDropdown() {
+    this.showDropdown = !this.showDropdown;
+  }
+
+  onDropdownHover(state: boolean) {
+  // Sur desktop uniquement
+  if (window.innerWidth > 900) {
+    this.showDropdown = state;
+  }
+}
+
+toggleDropdownMobile(event: Event) {
+  // Sur mobile uniquement
+  if (window.innerWidth <= 900) {
+    event.preventDefault(); // Empêche le scroll en haut de page
+    this.showDropdown = !this.showDropdown;
+  }
+ }
 }
