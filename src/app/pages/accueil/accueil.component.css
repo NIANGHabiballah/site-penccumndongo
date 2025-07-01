@@ -1365,26 +1365,293 @@ font-size: 0.98rem; /* réduit */
   scroll-margin-top: 90px; /* adapte la valeur à la hauteur de ton header */
 }
 
+/* Styles génériques pour les cards témoignages */
+.temoignage-card {
+  max-width: 100%;
+  box-sizing: border-box;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  padding: 1.2rem;
+}
+
+/* Pour éviter les titres coupés sur deux lignes, autorise le retour à la ligne proprement */
+.main-title, .black-subtitle, .services-title, .blue-subtitle, .white-subtitle,
+.testimonials h2, .partners .orange-title, .news h2, .key-numbers .white-subtitle {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  text-align: center;
+}
+
+/* Pour le bouton projet/contact, autorise le retour à la ligne sans débordement */
+.cta-btn {
+  white-space: normal !important;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  text-align: center;
+  display: inline-block;
+}
 
 
 
 
 
 
-/* Responsive : 2 cards sur tablette, 1 sur mobile */
-@media (max-width: 1100px) {
-  .news-cards {
-    grid-template-columns: repeat(2, 1fr);
+/* Très petit écran (400px) */
+@media (max-width: 400px) {
+  .testimonial-cards {
+    gap: 0.7rem !important;
+    padding: 1rem !important;
+  }
+  .testimonial-card, .temoignage-card {
+    font-size: 0.78rem !important;
+    padding: 0.5rem 0.9rem !important; /* marges latérales augmentées */
+    min-width: 0 !important;
+    max-width: 98vw !important;
+    margin-bottom: 0.7rem !important;
+    min-height: 400px !important; /* <-- Ajoute cette ligne */
+
+  }
+  .testimonial-text, .temoignage-card p, .temoignage-card span, .temoignage-card div {
+    font-size: 0.77rem !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+    .testimonial-name {
+    font-size: 0.9rem !important; /* réduit le nom */
+  }
+  .testimonial-title {
+    font-size: 0.65rem !important; /* réduit le titre */
+  }
+    .main-title, .black-subtitle, .services-title, .blue-subtitle, .white-subtitle,
+  .testimonials h2, .partners .orange-title, .news h2, .key-numbers .white-subtitle {
+    font-size: 0.85rem !important;
+    margin-bottom: 0.5rem !important;
+    line-height: 1.05 !important;
+    word-break: break-word;
+  }
+  .cta-btn {
+    font-size: 0.8rem !important;
+    padding: 0.5rem 0.3rem !important;
+    max-width: 99vw !important;
+    white-space: normal !important;
+    line-height: 1.1 !important;
+  }
+  .services-header, .testimonials, .partners, .news, .key-numbers {
+    padding-left: 0.1rem !important;
+    padding-right: 0.1rem !important;
+  }
+    .services-grid {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+  .service-card {
+    max-width: 99vw !important;
+    min-width: unset !important;
+    padding: 1rem 0.3rem 1rem 0.3rem !important;
   }
 }
+
+/* Services : 400px à 700px, cards plus petites et espacées */
+@media (min-width: 401px) and (max-width: 700px) {
+  .services-grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+  .service-card {
+    max-width: 92vw !important;
+    min-width: unset !important;
+    padding: 1rem 0.5rem 1rem 0.5rem !important;
+    margin-bottom: 0.7rem !important;
+  }
+}
+
+/* Témoignages : 401px à 800px, texte non débordant et cards adaptées */
+@media (min-width: 401px) and (max-width: 800px) {
+  .testimonial-cards {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.2rem !important;
+  }
+  .testimonial-card, .temoignage-card {
+    max-width: 96vw !important;
+    min-width: unset !important;
+    font-size: 0.93rem !important;
+    padding: 1rem 0.7rem !important;
+    margin-bottom: 0.7rem !important;
+  }
+  .testimonial-text, .temoignage-card p, .temoignage-card span, .temoignage-card div {
+    font-size: 0.65rem !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+  .testimonial-name {
+    font-size: 1rem !important;
+  }
+  .testimonial-title {
+    font-size: 0.8rem !important;
+  }
+}
+
+/* Témoignages : 401px à 558px, texte non débordant et cards adaptées */
+@media (min-width: 401px) and (max-width: 558px) {
+  .testimonial-cards {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.2rem !important;
+  }
+  .testimonial-card, .temoignage-card {
+    max-width: 96vw !important;
+    min-width: unset !important;
+    font-size: 0.93rem !important;
+    padding: 1rem 0.7rem !important;
+    margin-bottom: 0.7rem !important;
+  }
+  .testimonial-text, .temoignage-card p, .temoignage-card span, .temoignage-card div {
+    font-size: 0.71rem !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    margin-bottom: 0.2rem !important;
+
+  }
+  .testimonial-name {
+    font-size: 0.8rem !important;
+  }
+  .testimonial-title {
+    font-size: 0.7rem !important;
+  }
+}
+
+/* Témoignages : 500px à 800px, texte non débordant et cards adaptées */
+@media (min-width: 559px) and (max-width: 800px) {
+
+  .testimonial-card, .temoignage-card {
+    max-width: 96vw !important;
+    min-width: unset !important;
+    font-size: 0.93rem !important;
+    padding: 1rem 0.7rem !important;
+    margin-bottom: 0.7rem !important;
+    padding : 2rem !important;
+  }
+  .testimonial-text, .temoignage-card p, .temoignage-card span, .temoignage-card div {
+    font-size: 0.9rem !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    margin-bottom: 0.2rem !important;
+
+  }
+}
+
+
+@media (max-width: 500px) {
+  .main-title, .black-subtitle, .services-title, .blue-subtitle, .white-subtitle,
+  .testimonials h2, .partners .orange-title, .news h2, .key-numbers .white-subtitle {
+    font-size: 1.05rem !important;
+    margin-bottom: 0.7rem !important;
+    line-height: 1.1 !important;
+  }
+  .cta-btn {
+    font-size: 0.95rem !important;
+    padding: 0.6rem 0.7rem !important;
+    max-width: 98vw !important;
+  }
+}
+
+/* Responsive mobile */
+@media (max-width: 600px) {
+  .temoignage-card {
+    font-size: 0.98rem;
+    padding: 0.8rem;
+    max-width: 100vw;
+  }
+  .temoignage-card p, .temoignage-card span, .temoignage-card div {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+/* Mobile */
+
 @media (max-width: 700px) {
-  .news-cards {
+  .services-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .service-card {
+    max-width: 98vw;
+    min-width: unset;
+  }
+
+   .news-cards {
     grid-template-columns: 1fr;
   }
   .news-card iframe {
     height: 180px;
   }
+   .main-title, .black-subtitle, .services-title, .blue-subtitle, .white-subtitle,
+  .testimonials h2, .partners .orange-title, .news h2, .key-numbers .white-subtitle {
+    font-size: 1.3rem !important;
+    margin-bottom: 1.2rem !important;
+    line-height: 1.2 !important;
+    word-break: break-word;
+  }
+  .services-header, .testimonials, .partners, .news, .key-numbers {
+    padding-left: 0.2rem !important;
+    padding-right: 0.2rem !important;
+  }
+  .cta-btn {
+    font-size: 1rem !important;
+    padding: 0.7rem 1.2rem !important;
+    white-space: normal !important;
+    max-width: 95vw !important;
+    line-height: 1.2 !important;
+  }
 }
+/* Services : 701px à 795px */
+
+@media (min-width: 701px) and (max-width: 795px) {
+  .services-grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+  .service-card {
+    max-width: 45vw !important;
+    min-width: unset !important;
+    padding: 1.2rem 0.7rem 1.2rem 0.7rem !important;
+    margin-bottom: 1.2rem !important;
+  }
+}
+
+/* Témoignages : 800px à 871px, texte non débordant et cards adaptées */
+@media (min-width: 800px) and (max-width: 875px) {
+  .testimonial-cards {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.2rem !important;
+  }
+  .testimonial-card, .temoignage-card {
+    max-width: 96vw !important;
+    min-width: unset !important;
+    font-size: 0.93rem !important;
+    padding: 1rem 1.2rem !important;
+    margin-bottom: 0.7rem !important;
+  }
+  .testimonial-text, .temoignage-card p, .temoignage-card span, .temoignage-card div {
+    font-size: 0.9rem !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+  .testimonial-name {
+    font-size: 1rem !important;
+  }
+  .testimonial-title {
+    font-size: 0.8rem !important;
+  }
+}
+
+/* Tablette */
 @media (max-width: 900px) {
   .news-cards {
     flex-direction: column;
@@ -1399,78 +1666,7 @@ font-size: 0.98rem; /* réduit */
     min-height: 320px;
     max-height: 600px;
   }
-}
-
-
-@media (max-width: 900px) {
-  .logos-track {
-    gap: 1.2rem;
-    animation-duration: 35s;
-  }
-  .partner-logos-carousel img {
-    max-width: 90px;
-    padding: 0.7rem 1rem;
-  }
-}
-
-@media (max-width: 900px) {
-  .testimonial-cards {
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    max-width: 98vw;
-  }
-  .testimonial-card {
-    width: 95%;
-    min-width: unset;
-    max-width: unset;
-  }
-}
-
-@media (max-width: 1100px) {
-  .services-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.2rem 1.2rem;
-  }
-}
-@media (max-width: 700px) {
-  .services-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  .service-card {
-    max-width: 98vw;
-    min-width: unset;
-  }
-}
-
-
-@media (max-width: 900px) {
-  .testimonial-cards {
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-  }
-  .testimonial-card {
-    width: 95%;
-    min-width: unset;
-    max-width: unset;
-  }
-}
-
-
-@media (max-width: 900px) {
-  .contact-form.wide {
-    padding: 1.5rem 0.5rem;
-  }
-  .form-row.double {
-    flex-direction: column;
-    gap: 0.3rem;
-  }
-}
-
-@media (max-width: 900px) {
-  .news-cards, .numbers-cards {
+    .news-cards, .numbers-cards {
     flex-direction: column;
     gap: 1.5rem;
     align-items: center;
@@ -1479,4 +1675,47 @@ font-size: 0.98rem; /* réduit */
     max-width: 95vw;
     min-width: unset;
   }
+
+    .logos-track {
+    gap: 1.2rem;
+    animation-duration: 35s;
+  }
+  .partner-logos-carousel img {
+    max-width: 90px;
+    padding: 0.7rem 1rem;
+  }
+
+    .testimonial-cards {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .testimonial-card {
+    width: 95%;
+    min-width: unset;
+    max-width: unset;
+  }
+    .contact-form.wide {
+    padding: 1.5rem 0.5rem;
+  }
+  .form-row.double {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .services-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem 1.2rem;
+  }
 }
+
+/* Responsive : 2 cards sur tablette, 1 sur mobile */
+@media (max-width: 1100px) {
+  .news-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+   .services-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.2rem 1.2rem;
+  }
+}
+

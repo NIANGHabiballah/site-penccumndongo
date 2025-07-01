@@ -12,7 +12,9 @@
 <nav class="nav" [class.open]="menuOpen" >
   <!-- Si on est sur la page 'apropos' : afficher uniquement Accueil -->
   <ng-container *ngIf="router.url.includes('apropos'); else autresMenus">
-    <a routerLink="/accueil" class="active">{{ 'ACCUEIL' | translate }}</a>
+    <a routerLink="/accueil">{{ 'ACCUEIL' | translate }}</a>
+    <a routerLink="/apropos" routerLinkActive="active">{{ 'APROPOS' | translate }}</a>
+
   </ng-container>
 
   <ng-template #autresMenus>
@@ -21,8 +23,10 @@
                       || router.url.includes('formations') 
                       || router.url.includes('opportunites') 
                       || router.url.includes('cp2i'); else menuComplet">
-      <a routerLink="/accueil" class="active">{{ 'ACCUEIL' | translate }}</a>
+      <!-- <a routerLink="/devis" class="devis-link active">Obtenir un Devis</a> -->
+      <a routerLink="/accueil">{{ 'ACCUEIL' | translate }}</a>
       <a routerLink="/apropos" routerLinkActive="active">{{ 'APROPOS' | translate }}</a>
+
     </ng-container>
   </ng-template>
 
@@ -49,7 +53,7 @@
           <a routerLink="/opportunites">Opportunités</a>
           <a routerLink="/formations">Formations</a>
           <a routerLink="/cp2i">CP2i</a>
-          <a routerLink="/devis" class="devis-link">Obtenir un devis</a>
+          <a routerLink="/devis" class="devis-link">Obtenir un Devis</a>
         </div>
       </div>
 

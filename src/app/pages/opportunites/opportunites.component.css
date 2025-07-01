@@ -41,6 +41,12 @@
   background: linear-gradient(90deg, #FF7F1A 60%, #0380C2 100%);
 }
 
+.offre-banner h1{
+   font-size: 2rem;
+   font-weight: 800;
+   letter-spacing: 1px;
+}
+
 .offre-banner{
     padding-top: 6.5rem;
 }

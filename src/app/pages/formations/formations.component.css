@@ -1,4 +1,5 @@
-/* Largeur maximale pour la section principale */
+
+/* Main Layout */
 .formation-main {
     width: 100vw;
     max-width: 100vw;
@@ -30,6 +31,7 @@
     line-height: 1.7;
     position: relative;
     overflow: hidden;
+    padding-top: 2.5rem;
 }
 .formation-presentation.card.highlight h2 {
     color: #fff;
@@ -39,6 +41,8 @@
 }
 .formation-presentation.card.highlight p {
     color: #e0e7ff;
+    font-size: 1rem;
+
 }
 
 /* 7 axes stratégiques : plus de visibilité */
@@ -46,7 +50,7 @@
     background: #fff;
     color: #222;
     flex: 2 1 600px;
-    min-width: 340px;
+    min-width: 260px;
     max-width: 900px;
     display: flex;
     flex-direction: column;
@@ -106,6 +110,7 @@
   background: #fff;
   padding: 0.5rem;
   object-fit: contain;
+  transition: box-shadow 0.2s;
 }
 
 
@@ -120,15 +125,13 @@
     box-shadow: 0 4px 24px rgba(3,128,194,0.10);
 }
 .formation-banner h1 {
-    font-size: 2.2rem;
+    font-size: 2rem;
     font-weight: 800;
     letter-spacing: 1px;
 }
-.formation-slogan {
-    font-size: 1.3rem;
-    font-weight: 600;
-    margin-top: 1rem;
-    color: #ffe6d1;
+
+.formation-banner p {
+  font-size: 1.0rem;
 }
 
 /* Présentation + axes côte à côte */
@@ -299,13 +302,6 @@
     font-weight: 800;
     letter-spacing: 1px;
 }
-.formation-slogan {
-    font-size: 1.3rem;
-    font-weight: 600;
-    margin-top: 1rem;
-    color: #ffe6d1;
-}
-
 /* Présentation + axes côte à côte */
 .formation-main {
     display: flex;
@@ -826,8 +822,51 @@ position: fixed;
 
 
 
+/* Responsive tablette */
+@media (max-width: 1100px) {
+  .formation-main {
+    flex-wrap: wrap;
+  }
+  .formation-presentation.card.highlight,
+  .formation-axes.card.wide {
+    max-width: 100vw;
+    min-width: unset;
+  }
+  .axes-grid {
+    grid-template-columns: 1fr 1fr;
+    padding: 0;
+  }
+   .penccboost-logo {
+    max-width: 360px;
+    margin-top: 0.5rem;
+  }
+}
 
-
+/* Responsive mobile */
+@media (max-width: 700px) {
+  .formation-main {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: stretch;
+    padding: 0 1vw;
+  }
+  .formation-presentation.card.highlight,
+  .formation-axes.card.wide {
+    max-width: 100vw;
+    min-width: unset;
+    width: 100%;
+    padding-top: 1.5rem;
+  }
+  .penccboost-logo {
+    max-width: 90px;
+    margin-top: 0.5rem;
+  }
+  .axes-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0;
+  }
+}
 
 /* Responsive */
 @media (max-width: 700px) {
@@ -836,15 +875,25 @@ position: fixed;
     max-width: 99vw;
     border-radius: 1.2rem !important;
   }
+  .formation-presentation.card.highlight,
+  .formation-axes.card.wide {
+    max-width: 100vw;
+    min-width: unset;
+  }
+  .penccboost-logo {
+    max-width: 60px;
+    width: 40%;
+    margin-bottom: 0.5rem;
+    padding: 0.3rem;
 }
-
+}
 
 @media (max-width: 600px) {
   .penccboost-logo {
-    max-width: 140px;
-    width: 90%;
-    margin-bottom: 1.2rem;
-    padding: 0.5rem;
+    max-width: 60px;
+    width: 40%;
+    margin-bottom: 0.5rem;
+    padding: 0.3rem;
   }
     .modal-content {
     padding: 1.2rem 0.5rem 1.2rem 0.5rem;
@@ -853,18 +902,6 @@ position: fixed;
   }
 }
 
-@media (max-width: 900px) {
-  .formation-double {
-    flex-direction: column;
-    gap: 1.5rem;
-    align-items: center;
-  }
-  .formation-presentation.card,
-  .formation-axes.card {
-    max-width: 98vw;
-    min-width: unset;
-  }
-}
 
 @media (max-width: 900px) {
     .formation-double {
@@ -878,6 +915,11 @@ position: fixed;
     min-width: unset;
     padding-bottom: 2rem;
 }
+ .penccboost-logo {
+    max-width: 180px;
+    width: 50%;
+    margin-bottom: 0.1rem;
+  }
 .axes-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -941,4 +983,14 @@ position: fixed;
         grid-template-columns: 1fr;
         padding: 0;
     }
+}
+
+/* Très petit écran */
+@media (max-width: 400px) {
+  .penccboost-logo {
+    max-width: 40px;
+    width: 30%;
+    margin-bottom: 0.2rem;
+    padding: 0.15rem;
+  }
 }

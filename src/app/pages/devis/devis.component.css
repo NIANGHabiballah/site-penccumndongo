@@ -37,9 +37,14 @@
 }
 
 .devis-banner h1 {
-  font-size: 2.2rem;
+  font-size: 2rem;
   font-weight: 800;
+  letter-spacing: 1px;
   margin-bottom: 0.7rem;
+}
+
+.devis-banner p {
+  font-size: 1.0rem;
 }
 
 .devis-form {
