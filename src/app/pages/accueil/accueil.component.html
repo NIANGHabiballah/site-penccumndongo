@@ -1,4 +1,4 @@
-  <div class="home">
+  <div class="home fade-in">
   <app-banner></app-banner>
 
 <!-- Section Services -->
@@ -304,6 +304,10 @@
   </div>
   <button type="submit" [disabled]="!contactForm.valid || !captchaResolved">Envoyer</button>
 </form>
+
+<div *ngIf="successMsg" class="success">{{successMsg}}</div>
+<div *ngIf="errorMsg" class="error">{{errorMsg}}</div>
+
 </section>
 
 <!-- Boutons de scroll haut/bas -->

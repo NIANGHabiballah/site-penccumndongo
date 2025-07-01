@@ -40,12 +40,6 @@
 .cta-btn:hover {
   background: linear-gradient(90deg, #FF7F1A 60%, #0380C2 100%);
 }
-@media (max-width: 900px) {
-  .offre-cards, .formation-axes, .cp2i-ceremonie, .cp2i-recueil {
-    flex-direction: column;
-    align-items: center;
-  }
-}
 
 .offre-banner{
     padding-top: 6.5rem;
@@ -106,4 +100,21 @@
 
 .offre-contact-form-link {
   margin-top: 1.2rem;
+}
+
+.fade-in {
+  animation: fadeIn 0.7s;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97) translateY(40px);}
+  to { opacity: 1; transform: scale(1) translateY(0);}
+}
+
+
+
+@media (max-width: 900px) {
+  .offre-cards, .formation-axes, .cp2i-ceremonie, .cp2i-recueil {
+    flex-direction: column;
+    align-items: center;
+  }
 }

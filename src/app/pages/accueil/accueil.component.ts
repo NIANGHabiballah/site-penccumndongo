@@ -1,18 +1,19 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ContactService } from '../../services/contact.service';
 import { BannerComponent } from '../../components/banner/banner.component';
 import { RecaptchaModule } from 'ng-recaptcha';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { RouterModule } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+
 
 @Component({
   selector: 'app-accueil',
   templateUrl: './accueil.component.html',
   styleUrls: ['./accueil.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, BannerComponent, RecaptchaModule, RouterModule,
+  imports: [CommonModule, FormsModule, BannerComponent, RecaptchaModule, RouterModule
   ],
 
   animations: [
@@ -36,7 +37,9 @@ export class AccueilComponent {
   };
 
   captchaResolved = false;
-
+  successMsg = '';
+  errorMsg = '';
+  
     activeTab: 'mission' | 'vision' = 'mission';
 
     setTab(tab: 'mission' | 'vision') {
@@ -48,11 +51,31 @@ onCaptchaResolved(response: string | null) {
   this.captchaToken = response ?? '';
 }
 
-  constructor(private contactService: ContactService) {}
+constructor(private http: HttpClient) {}
 
  captchaToken: string = '';
 
 onSubmit() {
+
+  this.successMsg = '';
+  this.errorMsg = '';
+  this.http.post<{success: boolean, message: string}>('http://localhost:8000/contact.php', this.contactData)
+      .subscribe({
+      next: (res: {success: boolean, message: string}) => {
+        if (res.success) {
+          this.successMsg = 'Message envoyé avec succès !';
+          this.contactData = { firstname: '', lastname: '', phone: '', email: '', company: '', message: '' };
+        } else {
+          this.errorMsg = res.message;
+        }
+      },
+      error: (err: any) => {
+        this.errorMsg = "Erreur lors de l'envoi du message.";
+        console.error(err);
+      }
+    });
+
+
   // Récupérer le token reCAPTCHA
   const recaptchaResponse = (window as any).grecaptcha.getResponse();
   if (!recaptchaResponse) {
@@ -63,12 +86,6 @@ onSubmit() {
 
   // Ajoutez le token à vos données si besoin
   const dataToSend = { ...this.contactData, captcha: this.captchaToken };
-
-  this.contactService.sendContactForm(dataToSend).subscribe(response => {
-    console.log('Contact form submitted successfully', response);
-    // Réinitialiser le reCAPTCHA
-    (window as any).grecaptcha.reset();
-  });
 }
 
 private countersAnimated = false;

@@ -1,26 +1,29 @@
-<section class="devis-banner">
+<section class="devis-banner fade-in">
   <h1>Obtenir un Devis !</h1>
   <p>Remplissez ce formulaire pour recevoir une proposition personnalisée adaptée à vos besoins.</p>
 </section>
   <h2 class="devis-form-title">Formulaire de Demande de Devis</h2>
 
 
-<form class="devis-form" (ngSubmit)="onSubmit()" #devisForm="ngForm">
+<form class="devis-form" (ngSubmit)="onSubmit(devisForm)" #devisForm="ngForm">
 
   <div class="form-row">
     <div class="form-group">
       <label for="nom">Nom complet *</label>
-      <input type="text" id="nom" name="nom" ngModel required placeholder="Votre nom et prénom">
+      <input type="text" id="nom" name="nom" ngModel required placeholder="Votre nom et prénom" #nom="ngModel">
+      <div class="error" *ngIf="devisForm.submitted && nom.invalid">Le nom est requis.</div>
     </div>
     <div class="form-group">
       <label for="email">Email *</label>
-      <input type="email" id="email" name="email" ngModel required placeholder="exemple@email.com">
+      <input type="email" id="email" name="email" ngModel required placeholder="exemple@email.com" #email="ngModel">
+      <div class="error" *ngIf="devisForm.submitted && email.invalid">L'email est requis.</div>
     </div>
   </div>
   <div class="form-row">
     <div class="form-group">
       <label for="telephone">Téléphone *</label>
-      <input type="tel" id="telephone" name="telephone" ngModel required placeholder="Votre numéro de téléphone">
+      <input type="tel" id="telephone" name="telephone" ngModel required placeholder="Votre numéro de téléphone" #telephone="ngModel">
+      <div class="error" *ngIf="devisForm.submitted && telephone.invalid">Le téléphone est requis.</div>
     </div>
     <div class="form-group">
       <label for="entreprise">Entreprise / Organisation</label>
@@ -29,7 +32,7 @@
   </div>
   <div class="form-group">
     <label for="vousetes">Vous êtes ? *</label>
-    <select id="vousetes" name="vousetes" ngModel required>
+    <select id="vousetes" name="vousetes" ngModel required #vousetes="ngModel">
       <option value="" disabled selected>Sélectionnez votre profil</option>
       <option>Particulier</option>
       <option>Entreprise</option>
@@ -37,10 +40,11 @@
       <option>Institution</option>
       <option>Autre</option>
     </select>
+    <div class="error" *ngIf="devisForm.submitted && vousetes.invalid">Ce champ est requis.</div>
   </div>
   <div class="form-group">
     <label for="service">Service souhaité *</label>
-    <select id="service" name="service" ngModel required>
+    <select id="service" name="service" ngModel required #service="ngModel">
       <option value="" disabled selected>Choisissez un service</option>
       <option>Création de site web</option>
       <option>Application mobile</option>
@@ -49,10 +53,12 @@
       <option>Stratégie digitale</option>
       <option>Autre</option>
     </select>
+    <div class="error" *ngIf="devisForm.submitted && service.invalid">Ce champ est requis.</div>
   </div>
   <div class="form-group">
     <label for="details">Détaillez votre besoin *</label>
-    <textarea id="details" name="details" rows="4" ngModel required placeholder="Décrivez votre projet, vos attentes, vos délais..."></textarea>
+    <textarea id="details" name="details" rows="4" ngModel required placeholder="Décrivez votre projet, vos attentes, vos délais..." #details="ngModel"></textarea>
+    <div class="error" *ngIf="devisForm.submitted && details.invalid">Ce champ est requis.</div>
   </div>
   <div class="form-group">
     <label for="budget">Budget estimé</label>
@@ -60,7 +66,7 @@
   </div>
   <div class="form-group">
     <label for="connaissance">Comment avez-vous connu Penccum Ndongo ? *</label>
-    <select id="connaissance" name="connaissance" ngModel required>
+    <select id="connaissance" name="connaissance" ngModel required #connaissance="ngModel">
       <option value="" disabled selected>Sélectionnez une option</option>
       <option>Bouche à oreille</option>
       <option>Réseaux sociaux</option>
@@ -69,16 +75,18 @@
       <option>Publicité</option>
       <option>Autre</option>
     </select>
+    <div class="error" *ngIf="devisForm.submitted && connaissance.invalid">Ce champ est requis.</div>
   </div>
   <div class="form-group">
     <label for="canal">Par quel canal voulez-vous être recontacté ? *</label>
-    <select id="canal" name="canal" ngModel required>
+    <select id="canal" name="canal" ngModel required #canal="ngModel">
       <option value="" disabled selected>Sélectionnez un canal</option>
       <option>Email</option>
       <option>Téléphone</option>
       <option>WhatsApp</option>
       <option>SMS</option>
     </select>
+    <div class="error" *ngIf="devisForm.submitted && canal.invalid">Ce champ est requis.</div>
   </div>
   <div class="form-group">
     <button type="submit" class="devis-btn">Envoyer ma demande</button>

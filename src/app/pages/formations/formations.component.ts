@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-formations',
@@ -12,17 +13,20 @@ export class FormationsComponent {
   
 showInscriptionModal = false;
 inscriptionForm: FormGroup;
-axesList = [
-  'Communication',
-  'Leadership',
-  'Prise de parole',
-  'Créativité',
-  'Gestion de projet',
-  'Développement personnel',
-  'Autre'
-];
+successMsg = '';
+errorMsg = '';
 
-constructor(private fb: FormBuilder) {
+  axesList = [
+    "Leadership & Développement personnel",
+    "Création graphique & design visuel",
+    "Tech & Développement",
+    "Marketing digital & Présence en ligne",
+    "Insertion professionnelle & employabilité",
+    "Santé & Bien-être au travail",
+    "Création artistique & expression poétique"
+  ];
+
+constructor(private fb: FormBuilder, private http: HttpClient) {
   this.inscriptionForm = this.fb.group({
     nom: ['', Validators.required],
     prenom: ['', Validators.required],
@@ -37,33 +41,59 @@ constructor(private fb: FormBuilder) {
   });
 }
 
-openInscriptionModal() {
+  onAxeChange(event: any) {
+    const axes = this.inscriptionForm.value.axes as string[];
+    if (event.target.checked) {
+      axes.push(event.target.value);
+    } else {
+      const index = axes.indexOf(event.target.value);
+      if (index > -1) {
+        axes.splice(index, 1);
+      }
+    }
+    this.inscriptionForm.get('axes')?.setValue(axes);
+    this.inscriptionForm.get('axes')?.markAsTouched();
+  }
+
+  submitInscription() {
+    this.successMsg = '';
+    this.errorMsg = '';
+    if (this.inscriptionForm.invalid) {
+      this.errorMsg = "Merci de remplir tous les champs obligatoires.";
+      this.markAllAsTouched();
+      return;
+    }
+    this.http.post<{success: boolean, message: string}>('http://localhost:8000/inscription.php', this.inscriptionForm.value)
+      .subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.successMsg = res.message;
+            this.errorMsg = '';
+            this.inscriptionForm.reset();
+          } else {
+            this.errorMsg = res.message;
+            this.successMsg = '';
+          }
+        },
+        error: () => {
+          this.errorMsg = "Erreur lors de l'envoi du formulaire.";
+          this.successMsg = '';
+        }
+      });
+  }
+
+   markAllAsTouched() {
+    Object.values(this.inscriptionForm.controls).forEach(control => {
+      control.markAsTouched();
+    });
+  }
+
+  openInscriptionModal() {
   this.showInscriptionModal = true;
 }
 
 closeInscriptionModal() {
   this.showInscriptionModal = false;
-}
-
-submitInscription() {
-  if (this.inscriptionForm.valid) {
-    // Traitez l'inscription ici (API, email, etc.)
-    alert('Inscription envoyée !');
-    this.inscriptionForm.reset();
-    this.closeInscriptionModal();
-  }
- }
-
- onAxeChange(event: any) {
-  const axes = this.inscriptionForm.value.axes as string[];
-  if (event.target.checked) {
-    axes.push(event.target.value);
-  } else {
-    const index = axes.indexOf(event.target.value);
-    if (index > -1) axes.splice(index, 1);
-  }
-  this.inscriptionForm.patchValue({ axes: axes });
-  this.inscriptionForm.get('axes')?.updateValueAndValidity();
 }
 
   ngOnInit() {

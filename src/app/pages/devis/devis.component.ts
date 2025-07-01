@@ -1,15 +1,43 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-devis',
-  imports: [FormsModule,],
+  imports: [CommonModule, FormsModule,],
   templateUrl: './devis.component.html',
   styleUrl: './devis.component.css'
 })
 export class DevisComponent {
-    onSubmit() {
-    alert('Votre demande de devis a bien été envoyée !');
+  successMsg = '';
+  errorMsg = '';
+
+    constructor(private http: HttpClient) {}
+
+  onSubmit(form: NgForm) {
+    if (form.invalid) {
+      this.errorMsg = "Merci de remplir tous les champs obligatoires.";
+      this.successMsg = '';
+      return;
+    }
+    this.http.post<{success: boolean, message: string}>('http://localhost:8000/devis.php', form.value)
+      .subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.successMsg = res.message;
+            this.errorMsg = '';
+            form.resetForm();
+          } else {
+            this.errorMsg = res.message;
+            this.successMsg = '';
+          }
+        },
+        error: (err) => {
+          this.errorMsg = "Erreur lors de l'envoi du formulaire.";
+          this.successMsg = '';
+        }
+      });
   }
 
   ngOnInit() {

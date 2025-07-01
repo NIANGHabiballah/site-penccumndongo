@@ -803,12 +803,33 @@ position: fixed;
   width: 1.1em;
   height: 1.1em;
 }
+
+.fade-in {
+  animation: fadeIn 0.7s;
+}
 @keyframes fadeIn {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to   { opacity: 1; }
+}
+
+/* formations.component.css */
+.error {
+  color: #d32f2f;
+  font-size: 0.95em;
+  margin-bottom: 8px;
+}
+.success {
+  color: #388e3c;
+  font-size: 1em;
+  margin-bottom: 8px;
 }
 
 
+
+
+
+
+/* Responsive */
 @media (max-width: 700px) {
   .modal-content {
     padding: 1.2rem 0.5rem 1.2rem 0.5rem;
@@ -832,8 +853,6 @@ position: fixed;
   }
 }
 
-
-/* Responsive */
 @media (max-width: 900px) {
   .formation-double {
     flex-direction: column;
@@ -899,8 +918,6 @@ position: fixed;
   }
 }
 
-
-/* Responsive */
 @media (max-width: 1200px) {
     .axes-grid {
         grid-template-columns: 1fr 1fr;

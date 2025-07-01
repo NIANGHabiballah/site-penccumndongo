@@ -1,4 +1,4 @@
-<section class="formation-banner">
+<section class="formation-banner fade-in">
   <h1>PENC’BOOST – Formations Professionnelles</h1>
   <p class="formation-slogan">Développez vos compétences, boostez votre avenir !</p>
 </section>
@@ -78,41 +78,83 @@
   <div class="modal-content" (click)="$event.stopPropagation()">
     <button class="modal-close" (click)="closeInscriptionModal()">&times;</button>
     <h2>Inscription PENC’BOOST</h2>
-    <form [formGroup]="inscriptionForm" (ngSubmit)="submitInscription()">
+
+   <form [formGroup]="inscriptionForm" (ngSubmit)="submitInscription()">
+  <div *ngIf="successMsg" class="success">{{ successMsg }}</div>
+  <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+
   <input formControlName="nom" type="text" placeholder="Nom complet" required>
+  <div class="error" *ngIf="inscriptionForm.get('nom')?.invalid && inscriptionForm.get('nom')?.touched">
+    Le nom est requis.
+  </div>
+
   <input formControlName="prenom" type="text" placeholder="Prénom" required>
+  <div class="error" *ngIf="inscriptionForm.get('prenom')?.invalid && inscriptionForm.get('prenom')?.touched">
+    Le prénom est requis.
+  </div>
+
   <input formControlName="dateNaissance" type="date" placeholder="Date de naissance" required>
+  <div class="error" *ngIf="inscriptionForm.get('dateNaissance')?.invalid && inscriptionForm.get('dateNaissance')?.touched">
+    La date de naissance est requise.
+  </div>
+
   <input formControlName="email" type="email" placeholder="Adresse email" required>
+  <div class="error" *ngIf="inscriptionForm.get('email')?.invalid && inscriptionForm.get('email')?.touched">
+    Une adresse email valide est requise.
+  </div>
+
   <input formControlName="telephone" type="tel" placeholder="Téléphone" required>
+  <div class="error" *ngIf="inscriptionForm.get('telephone')?.invalid && inscriptionForm.get('telephone')?.touched">
+    Le téléphone est requis.
+  </div>
+
   <input formControlName="adresse" type="text" placeholder="Adresse complète" required>
+  <div class="error" *ngIf="inscriptionForm.get('adresse')?.invalid && inscriptionForm.get('adresse')?.touched">
+    L'adresse est requise.
+  </div>
+
   <input formControlName="ville" type="text" placeholder="Ville" required>
-<select formControlName="niveauEtudes" required>
-  <option value="" disabled selected hidden>Niveau d'études</option>
-  <option>Collège</option>
-  <option>Lycée</option>
-  <option>Baccalauréat</option>
-  <option>BTS / DUT</option>
-  <option>Licence</option>
-  <option>Master</option>
-  <option>Doctorat</option>
-  <option>Autre</option>
-</select>
+  <div class="error" *ngIf="inscriptionForm.get('ville')?.invalid && inscriptionForm.get('ville')?.touched">
+    La ville est requise.
+  </div>
+
+  <select formControlName="niveauEtudes" required>
+    <option value="" disabled selected hidden>Niveau d'études</option>
+    <option>Collège</option>
+    <option>Lycée</option>
+    <option>Baccalauréat</option>
+    <option>BTS / DUT</option>
+    <option>Licence</option>
+    <option>Master</option>
+    <option>Doctorat</option>
+    <option>Autre</option>
+  </select>
+  <div class="error" *ngIf="inscriptionForm.get('niveauEtudes')?.invalid && inscriptionForm.get('niveauEtudes')?.touched">
+    Le niveau d'études est requis.
+  </div>
+
   <div class="form-section">
     <label class="form-section-title">Modules/axes souhaités :</label>
     <div class="checkbox-group">
       <label *ngFor="let axe of axesList">
         <input type="checkbox"
-               [value]="axe"
-               (change)="onAxeChange($event)"
-               [checked]="inscriptionForm.value.axes.includes(axe)">
+              [value]="axe"
+              (change)="onAxeChange($event)"
+              [checked]="inscriptionForm.value.axes.includes(axe)">
         {{ axe }}
       </label>
     </div>
+    <div class="error" *ngIf="inscriptionForm.get('axes')?.invalid && inscriptionForm.get('axes')?.touched">
+      Veuillez sélectionner au moins un axe.
+    </div>
   </div>
+
   <textarea formControlName="motivation" rows="3" placeholder="Motivation (facultatif)"></textarea>
+
   <button type="submit" class="cta-btn" [disabled]="inscriptionForm.invalid">Envoyer l'inscription</button>
 </form>
-  </div>
+
+</div>
 </div>
 
 <section class="formation-contact card">
