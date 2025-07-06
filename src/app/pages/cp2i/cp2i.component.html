@@ -67,18 +67,28 @@
     <button class="lightbox-close" (click)="closeBookLightbox()">&times;</button>
 </div>
 
-<div class="cp2i-gallery-section">
+<!-- Galerie de la Cérémonie 2025 en carrousel -->
+<div class="cp2i-gallery-section card">
   <h2>Galerie de la Cérémonie 2025</h2>
   <div class="cp2i-gallery-subtitle">Deuxième Édition du Concours de Poésie Inédit & Innovant (CP2i)</div>
-  <div class="cp2i-gallery">
-    <ng-container *ngFor="let idx of galleryIndexes">
-      <img 
-        [src]="'cp2i/galerie/' + idx + '.jpg'"
-        [alt]="'Photo cérémonie ' + (idx+1)"
-        loading="lazy"
-        (click)="openLightbox(idx)"
-      />
-    </ng-container>
+  <div class="cp2i-gallery-carousel">
+    <button class="gallery-arrow left" (click)="prevGalleryImage()">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <div class="gallery-track" (click)="openGalleryModal(galleryImages[galleryIndex])">
+      <img [src]="galleryImages[galleryIndex]" [alt]="'Photo cérémonie ' + (galleryIndex+1)" class="gallery-img" />
+    </div>
+    <button class="gallery-arrow right" (click)="nextGalleryImage()">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+</div>
+
+<!-- Modal pour agrandir l'image -->
+<div class="modal-backdrop" *ngIf="showGalleryModal" (click)="closeGalleryModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="closeGalleryModal()">&times;</button>
+    <img [src]="selectedGalleryImage" alt="Image agrandie" class="modal-img" />
   </div>
 </div>
 

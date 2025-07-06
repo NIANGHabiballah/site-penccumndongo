@@ -764,12 +764,12 @@
   justify-content: center;
   padding: 2.5rem 0 1.5rem 0;
   background: transparent;
-  margin-top: 2rem;
+  margin-top: 0;
 }
 
 .social-links-footer {
   display: flex;
-  gap: 2.2rem;
+  gap: 1.5rem;
   justify-content: center;
   align-items: center;
   list-style: none;
@@ -777,7 +777,7 @@
   margin: 0;
 }
 .social-links-footer a i {
-  font-size: 2.7rem;
+  font-size: 2.2rem;
 }
 .social-links-footer a {
   color: #0380C2;
@@ -934,6 +934,24 @@
 #scrollTopBtn { bottom: 90px; }
 #scrollBottomBtn { bottom: 30px; }
 .scroll-btn:hover { background: #FF7F1A; transform: scale(1.08); }
+
+
+.apropos-social-title{
+  text-align:center;
+  margin-top:1.5rem;
+  margin-bottom:0;
+  font-weight:600;
+  font-size:1.5rem;
+  color :#FF7F1A;
+   margin-top: 6rem;
+}
+
+
+
+
+
+
+
 
 
 

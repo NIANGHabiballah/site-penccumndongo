@@ -93,43 +93,29 @@ private countersAnimated = false;
 ngAfterViewInit() {
   if (this.countersAnimated) return; // Empêche de relancer l'animation
   this.countersAnimated = true;
-
-  setTimeout(() => {
-    const counters = document.querySelectorAll('.number');
-    counters.forEach(counter => {
-      counter.textContent = '0';
-      const animate = () => {
-        const target = +counter.getAttribute('data-target')!;
-        const count = +counter.textContent!;
-        const increment = Math.ceil(target / 80);
-        // Script pour les boutons de scroll haut/bas
-        const scrollTopBtn = document.getElementById('scrollTopBtn');
-        const scrollBottomBtn = document.getElementById('scrollBottomBtn');
-
-        if (scrollTopBtn && scrollBottomBtn) {
-          scrollTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-          scrollBottomBtn.onclick = () => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-
-          window.addEventListener('scroll', () => {
-            if (scrollTopBtn)
-              scrollTopBtn.style.display = window.scrollY > 200 ? 'block' : 'none';
-            if (scrollBottomBtn)
-              scrollBottomBtn.style.display = window.scrollY < (document.body.scrollHeight - window.innerHeight - 200) ? 'block' : 'none';
-          });
-        }
-        if (count < target) {
-          counter.textContent = `${Math.min(count + increment, target)}`;
-          setTimeout(animate, 20);
-        } else {
-          counter.textContent = `${target}`;
-        }
-      };
-      animate();
-    });
-  }, 100);
+    this.animateNumbers();
 }
 
-// ...existing code...
+animateNumbers() {
+  const elements = document.querySelectorAll('.number');
+  elements.forEach((el: any) => {
+    const target = +el.getAttribute('data-target');
+    let count = 0;
+    const increment = Math.ceil(target / 50);
+
+    const update = () => {
+      count += increment;
+      if (count >= target) {
+        el.textContent = target;
+      } else {
+        el.textContent = count;
+        requestAnimationFrame(update);
+      }
+    };
+    update();
+  });
+}
+
 testimonials = [
   {
     photo: 'PMN.enc',
@@ -142,7 +128,7 @@ testimonials = [
     title: 'Directeur Exécutif Mourchid Services'
   },
   {
-    photo: 'T2.jpg',
+    photo: 'Tafsir.jpg',
     text: `"Nous tenons à vous remercier sincèrement pour votre précieuse collaboration.
     Votre engagement et votre professionnalisme ont grandement contribué au succès de cette événement.
     Nous espérons pouvoir poursuivre cette belle dynamique et renforcer notre partenariat dans les mois à venir.
@@ -247,9 +233,6 @@ get filteredPortfolio() {
   return this.portfolio.filter(p => p.tags.includes(this.selectedCategory));
 }
 
-selectCategory(cat: string) {
-  this.selectedCategory = cat;
-}
 
 selectedRealisation: any = null;
 
@@ -267,5 +250,34 @@ closeRealisation() {
       el.scrollIntoView({ behavior: 'smooth' });
     }
   }
+
+  currentPortfolioIndex = 0;
+
+get visiblePortfolio() {
+  // Affiche 3 éléments : précédent, courant, suivant (boucle)
+  const arr = [];
+  const len = this.filteredPortfolio.length;
+  if (len === 0) return [];
+  for (let i = -1; i <= 1; i++) {
+    arr.push(this.filteredPortfolio[(this.currentPortfolioIndex + i + len) % len]);
+  }
+  return arr;
+}
+
+prevPortfolio() {
+  const len = this.filteredPortfolio.length;
+  this.currentPortfolioIndex = (this.currentPortfolioIndex - 1 + len) % len;
+}
+
+nextPortfolio() {
+  const len = this.filteredPortfolio.length;
+  this.currentPortfolioIndex = (this.currentPortfolioIndex + 1) % len;
+}
+
+// Quand on change d'onglet, on remet l'index à 0
+selectCategory(cat: string) {
+  this.selectedCategory = cat;
+  this.currentPortfolioIndex = 0;
+}
 
 }

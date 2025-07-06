@@ -95,12 +95,27 @@
     </button>
   </div>
 
-<div class="portfolio-cards">
-  <div class="portfolio-crea"
-       *ngFor="let proj of filteredPortfolio"
-       (click)="openRealisation(proj)">
-    <img [src]="proj.image" [alt]="proj.title" class="portfolio-img"/>
+<div class="portfolio-carousel">
+  <button class="carousel-arrow left" (click)="prevPortfolio()">
+    <i class="fas fa-chevron-left"></i>
+  </button>
+  <div class="carousel-track">
+    <div
+      *ngFor="let proj of visiblePortfolio; let i = index"
+      class="portfolio-crea"
+      [ngClass]="{
+        'active': i === 1,
+        'left': i === 0,
+        'right': i === 2
+      }"
+      (click)="i === 1 && openRealisation(proj)">
+      <img [src]="proj.image" [alt]="proj.title" class="portfolio-img"/>
+      <!-- <div class="portfolio-desc">{{ proj.description }}</div> -->
+    </div>
   </div>
+  <button class="carousel-arrow right" (click)="nextPortfolio()">
+    <i class="fas fa-chevron-right"></i>
+  </button>
 </div>
 
 <!-- Overlay pour la créa sélectionnée -->

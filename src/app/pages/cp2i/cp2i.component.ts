@@ -14,6 +14,12 @@ export class Cp2iComponent {
   currentImg = 0;
   showThanksLightbox = false;
 
+galleryImages = Array.from({length: 55}, (_, i) => `cp2i/galerie/${i}.jpg`);
+galleryIndex = 0;
+galleryInterval: any;
+showGalleryModal = false;
+selectedGalleryImage = '';
+
 
     // Images du recueil & temps forts
   bookImages = [
@@ -54,7 +60,42 @@ export class Cp2iComponent {
   }
 
     ngOnInit() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+   window.scrollTo({ top: 0, behavior: 'smooth' });
+  this.startGalleryAutoSlide();
 }
 
+startGalleryAutoSlide() {
+  this.galleryInterval = setInterval(() => {
+    this.nextGalleryImage();
+  }, 3500);
+}
+
+stopGalleryAutoSlide() {
+  if (this.galleryInterval) {
+    clearInterval(this.galleryInterval);
+  }
+}
+
+nextGalleryImage() {
+  this.galleryIndex = (this.galleryIndex + 1) % this.galleryImages.length;
+}
+
+prevGalleryImage() {
+  this.galleryIndex = (this.galleryIndex - 1 + this.galleryImages.length) % this.galleryImages.length;
+}
+
+openGalleryModal(img: string) {
+  this.selectedGalleryImage = img;
+  this.showGalleryModal = true;
+  this.stopGalleryAutoSlide();
+}
+
+closeGalleryModal() {
+  this.showGalleryModal = false;
+  this.startGalleryAutoSlide();
+}
+
+ngOnDestroy() {
+  this.stopGalleryAutoSlide();
+}
 }
