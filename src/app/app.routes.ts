@@ -14,8 +14,8 @@ import { Cp2iComponent } from './pages/cp2i/cp2i.component';
 
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/accueil', pathMatch: 'full' },
-  { path: 'accueil', component: AccueilComponent },
+  { path: '', component: AccueilComponent },
+  { path: 'accueil', redirectTo: '', pathMatch: 'full' },
   { path: 'apropos', component: AproposComponent },
   { path: 'services', component: ServicesComponent },
   { path: 'portfolio', component: PortfolioComponent },
