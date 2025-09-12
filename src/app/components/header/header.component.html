@@ -1,0 +1,54 @@
+<header class="header">
+  <div class="container">
+    <img routerLink="/accueil" src="logo.png" alt="Penccum Ndongo Logo" class="logo">
+    
+    <!-- Icône hamburger visible sur mobile -->
+    <button class="menu-toggle" (click)="toggleMenu()" aria-label="Ouvrir le menu">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+
+    <nav class="nav" [class.open]="menuOpen" (mouseleave)="closeMenuOnMouseLeave()">
+      <!-- Correction : le menu complet doit être affiché par défaut -->
+      <ng-container *ngIf="router.url.includes('apropos'); else autresMenus">
+        <a routerLink="/accueil" (click)="closeMenuOnClick()">{{ 'ACCUEIL' }}</a>
+        <a routerLink="/apropos" routerLinkActive="active">{{ 'APROPOS' }}</a>
+      </ng-container>
+
+      <ng-template #autresMenus>
+        <ng-container *ngIf="router.url.includes('devis') 
+                          || router.url.includes('formations') 
+                          || router.url.includes('opportunites') 
+                          || router.url.includes('cp2i'); else menuComplet">
+          <a routerLink="/accueil" (click)="closeMenuOnClick()">{{ 'ACCUEIL' }}</a>
+          <a routerLink="/apropos" routerLinkActive="active" (click)="closeMenuOnClick()">{{ 'APROPOS' }}</a>
+        </ng-container>
+        <!-- Correction : placer le menuComplet ici pour qu'il s'affiche si aucune condition n'est remplie -->
+        <ng-template #menuComplet>
+          <a routerLink="/accueil" (click)="scrollToSection('accueil')" [class.active]="activeSection === 'accueil'">{{ 'ACCUEIL' }}</a>
+          <a routerLink="/apropos" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenuOnClick()">{{ 'APROPOS' }}</a>
+          <a (click)="scrollToSection('services') ; closeMenuOnClick()" [class.active]="activeSection === 'services'">{{ 'SERVICES' }}</a>
+          <a (click)="scrollToSection('portfolio') ; closeMenuOnClick()" [class.active]="activeSection === 'portfolio'">{{ 'PORTFOLIO' }}</a>
+          <a (click)="scrollToSection('news') ; closeMenuOnClick()" [class.active]="activeSection === 'news'">{{ 'NEWS' }}</a>
+          <a (click)="scrollToSection('contact') ; closeMenuOnClick()" [class.active]="activeSection === 'contact'">{{ 'CONTACT' }}</a>
+        </ng-template>
+      </ng-template>
+
+      <!-- Onglet Offres avec menu déroulant -->
+      <div class="dropdown"
+        (mouseenter)="onDropdownHover(true)"
+        (mouseleave)="onDropdownHover(false)">
+        <button class="dropdown-btn" (click)="toggleDropdownMobile($event)">
+          Offres <span class="arrow">&#9662;</span>
+        </button>
+        <div class="dropdown-content" [class.show]="showDropdown">
+          <a routerLink="/opportunites" (click)="closeMenuOnClick()">Opportunités</a>
+          <a routerLink="/formations" (click)="closeMenuOnClick()">Formations</a>
+          <a routerLink="/cp2i" (click)="closeMenuOnClick()">CP2i</a>
+          <a routerLink="/devis" class="devis-link" (click)="closeMenuOnClick()">Obtenir un Devis</a>
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
