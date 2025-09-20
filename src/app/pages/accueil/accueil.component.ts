@@ -631,179 +631,179 @@ webTabs: WebTab[] = ['vitre', 'ecommerce', 'onepage', 'refontes'];
   graphicProjects: GraphicProject[] = [
     {
       id: 1,
-      title: 'Marhaba Unit Parfum Joy Dior',
+      title: 'Formation Professionnelle en Infographie - PENCCUM NDONGO',
       image: 'Formation-Infographie.jpg',
-      category: 'Publicité',
+      category: 'Affiches',
       downloadUrl: 'https://penccumndongo.com/Formation-Infographie.jpg'
     },
     {
       id: 2,
-      title: 'Bonne Rupture - Félicitations',
+      title: 'Formation Professionnelle - PENC\'BOOST',
       image: 'postmadiop.jpeg',
-      category: 'Événementiel',
+      category: 'Affiches',
       downloadUrl: 'https://penccumndongo.com/postmadiop.jpeg'
     },
     {
       id: 3,
-      title: 'Piment Yaii - Produit assaisonné',
+      title: 'Logo Seye Teranga Shop - Vente En Ligne',
       image: 'Logo-SeyeTerangaShop.png',
-      category: 'Packaging',
+      category: 'Logos',
       downloadUrl: 'https://penccumndongo.com/Logo-SeyeTerangaShop.png'
     },
     {
       id: 4,
-      title: 'Merci 20k TikTok Followers',
+      title: 'Identié Visuelle M7 Dakar - Vente de Tenue de Luxe',
       image: 'logoM7.jpg',
-      category: 'Réseaux Sociaux',
+      category: 'Logos',
       downloadUrl: 'https://penccumndongo.com/logoM7.jpg'
     },
     {
       id: 5,
-      title: 'Ahlame Shop - Moyens de paiement',
+      title: 'Affiche Lundi d\inspiration - Tafsir Haby NIANG',
       image: 'pubposttafsir.jpeg',
-      category: 'E-commerce',
+      category: 'Affiches',
       downloadUrl: 'https://penccumndongo.com/pubposttafsir.jpeg'
     },
     {
       id: 6,
-      title: 'Bonne Rupture - Ramadan',
+      title: 'Souhait meilleurs vœux de Réussite au BFEM - Post AMEN',
       image: 'bacbfem.jpg',
-      category: 'Événementiel',
+      category: 'Affiches',
       downloadUrl: 'https://penccumndongo.com/bacbfem.jpg'
     },
     {
       id: 7,
-      title: 'Kollo - Construction Matériaux',
+      title: 'Attestation Professionnelle De Reconnaissance - CP2i',
       image: 'Attestation.jpg',
-      category: 'Industrie',
+      category: 'Attestations',
       downloadUrl: 'https://penccumndongo.com/Attestation.jpg'
     },
     {
       id: 8,
-      title: 'Application Mobile DjgoZone',
+      title: '48H Journées Culturelles - Lycée Franco-Arabe',
       image: 'affiches.jpg',
-      category: 'Application',
+      category: 'Affiches',
       downloadUrl: 'https://penccumndongo.com/affiches.jpg'
     },
     {
       id: 9,
-      title: 'Séminaire Formation Management',
+      title: 'Design Badge Évènementiel - Cérémonie de Remise Des Prix CP2i',
       image: 'Badge.jpg',
-      category: 'Formation',
+      category: 'Badges',
       downloadUrl: 'https://penccumndongo.com/Badge.jpg'
     },
     {
       id: 10,
-      title: 'École Intelligence - Niveau Supérieur',
+      title: 'Logo Zaza Agency',
       image: 'ZazaAgency-logo.png',
-      category: 'Éducation',
+      category: 'Logos',
       downloadUrl: 'https://penccumndongo.com/ZazaAgency-logo.png'
     },
     {
       id: 11,
-      title: 'Save the Date - Mariage',
+      title: 'Bannière Promotionnelle WUDERE - COMMERCE',
       image: 'Bannière-Wudere.jpg',
-      category: 'Événementiel',
+      category: 'Bannières',
       downloadUrl: 'https://penccumndongo.com/Bannière-Wudere.jpg'
     },
     {
-      id: 12,
-      title: 'Lait Caillé au Coco',
-      image: 'BannièreWudere.jpg',
-      category: 'Alimentaire',
-      downloadUrl: 'https://penccumndongo.com/BannièreWudere.jpg'
+      id: 25,
+      title: 'Lancement Wébinaire - Collectif des Coachs Professionnel du Sénégal et d\'Ailleurs',
+      image: 'Web0.jpg',
+      category: 'Affiches',
+      downloadUrl: 'https://penccumndongo.com/Web0.jpg'
     },
     {
       id: 13,
-      title: 'Chic & Prestige - Bijoux',
+      title: 'Dépliant Publicitaire Two-fold - COSDEN',
       image: 'Depliant.jpg',
-      category: 'Mode',
+      category: 'Dépliants',
       downloadUrl: 'https://penccumndongo.com/Depliant.jpg'
     },
     {
       id: 14,
-      title: 'L.A.P Prestige - Street Dance Talent',
+      title: 'Design Casquette Personnalisée - PENCCUM NDONGO',
       image: 'casquette.jpg',
-      category: 'Événementiel',
+      category: 'Mockups',
       downloadUrl: 'https://penccumndongo.com/casquette.jpg'
     },
     {
       id: 15,
-      title: 'Guidan Aski - Salon de Coiffure',
+      title: 'Design Chapeau Personnalisé - M7 DAKAR',
       image: 'chap.jpg',
-      category: 'Beauté',
+      category: 'Mockups',
       downloadUrl: 'https://penccumndongo.com/chap.jpg'
     },
      {
       id: 16,
-      title: 'Guidan Aski - Salon de Coiffure',
+      title: 'Bâche Publicitaire - Sall Lamtoro Business',
       image: 'SALLLAMTOROBUSINESS-bache.jpg',
-      category: 'Beauté',
+      category: 'Bâches',
       downloadUrl: 'https://penccumndongo.com/SALLLAMTOROBUSINESS-bache.jpg'
     },
      {
       id: 17,
-      title: 'Guidan Aski - Salon de Coiffure',
-      image: 'chap.jpg',
-      category: 'Beauté',
-      downloadUrl: 'https://penccumndongo.com/chap.jpg'
+      title: 'Lancement Officiel - Site Web Penccum Ndongo',
+      image: 'LancementOfficielSiteWebPenccumNdongo.jpg',
+      category: 'Affiches',
+      downloadUrl: 'https://penccumndongo.com/LancementOfficielSiteWebPenccumNdongo.jpg'
     },
  {
       id: 18,
-      title: 'Guidan Aski - Salon de Coiffure',
+      title: 'Logo NICONS - Services BTP',
       image: 'P5.png',
-      category: 'Beauté',
+      category: 'Logos',
       downloadUrl: 'https://penccumndongo.com/P5.png'
     },
      {
       id: 19,
-      title: 'Guidan Aski - Salon de Coiffure',
+      title: 'Logo WUDERE - COMMERCE',
       image: 'P6.jpg',
-      category: 'Beauté',
+      category: 'Logos',
       downloadUrl: 'https://penccumndongo.com/P6.jpg'
     },
      {
       id: 20,
-      title: 'Guidan Aski - Salon de Coiffure',
+      title: 'Logo PENC\BOOST - Formations Professionelles',
       image: 'penccboost.png',
-      category: 'Beauté',
+      category: 'Logos',
       downloadUrl: 'https://penccumndongo.com/penccboost.png'
     },
      {
       id: 21,
-      title: 'Guidan Aski - Salon de Coiffure',
+      title: 'Services PENCCUM NDONGO - Post',
       image: 'PN.jpg',
-      category: 'Beauté',
+      category: 'Affiches',
       downloadUrl: 'https://penccumndongo.com/PN.jpg'
     },
      {
       id: 22,
-      title: 'Guidan Aski - Salon de Coiffure',
+      title: 'Lettre de Remerciements - Cérémonie CP2i ÉDITION 2 ',
       image: 'remerciements.jpg',
-      category: 'Beauté',
+      category: 'Affiches',
       downloadUrl: 'https://penccumndongo.com/remerciements.jpg'
     },
      {
       id: 23,
-      title: 'Guidan Aski - Salon de Coiffure',
-      image: 'bagn1.jpg',
-      category: 'Beauté',
-      downloadUrl: 'https://penccumndongo.com/bagn1.jpg'
+      title: 'Logo Professionnel - DOLEL DEBBO CULTURES URBAINES',
+      image: 'doleldebbologo.jpg',
+      category: 'Bannières',
+      downloadUrl: 'https://penccumndongo.com/doleldebbologo.jpg'
     },
      {
       id: 24,
-      title: 'Guidan Aski - Salon de Coiffure',
+      title: 'Wébinaire - Collectif des Coachs Professionnels du Sénégal et d\'Ailleurs',
       image: 'WEB.jpg',
-      category: 'Beauté',
+      category: 'Affiches',
       downloadUrl: 'https://penccumndongo.com/WEB.jpg'
     },
-     {
-      id: 25,
-      title: 'Guidan Aski - Salon de Coiffure',
-      image: 'Web0.jpg',
-      category: 'Beauté',
-      downloadUrl: 'https://penccumndongo.com/Web0.jpg'
-    },
+    //  {
+    //   id: 25,
+    //   title: 'Lancement Wébinaire - Collectif des Coachs Professionnel du Sénégal et d\'Ailleurs',
+    //   image: 'Web0.jpg',
+    //   category: 'Affiches',
+    //   downloadUrl: 'https://penccumndongo.com/Web0.jpg'
+    // },
   ];
 
   // Obtenir les projets web filtrés
