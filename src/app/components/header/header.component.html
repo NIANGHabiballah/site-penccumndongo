@@ -19,6 +19,7 @@
       <ng-template #autresMenus>
         <ng-container *ngIf="router.url.includes('devis') 
                           || router.url.includes('formations') 
+                          || router.url.includes('formation-infographie') 
                           || router.url.includes('opportunites') 
                           || router.url.includes('cp2i'); else menuComplet">
           <a routerLink="/accueil" (click)="closeMenuOnClick()">{{ 'ACCUEIL' }}</a>
@@ -44,7 +45,8 @@
         </button>
         <div class="dropdown-content" [class.show]="showDropdown">
           <a routerLink="/opportunites" (click)="closeMenuOnClick()">Opportunités</a>
-          <a routerLink="/formations" (click)="closeMenuOnClick()">Formations</a>
+          <a routerLink="/formations" (click)="closeMenuOnClick()">Penc'Boost</a>
+          <a routerLink="/formation-infographie" (click)="closeMenuOnClick()">Formation Infographie</a>
           <a routerLink="/cp2i" (click)="closeMenuOnClick()">CP2i</a>
           <a routerLink="/devis" class="devis-link" (click)="closeMenuOnClick()">Obtenir un Devis</a>
         </div>

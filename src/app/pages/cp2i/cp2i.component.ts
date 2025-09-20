@@ -8,6 +8,28 @@ import { CommonModule } from '@angular/common'; // <-- Ajout
   styleUrl: './cp2i.component.css'
 })
 export class Cp2iComponent {
+
+  ngAfterViewInit() {
+    // WhatsApp floating icon logic
+    const whatsappFloat = document.getElementById('whatsapp-float');
+    const whatsappIcon = document.querySelector('.whatsapp-icon');
+    const whatsappText = document.getElementById('whatsapp-text');
+    const whatsappLink = document.getElementById('whatsapp-link');
+    if (whatsappIcon && whatsappFloat && whatsappText && whatsappLink) {
+      whatsappIcon.addEventListener('click', (e) => {
+        e.preventDefault();
+        whatsappFloat.classList.toggle('active');
+        if (whatsappFloat.classList.contains('active')) {
+          whatsappText.style.display = 'inline-block';
+        } else {
+          whatsappText.style.display = 'none';
+        }
+      });
+      whatsappText.addEventListener('click', () => {
+        window.open(whatsappLink.getAttribute('href')!, '_blank');
+      });
+    }
+  }
   galleryIndexes = Array.from({length: 48}, (_, i) => i); // 0 à 50 inclus
   // Lightbox pour la galerie principale
   lightboxOpen = false;
@@ -98,4 +120,13 @@ closeGalleryModal() {
 ngOnDestroy() {
   this.stopGalleryAutoSlide();
 }
+
+  scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+scrollToBottom() {
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
 }

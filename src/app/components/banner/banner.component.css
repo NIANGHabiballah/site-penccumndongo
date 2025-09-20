@@ -1,3 +1,26 @@
+:root {
+  --primary-color: #0085CA;
+  --secondary-color: #FF7F32;
+  --primary-dark: #006399;
+  --secondary-dark: #E65100;
+  --gradient-primary: linear-gradient(135deg, #0085CA 0%, #00A8E8 100%);
+  --gradient-secondary: linear-gradient(135deg, #FF7F32 0%, #FFA500 100%);
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --text-light: #999999;
+  --background: #ffffff;
+  --background-light: #f8f9fa;
+  --background-dark: #0a1628;
+  --border-radius: 20px;
+  --border-radius-small: 12px;
+  --border-radius-large: 30px;
+  --shadow-sm: 0 2px 8px rgba(0, 133, 202, 0.1);
+  --shadow-md: 0 8px 24px rgba(0, 133, 202, 0.15);
+  --shadow-lg: 0 16px 48px rgba(0, 133, 202, 0.2);
+  --shadow-hover: 0 12px 36px rgba(0, 133, 202, 0.25);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .banner {
     color: #0380C2;
     text-align: center;
@@ -37,13 +60,56 @@
     margin: 0 auto;
   }
 
-  /* boutton contact et devis */
+  /* Ajoute un espace horizontal entre les deux boutons sur ordinateur */
 .btns {
   display: flex;
-  gap: 1.2rem; /* Ajuste la valeur selon l'espacement désiré */
+  gap: 1.2rem; /* Espace horizontal entre les boutons */
   justify-content: center;
   align-items: center;
 }
+
+
+
+/* Bouton Obtenir un devis : orange + hover bleu dégradé */
+.apropos-hero-btn.devis-btn {
+  background: linear-gradient(90deg, #FF7F32 60%, #FFB347 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.08rem;
+  padding: 0.9rem 2.2rem;
+  box-shadow: 0 2px 8px rgba(0,133,202,0.08);
+  text-decoration: none;
+  transition: var(--transition);
+  margin-top: 1.2rem;
+  border: none;
+}
+.apropos-hero-btn.devis-btn:hover {
+  background: linear-gradient(90deg, #0085CA 60%, #034877 100%);
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* Bouton Nous contacter : bleu dégradé + hover orange dégradé */
+.apropos-hero-btn.contact-btn {
+  font-size: 1.08rem;
+  padding: 0.9rem 2.2rem;
+  text-decoration: none;
+  margin-top: 1.2rem;
+  border: 2px solid #0085CA;
+  background: #fff;
+  color: #0085CA;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 2px 8px rgba(0,133,202,0.08);
+}
+
+.apropos-hero-btn.contact-btn:hover {
+  background: linear-gradient(90deg, #0085CA 60%, #034877 100%);
+  color: #fff;
+  transform: scale(1.05);
+}
+
 
 .apropos-hero-btn {
   display: inline-block;
@@ -57,4 +123,135 @@
   text-decoration: none;
   transition: background 0.2s, color 0.2s, transform 0.2s;
   margin-top: 1.2rem;
+}
+/* ...existing code... */
+
+.hero-main-title {
+  text-align: center;
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  animation: fadeInUp 1.2s cubic-bezier(0.4,0,0.2,1);
+}
+
+.penccum-title {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: #0085CA;
+  background: linear-gradient(90deg, #0085CA 60%, #FF7F32 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: block; /* <-- change from inline-block to block */
+  animation: gradient-shift 3s ease infinite;
+  margin-top: 2rem;
+  margin-bottom: 1.2rem;
+  line-height: 1.5; 
+  text-shadow: 0 2px 8px rgba(0,133,202,0.10);
+  word-break: break-word;
+
+}
+
+.agency-label {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #FF7F32;
+  border-radius: 0; /* <-- remove rounded background */
+  display: block; /* <-- force to new line */
+  padding: 0;
+  margin-bottom: 1.2rem;
+  letter-spacing: 0.5px;
+  box-shadow: none;
+  background: none; /* <-- remove background */
+  animation: fadeIn 1.2s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ...existing code... */
+
+.hero-slogan {
+  font-size: 1.18rem;
+  color: #222;
+  font-weight: 500;
+  margin-top: 0.7rem;
+  margin-bottom: 0;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+  background: rgba(232,246,255,0.3);
+  border-radius: 12px;
+  padding: 12px 22px;
+  animation: fadeIn 1.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(40px);}
+  60% { opacity: 1; transform: translateY(-8px);}
+  100% { opacity: 1; transform: translateY(0);}
+}
+@keyframes fadeIn {
+  0% { opacity: 0;}
+  100% { opacity: 1;}
+}
+@keyframes gradient-shift {
+  0%,100% { background-position: 0%;}
+  50% { background-position: 100%;}
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .hero-main-title {
+    margin-top: 1.2rem;
+    margin-bottom: 1.2rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .penccum-title {
+    font-size: 2rem;
+    margin-top: 1.5rem !important;
+
+    margin-bottom: 0.2rem !important;
+    line-height: 1.2 !important; /* Garde le "g" bien visible sur mobile */
+
+  }
+  .agency-label {
+    font-size: 1.5rem;
+    padding: 8px 14px !important;
+    margin-bottom: 0.1rem !important;
+  }
+  .hero-slogan {
+     font-size: 1rem !important; /* Diminue la taille du slogan sur mobile */
+    padding: 6px 8px !important;
+    margin-top: 0.3rem !important;
+    max-width: 95vw !important;
+  }
+
+   .btns {
+    flex-direction: column;
+    gap: 0.7rem;
+    align-items: center;
+  }
+  .apropos-hero-btn {
+    font-size: 1.2rem !important;
+    padding: 0.7rem 1.2rem !important;
+    border-radius: 1.5rem !important;
+    min-width: 200px;
+    max-width: 100vw;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+    .apropos-hero-btn.devis-btn,
+  .apropos-hero-btn.contact-btn {
+    font-size: 1rem !important;
+    padding: 0.7rem 1.2rem !important;
+    min-width: 160px;
+    max-width: 95vw;
+    border-radius: 1.5rem !important;
+    white-space: nowrap;
+    text-align: center;
+  }
 }

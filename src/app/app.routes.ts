@@ -9,7 +9,9 @@ import { AccueilComponent } from './pages/accueil/accueil.component';
 import { DevisComponent } from './pages/devis/devis.component';
 
 import { OpportunitesComponent } from './pages/opportunites/opportunites.component';
+import { FormationInfographieComponent } from './pages/formation-infographie/formation-infographie.component';
 import { FormationsComponent } from './pages/formations/formations.component';
+
 import { Cp2iComponent } from './pages/cp2i/cp2i.component';
 
 
@@ -26,5 +28,6 @@ export const routes: Routes = [
 
   { path: 'opportunites', component: OpportunitesComponent },
   { path: 'formations', component: FormationsComponent },
+  { path: 'formation-infographie', component: FormationInfographieComponent },
   { path: 'cp2i', component: Cp2iComponent },
 ];

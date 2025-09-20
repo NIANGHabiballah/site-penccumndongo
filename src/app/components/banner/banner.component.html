@@ -1,10 +1,19 @@
 <div id="accueil" class="banner">
   <img src="bagn1.jpg" alt="Logo Penccum Ndongo" class="banner-logo">
-  <h1>Penccum Ndongo</h1>
-  <p> De la stratégie à l'action, nous propulsons votre communication !</p>
+
+ <div class="hero-main-title animated-fade-in">
+  <h1 class="penccum-title animated-gradient">Penccum Ndongo</h1>
+  <div class="agency-label animated-fade-in">
+    Agence de marketing & communication digitale
+  </div>
+  <p class="hero-slogan animated-fade-in">
+    De la stratégie à l'action, nous propulsons votre communication !
+  </p>
+</div>
+
   <div class="btns">
-    <a routerLink="../devis" class="cta-button apropos-hero-btn">Obtenir un devis</a>
-    <a (click)="scrollToSection('contact')" class="cta-button apropos-hero-btn">Nous Contacter</a>
+    <a routerLink="/devis" class="apropos-hero-btn devis-btn btn-select">Obtenir un devis</a>
+    <a (click)="scrollToSection('contact')" class="apropos-hero-btn contact-btn">Nous Contacter</a>
   </div>
  
 </div>

@@ -1,26 +1,20 @@
 import { Component } from '@angular/core';
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { TranslateService } from '@ngx-translate/core';
+// ngx-translate supprimé
 import { Router, NavigationEnd } from '@angular/router';
 import { RouterModule } from '@angular/router';
 import { routes } from '../../app.routes';
 import { CommonModule } from '@angular/common';
 
 
-export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
-}
+
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [
-    TranslateModule,
     RouterModule,
     CommonModule,
-
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
@@ -33,19 +27,12 @@ export class HeaderComponent {
   showDropdown = false;
 
 
-   constructor(public translate: TranslateService, public router: Router) {
-    translate.addLangs(['fr', 'en']);
-    translate.setDefaultLang('fr');
-    const browserLang = translate.getBrowserLang();
-    translate.use(browserLang && browserLang.match(/fr|en/) ? browserLang : 'fr');
-
+   constructor(public router: Router) {
     // Écoute le scroll pour détecter la section visible
     window.addEventListener('scroll', () => this.updateActiveSection());
   }
 
-  setLang(lang: string) {
-    this.translate.use(lang);
-  }
+  // Méthode setLang supprimée (plus de traduction)
 
   scrollToSection(sectionId: string) {
     const el = document.getElementById(sectionId);

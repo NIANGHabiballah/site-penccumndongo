@@ -83,102 +83,208 @@
   </div>
 </section>
 
-  <!-- Section Réalisations -->
-<section id="portfolio" class="portfolio scroll-section">
-  <div class="blue-subtitle">Nos Réalisations</div>
-  <div class="portfolio-categories">
-    <button 
-      *ngFor="let cat of portfolioCategories" 
-      [class.active]="cat === selectedCategory"
-      (click)="selectCategory(cat)">
-      {{ cat }}
-    </button>
-  </div>
 
-<div class="portfolio-carousel">
-  <button class="carousel-arrow left" (click)="prevPortfolio()">
-    <i class="fas fa-chevron-left"></i>
-  </button>
-  <div class="carousel-track">
-    <div
-      *ngFor="let proj of visiblePortfolio; let i = index"
-      class="portfolio-crea"
-      [ngClass]="{
-        'active': i === 1,
-        'left': i === 0,
-        'right': i === 2
-      }"
-      (click)="i === 1 && openRealisation(proj)">
-      <img [src]="proj.image" [alt]="proj.title" class="portfolio-img"/>
-      <!-- <div class="portfolio-desc">{{ proj.description }}</div> -->
+<!-- Section Réalisations -->
+<section class="realisations-section" id="portfolio">
+
+  <!-- BLOC 1 : Réalisations Web -->
+  <div class="web-realizations-bloc">
+    <div class="container">
+      
+      <!-- En-tête -->
+      <div class="section-header">
+        <h2 class="section-title">Quelques Sites Web</h2>
+        <p class="section-subtitle">conçus récemment !</p>
+        <div class="title-arrow">▼</div>
+      </div>
+
+      <!-- Navigation par onglets -->
+      <div class="tabs-navigation">
+      <button 
+        *ngFor="let tab of webTabs"
+        class="tab-btn"
+        [class.active]="activeWebTab === tab"
+        (click)="setActiveTab(tab)">
+        {{ getTabLabel(tab) }}
+      </button>
+      </div>
+
+      <!-- Grille des projets web -->
+      <div class="web-projects-grid">
+        <div 
+          class="web-project-card"
+          *ngFor="let project of filteredWebProjects">
+          
+          <div class="project-image-container">
+            <img [src]="project.image" [alt]="project.title" class="project-image">
+            <div class="project-overlay">
+              <button 
+                class="btn-voir-projet"
+                (click)="openWebProject(project.url)">
+                Voir Le Projet →
+              </button>
+            </div>
+          </div>
+          
+          <div class="project-info">
+            <h3 class="project-title">{{ project.title }}</h3>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <button class="carousel-arrow right" (click)="nextPortfolio()">
-    <i class="fas fa-chevron-right"></i>
-  </button>
-</div>
 
-<!-- Overlay pour la créa sélectionnée -->
-<div 
-  class="realisation-modal" 
-  *ngIf="selectedRealisation" 
-  @fadeIn
-  (click)="closeRealisation()">
-  <div class="realisation-modal-content" (click)="$event.stopPropagation()">
-    <img [src]="selectedRealisation.image" [alt]="selectedRealisation.title" class="realisation-img"/>
-    <button class="close-modal" (click)="closeRealisation()">&times;</button>
+  <!-- BLOC 2 : Conceptions Graphiques -->
+  <div class="graphic-realizations-bloc">
+    <div class="container">
+      
+      <!-- En-tête -->
+      <div class="graphic-section-header">
+        <p class="graphic-subtitle">Démarquez vous des autres à travers vos</p>
+        <h2 class="graphic-title">Conceptions Graphiques</h2>
+        <div class="title-arrow-white">▼</div>
+      </div>
+
+      <!-- Grille des conceptions graphiques -->
+      <div class="graphics-grid">
+        <div 
+          class="graphic-card"
+          *ngFor="let graphic of graphicProjects"
+          (click)="openLightbox(graphic)">
+          
+          <div class="graphic-image-container">
+            <img [src]="graphic.image" [alt]="graphic.title" class="graphic-image">
+            <div class="graphic-overlay">
+              <div class="zoom-icon">🔍</div>
+              <span class="view-text">Voir en grand</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
-  <div class="portfolio-cta">
-    <a (click)="scrollToSection('contact')"class="cta-btn">Vous avez un projet ? Contactez-nous</a>
+
+  <!-- Lightbox Modal -->
+  <div 
+    class="lightbox-modal"
+    *ngIf="isLightboxOpen"
+    (click)="closeLightbox()"
+    (keydown)="onKeydown($event)"
+    tabindex="0">
+    
+    <div class="lightbox-content" (click)="$event.stopPropagation()">
+      
+      <!-- Bouton fermer -->
+      <button class="lightbox-close" (click)="closeLightbox()">
+        ✕
+      </button>
+
+      <!-- Actions en haut -->
+      <div class="lightbox-actions-top">
+        <button 
+          class="action-btn download-btn"
+          *ngIf="selectedGraphic?.downloadUrl"
+          (click)="downloadGraphic(selectedGraphic!)">
+          ⬇ Télécharger
+        </button>
+        <button 
+          class="action-btn share-btn"
+          (click)="shareGraphic(selectedGraphic!)">
+          📤 Partager
+        </button>
+      </div>
+
+      <!-- Image principale -->
+      <div class="lightbox-image-container">
+        <img 
+          [src]="selectedGraphic?.image" 
+          [alt]="selectedGraphic?.title"
+          class="lightbox-image">
+      </div>
+
+      <!-- Informations -->
+      <div class="lightbox-info">
+        <h3 class="lightbox-title">{{ selectedGraphic?.title }}</h3>
+        <span class="lightbox-category">{{ selectedGraphic?.category }}</span>
+      </div>
+    </div>
   </div>
+
 </section>
+
+
 
 <!-- Section Actualités -->
-<section id="news" class="news scroll-section">
-  <div class="blue-subtitle">Actualités</div>
-  <div class="news-cards">
-    <div class="news-card">
-      <iframe
-        src="https://www.linkedin.com/embed/feed/update/urn:li:share:7336779628230893571?collapsed=1"
-        height="670"
-        width="504"
-        frameborder="0"
-        allowfullscreen=""
-        title="Post intégré"></iframe>
-      <a class="news-link" href="https://www.linkedin.com/feed/update/urn:li:share:7336779628230893571?collapsed=1" target="_blank" rel="noopener">
-        Voir plus
-      </a>
+<div id="news"  class="actualites-section">
+  <div class="container">
+    <!-- En-tête de section -->
+    <div class="section-header" [@fadeInUp]>
+      <div class="header-content">
+        <h2 class="section-title">Actualités</h2>
+        <span class="subtitle">Restez connectés</span>
+        <div class="title-divider"></div>
+      </div>
     </div>
 
-    <div class="news-card">
-      <iframe
-        src="https://www.linkedin.com/embed/feed/update/urn:li:share:7328857368157421568?collapsed=1"
-        height="670"
-        width="504"
-        frameborder="0"
-        allowfullscreen=""
-        title="Post intégrén"></iframe>
-      <a class="news-link" href="https://www.linkedin.com/feed/update/urn:li:share:7328857368157421568?collapsed=1" target="_blank" rel="noopener">
-        Voir plus
-      </a>
+    <!-- Grille des actualités -->
+    <div class="news-grid">
+      <div 
+        class="news-card"
+        *ngFor="let article of articles; let i = index"
+        [@slideInUp]="{ value: '', params: { delay: i * 100 + 'ms' } }"
+        (click)="redirectToLinkedIn(article.linkedinUrl)"
+        [class.featured]="article.featured">
+        
+        <!-- Image de l'article -->
+        <div class="card-image">
+          <img [src]="article.image" [alt]="article.title" loading="lazy">
+          <div class="image-overlay">
+            <div class="category-badge" [ngClass]="article.category.toLowerCase()">
+              {{ article.category }}
+            </div>
+            <div class="read-more-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M7 17L17 7M17 7H7M17 7V17"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenu de l'article -->
+        <div class="card-content">
+          <h3 class="article-title">{{ article.title }}</h3>
+          <p class="article-excerpt">{{ article.excerpt }}</p>
+          
+          <div class="article-footer">
+            <div class="article-meta">
+              <span class="date">{{ article.date | date:'dd MMMM yyyy':'fr-FR' }}</span>
+              <span class="separator">•</span>
+              <span class="author">{{ article.author }}</span>
+            </div>
+            <div class="linkedin-indicator">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Animation de hover -->
+        <div class="hover-effect"></div>
+      </div>
     </div>
 
-    <div class="news-card">
-        <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7327362470505836544?collapsed=1"
-        height="670"
-        width="504"
-        frameborder="0"
-        allowfullscreen=""
-        title="Post intégré"></iframe>
-        <a class="news-link" href="https://www.linkedin.com/feed/update/urn:li:share:7328857368157421568?compact=0" target="_blank" rel="noopener">
-          Voir plus
-        </a>
+    <!-- Bouton voir plus -->
+    <div class="view-more-section" [@fadeIn]>
+      <button class="view-more-btn" (click)="viewAllNews()">
+        <span>Voir toutes les actualités</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12H19M19 12L12 5M19 12L12 19"/>
+        </svg>
+      </button>
     </div>
-    
-
   </div>
-</section>
+</div>
 
 <!-- Section Chiffres Clés -->
 <section class="key-numbers">
@@ -208,27 +314,66 @@
 </section>
 
   <!-- Section Témoignages -->
-  <section class="testimonials">
-    <div class="blue-subtitle">Témoignages</div>
-    <div class="testimonial-cards">
-      <div 
-        class="testimonial-card" 
-        *ngFor="let t of testimonials.slice(currentIndex, currentIndex+2)">
-        <img class="testimonial-photo" [src]="t.photo" [alt]="t.name">
-        <div class="testimonial-content">
-          <p class="testimonial-text">{{ t.text }}</p>
-          <div class="testimonial-profile">
-            <span class="testimonial-name">{{ t.name }}</span>
-            <span class="testimonial-title">{{ t.title }}</span>
-          </div>
+<!-- Exemple de structure HTML pour le carousel de témoignages -->
+<section class="testimonials-section" [@staggerAnimation]>
+  <!-- En-tête de la section -->
+  <div class="section-header" [@fadeInUp]>
+    <div class="header-decoration"></div>
+    <h2 class="section-title">Témoignages</h2>
+    <p class="section-subtitle">Découvrez ce que disent nos clients satisfaits</p>
+    <div class="header-decoration"></div>
+  </div>
+
+  <!-- Grille des témoignages -->
+  <div class="testimonials-grid">
+    <div 
+      class="testimonial-card" 
+      *ngFor="let temoignage of temoignages; let i = index"
+      [@fadeInUp]
+      [@cardHover]="getCardState(i)"
+      (mouseenter)="onCardHover(i)"
+      (mouseleave)="onCardLeave()">
+      
+      <!-- Citation -->
+      <div class="quote-icon">
+        <svg width="40" height="30" viewBox="0 0 40 30" fill="none">
+          <path d="M0 15C0 6.716 6.716 0 15 0c1.657 0 3 1.343 3 3s-1.343 3-3 3C9.477 6 6 9.477 6 15c0 1.657-1.343 3-3 3S0 16.657 0 15z" fill="currentColor"/>
+          <path d="M22 15C22 6.716 28.716 0 37 0c1.657 0 3 1.343 3 3s-1.343 3-3 3c-5.523 0-9 3.477-9 9 0 1.657-1.343 3-3 3s-3-1.343-3-3z" fill="currentColor"/>
+        </svg>
+      </div>
+
+      <!-- Texte du témoignage -->
+      <div class="testimonial-text">
+        <p>{{ temoignage.text }}</p>
+      </div>
+
+      <!-- Profil du client -->
+      <div class="client-profile">
+        <div class="profile-image">
+          <img [src]="temoignage.photo" 
+          [alt]="temoignage.nom"
+          (error)="onImageError($event)">
+          <div class="image-overlay"></div>
+        </div>
+        
+        <div class="profile-info">
+          <h4 class="client-name">{{ temoignage.nom }}</h4>
+          <p class="client-title">{{ temoignage.titre }}</p>
         </div>
       </div>
+
+      <!-- Décoration de carte -->
+      <div class="card-decoration"></div>
     </div>
-    <div class="testimonial-arrows-container">
-      <button class="testimonial-arrow left" (click)="prevTestimonial()">&#8592;</button>
-      <button class="testimonial-arrow right" (click)="nextTestimonial()">&#8594;</button>
-    </div>
-  </section>
+  </div>
+
+  <!-- Décoration de fond -->
+  <div class="background-decoration">
+    <div class="decoration-circle circle-1"></div>
+    <div class="decoration-circle circle-2"></div>
+    <div class="decoration-circle circle-3"></div>
+  </div>
+</section>
 
   <!-- Section Partenaires -->
 <section class="partners">
@@ -261,11 +406,23 @@
   </div>
   </section>
 
+
   <!-- Section Contact -->
 <section id="contact" class="contact scroll-section">
-  <h2>Contactez-nous</h2>
+
+ <div class="section-header" [@fadeInUp]>
+    <h2 class="section-title">Contactez-nous</h2>
+    <p class="section-subtitle">
+      Un projet, une question ? Notre équipe vous répond rapidement et vous accompagne dans votre démarche digitale.
+    </p>
+    <div class="title-divider"></div>
+  </div>
+
   <form (ngSubmit)="onSubmit()" #contactForm="ngForm" class="contact-form wide" novalidate>
-  <div class="form-row double">
+    <h3 class="form-title">Formulaire de contact</h3>
+
+    <div class="form-row double">
+
     <div class="form-group">
       <label for="firstname">Prénom <span class="required">*</span></label>
       <input id="firstname" type="text" placeholder="Ex : Malik ibrah"
@@ -285,7 +442,7 @@
   </div>
   <div class="form-row double">
     <div class="form-group">
-      <label for="phone">Numéro de portable <span class="required">*</span></label>
+      <label for="phone">Téléphone <span class="required">*</span></label>
       <input id="phone" type="tel" placeholder="Numéro de portable"
         [(ngModel)]="contactData.phone" name="phone" required #phone="ngModel">
       <div class="error" *ngIf="phone.invalid && (phone.dirty || phone.touched)">
@@ -325,10 +482,19 @@
 
 </section>
 
+<!-- Icône WhatsApp flottante -->
+<div id="whatsapp-float" class="whatsapp-float">
+  <a href="https://wa.me/221771234567?text=Bonjour%20Penccum%20Ndongo%20!" target="_blank" rel="noopener" id="whatsapp-link">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" class="whatsapp-icon"/>
+  </a>
+  <span id="whatsapp-text" class="whatsapp-text">Discutons sur WhatsApp</span>
+</div>
+
 <!-- Boutons de scroll haut/bas -->
-<button id="scrollTopBtn" class="scroll-btn" title="Haut">
+<button id="scrollTopBtn" class="scroll-btn" title="Haut" (click)="scrollToTop()">
   <i class="fas fa-arrow-up"></i>
 </button>
-<button id="scrollBottomBtn" class="scroll-btn" title="Bas">
+
+<button id="scrollBottomBtn" class="scroll-btn" title="Bas" (click)="scrollToBottom()">
   <i class="fas fa-arrow-down"></i>
 </button>

@@ -1,3 +1,62 @@
+/* WhatsApp floating icon and text */
+.whatsapp-float {
+  position: fixed;
+  right: 1.2rem;
+  bottom: 12.5rem;
+  z-index: 12000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.whatsapp-icon {
+  width: 3.2rem;
+  height: 3.2rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  border-radius: 50%;
+  background: #25D366;
+  padding: 0.3em;
+}
+.whatsapp-icon:hover {
+  transform: scale(1.08);
+}
+.whatsapp-text {
+  display: none;
+  margin-top: 0.5em;
+  background: #25D366;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 2em;
+  padding: 0.7em 1.5em;
+  font-size: 1.1em;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  cursor: pointer;
+  white-space: nowrap;
+  animation: fadeInWhatsapp 0.3s;
+}
+@keyframes fadeInWhatsapp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Affiche le texte au clic sur l'icône */
+#whatsapp-float.active .whatsapp-text {
+  display: inline-block;
+}
+
+/* Responsive: ajuste la position sur mobile */
+@media (max-width: 600px) {
+  .whatsapp-float {
+    right: 1.6rem;
+    bottom: 10.5rem;
+  }
+  .whatsapp-icon {
+    width: 2.3rem;
+    height: 2.3rem;
+  }
+}
+
 .offre-banner, .formation-banner, .cp2i-banner {
   background: linear-gradient(120deg, #0380C2 0%, #FF7F1A 100%);
   color: #fff;
@@ -334,6 +393,31 @@
   object-fit: contain;
   border-radius: 1rem;
 }
+
+
+/* Fleche pour scroller */
+.scroll-btn {
+  position: fixed;
+  right: 24px;
+  z-index: 9999 ;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: #0380C2;
+  color: #fff;
+  font-size: 1.6rem;
+  box-shadow: 0 4px 16px rgba(3,128,194,0.18);
+  cursor: pointer;
+  display: block;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+}
+#scrollTopBtn { bottom: 90px; }
+#scrollBottomBtn { bottom: 30px; }
+.scroll-btn:hover { background: #FF7F1A; transform: scale(1.08);}
+
 
 /* Responsive */
 @media (max-width: 700px) {
