@@ -1,0 +1,299 @@
+<div class="service-page">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <div class="hero-particles"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="fas fa-paint-brush"></i>
+        <span>Design & Créativité</span>
+      </div>
+      <h1 class="hero-title">Design Graphique & Sérigraphie</h1>
+      <p class="hero-subtitle">
+        Créons ensemble une identité visuelle forte qui marque les esprits et valorise votre image de marque
+      </p>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-number">200+</span>
+          <span class="stat-label">Créations réalisées</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">98%</span>
+          <span class="stat-label">Clients satisfaits</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">48h</span>
+          <span class="stat-label">Délai moyen</span>
+        </div>
+      </div>
+      <div class="hero-cta">
+        <button class="cta-primary" routerLink="/devis">
+          <span>Créer mon identité</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+        <button class="cta-secondary" (click)="scrollToSection('services')">
+          <span>Voir nos créations</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services" class="services-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Nos Services Créatifs</h2>
+        <p class="section-subtitle">
+          De la conception à la réalisation, nous donnons vie à vos idées avec créativité et professionnalisme
+        </p>
+      </div>
+      
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-palette"></i>
+          </div>
+          <h3>Identité Visuelle</h3>
+          <p>Création de logos, chartes graphiques et éléments d'identité pour une image cohérente</p>
+          <ul class="service-features">
+            <li>Logo professionnel unique</li>
+            <li>Charte graphique complète</li>
+            <li>Déclinaisons multi-supports</li>
+            <li>Guide d'utilisation</li>
+          </ul>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-file-alt"></i>
+          </div>
+          <h3>Supports de Communication</h3>
+          <p>Conception de tous vos supports print et digital pour une communication efficace</p>
+          <ul class="service-features">
+            <li>Flyers, brochures, catalogues</li>
+            <li>Cartes de visite, en-têtes</li>
+            <li>Affiches et banderoles</li>
+            <li>Supports digitaux</li>
+          </ul>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-tshirt"></i>
+          </div>
+          <h3>Sérigraphie & Impression</h3>
+          <p>Personnalisation textile et impression sur tous supports avec finition professionnelle</p>
+          <ul class="service-features">
+            <li>T-shirts, polos, sweats</li>
+            <li>Objets publicitaires</li>
+            <li>Signalétique</li>
+            <li>Finitions premium</li>
+          </ul>
+        </div>
+        
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-images"></i>
+          </div>
+          <h3>Design Digital</h3>
+          <p>Créations optimisées pour le web et les réseaux sociaux</p>
+          <ul class="service-features">
+            <li>Visuels réseaux sociaux</li>
+            <li>Bannières web</li>
+            <li>Infographies</li>
+            <li>Animations simples</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Portfolio Section -->
+  <section class="portfolio-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Nos Réalisations</h2>
+        <p class="section-subtitle">
+          Découvrez quelques-unes de nos créations qui ont marqué nos clients
+        </p>
+      </div>
+      
+      <div class="portfolio-categories">
+        <button class="category-btn active" (click)="filterPortfolio('all')">Tout voir</button>
+        <button class="category-btn" (click)="filterPortfolio('logo')">Logos</button>
+        <button class="category-btn" (click)="filterPortfolio('print')">Print</button>
+        <button class="category-btn" (click)="filterPortfolio('digital')">Digital</button>
+        <button class="category-btn" (click)="filterPortfolio('textile')">Textile</button>
+      </div>
+      
+      <div class="portfolio-grid">
+        <div class="portfolio-item" data-category="logo">
+          <div class="portfolio-image">
+            <img src="assets/portfolio/logo1.jpg" alt="Logo Design">
+            <div class="portfolio-overlay">
+              <div class="portfolio-info">
+                <h4>Logo Restaurant</h4>
+                <p>Identité visuelle complète</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="portfolio-item" data-category="print">
+          <div class="portfolio-image">
+            <img src="assets/portfolio/flyer1.jpg" alt="Flyer Design">
+            <div class="portfolio-overlay">
+              <div class="portfolio-info">
+                <h4>Flyer Événement</h4>
+                <p>Support de communication</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="portfolio-item" data-category="digital">
+          <div class="portfolio-image">
+            <img src="assets/portfolio/social1.jpg" alt="Social Media Design">
+            <div class="portfolio-overlay">
+              <div class="portfolio-info">
+                <h4>Visuels Réseaux</h4>
+                <p>Campagne social media</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="portfolio-item" data-category="textile">
+          <div class="portfolio-image">
+            <img src="assets/portfolio/tshirt1.jpg" alt="T-shirt Design">
+            <div class="portfolio-overlay">
+              <div class="portfolio-info">
+                <h4>T-shirt Personnalisé</h4>
+                <p>Sérigraphie textile</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Process Section -->
+  <section class="process-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Notre Processus Créatif</h2>
+        <p class="section-subtitle">
+          Une approche méthodique pour garantir des créations qui vous ressemblent
+        </p>
+      </div>
+      
+      <div class="process-timeline">
+        <div class="process-step">
+          <div class="step-number">01</div>
+          <div class="step-content">
+            <h3>Brief & Inspiration</h3>
+            <p>Écoute de vos besoins et recherche d'inspiration pour définir l'orientation créative</p>
+          </div>
+        </div>
+        
+        <div class="process-step">
+          <div class="step-number">02</div>
+          <div class="step-content">
+            <h3>Concepts & Esquisses</h3>
+            <p>Développement de plusieurs pistes créatives et présentation des concepts</p>
+          </div>
+        </div>
+        
+        <div class="process-step">
+          <div class="step-number">03</div>
+          <div class="step-content">
+            <h3>Création & Affinement</h3>
+            <p>Réalisation de la création finale avec ajustements selon vos retours</p>
+          </div>
+        </div>
+        
+        <div class="process-step">
+          <div class="step-number">04</div>
+          <div class="step-content">
+            <h3>Finalisation & Livraison</h3>
+            <p>Préparation des fichiers finaux et livraison dans tous les formats nécessaires</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools Section -->
+  <section class="tools-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Nos Outils de Création</h2>
+        <p class="section-subtitle">
+          Nous maîtrisons les logiciels professionnels de référence dans le domaine du design
+        </p>
+      </div>
+      
+      <div class="tools-grid">
+        <div class="tool-card">
+          <div class="tool-icon adobe">
+            <i class="fab fa-adobe"></i>
+          </div>
+          <h3>Adobe Creative Suite</h3>
+          <div class="tool-list">
+            <span>Photoshop</span>
+            <span>Illustrator</span>
+            <span>InDesign</span>
+            <span>After Effects</span>
+          </div>
+        </div>
+        
+        <div class="tool-card">
+          <div class="tool-icon design">
+            <i class="fas fa-pencil-ruler"></i>
+          </div>
+          <h3>Outils Complémentaires</h3>
+          <div class="tool-list">
+            <span>Figma</span>
+            <span>Canva Pro</span>
+            <span>Procreate</span>
+            <span>CorelDRAW</span>
+          </div>
+        </div>
+        
+        <div class="tool-card">
+          <div class="tool-icon print">
+            <i class="fas fa-print"></i>
+          </div>
+          <h3>Équipements d'Impression</h3>
+          <div class="tool-list">
+            <span>Presses sérigraphiques</span>
+            <span>Imprimantes grand format</span>
+            <span>Découpeuses vinyle</span>
+            <span>Finitions premium</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2>Prêt à créer votre identité visuelle ?</h2>
+        <p>Donnons vie à vos idées et créons ensemble des visuels qui marquent les esprits</p>
+        <div class="cta-buttons">
+          <button class="cta-primary" routerLink="/devis">
+            <span>Demander un devis créatif</span>
+            <i class="fas fa-arrow-right"></i>
+          </button>
+          <button class="cta-secondary" routerLink="/contact">
+            <span>Discuter de mon projet</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

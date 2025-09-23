@@ -1,0 +1,272 @@
+/* Styles partagés pour toutes les pages de services */
+
+/* Variables spécifiques aux services */
+:root {
+  --service-gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --service-gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --service-gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --service-gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  --service-gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+/* Base pour toutes les pages de services */
+.service-page {
+  min-height: 100vh;
+  background: var(--white);
+}
+
+/* Hero section améliorée */
+.service-page .hero-section {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 100%);
+}
+
+.service-page .hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 70%, rgba(255, 127, 26, 0.2) 0%, transparent 50%),
+              radial-gradient(circle at 70% 30%, rgba(3, 128, 194, 0.3) 0%, transparent 50%);
+  z-index: 1;
+}
+
+.service-page .hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* Titres avec animations */
+.service-page .hero-title {
+  background: linear-gradient(135deg, var(--white) 0%, var(--primary-orange) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: slideInUp 0.8s ease-out;
+}
+
+.service-page .section-title {
+  position: relative;
+  display: inline-block;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.service-page .section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+  border-radius: 2px;
+}
+
+/* Cards avec effets visuels améliorés */
+.service-page .service-card,
+.service-page .platform-card,
+.service-page .result-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(3, 128, 194, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.service-page .service-card::before,
+.service-page .platform-card::before,
+.service-page .result-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 127, 26, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.service-page .service-card:hover::before,
+.service-page .platform-card:hover::before,
+.service-page .result-card:hover::before {
+  left: 100%;
+}
+
+.service-page .service-card:hover,
+.service-page .platform-card:hover,
+.service-page .result-card:hover {
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary-orange);
+}
+
+/* Icônes avec animations */
+.service-page .service-icon,
+.service-page .platform-icon,
+.service-page .result-icon {
+  position: relative;
+  transition: all 0.4s ease;
+}
+
+.service-page .service-icon:hover,
+.service-page .platform-icon:hover,
+.service-page .result-icon:hover {
+  transform: scale(1.1) rotate(5deg);
+  animation: pulse 1.5s infinite;
+}
+
+/* Boutons CTA améliorés */
+.service-page .cta-primary {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--primary-orange) 0%, #ff9a4d 100%);
+  box-shadow: 0 4px 15px rgba(255, 127, 26, 0.3);
+}
+
+.service-page .cta-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.service-page .cta-primary:hover::before {
+  left: 100%;
+}
+
+.service-page .cta-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(255, 127, 26, 0.4);
+}
+
+/* Statistiques animées */
+.service-page .stat-number {
+  background: linear-gradient(135deg, var(--primary-orange), #ff9a4d);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: pulse 2s infinite;
+}
+
+/* Timeline de processus */
+.service-page .process-step {
+  opacity: 0;
+  animation: slideInUp 0.6s ease-out forwards;
+}
+
+.service-page .process-step:nth-child(1) { animation-delay: 0.1s; }
+.service-page .process-step:nth-child(2) { animation-delay: 0.2s; }
+.service-page .process-step:nth-child(3) { animation-delay: 0.3s; }
+.service-page .process-step:nth-child(4) { animation-delay: 0.4s; }
+.service-page .process-step:nth-child(5) { animation-delay: 0.5s; }
+
+/* Technologies avec effets hover */
+.service-page .tech-item {
+  position: relative;
+  cursor: pointer;
+}
+
+.service-page .tech-item::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(3, 128, 194, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.4s ease;
+}
+
+.service-page .tech-item:hover::after {
+  width: 120%;
+  height: 120%;
+}
+
+.service-page .tech-item:hover {
+  transform: translateY(-8px) scale(1.05);
+}
+
+/* Sections avec backgrounds alternés */
+.service-page .services-section {
+  background: var(--white);
+  position: relative;
+}
+
+.service-page .technologies-section,
+.service-page .platforms-section {
+  background: linear-gradient(135deg, var(--light-gray) 0%, rgba(248, 249, 250, 0.8) 100%);
+  position: relative;
+}
+
+.service-page .process-section,
+.service-page .results-section {
+  background: var(--white);
+  position: relative;
+}
+
+/* Effets de parallaxe légers */
+.service-page .section-header {
+  transform: translateY(0);
+  transition: transform 0.3s ease;
+}
+
+/* Responsive amélioré */
+@media (max-width: 768px) {
+  .service-page .hero-title {
+    font-size: clamp(2rem, 8vw, 3rem);
+  }
+  
+  .service-page .service-card,
+  .service-page .platform-card,
+  .service-page .result-card {
+    margin-bottom: 1.5rem;
+  }
+  
+  .service-page .service-card:hover,
+  .service-page .platform-card:hover,
+  .service-page .result-card:hover {
+    transform: translateY(-8px) scale(1.01);
+  }
+}
+
+@media (max-width: 480px) {
+  .service-page .hero-content {
+    padding: 1rem;
+  }
+  
+  .service-page .section-title::after {
+    width: 40px;
+    height: 3px;
+  }
+}
+
+/* Animations personnalisées */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(255, 127, 26, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(255, 127, 26, 0.6); }
+}
+
+.service-page .hero-badge {
+  animation: float 3s ease-in-out infinite;
+}
+
+.service-page .cta-primary:hover {
+  animation: glow 1.5s ease-in-out infinite;
+}

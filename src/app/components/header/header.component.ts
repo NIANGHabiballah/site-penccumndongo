@@ -17,7 +17,7 @@ import { CommonModule } from '@angular/common';
     CommonModule,
   ],
   templateUrl: './header.component.html',
-  styleUrl: './header.component.css'
+  styleUrls: ['./header.component.css']
 })
 
 export class HeaderComponent { 
@@ -25,6 +25,7 @@ export class HeaderComponent {
   activeSection: string = 'accueil';
   menuOpen = false;
   showDropdown = false;
+  showPortfolioDropdown = false;
 
 
    constructor(public router: Router) {
@@ -74,16 +75,17 @@ export class HeaderComponent {
   }
 
   closeMenuOnClick() {
-  if (window.innerWidth <= 900) {
+  if (window.innerWidth <= 1200) {
     this.menuOpen = false;
   }
 }
 
  // Ajoute cette méthode pour fermer le menu hamburger quand on quitte la zone
   closeMenuOnMouseLeave() {
-    if (window.innerWidth <= 900 && this.menuOpen) {
+    if (window.innerWidth <= 1200 && this.menuOpen) {
       this.menuOpen = false;
       this.showDropdown = false;
+      this.showPortfolioDropdown = false;
     }
   }
 
@@ -93,16 +95,32 @@ export class HeaderComponent {
 
   onDropdownHover(state: boolean) {
   // Sur desktop uniquement
-  if (window.innerWidth > 900) {
+  if (window.innerWidth > 1200) {
     this.showDropdown = state;
   }
 }
 
 toggleDropdownMobile(event: Event) {
   // Sur mobile uniquement
-  if (window.innerWidth <= 900) {
+  if (window.innerWidth <= 1200) {
     event.preventDefault(); // Empêche le scroll en haut de page
     this.showDropdown = !this.showDropdown;
   }
+ }
+
+ // Méthodes pour le sous-menu Portfolio
+ onPortfolioDropdownHover(state: boolean) {
+   // Sur desktop uniquement
+   if (window.innerWidth > 1200) {
+     this.showPortfolioDropdown = state;
+   }
+ }
+
+ togglePortfolioDropdownMobile(event: Event) {
+   // Sur mobile uniquement
+   if (window.innerWidth <= 1200) {
+     event.preventDefault();
+     this.showPortfolioDropdown = !this.showPortfolioDropdown;
+   }
  }
 }

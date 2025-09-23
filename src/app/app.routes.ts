@@ -13,7 +13,11 @@ import { FormationInfographieComponent } from './pages/formation-infographie/for
 import { FormationsComponent } from './pages/formations/formations.component';
 
 import { Cp2iComponent } from './pages/cp2i/cp2i.component';
-
+import { DeveloppementWebComponent } from './pages/services/developpement-web/developpement-web.component';
+import { CommunityManagementComponent } from './pages/services/community-management/community-management.component';
+import { DesignGraphiqueComponent } from './pages/services/design-graphique/design-graphique.component';
+import { MarketingDigitalComponent } from './pages/services/marketing-digital/marketing-digital.component';
+import { FormationsProComponent } from './pages/services/formations-pro/formations-pro.component';
 
 export const routes: Routes = [
   { path: '', component: AccueilComponent },
@@ -30,4 +34,11 @@ export const routes: Routes = [
   { path: 'formations', component: FormationsComponent },
   { path: 'formation-infographie', component: FormationInfographieComponent },
   { path: 'cp2i', component: Cp2iComponent },
+  
+  // Routes des services
+  { path: 'services/developpement-web', component: DeveloppementWebComponent },
+  { path: 'services/community-management', component: CommunityManagementComponent },
+  { path: 'services/design-graphique', component: DesignGraphiqueComponent },
+  { path: 'services/marketing-digital', component: MarketingDigitalComponent },
+  { path: 'services/formations-professionnelles', component: FormationsProComponent },
 ];

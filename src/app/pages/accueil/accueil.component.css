@@ -128,7 +128,7 @@
 }
 
 .vm-title {
-  font-family: 'Montserrat', 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 1.7rem;
   margin-bottom: 1rem;
   color: #0380C2;
@@ -140,7 +140,7 @@
   font-size: 1.13rem;
   color: #222;
   text-align: center;
-  font-family: 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: 400;
   line-height: 1.7;
   max-width: 700px;
@@ -169,14 +169,14 @@
 /* Réalisations */
 
 body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
-  font-family: 'Poppins', 'Montserrat', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 
 .blue-subtitle {
   color: #fff;
   font-size: 3.4rem;
-  font-family: 'Inter', 'Montserrat', 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin-bottom: 2.5rem;
   font-weight: bold;
   letter-spacing: 1px;
@@ -193,8 +193,22 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
 .portfolio-subtitle,
 .key-numbers .white-subtitle,
 .testimonials-section .section-title,
-.partners .orange-title {
-  font-family: 'Inter', 'Montserrat', 'Poppins', Arial, sans-serif !important;
+.partners .orange-title,
+.client-title,
+.form-title,
+.article-title,
+.tab-panel h2,
+.main-title,
+.black-subtitle,
+.portfolio-modern-title,
+.gallery-project-title,
+.project-title,
+.graphic-subtitle,
+.lightbox-title,
+.contact h2,
+.news h2,
+.testimonials h2 {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 
@@ -229,7 +243,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
 .services-title {
   color: #fff;
   font-size: 3.4rem;
-  font-family: 'Montserrat', 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin-bottom: 2.5rem;
   font-weight: bold;
   letter-spacing: 1px;
@@ -240,7 +254,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
   color: #e0e7ff;
   max-width: 600px;
   margin: 0 auto;
-  font-family: 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   opacity: 0.95;
 }
 
@@ -268,8 +282,10 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
   min-width: 260px;
   max-width: 340px;
   flex: 1 1 320px;
-  transition: box-shadow 0.2s, transform 0.2s;  position: relative;
+  transition: box-shadow 0.2s, transform 0.2s;
+  position: relative;
   margin-bottom: 2rem;
+  min-height: 320px;
 }
 
 .service-card:hover {
@@ -298,7 +314,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
 }
 
 .service-card h3 {
-  font-family: 'Montserrat', 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 1.18rem;
   color: #FF7F1A;
   font-weight: 700;
@@ -311,9 +327,61 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
   font-size: 1.05rem;
   color: #222;
   text-align: center;
-  font-family: 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: 400;
   line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.service-btn {
+  background: linear-gradient(135deg, #0380C2 0%, #FF7F1A 100%);
+  color: #fff;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.8rem 1.8rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: auto;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.service-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #FF7F1A 0%, #0380C2 100%);
+  transition: left 0.4s ease;
+  z-index: -1;
+}
+
+.service-btn:hover::before {
+  left: 0;
+}
+
+.service-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(3, 128, 194, 0.3);
+}
+
+.service-btn i {
+  font-size: 0.9rem;
+  transition: transform 0.3s ease;
+}
+
+.service-btn:hover i {
+  transform: translateX(4px);
 }
 
 .fade-in {
@@ -760,14 +828,14 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
 .orange-title {
   color: #0380C2 !important;
   font-size: 2rem;
-  font-family: 'Montserrat', 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin-bottom: 0.5rem;
 }
 
 .blue-subtitle {
   color: #FF7F1A;
   font-size: 3.4rem;
-  font-family: 'Montserrat', 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin-bottom: 2.5rem;
   font-weight: bold;
   letter-spacing: 1px;
@@ -856,7 +924,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
 
 .contact h2 {
   font-size: 2.2rem;
-  font-family: 'Montserrat', 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin-bottom: 2.5rem;
   color: #2d3a4a;
 }
@@ -975,7 +1043,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
 }
 
 .form-row label {
-  font-family: 'Poppins', 'Montserrat', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 1rem;
   color: #0380C2;
   font-weight: 400;
@@ -993,7 +1061,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
 
 .form-row input,
 .form-row textarea {
-  font-family: 'Poppins', 'Montserrat', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 1.08rem;
   border: 2px solid #FF7F1A;
   border-radius: 1rem;
@@ -1047,7 +1115,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
 .contact-form.wide button[type="submit"] {
   background: linear-gradient(90deg, #0380C2 0%, #FF7F1A 100%);
   color: #fff;
-  font-family: 'Montserrat', 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 1.2rem;
   font-weight: 700;
   border: none;
@@ -1076,7 +1144,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
 /* Actualités */
 /* Section principale */
 .actualites-section {
-  padding: 80px 0;
+  padding: 50px 0;
   background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
   position: relative;
   overflow: hidden;
@@ -1238,7 +1306,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
 .section-title,
 .partners .orange-title,
 .testimonials-section .section-title {
-  font-family: 'Inter', 'Montserrat', 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 @media (max-width: 600px) {
@@ -1491,7 +1559,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
 .white-subtitle{
   color: #fff;
   font-size: 3.4rem;
-  font-family: 'Montserrat', 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin-bottom: 2.5rem;
   font-weight: bold;
   letter-spacing: 1px;
@@ -1630,7 +1698,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
   padding: 0.6em 2.2em;
   font-size: 1.1rem;
   font-weight: 700;
-  font-family: 'Montserrat', 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   cursor: pointer;
   transition: background 0.2s, color 0.2s, border 0.2s;
   outline: none;
@@ -1661,13 +1729,13 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
   color: #FF7F1A;
   font-size: 1.5rem;
   margin-bottom: 0.7rem;
-  font-family: 'Montserrat', 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .tab-panel p {
   color: #222;
   font-size: 1.08rem;
-  font-family: 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.7;
 }
 
@@ -1742,7 +1810,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
 .portfolio-title {
   color: rgb(255, 255, 255);
   font-size: 3.5rem;
-  font-family: 'Montserrat', 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin: 0;
   font-weight: 700;
   letter-spacing: -1px;
@@ -1918,7 +1986,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .portfolio-modern-tags {
@@ -2078,7 +2146,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .gallery-project-description {
@@ -2324,7 +2392,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
 .black-subtitle {
   color: #222; /* Noir moderne */
   font-size: 2.2rem;
-  font-family: 'Montserrat', 'Poppins', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin-bottom: 2.5rem;
   font-weight: 500;
   letter-spacing: 1px;
@@ -2518,7 +2586,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
 .realisations-section {
   padding: 0;
   margin: 0;
-  font-family: 'Inter', 'Poppins', 'Montserrat', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .container {
@@ -2543,6 +2611,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
 }
 
 .realisations-section .section-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: clamp(2.5rem, 5vw, 3.5rem);
   font-weight: 700;
   color: #fff  !important;
@@ -2552,7 +2621,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
 }
 
 .realisations-section .section-subtitle  {
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-size: clamp(1rem, 4vw, 1.4rem) !important;
   font-weight: 600;
   color: #FF7F1A !important;
   line-height: 1.3  !important;
@@ -2740,6 +2809,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
 }
 
 .graphic-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: clamp(2.5rem, 5vw, 3.5rem);
   font-weight: 700;
   color: #fff  !important;

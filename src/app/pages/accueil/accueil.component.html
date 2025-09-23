@@ -14,31 +14,55 @@
       <div class="service-icon"><i class="fas fa-laptop-code"></i></div>
       <h3>Développement web & mobile</h3>
       <p>Sites web, applications mobiles modernes et performants, adaptés à vos besoins.</p>
+      <button class="service-btn" routerLink="/services/developpement-web">
+        <span>Voir plus</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
     </div>
     <div class="service-card">
       <div class="service-icon"><i class="fas fa-users"></i></div>
       <h3>Community management & réseaux sociaux</h3>
       <p>Gestion de vos réseaux sociaux, animation de communauté et création de contenus engageants.</p>
+      <button class="service-btn" routerLink="/services/community-management">
+        <span>Voir plus</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
     </div>
     <div class="service-card">
       <div class="service-icon"><i class="fas fa-bullhorn"></i></div>
       <h3>Communication & marketing digital</h3>
       <p>Stratégies digitales, campagnes publicitaires et optimisation de votre visibilité en ligne.</p>
+      <button class="service-btn" routerLink="/services/marketing-digital">
+        <span>Voir plus</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
     </div>
     <div class="service-card">
       <div class="service-icon"><i class="fas fa-paint-brush"></i></div>
       <h3>Design graphique & sérigraphie</h3>
       <p>Identité visuelle, supports de communication, sérigraphie personnalisée sur tous supports.</p>
+      <button class="service-btn" routerLink="/services/design-graphique">
+        <span>Voir plus</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
     </div>
     <div class="service-card">
       <div class="service-icon"><i class="fas fa-chalkboard-teacher"></i></div>
       <h3>Formations professionnelles</h3>
       <p>Formations en digital, communication, design, réseaux sociaux et outils numériques.</p>
+      <button class="service-btn" routerLink="/services/formations-professionnelles">
+        <span>Voir plus</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
     </div>
     <div class="service-card">
       <div class="service-icon"><i class="fas fa-star"></i></div>
       <h3>Promotion de la culture & jeunes talents</h3>
       <p>Valorisation de la culture locale et accompagnement des jeunes talents dans leur développement digital.</p>
+      <button class="service-btn" routerLink="/cp2i">
+        <span>Voir plus</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
     </div>
   </div>
 </section>
@@ -88,13 +112,13 @@
 <section class="realisations-section" id="portfolio">
 
   <!-- BLOC 1 : Réalisations Web -->
-  <div class="web-realizations-bloc">
+  <div id="web-projects" class="web-realizations-bloc">
     <div class="container">
       
       <!-- En-tête -->
       <div class="section-header">
         <h2 class="section-title">Quelques Sites Web</h2>
-        <p class="section-subtitle">conçus récemment !</p>
+        <p class="section-subtitle">conçus pour performer et soutenir votre croissance</p>
         <div class="title-arrow">▼</div>
       </div>
 
@@ -135,12 +159,12 @@
   </div>
 
   <!-- BLOC 2 : Conceptions Graphiques -->
-  <div class="graphic-realizations-bloc">
+  <div id="graphic-projects" class="graphic-realizations-bloc">
     <div class="container">
       
       <!-- En-tête -->
       <div class="graphic-section-header">
-        <p class="graphic-subtitle">Démarquez vous des autres à travers vos</p>
+        <p class="section-subtitle">Votre identité, sublimée par nos</p>
         <h2 class="graphic-title">Conceptions Graphiques</h2>
         <div class="title-arrow-white">▼</div>
       </div>
@@ -221,7 +245,7 @@
     <div class="section-header" [@fadeInUp]>
       <div class="header-content">
         <h2 class="section-title">Actualités</h2>
-        <span class="subtitle">Restez connectés</span>
+        <span class="section-subtitle">Restez connectés</span>
         <div class="title-divider"></div>
       </div>
     </div>
@@ -292,22 +316,22 @@
   <div class="numbers-cards">
     
     <div class="number-card">
-      <div class="number" data-target="50">0</div>
+      <div class="number" data-target="50">+0</div>
       <div class="number-label">Clients accompagnés</div>
     </div>
 
     <div class="number-card">
-  <div class="number" data-target="03">0</div>
+  <div class="number" data-target="03">+0</div>
       <div class="number-label">Projets réalisés</div>
     </div>
 
     <div class="number-card">
-  <div class="number" data-target="11">0</div>
+  <div class="number" data-target="11">+0</div>
       <div class="number-label">Partenaires</div>
     </div>
 
     <div class="number-card">
-  <div class="number" data-target="01">0</div>
+  <div class="number" data-target="03">+0</div>
       <div class="number-label">Années d’expérience</div>
     </div>
   </div>
@@ -482,19 +506,3 @@
 
 </section>
 
-<!-- Icône WhatsApp flottante -->
-<div id="whatsapp-float" class="whatsapp-float">
-  <a href="https://wa.me/221771234567?text=Bonjour%20Penccum%20Ndongo%20!" target="_blank" rel="noopener" id="whatsapp-link">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" class="whatsapp-icon"/>
-  </a>
-  <span id="whatsapp-text" class="whatsapp-text">Discutons sur WhatsApp</span>
-</div>
-
-<!-- Boutons de scroll haut/bas -->
-<button id="scrollTopBtn" class="scroll-btn" title="Haut" (click)="scrollToTop()">
-  <i class="fas fa-arrow-up"></i>
-</button>
-
-<button id="scrollBottomBtn" class="scroll-btn" title="Bas" (click)="scrollToBottom()">
-  <i class="fas fa-arrow-down"></i>
-</button>

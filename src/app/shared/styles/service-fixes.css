@@ -1,0 +1,266 @@
+/* Corrections finales pour les pages de services */
+
+/* Force l'application des couleurs principales */
+.service-page * {
+  box-sizing: border-box;
+}
+
+/* Exception pour le header - ne pas appliquer les styles service-page */
+.service-page .header,
+.service-page .header * {
+  all: revert !important;
+}
+
+/* Restaurer les styles du bouton hamburger */
+.service-page .menu-toggle {
+  all: revert !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  width: 40px !important;
+  height: 40px !important;
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  z-index: 1200 !important;
+  position: absolute !important;
+  right: 1.5rem !important;
+  top: 1.2rem !important;
+}
+
+.service-page .menu-toggle .bar {
+  all: revert !important;
+  width: 28px !important;
+  height: 4px !important;
+  background: #0380C2 !important;
+  border-radius: 2px !important;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  display: block !important;
+}
+
+/* Titres principaux */
+.service-page h1,
+.service-page .hero-title {
+  font-size: clamp(2.5rem, 5vw, 4rem) !important;
+  font-weight: 800 !important;
+  background: linear-gradient(135deg, #ffffff 0%, #FF7F1A 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.service-page h2,
+.service-page .section-title {
+  font-size: clamp(2rem, 4vw, 3rem) !important;
+  font-weight: 800 !important;
+  color: #2c3e50 !important;
+  margin-bottom: 1rem !important;
+}
+
+.service-page h3 {
+  font-size: clamp(1.5rem, 3vw, 2rem) !important;
+  font-weight: 700 !important;
+  color: #2c3e50 !important;
+}
+
+/* Sections hero */
+.service-page .hero-section {
+  background: linear-gradient(135deg, #001B36 0%, #0380C2 100%) !important;
+  color: #ffffff !important;
+  min-height: 100vh !important;
+}
+
+.service-page .hero-section * {
+  color: inherit !important;
+}
+
+.service-page .hero-subtitle,
+.service-page .hero-section p {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Icônes de services */
+.service-page .service-icon,
+.service-page .platform-icon,
+.service-page .result-icon,
+.service-page .strategy-icon {
+  background: linear-gradient(135deg, #0380C2 0%, #FF7F1A 100%) !important;
+  color: #ffffff !important;
+  width: 80px !important;
+  height: 80px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 2rem !important;
+}
+
+.service-page .service-icon i,
+.service-page .platform-icon i,
+.service-page .result-icon i,
+.service-page .strategy-icon i {
+  color: #ffffff !important;
+}
+
+/* Boutons CTA */
+.service-page .cta-primary {
+  background: linear-gradient(135deg, #FF7F1A 0%, #ff9a4d 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 1rem 2rem !important;
+  border-radius: 50px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+}
+
+.service-page .cta-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 30px rgba(255, 127, 26, 0.3) !important;
+}
+
+.service-page .cta-secondary {
+  background: transparent !important;
+  color: #ffffff !important;
+  border: 2px solid #0380C2 !important;
+}
+
+.service-page .cta-secondary:hover {
+  background: #0380C2 !important;
+  color: #ffffff !important;
+}
+
+/* Cards avec animations */
+.service-page .service-card,
+.service-page .platform-card,
+.service-page .result-card,
+.service-page .strategy-card,
+.service-page .tech-item,
+.service-page .tool-item {
+  background: #ffffff !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 1px solid rgba(3, 128, 194, 0.1) !important;
+}
+
+.service-page .service-card:hover,
+.service-page .platform-card:hover,
+.service-page .result-card:hover,
+.service-page .strategy-card:hover,
+.service-page .tech-item:hover,
+.service-page .tool-item:hover {
+  transform: translateY(-8px) !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12) !important;
+  border-color: #FF7F1A !important;
+}
+
+/* Statistiques */
+.service-page .stat-number {
+  font-size: 2.5rem !important;
+  font-weight: 800 !important;
+  color: #FF7F1A !important;
+  line-height: 1 !important;
+}
+
+.service-page .result-number {
+  font-size: 2.5rem !important;
+  font-weight: 800 !important;
+  color: #FF7F1A !important;
+}
+
+/* Numéros d'étapes */
+.service-page .step-number {
+  background: linear-gradient(135deg, #0380C2 0%, #FF7F1A 100%) !important;
+  color: #ffffff !important;
+  width: 80px !important;
+  height: 80px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.5rem !important;
+  font-weight: 800 !important;
+}
+
+/* Sections CTA finales */
+.service-page .cta-section {
+  background: linear-gradient(135deg, #001B36 0%, #0380C2 100%) !important;
+  color: #ffffff !important;
+}
+
+.service-page .cta-section h2 {
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.service-page .cta-section p {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Corrections pour les icônes FontAwesome */
+.service-page .fas,
+.service-page .fab,
+.service-page .fa {
+  color: inherit !important;
+}
+
+/* Textes et couleurs */
+.service-page .service-card h3,
+.service-page .platform-card h3,
+.service-page .result-card h3,
+.service-page .strategy-card h3 {
+  color: #2c3e50 !important;
+  font-weight: 700 !important;
+}
+
+.service-page .service-card p,
+.service-page .platform-card p,
+.service-page .result-card p,
+.service-page .strategy-card p {
+  color: #6c757d !important;
+}
+
+/* Listes de fonctionnalités */
+.service-page .service-features li::before {
+  content: '✓' !important;
+  color: #FF7F1A !important;
+  font-weight: bold !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .service-page .hero-title {
+    font-size: clamp(2rem, 8vw, 3rem) !important;
+  }
+  
+  .service-page .section-title {
+    font-size: clamp(1.5rem, 6vw, 2.5rem) !important;
+  }
+}
+
+/* Animations renforcées */
+@keyframes serviceSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.service-page .service-card,
+.service-page .platform-card,
+.service-page .result-card {
+  animation: serviceSlideUp 0.6s ease-out;
+}
+
+.service-page .service-card:nth-child(1) { animation-delay: 0.1s; }
+.service-page .service-card:nth-child(2) { animation-delay: 0.2s; }
+.service-page .service-card:nth-child(3) { animation-delay: 0.3s; }
+.service-page .service-card:nth-child(4) { animation-delay: 0.4s; }
+

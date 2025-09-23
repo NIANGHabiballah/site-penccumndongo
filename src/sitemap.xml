@@ -16,5 +16,36 @@
     <loc>https://penccumndongo.com/a-propos</loc>
     <priority>0.7</priority>
   </url>
-  <!-- Ajoutez ici vos autres pages importantes -->
+  <url>
+    <loc>https://penccumndongo.com/portfolio</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://penccumndongo.com/testimonials</loc>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://penccumndongo.com/news</loc>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://penccumndongo.com/devis</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://penccumndongo.com/opportunites</loc>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://penccumndongo.com/formations</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://penccumndongo.com/formation-infographie</loc>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://penccumndongo.com/cp2i</loc>
+    <priority>0.6</priority>
+  </url>
 </urlset>
