@@ -53,7 +53,7 @@
             <li><a routerLink="/apropos" class="footer-link">À propos</a></li>
             <li><a routerLink="/devis" class="footer-link">Obtenir un devis</a></li>
             <li><a (click)="scrollToSection('services')" class="footer-link">Services</a></li>
-            <li><a (click)="scrollToSection('portfolio')" class="footer-link">Portfolio</a></li>
+            <li><a (click)="scrollToSection('portfolio')" class="footer-link">Projets réalisés</a></li>
             <li><a (click)="scrollToSection('contact')" class="footer-link">Contact</a></li>
           </ul>
         </div>
@@ -114,9 +114,9 @@
           <span>&copy; {{ currentYear }} Agence Penccum Ndongo. Tous droits réservés.</span>
         </div>
         <div class="footer-links-bottom">
-          <a href="#" class="legal-link">Politique de confidentialité</a>
-          <a href="#" class="legal-link">Mentions légales</a>
-          <a href="#" class="legal-link">CGV</a>
+          <a routerLink="/politique-confidentialite" class="legal-link">Politique de confidentialité</a>
+          <a routerLink="/mentions-legales" class="legal-link">Mentions légales</a>
+          <a routerLink="/cgv" class="legal-link">CGV</a>
         </div>
       </div>
     </div>

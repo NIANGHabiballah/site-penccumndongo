@@ -1,0 +1,260 @@
+/* Variables */
+:root {
+  --primary-blue: #0380C2;
+  --primary-orange: #FF7F1A;
+  --dark-blue: #001B36;
+  --light-gray: #f8f9fa;
+  --white: #ffffff;
+  --text-dark: #2c3e50;
+  --text-light: #6c757d;
+  --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --border-radius: 16px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hero Section */
+.hero-section {
+  position: relative;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 100%);
+  overflow: hidden;
+}
+
+.hero-background {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.hero-particles {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 70%, rgba(255, 127, 26, 0.15) 0%, transparent 50%),
+              radial-gradient(circle at 70% 30%, rgba(3, 128, 194, 0.2) 0%, transparent 50%);
+}
+
+.hero-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, transparent 0%, rgba(255, 127, 26, 0.08) 100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: var(--white);
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.hero-title {
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-weight: 900;
+  margin-bottom: 1rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--white);
+}
+
+.hero-subtitle {
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  font-weight: 300;
+  opacity: 0.9;
+  color: var(--white);
+}
+
+/* Content Section */
+.content-section {
+  padding: 80px 0;
+  background: var(--light-gray);
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.legal-content {
+  background: var(--white);
+  border-radius: var(--border-radius);
+  padding: 3rem;
+  box-shadow: var(--shadow-light);
+}
+
+.legal-section {
+  margin-bottom: 3rem;
+}
+
+.legal-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  margin-bottom: 1.5rem;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::before,
+.section-title::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--primary-orange);
+  animation: expandDash 0.8s ease-out forwards;
+}
+
+.section-title::before {
+  right: 100%;
+  margin-right: 15px;
+}
+
+.section-title::after {
+  left: 100%;
+  margin-left: 15px;
+}
+
+@keyframes expandDash {
+  to {
+    width: 30px;
+  }
+}
+
+.text-content {
+  line-height: 1.7;
+  color: var(--text-dark);
+}
+
+.text-content p {
+  margin-bottom: 1.5rem;
+}
+
+.text-content h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--primary-orange);
+  margin: 2rem 0 1rem 0;
+}
+
+.text-content ul {
+  margin: 1rem 0;
+  padding-left: 2rem;
+}
+
+.text-content li {
+  margin-bottom: 0.5rem;
+  color: var(--text-light);
+}
+
+.conservation-grid {
+  display: grid;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.conservation-item {
+  padding: 1rem;
+  background: var(--light-gray);
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-blue);
+}
+
+.conservation-item strong {
+  color: var(--primary-blue);
+}
+
+.contact-dpo {
+  margin: 1.5rem 0;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--light-gray);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.contact-item i {
+  color: var(--primary-blue);
+  font-size: 1.2rem;
+  width: 20px;
+}
+
+.update-info {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+  border-radius: 12px;
+  color: var(--white) !important;
+}
+
+.update-info p {
+  margin: 0.5rem 0;
+  font-weight: 600;
+  color: var(--white) !important;
+}
+
+.update-info em {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  color: var(--white) !important;
+}
+
+.update-info strong {
+  color: var(--white) !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .legal-content {
+    padding: 2rem 1.5rem;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+  }
+  
+  .section-title::before,
+  .section-title::after {
+    display: none;
+  }
+  
+  .conservation-grid {
+    gap: 0.8rem;
+  }
+  
+  .conservation-item {
+    padding: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-section {
+    padding: 60px 0;
+  }
+  
+  .legal-content {
+    padding: 1.5rem 1rem;
+  }
+  
+  .legal-section {
+    margin-bottom: 2rem;
+  }
+  
+  .update-info {
+    padding: 1.5rem;
+  }
+}

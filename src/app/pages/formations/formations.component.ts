@@ -1,42 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-formations',
-  imports: [ReactiveFormsModule, CommonModule,],
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './formations.component.html',
   styleUrl: './formations.component.css'
 })
-export class FormationsComponent {
-
-  ngAfterViewInit() {
-    // WhatsApp floating icon logic
-    const whatsappFloat = document.getElementById('whatsapp-float');
-    const whatsappIcon = document.querySelector('.whatsapp-icon');
-    const whatsappText = document.getElementById('whatsapp-text');
-    const whatsappLink = document.getElementById('whatsapp-link');
-    if (whatsappIcon && whatsappFloat && whatsappText && whatsappLink) {
-      whatsappIcon.addEventListener('click', (e) => {
-        e.preventDefault();
-        whatsappFloat.classList.toggle('active');
-        if (whatsappFloat.classList.contains('active')) {
-          whatsappText.style.display = 'inline-block';
-        } else {
-          whatsappText.style.display = 'none';
-        }
-      });
-      whatsappText.addEventListener('click', () => {
-        window.open(whatsappLink.getAttribute('href')!, '_blank');
-      });
-    }
-  }
+export class FormationsComponent implements OnInit {
   
-showInscriptionModal = false;
-inscriptionForm: FormGroup;
-successMsg = '';
-errorMsg = '';
+  showInscriptionModal = false;
+  inscriptionForm: FormGroup;
+  successMsg = '';
+  errorMsg = '';
 
   axesList = [
     "Leadership & Développement personnel",
@@ -48,7 +27,7 @@ errorMsg = '';
     "Création artistique & expression poétique"
   ];
 
- constructor(private fb: FormBuilder, private http: HttpClient) {
+  constructor(private fb: FormBuilder, private http: HttpClient) {
     this.inscriptionForm = this.fb.group({
       nom: ['', Validators.required],
       prenom: ['', Validators.required],
@@ -61,6 +40,10 @@ errorMsg = '';
       axes: [[], Validators.required],
       motivation: ['']
     });
+  }
+
+  ngOnInit() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   onAxeChange(event: any) {
@@ -77,15 +60,16 @@ errorMsg = '';
     this.inscriptionForm.get('axes')?.markAsTouched();
   }
 
-
   submitInscription() {
     this.successMsg = '';
     this.errorMsg = '';
+    
     if (this.inscriptionForm.invalid) {
       this.errorMsg = "Merci de remplir tous les champs obligatoires.";
       this.markAllAsTouched();
       return;
     }
+
     this.http.post<{success: boolean, message: string}>('https://penccumndongo.com/inscription.php', this.inscriptionForm.value)
       .subscribe({
         next: (res) => {
@@ -93,6 +77,7 @@ errorMsg = '';
             this.successMsg = res.message;
             this.errorMsg = '';
             this.inscriptionForm.reset();
+            this.inscriptionForm.get('axes')?.setValue([]);
           } else {
             this.errorMsg = res.message;
             this.successMsg = '';
@@ -105,30 +90,21 @@ errorMsg = '';
       });
   }
 
-   markAllAsTouched() {
+  markAllAsTouched() {
     Object.values(this.inscriptionForm.controls).forEach(control => {
       control.markAsTouched();
     });
   }
 
   openInscriptionModal() {
-  this.showInscriptionModal = true;
-}
+    this.showInscriptionModal = true;
+    this.successMsg = '';
+    this.errorMsg = '';
+  }
 
-closeInscriptionModal() {
-  this.showInscriptionModal = false;
-}
-
-  ngOnInit() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-  scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-scrollToBottom() {
-  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-}
-
+  closeInscriptionModal() {
+    this.showInscriptionModal = false;
+    this.successMsg = '';
+    this.errorMsg = '';
+  }
 }

@@ -18,6 +18,12 @@ import { CommunityManagementComponent } from './pages/services/community-managem
 import { DesignGraphiqueComponent } from './pages/services/design-graphique/design-graphique.component';
 import { MarketingDigitalComponent } from './pages/services/marketing-digital/marketing-digital.component';
 import { FormationsProComponent } from './pages/services/formations-pro/formations-pro.component';
+import { TafsirHabyNiangComponent } from './pages/equipe/tafsir-haby-niang.component';
+import { KhadijatouSidibeComponent } from './pages/equipe/khadijatou-sidibe.component';
+import { MentionsLegalesComponent } from './pages/mentions-legales/mentions-legales.component';
+import { PolitiqueConfidentialiteComponent } from './pages/politique-confidentialite/politique-confidentialite.component';
+import { CgvComponent } from './pages/cgv/cgv.component';
+import { SecurityGuard } from './guards/security.guard';
 
 export const routes: Routes = [
   { path: '', component: AccueilComponent },
@@ -27,12 +33,12 @@ export const routes: Routes = [
   { path: 'portfolio', component: PortfolioComponent },
   { path: 'testimonials', component: TestimonialsComponent },
   { path: 'news', component: NewsComponent },
-  { path: 'contact', component: ContactComponent },
-  { path: 'devis', component: DevisComponent },
+  { path: 'contact', component: ContactComponent, canActivate: [SecurityGuard] },
+  { path: 'devis', component: DevisComponent, canActivate: [SecurityGuard] },
 
   { path: 'opportunites', component: OpportunitesComponent },
-  { path: 'formations', component: FormationsComponent },
-  { path: 'formation-infographie', component: FormationInfographieComponent },
+  { path: 'formations', component: FormationsComponent, canActivate: [SecurityGuard] },
+  { path: 'formation-infographie', component: FormationInfographieComponent, canActivate: [SecurityGuard] },
   { path: 'cp2i', component: Cp2iComponent },
   
   // Routes des services
@@ -41,4 +47,13 @@ export const routes: Routes = [
   { path: 'services/design-graphique', component: DesignGraphiqueComponent },
   { path: 'services/marketing-digital', component: MarketingDigitalComponent },
   { path: 'services/formations-professionnelles', component: FormationsProComponent },
+  
+  // Routes des profils d'équipe
+  { path: 'equipe/tafsir-haby-niang', component: TafsirHabyNiangComponent },
+  { path: 'equipe/khadijatou-sidibe', component: KhadijatouSidibeComponent },
+  
+  // Routes des pages légales
+  { path: 'mentions-legales', component: MentionsLegalesComponent },
+  { path: 'politique-confidentialite', component: PolitiqueConfidentialiteComponent },
+  { path: 'cgv', component: CgvComponent },
 ];

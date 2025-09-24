@@ -112,6 +112,22 @@
 .service-page .result-icon {
   position: relative;
   transition: all 0.4s ease;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  margin: 0 auto !important;
+}
+
+.service-page .service-icon i,
+.service-page .platform-icon i,
+.service-page .result-icon i {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .service-page .service-icon:hover,

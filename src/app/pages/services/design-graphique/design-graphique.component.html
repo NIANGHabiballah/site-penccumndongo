@@ -121,56 +121,24 @@
       
       <div class="portfolio-categories">
         <button class="category-btn active" (click)="filterPortfolio('all')">Tout voir</button>
-        <button class="category-btn" (click)="filterPortfolio('logo')">Logos</button>
-        <button class="category-btn" (click)="filterPortfolio('print')">Print</button>
-        <button class="category-btn" (click)="filterPortfolio('digital')">Digital</button>
-        <button class="category-btn" (click)="filterPortfolio('textile')">Textile</button>
+        <button class="category-btn" (click)="filterPortfolio('affiches')">Affiches</button>
+        <button class="category-btn" (click)="filterPortfolio('logos')">Logos</button>
+        <button class="category-btn" (click)="filterPortfolio('dépliants')">Dépliants</button>
+        <button class="category-btn" (click)="filterPortfolio('bannières')">Bannières</button>
+        <button class="category-btn" (click)="filterPortfolio('mockups')">Mockups</button>
+        <button class="category-btn" (click)="filterPortfolio('kakemonos')">Kakemonos</button>
       </div>
       
       <div class="portfolio-grid">
-        <div class="portfolio-item" data-category="logo">
+        <div class="portfolio-item" 
+             *ngFor="let project of graphicProjects" 
+             [attr.data-category]="project.category.toLowerCase()">
           <div class="portfolio-image">
-            <img src="assets/portfolio/logo1.jpg" alt="Logo Design">
+            <img [src]="project.image" [alt]="project.title">
             <div class="portfolio-overlay">
               <div class="portfolio-info">
-                <h4>Logo Restaurant</h4>
-                <p>Identité visuelle complète</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="portfolio-item" data-category="print">
-          <div class="portfolio-image">
-            <img src="assets/portfolio/flyer1.jpg" alt="Flyer Design">
-            <div class="portfolio-overlay">
-              <div class="portfolio-info">
-                <h4>Flyer Événement</h4>
-                <p>Support de communication</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="portfolio-item" data-category="digital">
-          <div class="portfolio-image">
-            <img src="assets/portfolio/social1.jpg" alt="Social Media Design">
-            <div class="portfolio-overlay">
-              <div class="portfolio-info">
-                <h4>Visuels Réseaux</h4>
-                <p>Campagne social media</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="portfolio-item" data-category="textile">
-          <div class="portfolio-image">
-            <img src="assets/portfolio/tshirt1.jpg" alt="T-shirt Design">
-            <div class="portfolio-overlay">
-              <div class="portfolio-info">
-                <h4>T-shirt Personnalisé</h4>
-                <p>Sérigraphie textile</p>
+                <h4>{{ project.title }}</h4>
+                <p>{{ project.category }}</p>
               </div>
             </div>
           </div>

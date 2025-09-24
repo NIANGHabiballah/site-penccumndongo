@@ -95,6 +95,8 @@
   align-items: center !important;
   justify-content: center !important;
   font-size: 2rem !important;
+  margin: 0 auto !important;
+  text-align: center !important;
 }
 
 .service-page .service-icon i,
@@ -102,6 +104,13 @@
 .service-page .result-icon i,
 .service-page .strategy-icon i {
   color: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  text-align: center !important;
+  line-height: 1 !important;
 }
 
 /* Boutons CTA */

@@ -1,132 +1,136 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common'; // <-- Ajout
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+
+interface BookImage {
+  src: string;
+  alt: string;
+}
 
 @Component({
   selector: 'app-cp2i',
-  imports: [CommonModule, ],
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './cp2i.component.html',
-  styleUrl: './cp2i.component.css'
+  styleUrls: ['./cp2i.component.css']
 })
-export class Cp2iComponent {
-
-  ngAfterViewInit() {
-    // WhatsApp floating icon logic
-    const whatsappFloat = document.getElementById('whatsapp-float');
-    const whatsappIcon = document.querySelector('.whatsapp-icon');
-    const whatsappText = document.getElementById('whatsapp-text');
-    const whatsappLink = document.getElementById('whatsapp-link');
-    if (whatsappIcon && whatsappFloat && whatsappText && whatsappLink) {
-      whatsappIcon.addEventListener('click', (e) => {
-        e.preventDefault();
-        whatsappFloat.classList.toggle('active');
-        if (whatsappFloat.classList.contains('active')) {
-          whatsappText.style.display = 'inline-block';
-        } else {
-          whatsappText.style.display = 'none';
-        }
-      });
-      whatsappText.addEventListener('click', () => {
-        window.open(whatsappLink.getAttribute('href')!, '_blank');
-      });
-    }
-  }
-  galleryIndexes = Array.from({length: 48}, (_, i) => i); // 0 à 50 inclus
-  // Lightbox pour la galerie principale
-  lightboxOpen = false;
-  currentImg = 0;
-  showThanksLightbox = false;
-
-galleryImages = Array.from({length: 55}, (_, i) => `cp2i/galerie/${i}.jpg`);
-galleryIndex = 0;
-galleryInterval: any;
-showGalleryModal = false;
-selectedGalleryImage = '';
-
-
-    // Images du recueil & temps forts
-  bookImages = [
-    { src: 'cp2i/couverturereccueil.jpg', alt: 'Couverture recueil' },
-    { src: 'cp2i/auatriemecouverturerecueil.jpg', alt: 'Quatrième de couverture' },
-    { src: 'cp2i/bibliolivre.jpeg', alt: 'Livre en bibliothèque' },
-    { src: 'cp2i/expolivre.jpeg', alt: 'Exposition livre' },
-    { src: 'cp2i/prixetdetail.jpeg', alt: 'Prix et détails' }
+export class Cp2iComponent implements OnInit {
+  
+  // Images du recueil
+  bookImages: BookImage[] = [
+    {
+      src: 'CouvertureRecueildePoème.jpeg',
+      alt: 'Couverture du recueil de poèmes'
+    },
+    {
+      src: 'QuatrièmeCouvertureRecueildePoème.jpeg',
+      alt: 'Quatrième de couverture du recueil'
+    },
+    {
+      src: 'expolivre.jpeg',
+      alt: 'Exposition du livre'
+    },
+    {
+      src: 'prixetdetail.jpeg',
+      alt: 'Prix et détails du livre'
+    },
+      {
+      src: 'bibliolivre.jpeg',
+      alt: 'Bibliothèque du recueil'
+    },
   ];
 
-  openLightbox(idx: number) {
-    this.currentImg = idx;
-    this.lightboxOpen = true;
-  }
+  // Images de la galerie
+  galleryImages: string[] = [
+    'cp2i/galerie/1.jpg',
+    'cp2i/galerie/2.jpg',
+    'cp2i/galerie/3.jpg',
+    'cp2i/galerie/4.jpg',
+    'cp2i/galerie/5.jpg',
+    'cp2i/galerie/6.jpg',
+    'cp2i/galerie/7.jpg',
+    'cp2i/galerie/8.jpg'
+  ];
 
-  closeLightbox() {
-    this.lightboxOpen = false;
-  }
-
-   // Lightbox pour les livres
+  // États des lightbox
+  showThanksLightbox = false;
   bookLightboxOpen = false;
+  showGalleryModal = false;
+  
+  // Index actuels
   currentBookImg = 0;
+  galleryIndex = 0;
+  selectedGalleryImage = '';
 
-  openBookLightbox(idx: number) {
-    this.currentBookImg = idx;
-    this.bookLightboxOpen = true;
-  }
-  closeBookLightbox() {
-    this.bookLightboxOpen = false;
+  ngOnInit() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  // Gestion lightbox remerciements
   openThanksLightbox() {
-  this.showThanksLightbox = true;
-}
+    this.showThanksLightbox = true;
+    document.body.style.overflow = 'hidden';
+  }
 
   closeThanksLightbox() {
     this.showThanksLightbox = false;
+    document.body.style.overflow = 'auto';
   }
 
-    ngOnInit() {
-   window.scrollTo({ top: 0, behavior: 'smooth' });
-  this.startGalleryAutoSlide();
-}
-
-startGalleryAutoSlide() {
-  this.galleryInterval = setInterval(() => {
-    this.nextGalleryImage();
-  }, 3500);
-}
-
-stopGalleryAutoSlide() {
-  if (this.galleryInterval) {
-    clearInterval(this.galleryInterval);
+  // Gestion lightbox livres
+  openBookLightbox(index: number) {
+    this.currentBookImg = index;
+    this.bookLightboxOpen = true;
+    document.body.style.overflow = 'hidden';
   }
-}
 
-nextGalleryImage() {
-  this.galleryIndex = (this.galleryIndex + 1) % this.galleryImages.length;
-}
+  closeBookLightbox() {
+    this.bookLightboxOpen = false;
+    document.body.style.overflow = 'auto';
+  }
 
-prevGalleryImage() {
-  this.galleryIndex = (this.galleryIndex - 1 + this.galleryImages.length) % this.galleryImages.length;
-}
+  prevBookImage() {
+    if (this.currentBookImg > 0) {
+      this.currentBookImg--;
+    }
+  }
 
-openGalleryModal(img: string) {
-  this.selectedGalleryImage = img;
-  this.showGalleryModal = true;
-  this.stopGalleryAutoSlide();
-}
+  nextBookImage() {
+    if (this.currentBookImg < this.bookImages.length - 1) {
+      this.currentBookImg++;
+    }
+  }
 
-closeGalleryModal() {
-  this.showGalleryModal = false;
-  this.startGalleryAutoSlide();
-}
+  // Gestion galerie
+  prevGalleryImage() {
+    if (this.galleryIndex > 0) {
+      this.galleryIndex--;
+    }
+  }
 
-ngOnDestroy() {
-  this.stopGalleryAutoSlide();
-}
+  nextGalleryImage() {
+    if (this.galleryIndex < this.galleryImages.length - 1) {
+      this.galleryIndex++;
+    }
+  }
 
-  scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+  openGalleryModal(imageSrc: string) {
+    this.selectedGalleryImage = imageSrc;
+    this.showGalleryModal = true;
+    document.body.style.overflow = 'hidden';
+  }
 
-scrollToBottom() {
-  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-}
+  closeGalleryModal() {
+    this.showGalleryModal = false;
+    this.selectedGalleryImage = '';
+    document.body.style.overflow = 'auto';
+  }
 
+  // Navigation vers la galerie
+  scrollToGallery() {
+    const galleryElement = document.getElementById('gallery-section');
+    if (galleryElement) {
+      galleryElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
 }

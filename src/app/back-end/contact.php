@@ -3,11 +3,10 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Autoriser uniquement ton domaine
+header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: https://penccumndongo.com");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
-header('Content-Type: application/json');
 
 // Répondre à la requête OPTIONS (préflight)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -24,8 +23,8 @@ if (!$data) {
 }
 
 // Vérification reCAPTCHA
-$captchaResponse = $data['g-recaptcha-response'] ?? '';
-$secretKey = "6LfFersrAAAAAD7kio_QXNM7cN1ymUBJKt8aOy7J";
+$captchaResponse = $data['recaptchaToken'] ?? $data['g-recaptcha-response'] ?? '';
+$secretKey = "6LcOtdMrAAAAAOmrA7qhV6cNswS-UgWsaBiSQR0b";
 
 if (!$captchaResponse) {
     echo json_encode(['success' => false, 'message' => 'Captcha manquant']);

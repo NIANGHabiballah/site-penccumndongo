@@ -431,7 +431,10 @@
   </section>
 
 
-  <!-- Section Contact -->
+  <!-- Section Newsletter -->
+<app-newsletter></app-newsletter>
+
+<!-- Section Contact -->
 <section id="contact" class="contact scroll-section">
 
  <div class="section-header" [@fadeInUp]>
@@ -495,10 +498,17 @@
       Merci de détailler votre projet.
     </div>
   </div>
-  <div class="recaptcha-container">
-    <re-captcha siteKey="6LfFersrAAAAAHr1r8kB0UmyDa3R-yooRboWftzU" (resolved)="onCaptchaResolved($event)"></re-captcha>
+  
+  <!-- reCAPTCHA -->
+  <div class="form-row recaptcha-row">
+    <re-captcha
+      (resolved)="onCaptchaResolved($event)"
+      siteKey="6LcOtdMrAAAAAKCPKLTLIONtTqumHbVTm316iyzT"
+      size="normal"
+      theme="light">
+    </re-captcha>
   </div>
-  <input type="hidden" name="g-recaptcha-response" [(ngModel)]="captchaToken">
+  
   <button type="submit" [disabled]="!contactForm.valid || !captchaResolved">Envoyer</button></form>
 
 <div *ngIf="successMsg" class="success">{{successMsg}}</div>

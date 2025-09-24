@@ -1,1 +1,88 @@
-<p>contact works!</p>
+<section class="contact-banner fade-in">
+  <h1>Contactez-nous</h1>
+  <p>Nous sommes là pour répondre à toutes vos questions et vous accompagner dans vos projets.</p>
+</section>
+
+<div class="contact-container">
+  <div class="contact-content">
+    <div class="contact-info">
+      <h2>Nos coordonnées</h2>
+      <div class="info-item">
+        <i class="fa-solid fa-envelope"></i>
+        <div>
+          <h3>Email</h3>
+          <p>pencc.penccumndongo&#64;gmail.com</p>
+        </div>
+      </div>
+      <div class="info-item">
+        <i class="fa-solid fa-phone"></i>
+        <div>
+          <h3>Téléphone</h3>
+          <p>+221 77 629 06 39</p>
+          <p>+221 76 841 54 14</p>
+        </div>
+      </div>
+      <div class="info-item">
+        <i class="fa-solid fa-location-dot"></i>
+        <div>
+          <h3>Adresse</h3>
+          <p>Yeumbeul, Comico Série B 156<br>Dakar, Sénégal</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-form-section">
+      <h2>Envoyez-nous un message</h2>
+      
+      <!-- Messages de confirmation ou d'erreur -->
+      <div *ngIf="successMsg" class="success-message">{{successMsg}}</div>
+      <div *ngIf="errorMsg" class="error-message">{{errorMsg}}</div>
+
+      <form class="contact-form" (ngSubmit)="onSubmit(contactForm)" #contactForm="ngForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nom">Nom complet *</label>
+            <input type="text" id="nom" name="nom" ngModel required placeholder="Votre nom et prénom" #nom="ngModel">
+            <div class="field-error" *ngIf="contactForm.submitted && nom.invalid">Le nom est requis.</div>
+          </div>
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input type="email" id="email" name="email" ngModel required placeholder="exemple@email.com" #email="ngModel">
+            <div class="field-error" *ngIf="contactForm.submitted && email.invalid">L'email est requis.</div>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="telephone">Téléphone *</label>
+            <input type="tel" id="telephone" name="telephone" ngModel required placeholder="Votre numéro de téléphone" #telephone="ngModel">
+            <div class="field-error" *ngIf="contactForm.submitted && telephone.invalid">Le téléphone est requis.</div>
+          </div>
+          <div class="form-group">
+            <label for="sujet">Sujet *</label>
+            <input type="text" id="sujet" name="sujet" ngModel required placeholder="Objet de votre message" #sujet="ngModel">
+            <div class="field-error" *ngIf="contactForm.submitted && sujet.invalid">Le sujet est requis.</div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="message">Message *</label>
+          <textarea id="message" name="message" rows="5" ngModel required placeholder="Votre message..." #message="ngModel"></textarea>
+          <div class="field-error" *ngIf="contactForm.submitted && message.invalid">Le message est requis.</div>
+        </div>
+        
+        <!-- reCAPTCHA -->
+        <div class="form-group recaptcha-group">
+          <re-captcha
+            (resolved)="onRecaptchaResolved($event)"
+            siteKey="6LfYourSiteKeyHere">
+          </re-captcha>
+        </div>
+        
+        <div class="form-group">
+          <button type="submit" class="contact-btn" [disabled]="!recaptchaToken">Envoyer le message</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,93 @@
+<section class="newsletter-section">
+  <div class="newsletter-background"></div>
+  
+  <div class="container">
+    <div class="newsletter-content">
+      
+      <!-- Icon et titre -->
+      <i class="fas fa-envelope newsletter-icon"></i>
+      <h2 class="newsletter-title">Restez informé !</h2>
+      <p class="newsletter-subtitle">
+        Recevez nos dernières actualités, conseils en communication digitale et offres exclusives directement dans votre boîte mail.
+      </p>
+
+      <!-- Formulaire d'inscription -->
+      <form class="newsletter-form" (ngSubmit)="onSubmit()" #newsletterForm="ngForm">
+        <input 
+          type="email" 
+          class="email-input"
+          placeholder="Votre adresse email"
+          [(ngModel)]="email"
+          name="email"
+          required
+          [disabled]="isLoading"
+        >
+        <button 
+          type="submit" 
+          class="subscribe-btn"
+          [disabled]="isLoading || !email"
+        >
+          <span *ngIf="!isLoading">
+            <i class="fas fa-paper-plane"></i>
+            S'abonner
+          </span>
+          <span *ngIf="isLoading" class="loading-spinner"></span>
+        </button>
+      </form>
+
+      <!-- Messages de retour -->
+      <div *ngIf="isSubscribed" class="success-message">
+        <i class="fas fa-check-circle"></i>
+        Merci ! Vous êtes maintenant abonné à notre newsletter.
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ errorMessage }}
+      </div>
+
+      <!-- Avantages de la newsletter -->
+      <div class="newsletter-benefits">
+        <div class="benefit-item">
+          <i class="fas fa-lightbulb benefit-icon"></i>
+          <div class="benefit-content">
+            <h4>Conseils d'experts</h4>
+            <p>Astuces et stratégies en communication digitale</p>
+          </div>
+        </div>
+        
+        <div class="benefit-item">
+          <i class="fas fa-rocket benefit-icon"></i>
+          <div class="benefit-content">
+            <h4>Nouveautés</h4>
+            <p>Nos derniers projets et innovations</p>
+          </div>
+        </div>
+        
+        <div class="benefit-item">
+          <i class="fas fa-gift benefit-icon"></i>
+          <div class="benefit-content">
+            <h4>Offres exclusives</h4>
+            <p>Promotions réservées aux abonnés</p>
+          </div>
+        </div>
+        
+        <div class="benefit-item">
+          <i class="fas fa-calendar-alt benefit-icon"></i>
+          <div class="benefit-content">
+            <h4>Événements</h4>
+            <p>Invitations à nos formations et webinaires</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Note de confidentialité -->
+      <p class="privacy-note">
+        Nous respectons votre vie privée. Vous pouvez vous désabonner à tout moment.
+        <br>
+        <a routerLink="/politique-confidentialite">Consultez notre politique de confidentialité</a>
+      </p>
+
+    </div>
+  </div>
+</section>
