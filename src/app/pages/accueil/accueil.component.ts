@@ -212,19 +212,30 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
   articles: Article[] = [
     {
       id: 1,
+      title: "Formation Designer Professionnel - 4 semaines intensives",
+      excerpt: "Formation 100% pratique pour maîtriser les outils professionnels, réaliser des projets concrets et repartir avec une attestation + un portfolio prêt à convaincre. Date limite des inscriptions : 3 octobre 2025.",
+      image: "ProgrammeFormatinInfographie.jpg",
+      date: new Date('2025-09-25'),
+      author: "Penccum Ndongo",
+      category: "FORMATION",
+      linkedinUrl: "https://www.linkedin.com/posts/penccum-ndongo_penccumndongo-formationprofessionnelle-infographie-activity-7377073165887516673-vQHG?utm_source=share&utm_medium=member_desktop&rcm=ACoAADqQAssBElpPsDolAtxkZ86cX_61QT4D7ZA",
+      featured: true
+    },
+    {
+      id: 2,
       title: "Formation Professionnelle en Infographie - Maîtrisez l'art qui fait la différence !",
       excerpt: "Formation 100% pratique en infographie pour transformer votre talent en compétences exploitables. 1 mois de formation intensive avec Photoshop, Illustrator, Premiere Pro. Inscriptions ouvertes du 22 septembre au 3 octobre 2025.",
       image: "Formation-Infographie.jpg",
-      date: new Date('2025-09-21'),
+      date: new Date('2025-09-22'),
       author: "Penccun Ndongo",
       category: "FORMATION",
       linkedinUrl: "https://www.linkedin.com/posts/penccum-ndongo_infographie-ma%C3%AEtrisez-lart-qui-fait-la-activity-7375807415356694528-_X9X?utm_source=share&utm_medium=member_desktop&rcm=ACoAADqQAssBElpPsDolAtxkZ86cX_61QT4D7ZA",
       featured: true
     },
      {
-      id: 2,
+      id: 3,
       title: "Lancement officiel du site web de PENCCUM NDONGO !",
-      excerpt: "Un site pensé pour vous. Avec Penccum Ndongo, passez de la stratégie à l’action et propulsez votre communication ! #penccumndongo #lancementofficiel #siteweb #digitalisation #exploreznosservices",
+      excerpt: "Un site pensé pour vous. Avec Penccum Ndongo, passez de la stratégie à l'action et propulsez votre communication ! #penccumndongo #lancementofficiel #siteweb #digitalisation #exploreznosservices",
       image: "LancementOfficielSiteWebPenccumNdongo.jpg",
       date: new Date('2025-09-21'),
       author: "Direction Générale",
@@ -232,18 +243,18 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
       linkedinUrl: "https://www.linkedin.com/feed/update/urn:li:activity:7375438674412404736"
     },
      {
-      id: 3,
+      id: 4,
       title: "Mawlid Moubarak !",
-      excerpt: "\n\nÀ l’occasion du Mawlid, nous adressons nos prières et nos vœux de paix, de santé et de prospérité à toute la communauté musulmane. #mawlid #penccumndongo",
+      excerpt: "\n\nÀ l'occasion du Mawlid, nous adressons nos prières et nos vœux de paix, de santé et de prospérité à toute la communauté musulmane. #mawlid #penccumndongo",
       image: "mawlid2025.jpeg",
-      date: new Date('2025-09-25'),
+      date: new Date('2025-09-03'),
       author: "Penccum Ndongo",
       category: "EVENNEMENT",
       linkedinUrl: "https://www.linkedin.com/posts/penccum-ndongo_mawlid-penccumndongo-activity-7369101274895654916-Iw2Y?utm_source=share&utm_medium=member_desktop&rcm=ACoAADqQAssBElpPsDolAtxkZ86cX_61QT4D7ZA",
     },
     {
-      id: 4,
-      title: "#OPPORTUNITE DE SE FORMER AVEC PENC’BOOST ",
+      id: 5,
+      title: "#OPPORTUNITE DE SE FORMER AVEC PENC'BOOST ",
       excerpt: "J-2 avant le démarrage ! Les sessions commencent ce lundi 21 juillet, pour une semaine complète de formation, du 21 au 27 juillet. ! #pencboost #formation #penccumndongo",
       image: "postmadiop.jpeg",
       date: new Date('2025-07-19'),
@@ -252,9 +263,9 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
       linkedinUrl: "https://www.linkedin.com/feed/update/urn:li:activity:7352326292681179137"
     },
     {
-      id: 5,
+      id: 6,
       title: "#Emission Évi #Weekend – Invité Tafsir Haby NIANG !",
-      excerpt: "Ce samedi 21 juin 2025, j’ai eu le plaisir de participer à l’émission Évi Weekend, diffusée en direct sur Evidence TV. À très bientôt pour d’autres aventures humaines et inspirantes. — Tafsir Haby Niang #eviweekend #evidencetv",
+      excerpt: "Ce samedi 21 juin 2025, j'ai eu le plaisir de participer à l'émission Évi Weekend, diffusée en direct sur Evidence TV. À très bientôt pour d'autres aventures humaines et inspirantes. — Tafsir Haby Niang #eviweekend #evidencetv",
       image: "emissiontafsir.png",
       date: new Date('2025-06-23'),
       author: "Tafsir Haby NIANG - CEO",
@@ -262,9 +273,9 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
       linkedinUrl: "https://www.linkedin.com/feed/update/urn:li:activity:7342796778259292160"
     },
      {
-      id: 6,
-      title: "Lundi d'inspiration - Se #cultiver, c’est se libérer !",
-      excerpt: "L’ignorance est une chaîne silencieuse. Elle alimente la peur, nourrit la haine et finit par engendrer la violence. #lundidinspiration #secultiver #education #savoirpouvoirpaix #initiativecourageaction",
+      id: 7,
+      title: "Lundi d'inspiration - Se #cultiver, c'est se libérer !",
+      excerpt: "L'ignorance est une chaîne silencieuse. Elle alimente la peur, nourrit la haine et finit par engendrer la violence. #lundidinspiration #secultiver #education #savoirpouvoirpaix #initiativecourageaction",
       image: "pubposttafsir.jpeg",
       date: new Date('2024-12-13'),
       author: "Tafsir Haby NIANG - CEO",

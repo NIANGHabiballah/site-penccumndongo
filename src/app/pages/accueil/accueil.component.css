@@ -896,11 +896,12 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
   border-radius: 1.5rem;
   box-shadow: 0 4px 24px rgba(79,140,255,0.10);
   padding: 1.2rem 2rem;
-  max-width: 150px;
-  max-height: 90px;
+  width: 150px;
+  height: 90px;
   object-fit: contain;
   filter: grayscale(40%);
   transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+  aspect-ratio: 150/90;
 }
 
 .partner-logos-carousel img:hover {
@@ -3423,6 +3424,66 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Reste du CSS existant... */
+/* Optimisations CLS - Réduction des décalages de mise en page */
+
+/* Stabilisation des conteneurs */
+.testimonials-section,
+.partners,
+.key-numbers,
+.actualites-section {
+  contain: layout style;
+}
+
+/* Dimensions fixes pour éviter les décalages */
+.profile-image img {
+  width: 70px !important;
+  height: 70px !important;
+  aspect-ratio: 1;
+}
+
+/* Préchargement des espaces pour les animations */
+.testimonial-card {
+  min-height: 300px;
+  will-change: transform;
+}
+
+.number-card {
+  min-height: 180px;
+  will-change: transform;
+}
+
+/* Stabilisation du carousel partenaires */
+.partner-logos-carousel {
+  height: 120px;
+  overflow: hidden;
+}
+
+.logos-track {
+  height: 120px;
+  display: flex;
+  align-items: center;
+}
+
+/* Optimisation des polices pour éviter FOIT/FOUT */
+body {
+  font-display: swap;
+}
+
+/* Réduction des animations CLS sur mobile */
+@media (max-width: 768px) {
+  /* Désactiver seulement les transforms qui causent des décalages */
+  .testimonial-card:hover,
+  .number-card:hover,
+  .service-card:hover {
+    transform: translateY(-4px) scale(1.01) !important; /* Réduit au lieu de supprimer */
+  }
+  
+  .partner-logos-carousel img:hover {
+    transform: scale(1.02) !important; /* Réduit l'effet de zoom */
   }
 }
 

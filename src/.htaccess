@@ -47,6 +47,10 @@ RewriteRule ^(.*)$ https://penccumndongo.com/$1 [L,R=301]
 ServerTokens Prod
 ServerSignature Off
 
+# Redirections SEO
+Redirect 301 /home /
+Redirect 301 /accueil /
+
 # Angular routing
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f

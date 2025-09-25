@@ -1,24 +1,15 @@
 User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: https://penccumndongo.com/sitemap.xml
-
 # Disallow sensitive areas
 Disallow: /admin/
 Disallow: /api/
-Disallow: /back-end/
+Disallow: /src/app/back-end/
 Disallow: /*.php$
 Disallow: /private/
 Disallow: /config/
+Disallow: /.htaccess
+Disallow: /error/
 
-# Allow important pages
-Allow: /
-Allow: /services/
-Allow: /portfolio/
-Allow: /contact/
-Allow: /formations/
-Allow: /cp2i/
-
-# Crawl delay for politeness
-Crawl-delay: 1
+# Sitemap
+Sitemap: https://penccumndongo.com/sitemap.xml
