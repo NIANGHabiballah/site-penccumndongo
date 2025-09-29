@@ -212,6 +212,28 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
   articles: Article[] = [
     {
       id: 1,
+      title: "Lundi d'inspiration - Thomas Edison",
+      excerpt: "« La vision sans exécution n'est qu'hallucination. » - Thomas Edison. Une citation puissante pour nous rappeler l'importance de passer à l'action. #lundidinspiration #thomasedison #penccumndongo",
+      image: "Citation36.jpg",
+      date: new Date('2025-09-29'),
+      author: "Tafsir Haby NIANG - CEO",
+      category: "INSPIRATION",
+      linkedinUrl: "https://www.linkedin.com/feed/update/urn:li:activity:7378371246658457600",
+      featured: true
+    },
+    {
+      id: 2,
+      title: "Formation Infographie - Découvrez les avantages clés",
+      excerpt: "Découvrez tous les avantages de notre formation professionnelle en infographie. Une formation complète pour développer vos compétences créatives et techniques. Inscriptions ouvertes ! #formation #infographie #penccumndongo",
+      image: "FormationInfographie-Avantages.jpg",
+      date: new Date('2025-09-29'),
+      author: "Penccum Ndongo",
+      category: "FORMATION",
+      linkedinUrl: "https://www.linkedin.com/feed/update/urn:li:activity:7378369440821854208",
+      featured: true
+    },
+    {
+      id: 4,
       title: "Formation Designer Professionnel - 4 semaines intensives",
       excerpt: "Formation 100% pratique pour maîtriser les outils professionnels, réaliser des projets concrets et repartir avec une attestation + un portfolio prêt à convaincre. Date limite des inscriptions : 3 octobre 2025.",
       image: "ProgrammeFormatinInfographie.jpg",
@@ -222,7 +244,7 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
       featured: true
     },
     {
-      id: 2,
+      id: 5,
       title: "Formation Professionnelle en Infographie - Maîtrisez l'art qui fait la différence !",
       excerpt: "Formation 100% pratique en infographie pour transformer votre talent en compétences exploitables. 1 mois de formation intensive avec Photoshop, Illustrator, Premiere Pro. Inscriptions ouvertes du 22 septembre au 3 octobre 2025.",
       image: "Formation-Infographie.jpg",
@@ -233,7 +255,7 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
       featured: true
     },
      {
-      id: 3,
+      id: 6,
       title: "Lancement officiel du site web de PENCCUM NDONGO !",
       excerpt: "Un site pensé pour vous. Avec Penccum Ndongo, passez de la stratégie à l'action et propulsez votre communication ! #penccumndongo #lancementofficiel #siteweb #digitalisation #exploreznosservices",
       image: "LancementOfficielSiteWebPenccumNdongo.jpg",
@@ -243,7 +265,7 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
       linkedinUrl: "https://www.linkedin.com/feed/update/urn:li:activity:7375438674412404736"
     },
      {
-      id: 4,
+      id: 7,
       title: "Mawlid Moubarak !",
       excerpt: "\n\nÀ l'occasion du Mawlid, nous adressons nos prières et nos vœux de paix, de santé et de prospérité à toute la communauté musulmane. #mawlid #penccumndongo",
       image: "mawlid2025.jpeg",
@@ -253,7 +275,7 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
       linkedinUrl: "https://www.linkedin.com/posts/penccum-ndongo_mawlid-penccumndongo-activity-7369101274895654916-Iw2Y?utm_source=share&utm_medium=member_desktop&rcm=ACoAADqQAssBElpPsDolAtxkZ86cX_61QT4D7ZA",
     },
     {
-      id: 5,
+      id: 8,
       title: "#OPPORTUNITE DE SE FORMER AVEC PENC'BOOST ",
       excerpt: "J-2 avant le démarrage ! Les sessions commencent ce lundi 21 juillet, pour une semaine complète de formation, du 21 au 27 juillet. ! #pencboost #formation #penccumndongo",
       image: "postmadiop.jpeg",
@@ -263,7 +285,7 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
       linkedinUrl: "https://www.linkedin.com/feed/update/urn:li:activity:7352326292681179137"
     },
     {
-      id: 6,
+      id: 9,
       title: "#Emission Évi #Weekend – Invité Tafsir Haby NIANG !",
       excerpt: "Ce samedi 21 juin 2025, j'ai eu le plaisir de participer à l'émission Évi Weekend, diffusée en direct sur Evidence TV. À très bientôt pour d'autres aventures humaines et inspirantes. — Tafsir Haby Niang #eviweekend #evidencetv",
       image: "emissiontafsir.png",
