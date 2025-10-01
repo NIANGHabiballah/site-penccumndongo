@@ -128,21 +128,39 @@ export class FormationInfographieComponent implements OnInit {
 
   testimonials = [
     {
-      name: 'Fatou Diop',
-      role: 'Entrepreneure',
-      text: 'Cette formation m\'a permis de créer moi-même les visuels de ma boutique en ligne. Un investissement très rentable!',
+      name: 'Astou NDONGO',
+      role: 'Bénéficiaire Penc\'Boost',
+      text: 'Le module sur l\'insertion professionnelle et l\'employabilité m\'a permis de connaître les outils nécessaires pour intégrer le monde professionnel. Il est primordial de se préparer, mettre en place des stratégies et mettre en valeur ses compétences.',
       rating: 5
     },
     {
-      name: 'Amadou Fall',
+      name: 'Alioune TOURÉ',
+      role: 'Freelance débutant',
+      text: 'Avec Penc\'Boost, j\'ai gagné en confiance et en compétences. Cette formation m\'a donné les clés pour démarrer mon parcours en tant que freelance. Je suis très reconnaissant pour cette opportunité.',
+      rating: 5
+    },
+    {
+      name: 'Aminata SALL',
+      role: 'Bénéficiaire Penc\'Boost',
+      text: 'Excellente expérience ! Non seulement j\'ai appris, mais j\'ai aussi pris confiance pour entreprendre par moi-même. Je recommande à 100% !',
+      rating: 5
+    },
+    {
+      name: 'Ridwane CHABI YÔ',
       role: 'Étudiant',
-      text: 'Les cours pratiques et l\'accompagnement personnalisé m\'ont aidé à décrocher mon premier contrat freelance.',
+      text: 'Durant cette formation, j\'ai eu l\'opportunité de renforcer mes compétences en leadership, création graphique, marketing digital et bien-être au travail. Une véritable expérience d\'apprentissage.',
       rating: 5
     },
     {
-      name: 'Mariama Ndiaye',
-      role: 'Community Manager',
-      text: 'J\'ai enfin les compétences pour créer des contenus visuels professionnels. Mon employeur est impressionné!',
+      name: 'Saliou SÈNE',
+      role: 'Bénéficiaire Penc\'Boost',
+      text: 'C\'est une formation très intéressante qui peut pousser les étudiants à se lancer dans l\'entrepreneuriat.',
+      rating: 5
+    },
+    {
+      name: 'Ababacar FALL',
+      role: 'Bénéficiaire Penc\'Boost',
+      text: 'Cette formation a approfondi mes compétences en gestion de projet et en bien-être au travail.',
       rating: 5
     }
   ];
