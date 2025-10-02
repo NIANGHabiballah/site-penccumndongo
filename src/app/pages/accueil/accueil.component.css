@@ -3173,28 +3173,28 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
   
   /* Ajustements mobiles pour les différents styles d'images */
   .lightbox-image.banner-style {
-    width: 98vw;
-    height: 60vh;
+    max-width: 95vw;
+    max-height: 50vh;
   }
   
   .lightbox-image.poster-style {
-    width: 90vw;
-    height: 80vh;
+    max-width: 85vw;
+    max-height: 75vh;
   }
   
   .lightbox-image.flyer-style {
-    width: 95vw;
-    height: 75vh;
+    max-width: 90vw;
+    max-height: 70vh;
   }
   
   .lightbox-image.logo-style {
-    width: 90vw;
-    height: 60vh;
+    max-width: 80vw;
+    max-height: 50vh;
   }
   
   .lightbox-image.default-style {
-    width: 98vw;
-    height: 80vh;
+    max-width: 95vw;
+    max-height: 75vh;
   }
 }
 
@@ -3262,18 +3262,18 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea {
   
   /* Ajustements supplémentaires pour très petits écrans */
   .lightbox-image.banner-style {
-    width: 100vw;
-    height: 50vh;
+    max-width: 98vw;
+    max-height: 45vh;
   }
   
   .lightbox-image.poster-style {
-    width: 95vw;
-    height: 75vh;
+    max-width: 90vw;
+    max-height: 70vh;
   }
   
   .lightbox-image.logo-style {
-    width: 90vw;
-    height: 55vh;
+    max-width: 85vw;
+    max-height: 45vh;
   }
 }
 

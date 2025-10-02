@@ -120,13 +120,13 @@
       </div>
       
       <div class="portfolio-categories">
-        <button class="category-btn active" (click)="filterPortfolio('all')">Tout voir</button>
-        <button class="category-btn" (click)="filterPortfolio('affiches')">Affiches</button>
-        <button class="category-btn" (click)="filterPortfolio('logos')">Logos</button>
-        <button class="category-btn" (click)="filterPortfolio('dépliants')">Dépliants</button>
-        <button class="category-btn" (click)="filterPortfolio('bannières')">Bannières</button>
-        <button class="category-btn" (click)="filterPortfolio('mockups')">Mockups</button>
-        <button class="category-btn" (click)="filterPortfolio('kakemonos')">Kakemonos</button>
+        <button class="category-btn" [class.active]="activeCategory === 'all'" (click)="filterPortfolio('all')">Tout voir</button>
+        <button class="category-btn" [class.active]="activeCategory === 'affiches'" (click)="filterPortfolio('affiches')">Affiches</button>
+        <button class="category-btn" [class.active]="activeCategory === 'logos'" (click)="filterPortfolio('logos')">Logos</button>
+        <button class="category-btn" [class.active]="activeCategory === 'dépliants'" (click)="filterPortfolio('dépliants')">Dépliants</button>
+        <button class="category-btn" [class.active]="activeCategory === 'bannières'" (click)="filterPortfolio('bannières')">Bannières</button>
+        <button class="category-btn" [class.active]="activeCategory === 'mockups'" (click)="filterPortfolio('mockups')">Mockups</button>
+        <button class="category-btn" [class.active]="activeCategory === 'kakemonos'" (click)="filterPortfolio('kakemonos')">Kakemonos</button>
       </div>
       
       <div class="portfolio-grid">
