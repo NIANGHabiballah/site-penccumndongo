@@ -133,12 +133,13 @@
         <div class="portfolio-item" 
              *ngFor="let project of graphicProjects" 
              [attr.data-category]="project.category.toLowerCase()">
-          <div class="portfolio-image">
+          <div class="portfolio-image" (click)="openLightbox(project)">
             <img [src]="project.image" [alt]="project.title">
             <div class="portfolio-overlay">
               <div class="portfolio-info">
                 <h4>{{ project.title }}</h4>
                 <p>{{ project.category }}</p>
+                <i class="fas fa-expand"></i>
               </div>
             </div>
           </div>
@@ -291,4 +292,18 @@
       </div>
     </div>
   </section>
+
+  <!-- Lightbox Modal -->
+  <div class="lightbox-backdrop" *ngIf="showLightbox" (click)="closeLightbox()">
+    <div class="lightbox-content" (click)="$event.stopPropagation()">
+      <button class="lightbox-close" (click)="closeLightbox()">
+        <i class="fas fa-times"></i>
+      </button>
+      <img [src]="selectedProject?.image" [alt]="selectedProject?.title" class="lightbox-image">
+      <div class="lightbox-info">
+        <h3>{{ selectedProject?.title }}</h3>
+        <p>{{ selectedProject?.category }}</p>
+      </div>
+    </div>
+  </div>
 </div>

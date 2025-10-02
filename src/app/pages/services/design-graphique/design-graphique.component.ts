@@ -16,6 +16,9 @@ interface GraphicProject {
   styleUrl: './design-graphique.component.css'
 })
 export class DesignGraphiqueComponent {
+  showLightbox = false;
+  selectedProject: GraphicProject | null = null;
+
   // Images des conceptions graphiques de la page d'accueil
   graphicProjects: GraphicProject[] = [
     // === AFFICHES ===
@@ -246,6 +249,16 @@ export class DesignGraphiqueComponent {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
+  }
+
+  openLightbox(project: GraphicProject): void {
+    this.selectedProject = project;
+    this.showLightbox = true;
+  }
+
+  closeLightbox(): void {
+    this.showLightbox = false;
+    this.selectedProject = null;
   }
 
   filterPortfolio(category: string): void {

@@ -344,10 +344,12 @@
   inset: 0;
   background: rgba(0, 27, 54, 0.8);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   opacity: 0;
   transition: var(--transition);
+  cursor: pointer;
 }
 
 .portfolio-item:hover .portfolio-overlay {
@@ -368,6 +370,83 @@
 .portfolio-info p {
   font-size: 0.9rem;
   opacity: 0.8;
+  margin-bottom: 1rem;
+}
+
+.portfolio-info i {
+  font-size: 2rem;
+  color: var(--white);
+}
+
+/* Lightbox Styles */
+.lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 2rem;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: -50px;
+  right: 0;
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--white);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.lightbox-close:hover {
+  background: var(--primary-orange);
+}
+
+.lightbox-image {
+  max-width: 100%;
+  max-height: 80vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--border-radius);
+}
+
+.lightbox-info {
+  text-align: center;
+  color: var(--white);
+  margin-top: 1rem;
+}
+
+.lightbox-info h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #ffffff !important;
+}
+
+.lightbox-info p {
+  font-size: 1rem;
+  opacity: 0.8;
+  color: #ffffff !important;
 }
 
 /* Process Section */
