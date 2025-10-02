@@ -128,6 +128,12 @@ export class FormationInfographieComponent implements OnInit {
 
   testimonials = [
     {
+      name: 'Aly THIAW',
+      role: 'Bénéficiaire Penc\'Boost',
+      text: 'Je tiens à remercier toute l\'équipe de PENCCUM NDONGO pour la qualité de la formation et l\'accompagnement que vous m\'avez apporté. Cette expérience m\'a permis d\'acquérir de nouvelles compétences et de renforcer ma motivation à réussir dans mon projet professionnel.',
+      rating: 5
+    },
+    {
       name: 'Astou NDONGO',
       role: 'Bénéficiaire Penc\'Boost',
       text: 'Le module sur l\'insertion professionnelle et l\'employabilité m\'a permis de connaître les outils nécessaires pour intégrer le monde professionnel. Il est primordial de se préparer, mettre en place des stratégies et mettre en valeur ses compétences.',

@@ -122,6 +122,16 @@
 
 .stat-item {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-icon {
+  font-size: 1.5rem;
+  color: var(--primary-orange);
+  margin-bottom: 0.5rem;
 }
 
 .stat-number {
@@ -383,7 +393,7 @@ button.cta-secondary:hover {
 
 .book-item {
   position: relative;
-  border-radius: var(--border-radius);
+  border-radius: 0;
   overflow: hidden;
   cursor: pointer;
   transition: var(--transition);

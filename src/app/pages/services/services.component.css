@@ -1,0 +1,66 @@
+/* Correction globale des puces pour toutes les pages de services */
+.service-page ul[class*="features"],
+.service-page ul[class*="list"],
+.service-page .service-features,
+.service-page .platform-features,
+.service-page .tool-features,
+.service-page .result-features,
+.service-page .strategy-features,
+.service-page .formation-features,
+.service-page .advantage-features,
+.service-page .process-features,
+.service-page .tech-features {
+  text-align: left !important;
+  width: 100% !important;
+  max-width: 300px !important;
+  margin: 0 auto !important;
+  list-style: none !important;
+  padding: 0 !important;
+}
+
+.service-page ul[class*="features"] li,
+.service-page ul[class*="list"] li,
+.service-page .service-features li,
+.service-page .platform-features li,
+.service-page .tool-features li,
+.service-page .result-features li,
+.service-page .strategy-features li,
+.service-page .formation-features li,
+.service-page .advantage-features li,
+.service-page .process-features li,
+.service-page .tech-features li {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 8px 0 !important;
+  text-align: left !important;
+  position: relative !important;
+  padding-left: 0 !important;
+}
+
+.service-page ul[class*="features"] li::before,
+.service-page ul[class*="list"] li::before,
+.service-page .service-features li::before,
+.service-page .platform-features li::before,
+.service-page .tool-features li::before,
+.service-page .result-features li::before,
+.service-page .strategy-features li::before,
+.service-page .formation-features li::before,
+.service-page .advantage-features li::before,
+.service-page .process-features li::before,
+.service-page .tech-features li::before {
+  content: '✓' !important;
+  color: #FF7F1A !important;
+  font-weight: bold !important;
+  font-size: 16px !important;
+  width: 20px !important;
+  height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(255, 127, 26, 0.1) !important;
+  border-radius: 50% !important;
+  flex-shrink: 0 !important;
+  position: static !important;
+  left: auto !important;
+}

@@ -44,7 +44,7 @@
 
 /* Titres avec animations */
 .service-page .hero-title {
-  background: linear-gradient(135deg, var(--white) 0%, var(--primary-orange) 100%);
+  background: linear-gradient(135deg, var(--white) 0%, #0380C2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -65,7 +65,7 @@
   transform: translateX(-50%);
   width: 60px;
   height: 4px;
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+  background: #0380C2;
   border-radius: 2px;
 }
 
@@ -88,7 +88,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 127, 26, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(3, 128, 194, 0.1), transparent);
   transition: left 0.6s ease;
 }
 
@@ -103,36 +103,75 @@
 .service-page .result-card:hover {
   transform: translateY(-12px) scale(1.02);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  border-color: var(--primary-orange);
+  border-color: #0380C2 !important;
 }
 
-/* Icônes avec animations */
+/* Icônes avec animations - Centrage parfait */
 .service-page .service-icon,
 .service-page .platform-icon,
-.service-page .result-icon {
+.service-page .result-icon,
+.service-page .tool-icon,
+.service-page .strategy-icon,
+.service-page .formation-icon,
+.service-page .advantage-icon {
   position: relative;
   transition: all 0.4s ease;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   text-align: center !important;
-  margin: 0 auto !important;
+  margin: 0 auto 1.5rem !important;
+  width: 80px !important;
+  height: 80px !important;
+  border-radius: 50% !important;
+  background: #0380C2 !important;
+  color: #ffffff !important;
+  font-size: 2rem !important;
+  flex-shrink: 0 !important;
+}
+
+.service-page .platform-icon,
+.service-page .advantage-icon {
+  width: 60px !important;
+  height: 60px !important;
+  font-size: 1.5rem !important;
+}
+
+/* Forcer toutes les icônes de plateformes en bleu */
+.service-page .platform-icon.facebook,
+.service-page .platform-icon.instagram,
+.service-page .platform-icon.linkedin,
+.service-page .platform-icon.twitter,
+.service-page .platform-icon.tiktok,
+.service-page .platform-icon.youtube,
+.service-page .result-icon {
+  background: #0380C2 !important;
+  color: #ffffff !important;
 }
 
 .service-page .service-icon i,
 .service-page .platform-icon i,
-.service-page .result-icon i {
+.service-page .result-icon i,
+.service-page .tool-icon i,
+.service-page .strategy-icon i {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   text-align: center !important;
   width: 100% !important;
   height: 100% !important;
+  color: #ffffff !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
 }
 
 .service-page .service-icon:hover,
 .service-page .platform-icon:hover,
-.service-page .result-icon:hover {
+.service-page .result-icon:hover,
+.service-page .tool-icon:hover,
+.service-page .strategy-icon:hover {
   transform: scale(1.1) rotate(5deg);
   animation: pulse 1.5s infinite;
 }
@@ -141,8 +180,8 @@
 .service-page .cta-primary {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--primary-orange) 0%, #ff9a4d 100%);
-  box-shadow: 0 4px 15px rgba(255, 127, 26, 0.3);
+  background: linear-gradient(135deg, #0380C2 0%, #0599e6 100%);
+  box-shadow: 0 4px 15px rgba(3, 128, 194, 0.3);
 }
 
 .service-page .cta-primary::before {
@@ -162,22 +201,39 @@
 
 .service-page .cta-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(255, 127, 26, 0.4);
+  box-shadow: 0 8px 25px rgba(3, 128, 194, 0.4);
 }
 
 /* Statistiques animées */
 .service-page .stat-number {
-  background: linear-gradient(135deg, var(--primary-orange), #ff9a4d);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #0380C2 !important;
   animation: pulse 2s infinite;
 }
 
-/* Timeline de processus */
+/* Timeline de processus - Centrage parfait */
+.service-page .process-timeline {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  max-width: 800px !important;
+  margin: 0 auto !important;
+  text-align: center !important;
+}
+
 .service-page .process-step {
-  opacity: 0;
+  opacity: 1 !important;
+  visibility: visible !important;
   animation: slideInUp 0.6s ease-out forwards;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  width: 100% !important;
+  max-width: 500px !important;
+  margin: 0 auto 2rem !important;
+  padding: 1.5rem !important;
 }
 
 .service-page .process-step:nth-child(1) { animation-delay: 0.1s; }
@@ -185,6 +241,23 @@
 .service-page .process-step:nth-child(3) { animation-delay: 0.3s; }
 .service-page .process-step:nth-child(4) { animation-delay: 0.4s; }
 .service-page .process-step:nth-child(5) { animation-delay: 0.5s; }
+
+/* Contenu des étapes centré */
+.service-page .step-content {
+  text-align: center !important;
+  margin: 1rem auto 0 !important;
+  max-width: 400px !important;
+}
+
+.service-page .step-content h3 {
+  text-align: center !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.service-page .step-content p {
+  text-align: center !important;
+  line-height: 1.6 !important;
+}
 
 /* Technologies avec effets hover */
 .service-page .tech-item {
@@ -214,22 +287,61 @@
   transform: translateY(-8px) scale(1.05);
 }
 
-/* Sections avec backgrounds alternés */
-.service-page .services-section {
+/* Sections avec backgrounds alternés - Centrage global */
+.service-page .services-section,
+.service-page .process-section,
+.service-page .results-section,
+.service-page .tools-section {
   background: var(--white);
   position: relative;
+  text-align: center !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .service-page .technologies-section,
-.service-page .platforms-section {
+.service-page .platforms-section,
+.service-page .methodology-section {
   background: linear-gradient(135deg, var(--light-gray) 0%, rgba(248, 249, 250, 0.8) 100%);
   position: relative;
+  text-align: center !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
-.service-page .process-section,
-.service-page .results-section {
-  background: var(--white);
-  position: relative;
+/* Grilles centrées pour toutes les sections */
+.service-page .services-grid,
+.service-page .tools-grid,
+.service-page .platforms-grid,
+.service-page .results-grid,
+.service-page .technologies-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+  gap: 2rem !important;
+  justify-items: center !important;
+  align-items: stretch !important;
+  margin: 0 auto !important;
+  max-width: 1200px !important;
+}
+
+/* Cards uniformes et centrées */
+.service-page .service-card,
+.service-page .tool-card,
+.service-page .platform-card,
+.service-page .result-card,
+.service-page .strategy-card,
+.service-page .tech-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: center !important;
+  padding: 2rem !important;
+  width: 100% !important;
+  max-width: 350px !important;
+  margin: 0 auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 /* Effets de parallaxe légers */
@@ -238,16 +350,29 @@
   transition: transform 0.3s ease;
 }
 
-/* Responsive amélioré */
+/* Responsive amélioré - Centrage mobile */
 @media (max-width: 768px) {
   .service-page .hero-title {
     font-size: clamp(2rem, 8vw, 3rem);
+    text-align: center !important;
+  }
+  
+  .service-page .services-grid,
+  .service-page .tools-grid,
+  .service-page .platforms-grid,
+  .service-page .results-grid {
+    grid-template-columns: 1fr !important;
+    justify-items: center !important;
   }
   
   .service-page .service-card,
   .service-page .platform-card,
-  .service-page .result-card {
+  .service-page .result-card,
+  .service-page .tool-card {
     margin-bottom: 1.5rem;
+    text-align: center !important;
+    align-items: center !important;
+    max-width: 100% !important;
   }
   
   .service-page .service-card:hover,
@@ -255,16 +380,49 @@
   .service-page .result-card:hover {
     transform: translateY(-8px) scale(1.01);
   }
+  
+  .service-page .process-step {
+    align-items: center !important;
+    text-align: center !important;
+    margin-bottom: 2rem !important;
+  }
+  
+  .service-page .step-content {
+    text-align: center !important;
+    max-width: 100% !important;
+  }
 }
 
 @media (max-width: 480px) {
   .service-page .hero-content {
     padding: 1rem;
+    text-align: center !important;
   }
   
   .service-page .section-title::after {
     width: 40px;
     height: 3px;
+  }
+  
+  .service-page .service-icon,
+  .service-page .tool-icon,
+  .service-page .platform-icon,
+  .service-page .result-icon {
+    width: 60px !important;
+    height: 60px !important;
+    font-size: 1.5rem !important;
+  }
+  
+  .service-page .step-number {
+    width: 60px !important;
+    height: 60px !important;
+    font-size: 1.2rem !important;
+  }
+  
+  .service-page .service-card,
+  .service-page .tool-card {
+    padding: 1.5rem !important;
+    text-align: center !important;
   }
 }
 
@@ -275,8 +433,8 @@
 }
 
 @keyframes glow {
-  0%, 100% { box-shadow: 0 0 5px rgba(255, 127, 26, 0.3); }
-  50% { box-shadow: 0 0 20px rgba(255, 127, 26, 0.6); }
+  0%, 100% { box-shadow: 0 0 5px rgba(3, 128, 194, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(3, 128, 194, 0.6); }
 }
 
 .service-page .hero-badge {

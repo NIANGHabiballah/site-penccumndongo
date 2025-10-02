@@ -123,6 +123,8 @@
   color: #FF7F32;
   font-weight: 700;
   letter-spacing: 0.5px;
+  text-align: center;
+  width: 100%;
 }
 .orange-number {
   color: #FF7F32 !important;
@@ -137,7 +139,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
+  width: 100%;
 }
 /* Animations et cards */
 .animated-fade-in {
@@ -191,7 +195,8 @@
 .payment-cards {
   display: flex;
   gap: 1.5rem;
-  justify-content: flex-start;
+  justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
@@ -654,6 +659,7 @@
 .hero-features {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 30px;
   margin-bottom: 40px;
   flex-wrap: wrap;
@@ -662,9 +668,11 @@
 .feature-item {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   font-size: 16px;
   color: rgba(255, 255, 255, 0.95);
+  text-align: center;
 }
 
 .feature-item .icon {
@@ -676,6 +684,7 @@
   align-items: center;
   justify-content: center;
   font-size: 14px;
+  flex-shrink: 0;
 }
 
 .hero-cta {
@@ -760,11 +769,17 @@
 .countdown {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 30px;
+  flex-wrap: wrap;
 }
 
 .countdown-item {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .countdown-value {
@@ -823,6 +838,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 30px;
+  align-items: stretch;
 }
 
 .about-card {
@@ -834,6 +850,10 @@
   transition: var(--transition);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .about-card::before {
@@ -867,6 +887,7 @@
   align-items: center;
   justify-content: center;
   font-size: 40px;
+  flex-shrink: 0;
 }
 
 .about-card h3 {
@@ -891,6 +912,9 @@
   max-width: 900px;
   margin: 0 auto;
   padding: 30px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .timeline-line {
   position: absolute;
@@ -902,14 +926,18 @@
   border-radius: 2px;
   opacity: 0.25;
   z-index: 0;
+  transform: translateX(-50%);
 }
 .module-item {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   margin-bottom: 48px;
   position: relative;
   z-index: 1;
+  width: 100%;
+  max-width: 600px;
 }
 .module-number {
   width: 54px;
@@ -927,6 +955,7 @@
   margin-bottom: 12px;
   position: relative;
   z-index: 2;
+  flex-shrink: 0;
 }
 .module-content {
   width: 100%;
@@ -939,17 +968,25 @@
   margin-bottom: 0;
   margin-top: 0;
   transition: var(--transition);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .module-content h3 {
   font-size: 1.5rem;
   margin-bottom: 8px;
   color: #0085CA;
   font-weight: 700;
+  text-align: center;
 }
 .module-content p {
   color: #333;
   margin-bottom: 10px;
   font-size: 1.1rem;
+  text-align: center;
+  line-height: 1.5;
 }
 .module-duration {
   display: inline-block;
@@ -974,6 +1011,8 @@
   gap: 40px;
   max-width: 900px;
   margin: 0 auto;
+  align-items: stretch;
+  justify-items: center;
 }
 
 .format-card {
@@ -985,6 +1024,13 @@
   transition: var(--transition);
   cursor: pointer;
   border: 3px solid transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
 }
 
 .format-card:hover {
@@ -1054,19 +1100,25 @@
 .format-features {
   list-style: none;
   margin-bottom: 30px;
+  width: 100%;
 }
 
 .format-features li {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 10px;
   padding: 10px 0;
   color: var(--text-secondary);
+  text-align: left;
 }
 
 .format-features li i {
   color: var(--secondary-color);
   font-weight: bold;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
 }
 
 .btn-select {
@@ -1374,6 +1426,7 @@
 .testimonials-dots {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 10px;
 }
 
@@ -1384,6 +1437,7 @@
   background: #ccc;
   cursor: pointer;
   transition: var(--transition);
+  flex-shrink: 0;
 }
 
 .dot.active {
@@ -1583,7 +1637,8 @@
 .payment-options {
   display: flex;
   gap: 1.5rem;
-  justify-content: flex-start;
+  justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
@@ -1601,6 +1656,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   padding: 18px 18px;
   background: #f8faff;
@@ -1608,6 +1664,7 @@
   border-radius: 12px;
   transition: var(--transition);
   box-shadow: 0 2px 8px rgba(0,133,202,0.07);
+  text-align: center;
 }
 .option-label {
   font-size: 1.08rem;
@@ -2038,11 +2095,13 @@
   .hero-features {
     flex-direction: column;
     align-items: center;
+    justify-content: center;
   }
   
   .countdown {
     flex-wrap: wrap;
     gap: 15px;
+    justify-content: center;
   }
   
   .form-row {
@@ -2051,6 +2110,7 @@
   
   .payment-options {
     grid-template-columns: 1fr;
+    justify-items: center;
   }
   
   .inscription-form {
@@ -2060,24 +2120,47 @@
   .cta-buttons {
     flex-direction: column;
     align-items: center;
+    justify-content: center;
   }
   
   .about-grid {
     grid-template-columns: 1fr;
+    justify-items: center;
   }
   
   .format-cards {
     grid-template-columns: 1fr;
+    justify-items: center;
   }
   
   .formateur-stats {
     grid-template-columns: 1fr;
+    justify-items: center;
+  }
+  
+  .modules-timeline {
+    align-items: center;
+  }
+  
+  .module-item {
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .promo-features {
+    align-items: center;
+  }
+  
+  .promo-feature {
+    justify-content: center;
+    text-align: center;
   }
 }
 
 @media (max-width: 480px) {
   .hero-section {
     padding: 40px 15px;
+    text-align: center;
   }
   
   .container {
@@ -2086,10 +2169,12 @@
   
   .countdown-wrapper {
     padding: 20px;
+    text-align: center;
   }
   
   .section-header {
     margin-bottom: 40px;
+    text-align: center;
   }
   
   .about-section,
@@ -2101,6 +2186,26 @@
   .form-section,
   .cta-section {
     padding: 60px 0;
+  }
+  
+  .hero-features {
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .feature-item {
+    justify-content: center;
+  }
+  
+  .payment-options,
+  .payment-cards {
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .format-features li {
+    justify-content: center;
+    text-align: center;
   }
 }
 
@@ -2198,15 +2303,18 @@
   flex-direction: column;
   gap: 15px;
   margin-bottom: 40px;
+  align-items: flex-start;
 }
 
 .promo-feature {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 12px;
   font-size: 16px;
   color: var(--text-primary);
   font-weight: 500;
+  width: 100%;
 }
 
 .promo-feature-icon {
@@ -2220,6 +2328,7 @@
   color: white;
   font-size: 14px;
   font-weight: bold;
+  flex-shrink: 0;
 }
 
 .promo-cta {
