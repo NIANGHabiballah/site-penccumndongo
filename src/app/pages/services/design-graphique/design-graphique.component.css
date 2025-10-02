@@ -413,6 +413,15 @@
   height: auto;
 }
 
+.lightbox-image-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  overflow: hidden;
+}
+
 @keyframes slideInLightbox {
   from { 
     opacity: 0; 
