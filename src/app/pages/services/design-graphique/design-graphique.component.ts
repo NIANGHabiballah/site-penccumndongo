@@ -283,4 +283,46 @@ export class DesignGraphiqueComponent {
       }
     });
   }
+
+  // Détermine la classe CSS appropriée selon le type d'image
+  getImageStyleClass(project: GraphicProject | null): string {
+    if (!project) return 'default-style';
+    
+    const category = project.category.toLowerCase();
+    const title = project.title.toLowerCase();
+    
+    if (category.includes('bannière') || category.includes('bâche') || title.includes('bannière') || title.includes('bâche')) {
+      return 'banner-style';
+    }
+    
+    if (category.includes('affiche') || title.includes('affiche') || title.includes('kakemono')) {
+      return 'poster-style';
+    }
+    
+    if (category.includes('dépliant') || title.includes('dépliant') || title.includes('mockup') || title.includes('polo') || title.includes('casquette')) {
+      return 'flyer-style';
+    }
+    
+    if (category.includes('logo') || title.includes('logo')) {
+      return 'logo-style';
+    }
+    
+    return 'default-style';
+  }
+
+  // Ajustement dynamique basé sur les dimensions réelles de l'image
+  onImageLoad(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    const aspectRatio = img.naturalWidth / img.naturalHeight;
+    
+    if (aspectRatio > 2.5) {
+      img.className = img.className.replace(/\b\w+-style\b/, 'banner-style');
+    } else if (aspectRatio < 0.7) {
+      img.className = img.className.replace(/\b\w+-style\b/, 'poster-style');
+    } else if (aspectRatio >= 0.8 && aspectRatio <= 1.2) {
+      if (!img.className.includes('logo-style')) {
+        img.className = img.className.replace(/\b\w+-style\b/, 'flyer-style');
+      }
+    }
+  }
 }

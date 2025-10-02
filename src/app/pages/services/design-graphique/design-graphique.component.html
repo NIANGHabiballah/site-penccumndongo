@@ -299,7 +299,11 @@
       <button class="lightbox-close" (click)="closeLightbox()">
         <i class="fas fa-times"></i>
       </button>
-      <img [src]="selectedProject?.image" [alt]="selectedProject?.title" class="lightbox-image">
+      <img 
+        [src]="selectedProject?.image" 
+        [alt]="selectedProject?.title" 
+        [class]="'lightbox-image ' + getImageStyleClass(selectedProject)"
+        (load)="onImageLoad($event)">
       <div class="lightbox-info">
         <h3>{{ selectedProject?.title }}</h3>
         <p>{{ selectedProject?.category }}</p>

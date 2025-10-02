@@ -223,7 +223,8 @@
         <img 
           [src]="selectedGraphic?.image" 
           [alt]="selectedGraphic?.title"
-          class="lightbox-image">
+          [class]="'lightbox-image ' + getImageStyleClass(selectedGraphic)"
+          (load)="onImageLoad($event)">
       </div>
 
       <!-- Informations -->
