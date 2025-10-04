@@ -26,7 +26,21 @@
 
           <a routerLink="/accueil" (click)="scrollToSection('accueil')" [class.active]="activeSection === 'accueil'">{{ 'Accueil' }}</a>
           <a routerLink="/apropos" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenuOnClick()">{{ 'À Propos' }}</a>
-          <a (click)="scrollToSection('services') ; closeMenuOnClick()" [class.active]="activeSection === 'services'">{{ 'Services' }}</a>
+          <!-- Sous-menu Services -->
+          <div class="dropdown services-dropdown"
+            (mouseenter)="onServicesDropdownHover(true)"
+            (mouseleave)="onServicesDropdownHover(false)">
+            <button class="dropdown-btn services-btn" (click)="toggleServicesDropdownMobile($event)" [class.active]="activeSection === 'services'">
+              Services <span class="arrow">&#9662;</span>
+            </button>
+            <div class="dropdown-content services-dropdown-content" [class.show]="showServicesDropdown">
+              <a routerLink="/services/developpement-web" routerLinkActive="active" (click)="closeMenuOnClick()">Développement Web</a>
+              <a routerLink="/services/design-graphique" routerLinkActive="active" (click)="closeMenuOnClick()">Design Graphique</a>
+              <a routerLink="/services/community-management" routerLinkActive="active" (click)="closeMenuOnClick()">Community Management</a>
+              <a routerLink="/services/marketing-digital" routerLinkActive="active" (click)="closeMenuOnClick()">Marketing Digital</a>
+              <a routerLink="/services/formations-professionnelles" routerLinkActive="active" (click)="closeMenuOnClick()">Formations Pro</a>
+            </div>
+          </div>
           <!-- Sous-menu Projets réalisés -->
           <div class="dropdown portfolio-dropdown"
             (mouseenter)="onPortfolioDropdownHover(true)"

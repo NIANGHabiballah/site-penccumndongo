@@ -125,11 +125,11 @@ nav ul li a.active {
   margin-right: 200px; 
 }
 
-.portfolio-dropdown {
+.portfolio-dropdown, .services-dropdown {
   margin-right: 1.5rem;
 }
 
-.portfolio-btn {
+.portfolio-btn, .services-btn {
   background: none;
   border: none;
   color: #0380C2;
@@ -143,12 +143,12 @@ nav ul li a.active {
   gap: 0.3em;
 }
 
-.portfolio-btn.active {
+.portfolio-btn.active, .services-btn.active {
   color: #FF7F1A;
   font-weight: bold;
 }
 
-.portfolio-dropdown-content {
+.portfolio-dropdown-content, .services-dropdown-content {
   display: none;
   position: absolute;
   top: 100%;
@@ -162,7 +162,7 @@ nav ul li a.active {
   padding: 0.7rem 0;
 }
 
-.portfolio-dropdown-content.show {
+.portfolio-dropdown-content.show, .services-dropdown-content.show {
   display: flex;
 }
 
@@ -295,11 +295,11 @@ nav ul li a.active {
     position: static; 
   }
   
-  .portfolio-dropdown {
+  .portfolio-dropdown, .services-dropdown {
     margin-right: 0;
   }
   
-  .portfolio-btn {
+  .portfolio-btn, .services-btn {
     width: 90%;
     margin: 0 auto;
     text-align: center;
@@ -309,7 +309,7 @@ nav ul li a.active {
     font-size: 1.1rem;
   }
   
-  .portfolio-dropdown-content {
+  .portfolio-dropdown-content, .services-dropdown-content {
     position: static;
     box-shadow: none;
     border-radius: 0;
@@ -318,7 +318,7 @@ nav ul li a.active {
     background: transparent;
   }
   
-  .portfolio-dropdown-content.show {
+  .portfolio-dropdown-content.show, .services-dropdown-content.show {
     display: flex;
     flex-direction: column;
     background: #fff;
@@ -395,7 +395,7 @@ nav ul li a.active {
     margin-right: 0.5rem;
   }
   
-  .portfolio-dropdown {
+  .portfolio-dropdown, .services-dropdown {
     margin-right: 0.5rem;
   }
 }
@@ -412,7 +412,7 @@ nav ul li a.active {
     padding: 0.4rem 0.7rem;
   }
   
-  .dropdown, .portfolio-dropdown {
+  .dropdown, .portfolio-dropdown, .services-dropdown {
     margin-right: 0.3rem;
   }
 }

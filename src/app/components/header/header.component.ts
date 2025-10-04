@@ -26,6 +26,7 @@ export class HeaderComponent {
   menuOpen = false;
   showDropdown = false;
   showPortfolioDropdown = false;
+  showServicesDropdown = false;
 
 
    constructor(public router: Router) {
@@ -121,6 +122,20 @@ toggleDropdownMobile(event: Event) {
    if (window.innerWidth <= 1200) {
      event.preventDefault();
      this.showPortfolioDropdown = !this.showPortfolioDropdown;
+   }
+ }
+
+ // Méthodes pour le sous-menu Services
+ onServicesDropdownHover(state: boolean) {
+   if (window.innerWidth > 1200) {
+     this.showServicesDropdown = state;
+   }
+ }
+
+ toggleServicesDropdownMobile(event: Event) {
+   if (window.innerWidth <= 1200) {
+     event.preventDefault();
+     this.showServicesDropdown = !this.showServicesDropdown;
    }
  }
 }
