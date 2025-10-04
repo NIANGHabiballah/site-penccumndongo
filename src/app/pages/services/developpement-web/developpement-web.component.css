@@ -28,12 +28,15 @@
 /* Hero Section */
 .hero-section {
   background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 100%);
-  min-height: 100vh;
+  min-height: 80vh !important;
+  max-height: 80vh !important;
+  height: 80vh !important;
   display: flex;
   align-items: center;
   position: relative;
   overflow: hidden;
   color: var(--white);
+  padding: 6rem 0 4rem !important;
 }
 
 .hero-background {
@@ -94,11 +97,11 @@
 }
 
 .hero-stats {
-  display: flex;
-  justify-content: center;
-  gap: 3rem;
-  margin-bottom: 3rem;
-  flex-wrap: wrap;
+  display: flex !important;
+  justify-content: center !important;
+  gap: 3rem !important;
+  margin-bottom: 3rem !important;
+  flex-wrap: nowrap !important;
 }
 
 .stat-item {

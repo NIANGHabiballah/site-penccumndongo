@@ -17,12 +17,15 @@
 
 /* Hero section améliorée */
 .service-page .hero-section {
-  position: relative;
-  overflow: hidden;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 100%);
+  position: relative !important;
+  overflow: hidden !important;
+  min-height: 50vh !important;
+  max-height: 50vh !important;
+  height: 50vh !important;
+  display: flex !important;
+  align-items: center !important;
+  background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 100%) !important;
+  padding: 4rem 0 !important;
 }
 
 .service-page .hero-section::before {
@@ -44,11 +47,26 @@
 
 /* Titres avec animations */
 .service-page .hero-title {
-  background: linear-gradient(135deg, var(--white) 0%, #0380C2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: slideInUp 0.8s ease-out;
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background-clip: unset !important;
+  animation: slideInUp 0.8s ease-out !important;
+}
+
+.service-page .hero-section .hero-title {
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.hero-section h1 {
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 .service-page .section-title {

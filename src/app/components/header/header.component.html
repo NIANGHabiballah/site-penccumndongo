@@ -16,11 +16,29 @@
                         || router.url.includes('formations') 
                         || router.url.includes('formation-infographie') 
                         || router.url.includes('opportunites') 
-                        || router.url.includes('cp2i')
+                        || router.url.includes('cp2i') 
                         || router.url.includes('services/'); else menuComplet">
         <a routerLink="/accueil" (click)="closeMenuOnClick()">{{ 'Accueil' }}</a>
         <a routerLink="/apropos" routerLinkActive="active" (click)="closeMenuOnClick()">{{ 'À Propos' }}</a>
       </ng-container>
+      
+        <!-- Sous-menu Services pour les pages de services -->
+        <div class="dropdown services-dropdown" *ngIf="router.url.includes('services/')"
+          (mouseenter)="onServicesDropdownHover(true)"
+          (mouseleave)="onServicesDropdownHover(false)">
+          <button class="dropdown-btn services-btn" (click)="toggleServicesDropdownMobile($event)">
+            Services <span class="arrow">&#9662;</span>
+          </button>
+          <div class="dropdown-content services-dropdown-content" [class.show]="showServicesDropdown">
+            <a routerLink="/services/developpement-web" routerLinkActive="active" (click)="closeMenuOnClick()">Développement Web</a>
+            <a routerLink="/services/design-graphique" routerLinkActive="active" (click)="closeMenuOnClick()">Design Graphique</a>
+            <a routerLink="/services/community-management" routerLinkActive="active" (click)="closeMenuOnClick()">Community Management</a>
+            <a routerLink="/services/marketing-digital" routerLinkActive="active" (click)="closeMenuOnClick()">Marketing Digital</a>
+            <a routerLink="/services/formations-professionnelles" routerLinkActive="active" (click)="closeMenuOnClick()">Formations Pro</a>
+          </div>
+        </div>
+      
+
 
       <ng-template #menuComplet>
 

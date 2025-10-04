@@ -1,226 +1,454 @@
-/* WhatsApp floating icon and text */
-.whatsapp-float {
-  position: fixed;
-  right: 1.2rem;
-  bottom: 12.5rem;
-  z-index: 12000;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-.whatsapp-icon {
-  width: 3.2rem;
-  height: 3.2rem;
-  cursor: pointer;
-  transition: transform 0.2s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-  border-radius: 50%;
-  background: #25D366;
-  padding: 0.3em;
-}
-.whatsapp-icon:hover {
-  transform: scale(1.08);
-}
-.whatsapp-text {
-  display: none;
-  margin-top: 0.5em;
-  background: #25D366;
-  color: #fff;
-  font-weight: bold;
-  border-radius: 2em;
-  padding: 0.7em 1.5em;
-  font-size: 1.1em;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  cursor: pointer;
-  white-space: nowrap;
-  animation: fadeInWhatsapp 0.3s;
-}
-@keyframes fadeInWhatsapp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+:root {
+  --primary-blue: #0380C2;
+  --primary-orange: #FF7F1A;
+  --dark-blue: #001B36;
+  --light-gray: #f8f9fa;
+  --white: #ffffff;
+  --text-dark: #2c3e50;
+  --text-light: #6c757d;
+  --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 8px 40px rgba(0, 0, 0, 0.12);
+  --border-radius: 16px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Affiche le texte au clic sur l'icône */
-#whatsapp-float.active .whatsapp-text {
-  display: inline-block;
+.service-page {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  color: var(--text-dark);
 }
 
-/* Responsive: ajuste la position sur mobile */
-@media (max-width: 600px) {
-  .whatsapp-float {
-    right: 1rem;
-    bottom: 6rem;
-  }
-  .whatsapp-icon {
-    width: 2.3rem;
-    height: 2.3rem;
-  }
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
-@media (max-width: 500px) {
-    .devis-banner {
-        padding: 3.5rem 0.5rem 1rem 0.5rem;
-        font-size: 0.98rem;
-        border-radius: 0 0 1.2rem 1.2rem;
-    }
-    .devis-banner h1 {
-        font-size: 1.3rem;
-    }
-    .devis-form {
-        max-width: 98vw;
-        padding: 0.8rem 0.2rem 1rem 0.2rem;
-        border-radius: 1rem;
-    }
-    .devis-btn {
-        width: 100%;
-        padding: 0.8rem 0;
-        font-size: 1rem;
-    }
-    .scroll-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
-        right: 12px;
-    }
-    #scrollTopBtn { bottom: 70px; }
-    #scrollBottomBtn { bottom: 20px; }
-}
-.devis-banner {
-  background: linear-gradient(120deg, #0380C2 0%, #FF7F1A 100%);
-  color: #fff;
-  padding: 5.5rem 1rem 1.5rem 1rem; /* augmente le padding-top ici */
-  border-radius: 0 0 2rem 2rem;
-  text-align: center;
-  margin-bottom: 2.5rem;
-  box-shadow: 0 4px 24px rgba(3,128,194,0.10);
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 100%) !important;
+  min-height: 35vh !important;
+  max-height: 35vh !important;
+  height: 35vh !important;
+  display: flex !important;
+  align-items: center !important;
+  position: relative !important;
+  overflow: hidden !important;
+  color: var(--white) !important;
+  padding: 3rem 0 !important;
 }
 
-.devis-banner h1 {
-  font-size: 2rem;
+.hero-background {
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+}
+
+.hero-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 20% 80%, #0380C2 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, #0380C2 0%, transparent 50%);
+}
+
+.hero-content {
+  position: relative !important;
+  z-index: 2 !important;
+  text-align: center !important;
+  max-width: 800px !important;
+  margin: 0 auto !important;
+  padding: 1rem !important;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  padding: 0.5rem 1.5rem;
+  margin-bottom: 0.5rem !important;
+  margin-top: 1rem !important;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.hero-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
   font-weight: 800;
-  letter-spacing: 1px;
-  margin-bottom: 0.7rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background-clip: unset !important;
 }
 
-.devis-banner p {
-  font-size: 1.0rem;
+.service-page .hero-section .hero-content .hero-title {
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
-.devis-form {
-  background: #fff;
+.hero-section h1 {
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  margin-bottom: 3rem;
+  opacity: 0.9;
   max-width: 600px;
-  margin: 0 auto 3rem auto;
-  padding: 2.2rem 1.5rem 1.5rem 1.5rem;
-  border-radius: 1.5rem;
-  box-shadow: 0 4px 24px rgba(3,128,194,0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Form Section */
+.form-section {
+  padding: 6rem 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.section-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  color: var(--primary-blue) !important;
+  margin-bottom: 1rem;
+}
+
+.section-subtitle {
+  font-size: 1.2rem;
+  color: var(--text-light);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Modern Form Styles */
+.devis-form {
+  background: var(--white);
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(3, 128, 194, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.devis-form::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-blue), var(--primary-orange));
 }
 
 .form-row {
-  display: flex;
-  gap: 1.2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
 }
 
-.form-group {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+.full-width {
+  grid-column: 1 / -1;
 }
 
-label {
-  font-weight: 600;
-  color: #0380C2;
+/* Input Groups with Floating Labels */
+.input-group {
+  position: relative;
+  margin-bottom: 1.5rem;
 }
 
-input, select, textarea {
-  border: 1px solid #e0e0e0;
-  border-radius: 0.7rem;
-  padding: 0.7rem 1rem;
+.input-group input {
+  width: 100%;
+  padding: 1.2rem 3rem 1.2rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
   font-size: 1rem;
+  font-family: inherit;
   background: #f8fafc;
-  transition: border 0.2s;
-}
-
-input:focus, select:focus, textarea:focus {
-  border: 1.5px solid #FF7F1A;
+  transition: var(--transition);
   outline: none;
 }
 
+.input-group input:focus,
+.input-group input:not(:placeholder-shown) {
+  border-color: var(--primary-blue);
+  background: var(--white);
+  box-shadow: 0 0 0 4px rgba(3, 128, 194, 0.1);
+}
+
+.input-group label {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: var(--text-light);
+  pointer-events: none;
+  transition: var(--transition);
+  background: transparent;
+  padding: 0 0.5rem;
+  font-weight: 500;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+  top: 0;
+  font-size: 0.85rem;
+  color: var(--primary-blue);
+  background: var(--white);
+  font-weight: 600;
+}
+
+.input-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary-blue);
+  font-size: 1.1rem;
+}
+
+/* Select Groups */
+.select-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.select-group select {
+  width: 100%;
+  padding: 1.2rem 3rem 1.2rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: #f8fafc;
+  transition: var(--transition);
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.select-group select:focus {
+  border-color: var(--primary-blue);
+  background: var(--white);
+  box-shadow: 0 0 0 4px rgba(3, 128, 194, 0.1);
+}
+
+.select-group label {
+  position: absolute;
+  left: 1rem;
+  top: 0;
+  font-size: 0.85rem;
+  color: var(--primary-blue);
+  background: var(--white);
+  padding: 0 0.5rem;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.select-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary-blue);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+/* Textarea Group */
+.textarea-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.textarea-group textarea {
+  width: 100%;
+  padding: 1.2rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: #f8fafc;
+  transition: var(--transition);
+  outline: none;
+  resize: vertical;
+  min-height: 120px;
+}
+
+.textarea-group textarea:focus,
+.textarea-group textarea:not(:placeholder-shown) {
+  border-color: var(--primary-blue);
+  background: var(--white);
+  box-shadow: 0 0 0 4px rgba(3, 128, 194, 0.1);
+}
+
+.textarea-group label {
+  position: absolute;
+  left: 1rem;
+  top: 1.2rem;
+  font-size: 1rem;
+  color: var(--text-light);
+  pointer-events: none;
+  transition: var(--transition);
+  background: transparent;
+  padding: 0 0.5rem;
+  font-weight: 500;
+}
+
+.textarea-group textarea:focus + label,
+.textarea-group textarea:not(:placeholder-shown) + label {
+  top: 0;
+  font-size: 0.85rem;
+  color: var(--primary-blue);
+  background: var(--white);
+  font-weight: 600;
+}
+
+/* Submit Button */
+.submit-group {
+  margin-top: 2rem;
+}
+
 .devis-btn {
-  background: #FF7F1A;
-  color: #fff;
+  width: 100%;
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+  color: var(--white);
   font-weight: 700;
   font-size: 1.1rem;
-  padding: 0.9rem 2.2rem;
-  border-radius: 2rem;
+  padding: 1.2rem 2rem;
+  border-radius: 16px;
   border: none;
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
-  margin-top: 1rem;
-  box-shadow: 0 2px 12px rgba(3,128,194,0.10);
-}
-.devis-btn:hover {
-  background: #FF7F1A;
-  color: #fff;
-  transform: translateY(-3px) scale(1.04);
-}
-
-@media (max-width: 700px) {
-  .form-row {
-    flex-direction: column;
-    gap: 0.7rem;
-  }
-  .devis-form {
-    padding: 1.2rem 0.5rem;
-  }
-}
-
-
-/* Fleche pour scroller */
-.scroll-btn {
-  position: fixed;
-  right: 24px;
-  z-index: 999;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: none;
-  background: #0380C2;
-  color: #fff;
-  font-size: 1.6rem;
-  box-shadow: 0 4px 16px rgba(3,128,194,0.18);
-  cursor: pointer;
-  display: none;
+  transition: var(--transition);
+  display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s, transform 0.2s;
-}
-#scrollTopBtn { bottom: 90px; }
-#scrollBottomBtn { bottom: 30px; }
-.scroll-btn:hover { background: #FF7F1A; transform: scale(1.08);}
-
-.devis-form-title {
-  text-align: center;
-  color: #FF7F1A;
-  font-size: 1.5rem;
-  margin-bottom: 1.2rem;
-  font-weight: 700;
+  gap: 0.5rem;
+  box-shadow: 0 8px 25px rgba(3, 128, 194, 0.3);
 }
 
-.fade-in {
-  animation: fadeIn 0.7s;
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.97) translateY(40px);}
-  to { opacity: 1; transform: scale(1) translateY(0);}
+.devis-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(3, 128, 194, 0.4);
 }
 
-/* devis.component.css */
+.devis-btn:active {
+  transform: translateY(0);
+}
+
+/* Messages */
+.success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: var(--white);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  font-weight: 500;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
 .error {
-  color: #d32f2f;
-  font-size: 0.95em;
-  margin-top: 2px;
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.error::before {
+  content: '⚠';
+  font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .devis-form {
+    padding: 2rem 1.5rem;
+    margin: 0 1rem;
+    border-radius: 20px;
+  }
+  
+  .hero-content {
+    padding: 1rem;
+  }
+  
+  .input-group input,
+  .select-group select,
+  .textarea-group textarea {
+    padding: 1rem 2.5rem 1rem 0.8rem;
+  }
+  
+  .input-group label,
+  .textarea-group label {
+    left: 0.8rem;
+  }
+  
+  .input-icon,
+  .select-icon {
+    right: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .devis-form {
+    padding: 1.5rem 1rem;
+    border-radius: 16px;
+  }
+  
+  .form-section {
+    padding: 4rem 0;
+  }
+  
+  .section-title {
+    font-size: 1.8rem;
+  }
+}
+
+/* Animation for form elements */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.devis-form {
+  animation: slideInUp 0.6s ease-out;
+}
+
+.input-group,
+.select-group,
+.textarea-group {
+  animation: slideInUp 0.6s ease-out;
 }

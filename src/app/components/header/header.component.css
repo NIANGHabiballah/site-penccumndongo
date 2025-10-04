@@ -132,7 +132,7 @@ nav ul li a.active {
 .portfolio-btn, .services-btn {
   background: none;
   border: none;
-  color: #0380C2;
+  color: #2c3e50;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -141,6 +141,10 @@ nav ul li a.active {
   display: flex;
   align-items: center;
   gap: 0.3em;
+}
+
+.portfolio-btn:hover, .services-btn:hover {
+  color: #0380C2;
 }
 
 .portfolio-btn.active, .services-btn.active {
@@ -169,7 +173,7 @@ nav ul li a.active {
 .dropdown-btn {
   background: none;
   border: none;
-  color: #0380C2;
+  color: #2c3e50;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -178,6 +182,10 @@ nav ul li a.active {
   display: flex;
   align-items: center;
   gap: 0.3em;
+}
+
+.dropdown-btn:hover {
+  color: #0380C2;
 }
 
 .dropdown-btn.active {

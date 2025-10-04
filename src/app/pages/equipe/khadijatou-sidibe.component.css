@@ -27,7 +27,7 @@
 
 /* Profile Hero */
 .profile-hero {
-  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-orange) 100%);
+  background: linear-gradient(135deg, var(--primary-blue) 0%, #001B36 100%) !important;
   color: var(--white);
   padding: 120px 0 80px;
   text-align: center;
@@ -120,31 +120,16 @@
   display: inline-block;
 }
 
-.section-header h2::before,
 .section-header h2::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  width: 0;
-  height: 2px;
-  background: var(--primary-orange);
-  animation: expandDash 0.8s ease-out forwards;
-}
-
-.section-header h2::before {
-  right: 100%;
-  margin-right: 15px;
-}
-
-.section-header h2::after {
-  left: 100%;
-  margin-left: 15px;
-}
-
-@keyframes expandDash {
-  to {
-    width: 50px;
-  }
+  content: '' !important;
+  position: absolute !important;
+  bottom: -10px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 60px !important;
+  height: 4px !important;
+  background: var(--primary-blue) !important;
+  border-radius: 2px !important;
 }
 
 /* About Section */
@@ -342,7 +327,7 @@
 /* Values Section */
 .values-section {
   padding: 80px 0;
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+  background: linear-gradient(135deg, var(--primary-blue), #001B36) !important;
   color: var(--white);
   text-align: center;
 }

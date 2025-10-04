@@ -29,11 +29,12 @@
 /* Hero Section */
 .hero-section {
   position: relative;
-  min-height: 100vh;
+  min-height: 60vh;
   display: flex;
   align-items: center;
   background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 100%);
   overflow: hidden;
+  padding: 6rem 0 4rem;
 }
 
 .hero-background {
@@ -60,9 +61,10 @@
   z-index: 2;
   text-align: center;
   color: var(--white);
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
+  max-width: 900px !important;
+  margin: 0 auto !important;
+  padding: 2rem !important;
+  width: 100% !important;
 }
 
 .hero-badge {
@@ -79,9 +81,9 @@
 }
 
 .hero-title {
-  font-size: clamp(3rem, 8vw, 5rem);
+  font-size: clamp(2rem, 5vw, 3rem) !important;
   font-weight: 800;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   line-height: 1.1;
   color: var(--white);
 }
@@ -94,30 +96,33 @@
 }
 
 .hero-subtitle {
-  font-size: clamp(1.2rem, 3vw, 1.5rem);
-  margin-bottom: 3rem;
+  font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+  margin-bottom: 2rem;
   opacity: 0.9;
   font-weight: 300;
   color: var(--white);
 }
 
 .hero-stats {
-  display: flex;
-  justify-content: center;
-  gap: 3rem;
-  flex-wrap: wrap;
+  display: flex !important;
+  justify-content: center !important;
+  gap: 3rem !important;
+  flex-wrap: nowrap !important;
+  margin-top: 2rem !important;
 }
 
 .stat-item {
-  text-align: center;
+  text-align: center !important;
+  flex: 0 1 auto !important;
+  min-width: 100px !important;
 }
 
 .stat-number {
   display: block;
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 800;
   color: var(--primary-orange);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 
 .stat-label {
@@ -145,12 +150,25 @@
   margin: 0 auto;
 }
 
-.title-divider {
-  width: 80px;
-  height: 4px;
-  background: linear-gradient(90deg, var(--primary-blue), var(--primary-orange));
-  margin: 2rem auto 0;
-  border-radius: 2px;
+/* Style des titres avec tiret bleu en bas comme sur la page opportunités */
+.section-title {
+  font-size: clamp(1.8rem, 4vw, 2.5rem) !important;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.section-title::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: -10px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 60px !important;
+  height: 4px !important;
+  background: var(--primary-blue) !important;
+  border-radius: 2px !important;
 }
 
 /* Presentation Section */
@@ -372,6 +390,10 @@
 
 .philosophy-section .section-title {
   color: var(--white);
+}
+
+.philosophy-section .section-title::after {
+  background: var(--primary-orange) !important;
 }
 
 .philosophy-quote {
@@ -729,12 +751,28 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .hero-section {
+    min-height: 50vh;
+    padding: 5rem 0 3rem;
+  }
+  
   .hero-stats {
-    gap: 2rem;
+    gap: 1.5rem !important;
+    flex-wrap: nowrap !important;
+    justify-content: space-around !important;
+  }
+  
+  .stat-item {
+    flex: 1;
+    min-width: 70px;
   }
   
   .stat-number {
-    font-size: 2rem;
+    font-size: 1.8rem;
+  }
+  
+  .stat-label {
+    font-size: 0.8rem;
   }
   
   .presentation-content {

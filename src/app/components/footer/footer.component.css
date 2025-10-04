@@ -207,7 +207,12 @@
   margin: 0 0 1rem;
   font-size: 1.2rem;
   font-weight: 600;
-  color: #0380C2 
+  color: #0380C2;
+}
+
+/* Supprimer le tiret bleu des titres du footer */
+.footer-section .section-title::after {
+  display: none !important;
 }
 
 .section-title span {

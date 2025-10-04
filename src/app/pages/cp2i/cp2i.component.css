@@ -29,11 +29,12 @@
 /* Hero Section */
 .hero-section {
   position: relative;
-  min-height: 100vh;
+  min-height: 60vh;
   display: flex;
   align-items: center;
   background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 100%);
   overflow: hidden;
+  padding: 6rem 0 3rem;
 }
 
 .hero-background {
@@ -220,36 +221,20 @@ button.cta-secondary:hover {
   font-size: clamp(2.5rem, 5vw, 3.5rem);
   font-weight: 800;
   color: var(--primary-blue);
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
   position: relative;
-  display: inline-block;
-}
-
-.section-title::before,
-.section-title::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  width: 0;
-  height: 2px;
-  background: var(--primary-orange);
-  animation: expandDash 0.8s ease-out forwards;
-}
-
-.section-title::before {
-  right: 100%;
-  margin-right: 15px;
 }
 
 .section-title::after {
-  left: 100%;
-  margin-left: 15px;
-}
-
-@keyframes expandDash {
-  to {
-    width: 50px;
-  }
+  content: '' !important;
+  position: absolute !important;
+  bottom: -10px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 60px !important;
+  height: 4px !important;
+  background: var(--primary-blue) !important;
+  border-radius: 2px !important;
 }
 
 .section-subtitle {
@@ -257,10 +242,6 @@ button.cta-secondary:hover {
   color: var(--text-light);
   max-width: 600px;
   margin: 0 auto;
-}
-
-.title-divider {
-  display: none;
 }
 
 /* About Section */
@@ -800,12 +781,54 @@ button.cta-secondary:hover {
     font-size: clamp(1.5rem, 4vw, 2rem);
   }
   
+  .hero-content {
+    padding: 1.5rem !important;
+    text-align: center !important;
+  }
+  
+  .hero-badge {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  .hero-title {
+    margin-bottom: 1rem !important;
+  }
+  
+  .hero-subtitle {
+    margin-bottom: 1rem !important;
+  }
+  
+  .hero-description {
+    margin-bottom: 2rem !important;
+  }
+  
   .hero-stats {
-    gap: 2rem;
+    gap: 1rem !important;
+    margin-bottom: 2rem !important;
+    justify-content: center !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+  }
+  
+  .stat-item {
+    min-width: 80px !important;
+    flex: 0 1 auto !important;
   }
   
   .stat-number {
-    font-size: 2.5rem;
+    font-size: 2rem !important;
+  }
+  
+  .hero-cta {
+    gap: 1rem !important;
+    justify-content: center !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+  }
+  
+  .cta-primary, .cta-secondary, button.cta-secondary {
+    padding: 0.8rem 1.5rem !important;
+    font-size: 0.9rem !important;
   }
   
   .about-content {
