@@ -101,7 +101,7 @@
       <h2>Notre Vision</h2>
       <p>
         <!-- Remplace ce texte par ta vision -->
-        Être un acteur de référence dans la promotion de la culture digitale et l’émergence des talents en Afrique.
+        Être un acteur de référence dans la promotion de la culture digitale et l'émergence des talents en Afrique.
       </p>
     </div>
   </div>
@@ -333,7 +333,7 @@
 
     <div class="number-card">
   <div class="number" data-target="03">+0</div>
-      <div class="number-label">Années d’expérience</div>
+      <div class="number-label">Années d'expérience</div>
     </div>
   </div>
 </section>
@@ -438,84 +438,121 @@
 <app-newsletter></app-newsletter>
 
 <!-- Section Contact -->
-<section id="contact" class="contact scroll-section">
-
- <div class="section-header" [@fadeInUp]>
-    <h2 class="section-title">Contactez-nous</h2>
-    <p class="section-subtitle">
-      Un projet, une question ? Notre équipe vous répond rapidement et vous accompagne dans votre démarche digitale.
-    </p>
-    <div class="title-divider"></div>
+<section id="contact" class="contact-section scroll-section">
+  <div class="contact-banner">
+    <div class="banner-content">
+      <h2 class="banner-title">Contactez-nous</h2>
+      <p class="banner-subtitle">
+        Un projet, une question? Notre équipe vous répond rapidement et vous accompagne dans votre démarche digitale.
+      </p>
+    </div>
   </div>
 
-  <form (ngSubmit)="onSubmit()" #contactForm="ngForm" class="contact-form wide" novalidate>
-    <h3 class="form-title">Formulaire de contact</h3>
+  <div class="contact-container">
+    <div class="contact-content">
+      <div class="contact-info">
+        <h3>Nos coordonnées</h3>
+        <div class="info-item">
+          <i class="fas fa-envelope"></i>
+          <div>
+            <h4>Email</h4>
+            <p>pencc.penccumndongo&#64;gmail.com</p>
+          </div>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-phone"></i>
+          <div>
+            <h4>Téléphone</h4>
+            <p>+221 77 629 06 39</p>
+            <p>+221 76 841 54 14</p>
+          </div>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <div>
+            <h4>Adresse</h4>
+            <p>Yeumbeul, Comico Série B 156<br>Dakar, Sénégal</p>
+          </div>
+        </div>
+      </div>
 
-    <div class="form-row double">
+      <div class="contact-form-section">
+        <h3>Envoyez-nous un message</h3>
+        
+        <div *ngIf="successMsg" class="success-message">{{successMsg}}</div>
+        <div *ngIf="errorMsg" class="error-message">{{errorMsg}}</div>
 
-    <div class="form-group">
-      <label for="firstname">Prénom <span class="required">*</span></label>
-      <input id="firstname" type="text" placeholder="Ex : Malik ibrah"
-        [(ngModel)]="contactData.firstname" name="firstname" required #firstname="ngModel">
-      <div class="error" *ngIf="firstname.invalid && (firstname.dirty || firstname.touched)">
-        Le prénom est obligatoire.
+        <form (ngSubmit)="onSubmit()" #contactForm="ngForm" class="modern-contact-form" novalidate>
+          <div class="form-row-modern">
+            <div class="form-group-modern">
+              <label for="firstname">Prénom <span class="required">*</span></label>
+              <input id="firstname" type="text" placeholder="Ex : Malik ibrah"
+                [(ngModel)]="contactData.firstname" name="firstname" required #firstname="ngModel">
+              <div class="field-error" *ngIf="firstname.invalid && (firstname.dirty || firstname.touched)">
+                Le prénom est obligatoire.
+              </div>
+            </div>
+            <div class="form-group-modern">
+              <label for="lastname">Nom de famille <span class="required">*</span></label>
+              <input id="lastname" type="text" placeholder="Nom de famille"
+                [(ngModel)]="contactData.lastname" name="lastname" required #lastname="ngModel">
+              <div class="field-error" *ngIf="lastname.invalid && (lastname.dirty || lastname.touched)">
+                Le nom de famille est obligatoire.
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row-modern">
+            <div class="form-group-modern">
+              <label for="phone">Téléphone <span class="required">*</span></label>
+              <input id="phone" type="tel" placeholder="Numéro de portable"
+                [(ngModel)]="contactData.phone" name="phone" required #phone="ngModel">
+              <div class="field-error" *ngIf="phone.invalid && (phone.dirty || phone.touched)">
+                Le numéro de portable est obligatoire.
+              </div>
+            </div>
+            <div class="form-group-modern">
+              <label for="email">E-mail <span class="required">*</span></label>
+              <input id="email" type="email" placeholder="Ex : malik@ibrah.com"
+                [(ngModel)]="contactData.email" name="email" required email #email="ngModel">
+              <div class="field-error" *ngIf="email.invalid && (email.dirty || email.touched)">
+                Un e-mail valide est obligatoire.
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group-modern">
+            <label for="company">Entreprise / Organisation</label>
+            <input id="company" type="text" placeholder="Ex : Penccum Ndongo"
+              [(ngModel)]="contactData.company" name="company">
+          </div>
+          
+          <div class="form-group-modern">
+            <label for="message">Détaillez votre projet <span class="required">*</span></label>
+            <textarea id="message" placeholder="Saisissez votre message..."
+              [(ngModel)]="contactData.message" name="message" required #message="ngModel" rows="5"></textarea>
+            <div class="field-error" *ngIf="message.invalid && (message.dirty || message.touched)">
+              Merci de détailler votre projet.
+            </div>
+          </div>
+          
+          <div class="form-group-modern recaptcha-group">
+            <re-captcha
+              (resolved)="onCaptchaResolved($event)"
+              siteKey="6LcOtdMrAAAAAKCPKLTLIONtTqumHbVTm316iyzT"
+              size="normal"
+              theme="light">
+            </re-captcha>
+          </div>
+          
+          <div class="form-group-modern">
+            <button type="submit" class="modern-contact-btn" [disabled]="!contactForm.valid || !captchaResolved">
+              <span>Envoyer le message</span>
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
-    <div class="form-group">
-      <label for="lastname">Nom de famille <span class="required">*</span></label>
-      <input id="lastname" type="text" placeholder="Nom de famille"
-        [(ngModel)]="contactData.lastname" name="lastname" required #lastname="ngModel">
-      <div class="error" *ngIf="lastname.invalid && (lastname.dirty || lastname.touched)">
-        Le nom de famille est obligatoire.
-      </div>
-    </div>
   </div>
-  <div class="form-row double">
-    <div class="form-group">
-      <label for="phone">Téléphone <span class="required">*</span></label>
-      <input id="phone" type="tel" placeholder="Numéro de portable"
-        [(ngModel)]="contactData.phone" name="phone" required #phone="ngModel">
-      <div class="error" *ngIf="phone.invalid && (phone.dirty || phone.touched)">
-        Le numéro de portable est obligatoire.
-      </div>
-    </div>
-    <div class="form-group">
-      <label for="email">E-mail <span class="required">*</span></label>
-      <input id="email" type="email" placeholder="Ex : malik@ibrah.com"
-        [(ngModel)]="contactData.email" name="email" required email #email="ngModel">
-      <div class="error" *ngIf="email.invalid && (email.dirty || email.touched)">
-        Un e-mail valide est obligatoire.
-      </div>
-    </div>
-  </div>
-  <div class="form-row">
-    <label for="company">Entreprise / Organisation</label>
-    <input id="company" type="text" placeholder="Ex : Penccum Ndongo"
-      [(ngModel)]="contactData.company" name="company">
-  </div>
-  <div class="form-row">
-    <label for="message">Détaillez votre projet <span class="required">*</span></label>
-    <textarea id="message" placeholder="Saisissez votre message..."
-      [(ngModel)]="contactData.message" name="message" required #message="ngModel" rows="7"></textarea>
-    <div class="error" *ngIf="message.invalid && (message.dirty || message.touched)">
-      Merci de détailler votre projet.
-    </div>
-  </div>
-  
-  <!-- reCAPTCHA -->
-  <div class="form-row recaptcha-row">
-    <re-captcha
-      (resolved)="onCaptchaResolved($event)"
-      siteKey="6LcOtdMrAAAAAKCPKLTLIONtTqumHbVTm316iyzT"
-      size="normal"
-      theme="light">
-    </re-captcha>
-  </div>
-  
-  <button type="submit" [disabled]="!contactForm.valid || !captchaResolved">Envoyer</button></form>
-
-<div *ngIf="successMsg" class="success">{{successMsg}}</div>
-<div *ngIf="errorMsg" class="error">{{errorMsg}}</div>
-
 </section>
-

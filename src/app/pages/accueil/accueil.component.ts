@@ -3,8 +3,9 @@ declare let gtag: Function;
 import { AfterViewInit, Component, OnDestroy, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BannerComponent } from '../../components/banner/banner.component';
 import { NewsletterComponent } from '../../components/newsletter/newsletter.component';
+import { BannerComponent } from '../../components/banner/banner.component';
+
 
 import { trigger, state, style, transition, animate, query, stagger, keyframes } from '@angular/animations';
 import { RouterModule } from '@angular/router';

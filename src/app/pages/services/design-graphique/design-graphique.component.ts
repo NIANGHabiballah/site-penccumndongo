@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 
 interface GraphicProject {
   id: number;
@@ -11,13 +12,15 @@ interface GraphicProject {
 
 @Component({
   selector: 'app-design-graphique',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './design-graphique.component.html',
   styleUrl: './design-graphique.component.css'
 })
 export class DesignGraphiqueComponent {
   showLightbox = false;
   selectedProject: GraphicProject | null = null;
+
+  constructor(private router: Router) {}
 
   // Images des conceptions graphiques de la page d'accueil
   graphicProjects: GraphicProject[] = [
@@ -317,5 +320,16 @@ export class DesignGraphiqueComponent {
         img.className = img.className.replace(/\b\w+-style\b/, 'flyer-style');
       }
     }
+  }
+
+  navigateToContact(): void {
+    this.router.navigate(['/']).then(() => {
+      setTimeout(() => {
+        const element = document.getElementById('contact');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    });
   }
 }

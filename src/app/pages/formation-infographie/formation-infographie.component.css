@@ -2475,3 +2475,188 @@
     align-items: center;
   }
 }
+
+/* Modal Inscriptions Clôturées */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 30px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0085CA;
+  margin: 0;
+}
+
+.modal-title-closed {
+  color: #dc3545 !important;
+  font-weight: 800 !important;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.modal-body {
+  padding: 30px;
+  text-align: center;
+}
+
+.modal-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-icon svg {
+  width: 64px;
+  height: 64px;
+  animation: pulse-icon 2s ease-in-out infinite;
+}
+
+@keyframes pulse-icon {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.modal-message {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.modal-submessage {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 0 30px;
+}
+
+.btn-whatsapp-group,
+.btn-whatsapp-contact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 25px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-whatsapp-group {
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: white;
+}
+
+.btn-whatsapp-group:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
+}
+
+.btn-whatsapp-contact {
+  background: linear-gradient(135deg, #0085CA 0%, #0066A3 100%);
+  color: white;
+}
+
+.btn-whatsapp-contact:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 133, 202, 0.3);
+}
+
+.modal-footer {
+  padding: 20px 30px 30px;
+  text-align: center;
+}
+
+.modal-note {
+  font-size: 0.9rem;
+  color: #888;
+  font-style: italic;
+  margin: 0;
+}
+
+/* Responsive pour le modal */
+@media (max-width: 600px) {
+  .modal-content {
+    margin: 10px;
+    border-radius: 16px;
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-actions,
+  .modal-footer {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  
+  .modal-actions {
+    gap: 12px;
+  }
+  
+  .btn-whatsapp-group,
+  .btn-whatsapp-contact {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+  }
+}

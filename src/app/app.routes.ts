@@ -3,7 +3,7 @@ import { ServicesComponent } from './pages/services/services.component';
 import { PortfolioComponent } from './pages/portfolio/portfolio.component';
 import { TestimonialsComponent } from './pages/testimonials/testimonials.component';
 import { NewsComponent } from './pages/news/news.component';
-import { ContactComponent } from './pages/contact/contact.component';
+
 import { AproposComponent } from './pages/apropos/apropos.component';
 import { AccueilComponent } from './pages/accueil/accueil.component';
 import { DevisComponent } from './pages/devis/devis.component';
@@ -33,12 +33,13 @@ export const routes: Routes = [
   { path: 'portfolio', component: PortfolioComponent },
   { path: 'testimonials', component: TestimonialsComponent },
   { path: 'news', component: NewsComponent },
-  { path: 'contact', component: ContactComponent, canActivate: [SecurityGuard] },
+
   { path: 'devis', component: DevisComponent, canActivate: [SecurityGuard] },
 
   { path: 'opportunites', component: OpportunitesComponent },
   { path: 'formations', component: FormationsComponent, canActivate: [SecurityGuard] },
   { path: 'formation-infographie', component: FormationInfographieComponent, canActivate: [SecurityGuard] },
+  { path: 'penc-boost', component: FormationInfographieComponent, canActivate: [SecurityGuard] },
   { path: 'cp2i', component: Cp2iComponent },
   
   // Routes des services

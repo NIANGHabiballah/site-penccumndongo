@@ -86,6 +86,8 @@ export class FormationInfographieComponent implements OnInit {
   loading = false;
   currentTestimonial = 0;
   countdown: any = {};
+  inscriptionsClosed = true; // Inscriptions clôturées
+  showClosedModal = false;
   
   modules: FormationModule[] = [
     {
@@ -256,6 +258,12 @@ export class FormationInfographieComponent implements OnInit {
   }
 
   onSubmit(): void {
+    // Vérifier si les inscriptions sont clôturées
+    if (this.inscriptionsClosed) {
+      this.showClosedModal = true;
+      return;
+    }
+
     if (this.inscriptionForm.valid) {
       this.loading = true;
       
@@ -323,12 +331,26 @@ export class FormationInfographieComponent implements OnInit {
     window.open('https://penccumndongo.com/Programme_Formation_INFOGRAPHIE.pdf', '_blank');
   }
 
-    scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+  closeModal(): void {
+    this.showClosedModal = false;
+  }
 
-scrollToBottom() {
-  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-}
+  joinWhatsAppGroup(): void {
+    window.open('https://chat.whatsapp.com/DSnk6NSXxLO5qfSKudT5Aw', '_blank');
+    this.closeModal();
+  }
+
+  contactWhatsApp(): void {
+    window.open('https://wa.me/221776290639?text=Bonjour Penccum Ndongo, je souhaite être informé des prochaines sessions de formation en infographie.', '_blank');
+    this.closeModal();
+  }
+
+  scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  scrollToBottom() {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
   
 }

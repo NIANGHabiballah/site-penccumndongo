@@ -150,7 +150,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 .devis-btn {
-  background: linear-gradient(120deg, #0380C2 0%, #FF7F1A 100%);
+  background: #FF7F1A;
   color: #fff;
   font-weight: 700;
   font-size: 1.1rem;
