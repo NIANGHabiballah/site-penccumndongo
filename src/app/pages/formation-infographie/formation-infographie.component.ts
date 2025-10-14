@@ -86,7 +86,7 @@ export class FormationInfographieComponent implements OnInit {
   loading = false;
   currentTestimonial = 0;
   countdown: any = {};
-  inscriptionsClosed = true; // Inscriptions clôturées
+  inscriptionsClosed = false; // Inscriptions clôturées
   showClosedModal = false;
   
   modules: FormationModule[] = [

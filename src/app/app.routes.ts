@@ -27,7 +27,7 @@ import { SecurityGuard } from './guards/security.guard';
 
 export const routes: Routes = [
   { path: '', component: AccueilComponent },
-  { path: 'accueil', component: AccueilComponent },
+  { path: 'accueil', redirectTo: '', pathMatch: 'full' },
   { path: 'apropos', component: AproposComponent },
   { path: 'services', component: ServicesComponent },
   { path: 'portfolio', component: PortfolioComponent },
@@ -57,4 +57,7 @@ export const routes: Routes = [
   { path: 'mentions-legales', component: MentionsLegalesComponent },
   { path: 'politique-confidentialite', component: PolitiqueConfidentialiteComponent },
   { path: 'cgv', component: CgvComponent },
+  
+  // Wildcard route - doit être en dernier
+  { path: '**', redirectTo: '', pathMatch: 'full' }
 ];

@@ -1,15 +1,26 @@
 User-agent: *
 Allow: /
 
+# Sitemap
+Sitemap: https://penccumndongo.com/sitemap.xml
+
 # Disallow sensitive areas
 Disallow: /admin/
 Disallow: /api/
-Disallow: /src/app/back-end/
-Disallow: /*.php$
-Disallow: /private/
-Disallow: /config/
-Disallow: /.htaccess
-Disallow: /error/
+Disallow: /*.log$
+Disallow: /*.sql$
+Disallow: /*.bak$
 
-# Sitemap
-Sitemap: https://penccumndongo.com/sitemap.xml
+# Allow important pages
+Allow: /
+Allow: /apropos
+Allow: /services
+Allow: /portfolio
+Allow: /formations
+Allow: /opportunites
+Allow: /devis
+Allow: /services/developpement-web
+Allow: /services/community-management
+Allow: /services/design-graphique
+Allow: /services/marketing-digital
+Allow: /services/formations-professionnelles

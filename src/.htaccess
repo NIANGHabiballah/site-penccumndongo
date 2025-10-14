@@ -14,8 +14,19 @@ RewriteCond %{HTTPS} off [OR]
 RewriteCond %{HTTP_HOST} ^www\. [NC]
 RewriteRule ^(.*)$ https://penccumndongo.com/$1 [L,R=301]
 
-# Redirection spécifique pour éviter les boucles
+# Redirections spécifiques pour éviter les boucles et problèmes d'indexation
 RewriteRule ^accueil/?$ / [L,R=301]
+
+# Redirections canoniques pour les pages principales
+RewriteRule ^index\.html?$ / [L,R=301]
+RewriteRule ^home/?$ / [L,R=301]
+
+# Redirections pour les pages avec trailing slash
+RewriteRule ^apropos/$ /apropos [L,R=301]
+RewriteRule ^formations/$ /formations [L,R=301]
+RewriteRule ^opportunites/$ /opportunites [L,R=301]
+RewriteRule ^politique-confidentialite/$ /politique-confidentialite [L,R=301]
+RewriteRule ^cgv/$ /cgv [L,R=301]
 
 # Hide sensitive files
 <Files ~ "^\.">
