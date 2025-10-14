@@ -1,0 +1,157 @@
+<div class="container" [class.sidebar-collapsed]="desktopMenuHidden">
+  <!-- Overlay pour fermer le menu -->
+  <div class="mobile-overlay" *ngIf="mobileMenuOpen" (click)="toggleMobileMenu()"></div>
+  
+  <div class="sidebar" [class.mobile-active]="mobileMenuOpen" [class.sidebar-hidden]="desktopMenuHidden">
+    <div class="logo">
+      <h2>CP2i Admin</h2>
+      <span>Concours de Poésie</span>
+    </div>
+    <nav class="nav-menu">
+      <div class="nav-item active">
+        <i class="fas fa-chart-bar"></i> Tableau de bord
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-trophy"></i> Gestion des concours
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-users"></i> Utilisateurs
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-file-alt"></i> Textes soumis
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-star"></i> Évaluations
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-chart-line"></i> Statistiques
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-envelope"></i> Messages
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-cog"></i> Paramètres
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-sign-out-alt"></i> Déconnexion
+      </div>
+      <div class="nav-item desktop-toggle" (click)="toggleDesktopMenu()">
+        <i class="fas fa-times"></i> Fermer Menu
+      </div>
+    </nav>
+  </div>
+
+  <!-- Menu Hamburger Mobile -->
+  <div class="mobile-menu-toggle" (click)="toggleMobileMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  
+  <div class="main-content">
+    <div class="header">
+      <h1>Tableau de bord Administrateur</h1>
+      <div class="user-info">
+        <span>Admin Principal</span>
+        <div class="user-avatar">AP</div>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <button class="btn btn-primary">+ Nouveau concours</button>
+      <button class="btn btn-secondary" (click)="exportData()">Exporter données</button>
+      <button class="btn btn-success" (click)="sendAnnouncement()">Envoyer notification</button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>CONCOURS ACTIFS</h3>
+        <div class="number">3</div>
+        <div class="trend up">+1 ce mois</div>
+      </div>
+      <div class="stat-card">
+        <h3>PARTICIPANTS INSCRITS</h3>
+        <div class="number">{{stats.participants}}</div>
+        <div class="trend up">+23 cette semaine</div>
+      </div>
+      <div class="stat-card">
+        <h3>TEXTES SOUMIS</h3>
+        <div class="number">{{stats.textesTotal}}</div>
+        <div class="trend up">+12 aujourd'hui</div>
+      </div>
+      <div class="stat-card">
+        <h3>ÉVALUATIONS EN COURS</h3>
+        <div class="number">{{stats.textesEnAttente}}</div>
+        <div class="trend down">-5 depuis hier</div>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Concours récents</h3>
+          <button class="btn btn-primary">Gérer tout</button>
+        </div>
+        <div class="panel-content">
+          <div class="contest-item">
+            <div class="contest-info">
+              <h4>Concours National de Poésie 2024</h4>
+              <p>156 participants • Fin: 15 Mars 2024</p>
+            </div>
+            <span class="contest-status status-active">Actif</span>
+          </div>
+          <div class="contest-item">
+            <div class="contest-info">
+              <h4>Poésie Jeunesse</h4>
+              <p>89 participants • Fin: 28 Février 2024</p>
+            </div>
+            <span class="contest-status status-pending">Évaluation</span>
+          </div>
+          <div class="contest-item">
+            <div class="contest-info">
+              <h4>Concours Thématique Amour</h4>
+              <p>203 participants • Terminé</p>
+            </div>
+            <span class="contest-status status-closed">Clôturé</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Activité récente</h3>
+        </div>
+        <div class="panel-content">
+          <div class="user-item">
+            <div class="user-avatar-small">MK</div>
+            <div class="user-details">
+              <h5>Marie Kouassi</h5>
+              <span>Nouveau texte soumis - Il y a 2h</span>
+            </div>
+          </div>
+          <div class="user-item">
+            <div class="user-avatar-small">JD</div>
+            <div class="user-details">
+              <h5>Jean Dupont</h5>
+              <span>Évaluation terminée - Il y a 4h</span>
+            </div>
+          </div>
+          <div class="user-item">
+            <div class="user-avatar-small">AS</div>
+            <div class="user-details">
+              <h5>Aminata Sow</h5>
+              <span>Inscription validée - Il y a 6h</span>
+            </div>
+          </div>
+          <div class="user-item">
+            <div class="user-avatar-small">PL</div>
+            <div class="user-details">
+              <h5>Pierre Leblanc</h5>
+              <span>Message envoyé - Il y a 1j</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

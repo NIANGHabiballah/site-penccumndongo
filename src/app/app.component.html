@@ -1,14 +1,16 @@
-<app-header></app-header>
+<app-header *ngIf="!isDashboardRoute"></app-header>
 <router-outlet></router-outlet>
-<app-footer></app-footer>
+<app-footer *ngIf="!isDashboardRoute"></app-footer>
 
 <!-- Boutons flottants globaux -->
-<a href="https://wa.me/221776290639" target="_blank" class="whatsapp-btn" aria-label="WhatsApp">
-  <i class="fab fa-whatsapp"></i>
-</a>
-<button class="scroll-to-top" (click)="scrollToTop()" aria-label="Haut de page">
-  <i class="fas fa-arrow-up"></i>
-</button>
-<button class="scroll-to-bottom" (click)="scrollToBottom()" aria-label="Bas de page">
-  <i class="fas fa-arrow-down"></i>
-</button>
+<div *ngIf="!isDashboardRoute">
+  <a href="https://wa.me/221776290639" target="_blank" class="whatsapp-btn" aria-label="WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+  <button class="scroll-to-top" (click)="scrollToTop()" aria-label="Haut de page">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+  <button class="scroll-to-bottom" (click)="scrollToBottom()" aria-label="Bas de page">
+    <i class="fas fa-arrow-down"></i>
+  </button>
+</div>

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CP2i - Tableau de Bord Correcteur</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8f9fa;
+            color: #2c3e50;
+        }
+        
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, #6f42c1 0%, #4a148c 100%);
+            color: white;
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .logo {
+            text-align: center;
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .logo h2 {
+            color: #FF7F1A;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .user-info {
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            background: #FF7F1A;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .nav-menu {
+            padding: 1rem 0;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: #FF7F1A;
+        }
+        
+        .nav-item i {
+            width: 20px;
+            margin-right: 1rem;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+        
+        .header {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .welcome h1 {
+            color: #6f42c1;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome p {
+            color: #6c757d;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #6f42c1;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #FF7F1A;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: #6f42c1;
+            border: 2px solid #6f42c1;
+        }
+        
+        .btn-outline:hover {
+            background: #6f42c1;
+            color: white;
+        }
+        
+        /* Correction Interface */
+        .correction-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .text-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .text-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .text-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .meta-tag {
+            background: #f8f9fa;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .text-content {
+            line-height: 1.8;
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+        
+        .evaluation-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            height: fit-content;
+        }
+        
+        .criteria-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .criteria-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .criteria-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .rating-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .rating-input input {
+            width: 60px;
+            padding: 0.5rem;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .comments-section {
+            margin-bottom: 2rem;
+        }
+        
+        .comments-section textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .submit-section {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .correction-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">
+                <h2>CP2i</h2>
+                <p>Espace Correcteur</p>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <h4>Dr. Fatou Sow</h4>
+                <p>Correcteur Senior</p>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Textes Assignés</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-edit"></i>
+                    <span>Interface Correction</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-history"></i>
+                    <span>Historique</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Mes Statistiques</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>Messages Admin</span>
+                    <span style="background: #FF7F1A; color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.7rem; margin-left: auto;">2</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-comments"></i>
+                    <span>Chat Support</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-book"></i>
+                    <span>Guide Correction</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-download"></i>
+                    <span>Mode Hors-ligne</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Déconnexion</span>
+                </a>
+            </div>
+        </nav>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="welcome">
+                    <h1>Interface de Correction</h1>
+                    <p>CP2i Édition 2025 - Évaluation en cours</p>
+                </div>
+                <div class="header-actions">
+                    <a href="#" class="btn btn-outline">
+                        <i class="fas fa-list"></i>
+                        Liste des textes
+                    </a>
+                    <a href="#" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Sauvegarder
+                    </a>
+                </div>
+            </header>
+            
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #6f42c1;">12</div>
+                    <div class="stat-label">Textes assignés</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #28a745;">8</div>
+                    <div class="stat-label">Corrigés</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #FF7F1A;">4</div>
+                    <div class="stat-label">En attente</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #dc3545;">3</div>
+                    <div class="stat-label">Jours restants</div>
+                </div>
+            </div>
+            
+            <!-- Correction Interface -->
+            <div class="correction-grid">
+                <div class="text-panel">
+                    <div class="text-header">
+                        <h3>Texte #CP2i-2025-047</h3>
+                        <div style="display: flex; gap: 1rem;">
+                            <button class="btn btn-outline" style="padding: 0.5rem 1rem;">
+                                <i class="fas fa-chevron-left"></i>
+                                Précédent
+                            </button>
+                            <button class="btn btn-outline" style="padding: 0.5rem 1rem;">
+                                Suivant
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="text-meta">
+                        <span class="meta-tag"><i class="fas fa-user"></i> Participant #047</span>
+                        <span class="meta-tag"><i class="fas fa-globe"></i> Français</span>
+                        <span class="meta-tag"><i class="fas fa-tag"></i> Espoir</span>
+                        <span class="meta-tag"><i class="fas fa-calendar"></i> 15 Dec 2024</span>
+                    </div>
+                    
+                    <h4 style="color: #2c3e50; margin-bottom: 1rem;">"L'Aube de Demain"</h4>
+                    
+                    <div class="text-content">
+                        <p>Dans les rues de Dakar, où l'espoir résonne,<br>
+                        Les enfants dansent sous le soleil qui rayonne.<br>
+                        Leurs rires éclatent comme des perles d'or,<br>
+                        Portant en eux les rêves d'un futur encore...<br><br>
+                        
+                        Ô Sénégal, terre de nos ancêtres,<br>
+                        Tes fils et filles, artisans de l'être,<br>
+                        Tissent l'avenir de leurs mains habiles,<br>
+                        Bâtissant un monde plus fertile...<br><br>
+                        
+                        L'éducation, clé de la liberté,<br>
+                        Ouvre les portes de la vérité.<br>
+                        Chaque livre lu, chaque leçon apprise,<br>
+                        Est une victoire sur l'ignorance grise...</p>
+                    </div>
+                </div>
+                
+                <div class="evaluation-panel">
+                    <h3 style="margin-bottom: 1.5rem; color: #6f42c1;">
+                        <i class="fas fa-star"></i>
+                        Grille d'Évaluation
+                    </h3>
+                    
+                    <div class="criteria-grid">
+                        <div class="criteria-item">
+                            <span class="criteria-name">Originalité</span>
+                            <div class="rating-input">
+                                <input type="number" min="0" max="5" value="4" placeholder="/5">
+                            </div>
+                        </div>
+                        
+                        <div class="criteria-item">
+                            <span class="criteria-name">Style & Forme</span>
+                            <div class="rating-input">
+                                <input type="number" min="0" max="5" value="4" placeholder="/5">
+                            </div>
+                        </div>
+                        
+                        <div class="criteria-item">
+                            <span class="criteria-name">Respect du Thème</span>
+                            <div class="rating-input">
+                                <input type="number" min="0" max="5" value="5" placeholder="/5">
+                            </div>
+                        </div>
+                        
+                        <div class="criteria-item">
+                            <span class="criteria-name">Technique</span>
+                            <div class="rating-input">
+                                <input type="number" min="0" max="5" value="3" placeholder="/5">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <div style="font-size: 2rem; font-weight: bold; color: #6f42c1;">16/20</div>
+                        <div style="color: #6c757d;">Note finale</div>
+                    </div>
+                    
+                    <div class="comments-section">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Commentaires et observations :</label>
+                        <textarea placeholder="Vos commentaires constructifs pour le participant...">Très beau texte qui capture bien l'esprit d'espoir du thème. La métaphore des "perles d'or" est particulièrement réussie. Quelques améliorations possibles au niveau de la métrique dans certains vers.</textarea>
+                    </div>
+                    
+                    <div class="submit-section">
+                        <button class="btn btn-outline" style="flex: 1;">
+                            <i class="fas fa-save"></i>
+                            Brouillon
+                        </button>
+                        <button class="btn btn-primary" style="flex: 1;">
+                            <i class="fas fa-check"></i>
+                            Valider
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

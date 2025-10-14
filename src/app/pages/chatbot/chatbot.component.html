@@ -1,0 +1,250 @@
+<div class="chatbot-container">
+  <div class="chatbot-header">
+    <h1>🤖 Gestion Chatbot CP2i</h1>
+    <div class="status-indicator" [class.active]="chatbotConfig.actif">
+      <span class="status-dot"></span>
+      {{chatbotConfig.actif ? 'Actif' : 'Inactif'}}
+    </div>
+  </div>
+
+  <div class="tab-navigation">
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'configuration'"
+      (click)="switchTab('configuration')">
+      ⚙️ Configuration
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'faq'"
+      (click)="switchTab('faq')">
+      📚 Base de Connaissances
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'conversations'"
+      (click)="switchTab('conversations')">
+      💬 Conversations
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'statistiques'"
+      (click)="switchTab('statistiques')">
+      📊 Statistiques
+    </button>
+  </div>
+
+  <!-- Onglet Configuration -->
+  <div *ngIf="activeTab === 'configuration'" class="tab-content">
+    <div class="config-container">
+      <div class="config-section">
+        <h3>Paramètres Généraux</h3>
+        <div class="form-group">
+          <label class="switch-label">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="chatbotConfig.actif"
+              class="switch-input">
+            <span class="switch-slider"></span>
+            Chatbot activé
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label>Nom du chatbot</label>
+          <input 
+            type="text" 
+            [(ngModel)]="chatbotConfig.nom"
+            placeholder="Nom affiché du chatbot">
+        </div>
+
+        <div class="form-group">
+          <label>Message d'accueil</label>
+          <textarea 
+            [(ngModel)]="chatbotConfig.message_accueil"
+            rows="3"
+            placeholder="Message affiché lors de l'ouverture du chat"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Langues supportées</label>
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" checked> Français
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" checked> Wolof
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox"> Anglais
+            </label>
+          </div>
+        </div>
+
+        <button class="btn-primary" (click)="sauvegarderConfig()">
+          💾 Sauvegarder Configuration
+        </button>
+      </div>
+
+      <div class="preview-section">
+        <h3>Aperçu du Chatbot</h3>
+        <div class="chatbot-preview">
+          <div class="chat-header">
+            <span class="bot-avatar">🤖</span>
+            <span class="bot-name">{{chatbotConfig.nom}}</span>
+            <span class="status-online"></span>
+          </div>
+          <div class="chat-messages">
+            <div class="message bot-message">
+              <span class="message-text">{{chatbotConfig.message_accueil}}</span>
+            </div>
+            <div class="quick-actions">
+              <button class="quick-btn">🔹 Inscription au concours</button>
+              <button class="quick-btn">🔹 Soumettre un texte</button>
+              <button class="quick-btn">🔹 Vérifier mes résultats</button>
+              <button class="quick-btn">🔹 Contacter un humain</button>
+            </div>
+          </div>
+          <div class="chat-input">
+            <input type="text" placeholder="Tapez votre message..." disabled>
+            <button disabled>📤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onglet FAQ -->
+  <div *ngIf="activeTab === 'faq'" class="tab-content">
+    <div class="faq-container">
+      <div class="faq-header">
+        <h3>Base de Connaissances</h3>
+        <button class="btn-primary" data-toggle="add-faq">➕ Ajouter FAQ</button>
+      </div>
+
+      <div class="add-faq-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Question</label>
+            <input 
+              type="text" 
+              [(ngModel)]="nouvelleQuestion"
+              placeholder="Saisissez la question fréquente">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Réponse</label>
+          <textarea 
+            [(ngModel)]="nouvelleReponse"
+            rows="3"
+            placeholder="Réponse automatique du chatbot"></textarea>
+        </div>
+        <button class="btn-primary" (click)="ajouterFAQ()">✅ Ajouter</button>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item" *ngFor="let item of faqItems">
+          <div class="faq-content">
+            <div class="faq-question">
+              <strong>Q: {{item.question}}</strong>
+              <span class="usage-count">{{item.utilisation}} utilisations</span>
+            </div>
+            <div class="faq-answer">
+              <strong>R:</strong> {{item.reponse}}
+            </div>
+            <div class="faq-meta">
+              <span class="category">{{item.categorie}}</span>
+            </div>
+          </div>
+          <div class="faq-actions">
+            <button class="btn-edit">✏️</button>
+            <button class="btn-delete" (click)="supprimerFAQ(item.id)">🗑️</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onglet Conversations -->
+  <div *ngIf="activeTab === 'conversations'" class="tab-content">
+    <div class="conversations-container">
+      <div class="conversations-filters">
+        <select>
+          <option>Toutes les conversations</option>
+          <option>Résolues automatiquement</option>
+          <option>Transférées à un humain</option>
+          <option>En cours</option>
+        </select>
+      </div>
+
+      <div class="conversations-list">
+        <div class="conversation-item" *ngFor="let conv of conversations">
+          <div class="conversation-info">
+            <div class="user-info">
+              <span class="user-avatar">👤</span>
+              <span class="user-name">{{conv.utilisateur}}</span>
+            </div>
+            <div class="conversation-details">
+              <p class="last-message">{{conv.dernier_message}}</p>
+              <div class="conversation-meta">
+                <span class="status" [class]="conv.statut">
+                  {{conv.statut === 'resolu_auto' ? '🤖 Résolu automatiquement' : 
+                    conv.statut === 'transfere_humain' ? '👤 Transféré à un humain' : 
+                    '⏳ En cours'}}
+                </span>
+                <span class="date">{{conv.date}}</span>
+              </div>
+            </div>
+          </div>
+          <button class="btn-view" (click)="voirConversation(conv)">👁️ Voir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onglet Statistiques -->
+  <div *ngIf="activeTab === 'statistiques'" class="tab-content">
+    <div class="stats-container">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">💬</div>
+          <div class="stat-content">
+            <h3>{{statistiques.conversations_totales}}</h3>
+            <p>Conversations Totales</p>
+          </div>
+        </div>
+        
+        <div class="stat-card success">
+          <div class="stat-icon">🤖</div>
+          <div class="stat-content">
+            <h3>{{statistiques.resolutions_auto}}</h3>
+            <p>Résolutions Automatiques</p>
+          </div>
+        </div>
+        
+        <div class="stat-card warning">
+          <div class="stat-icon">👤</div>
+          <div class="stat-content">
+            <h3>{{statistiques.transferts_humain}}</h3>
+            <p>Transferts Humain</p>
+          </div>
+        </div>
+        
+        <div class="stat-card info">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-content">
+            <h3>{{statistiques.taux_satisfaction}}%</h3>
+            <p>Taux de Satisfaction</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="performance-chart">
+        <h3>Performance du Chatbot</h3>
+        <div class="chart-placeholder">
+          <p>📊 Graphique des performances (à implémenter)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

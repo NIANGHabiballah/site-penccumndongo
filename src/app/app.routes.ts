@@ -24,6 +24,14 @@ import { MentionsLegalesComponent } from './pages/mentions-legales/mentions-lega
 import { PolitiqueConfidentialiteComponent } from './pages/politique-confidentialite/politique-confidentialite.component';
 import { CgvComponent } from './pages/cgv/cgv.component';
 import { SecurityGuard } from './guards/security.guard';
+import { DashboardAdminComponent } from './pages/dashboard-admin/dashboard-admin.component';
+import { DashboardCorrecteurComponent } from './pages/dashboard-correcteur/dashboard-correcteur.component';
+import { DashboardParticipantComponent } from './pages/dashboard-participant/dashboard-participant.component';
+import { MessagesComponent } from './pages/messages/messages.component';
+import { ChatbotComponent } from './pages/chatbot/chatbot.component';
+import { GestionParticipantsComponent } from './pages/gestion-participants/gestion-participants.component';
+import { LoginComponent } from './pages/auth/login.component';
+import { RegisterComponent } from './pages/auth/register.component';
 
 export const routes: Routes = [
   { path: '', component: AccueilComponent },
@@ -57,6 +65,18 @@ export const routes: Routes = [
   { path: 'mentions-legales', component: MentionsLegalesComponent },
   { path: 'politique-confidentialite', component: PolitiqueConfidentialiteComponent },
   { path: 'cgv', component: CgvComponent },
+  
+  // Routes du système CP2i
+  { path: 'dashboard-admin', component: DashboardAdminComponent, canActivate: [SecurityGuard] },
+  { path: 'dashboard-correcteur', component: DashboardCorrecteurComponent, canActivate: [SecurityGuard] },
+  { path: 'dashboard-participant', component: DashboardParticipantComponent, canActivate: [SecurityGuard] },
+  { path: 'admin/messages', component: MessagesComponent, canActivate: [SecurityGuard] },
+  { path: 'admin/chatbot', component: ChatbotComponent, canActivate: [SecurityGuard] },
+  { path: 'admin/participants', component: GestionParticipantsComponent, canActivate: [SecurityGuard] },
+  
+  // Routes d'authentification
+  { path: 'auth/login', component: LoginComponent },
+  { path: 'auth/register', component: RegisterComponent },
   
   // Wildcard route - doit être en dernier
   { path: '**', redirectTo: '', pathMatch: 'full' }

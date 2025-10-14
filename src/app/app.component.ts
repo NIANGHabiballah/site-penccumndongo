@@ -2,16 +2,18 @@ import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { HeaderComponent } from "./components/header/header.component";
 import { FooterComponent } from "./components/footer/footer.component";
+import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, HeaderComponent, FooterComponent],
+  imports: [RouterOutlet, HeaderComponent, FooterComponent, CommonModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
   title = 'penccumndongo';
+  isDashboardRoute = false;
 
   constructor(private router: Router) {}
 
@@ -19,6 +21,7 @@ export class AppComponent implements OnInit {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
+      this.isDashboardRoute = event.url.includes('dashboard') || event.url.includes('auth');
       this.updateCanonicalUrl(event.url);
     });
   }

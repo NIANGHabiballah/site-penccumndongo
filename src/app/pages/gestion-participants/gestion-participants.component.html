@@ -1,0 +1,190 @@
+<div class="participants-container">
+  <div class="participants-header">
+    <h1>👥 Gestion des Participants</h1>
+    <div class="header-actions">
+      <button class="btn-primary" (click)="toggleAddForm()">
+        {{showAddForm ? '❌ Annuler' : '➕ Nouveau Participant'}}
+      </button>
+      <button class="btn-secondary" (click)="exporterDonnees()">📊 Exporter</button>
+    </div>
+  </div>
+
+  <!-- Formulaire d'ajout -->
+  <div *ngIf="showAddForm" class="add-form-container">
+    <div class="add-form">
+      <h3>➕ Ajouter un Participant</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nom *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="newParticipant.nom"
+            placeholder="Nom de famille">
+        </div>
+        
+        <div class="form-group">
+          <label>Prénom *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="newParticipant.prenom"
+            placeholder="Prénom">
+        </div>
+        
+        <div class="form-group">
+          <label>Email *</label>
+          <input 
+            type="email" 
+            [(ngModel)]="newParticipant.email"
+            placeholder="adresse@email.com">
+        </div>
+        
+        <div class="form-group">
+          <label>Téléphone *</label>
+          <input 
+            type="tel" 
+            [(ngModel)]="newParticipant.telephone"
+            placeholder="+221 77 123 45 67">
+        </div>
+        
+        <div class="form-group">
+          <label>Ville</label>
+          <input 
+            type="text" 
+            [(ngModel)]="newParticipant.ville"
+            placeholder="Ville de résidence">
+        </div>
+        
+        <div class="form-group">
+          <label>Statut</label>
+          <select [(ngModel)]="newParticipant.statut">
+            <option value="actif">Actif</option>
+            <option value="inactif">Inactif</option>
+            <option value="suspendu">Suspendu</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button 
+          class="btn-primary" 
+          (click)="ajouterParticipant()"
+          [disabled]="!isFormValid()">
+          ✅ Ajouter Participant
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres et recherche -->
+  <div class="filters-container">
+    <div class="search-group">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange()"
+        placeholder="🔍 Rechercher par nom, prénom ou email..."
+        class="search-input">
+    </div>
+    
+    <div class="filter-group">
+      <label>Statut:</label>
+      <select 
+        [(ngModel)]="selectedStatus"
+        (change)="onStatusChange()"
+        class="filter-select">
+        <option value="tous">Tous les statuts</option>
+        <option value="actif">Actifs</option>
+        <option value="inactif">Inactifs</option>
+        <option value="suspendu">Suspendus</option>
+      </select>
+    </div>
+    
+    <div class="results-count">
+      <span>{{filteredParticipants.length}} participant(s) trouvé(s)</span>
+    </div>
+  </div>
+
+  <!-- Liste des participants -->
+  <div class="participants-list">
+    <div class="participants-table">
+      <div class="table-header">
+        <div class="col-name">Nom & Prénom</div>
+        <div class="col-contact">Contact</div>
+        <div class="col-ville">Ville</div>
+        <div class="col-date">Date Inscription</div>
+        <div class="col-status">Statut</div>
+        <div class="col-actions">Actions</div>
+      </div>
+      
+      <div class="table-body">
+        <div 
+          *ngFor="let participant of filteredParticipants" 
+          class="table-row"
+          [class]="participant.statut">
+          
+          <div class="col-name">
+            <div class="participant-info">
+              <div class="participant-avatar">
+                {{participant.prenom.charAt(0)}}{{participant.nom.charAt(0)}}
+              </div>
+              <div class="participant-details">
+                <strong>{{participant.prenom}} {{participant.nom}}</strong>
+                <small>ID: #{{participant.id}}</small>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-contact">
+            <div class="contact-info">
+              <div class="email">📧 {{participant.email}}</div>
+              <div class="phone">📱 {{participant.telephone}}</div>
+            </div>
+          </div>
+          
+          <div class="col-ville">
+            <span class="ville">📍 {{participant.ville || 'Non renseigné'}}</span>
+          </div>
+          
+          <div class="col-date">
+            <span class="date">📅 {{participant.dateInscription}}</span>
+          </div>
+          
+          <div class="col-status">
+            <span class="status-badge" [class]="participant.statut">
+              {{participant.statut === 'actif' ? '✅ Actif' : 
+                participant.statut === 'inactif' ? '⏸️ Inactif' : 
+                '🚫 Suspendu'}}
+            </span>
+          </div>
+          
+          <div class="col-actions">
+            <div class="action-buttons">
+              <button 
+                class="btn-action view" 
+                (click)="voirDetails(participant)"
+                title="Voir détails">
+                👁️
+              </button>
+              
+              <div class="status-dropdown">
+                <button class="btn-action status" title="Changer statut">⚙️</button>
+                <div class="dropdown-menu">
+                  <button (click)="changerStatut(participant, 'actif')">✅ Activer</button>
+                  <button (click)="changerStatut(participant, 'inactif')">⏸️ Désactiver</button>
+                  <button (click)="changerStatut(participant, 'suspendu')">🚫 Suspendre</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Message si aucun résultat -->
+    <div *ngIf="filteredParticipants.length === 0" class="no-results">
+      <div class="no-results-icon">🔍</div>
+      <h3>Aucun participant trouvé</h3>
+      <p>Essayez de modifier vos critères de recherche ou ajoutez un nouveau participant.</p>
+    </div>
+  </div>
+</div>
