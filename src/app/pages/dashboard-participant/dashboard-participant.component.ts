@@ -14,6 +14,7 @@ export class DashboardParticipantComponent implements OnInit {
   stats = { soumises: 0, enCours: 0, corrigees: 0 };
   mobileMenuOpen = false;
   desktopMenuHidden = false;
+  chatOpen = false;
 
   ngOnInit() {
     this.chargerSoumissions();
@@ -46,8 +47,15 @@ export class DashboardParticipantComponent implements OnInit {
   }
 
   openChatSupport() {
-    console.log('Ouverture du chat support');
-    // Ici vous pouvez ajouter la logique pour ouvrir le chat
-    alert('Chat Support CP2i - Fonctionnalité en développement');
+    this.chatOpen = !this.chatOpen;
+  }
+
+  sendMessage(message: string) {
+    console.log('Message envoyé:', message);
+    // Logique d'envoi de message
+  }
+
+  closeChat() {
+    this.chatOpen = false;
   }
 }
