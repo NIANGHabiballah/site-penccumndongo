@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
+import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
 
 @Component({
   selector: 'app-login',
@@ -229,6 +230,24 @@ import { RouterModule } from '@angular/router';
       color: #2c3e50;
     }
     
+    .error-alert {
+      background: #fee;
+      border: 1px solid #fcc;
+      color: #c33;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .auth-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    
     @media (max-width: 768px) {
       .auth-wrapper {
         flex-direction: column;
@@ -291,11 +310,15 @@ import { RouterModule } from '@angular/router';
             </div>
           </div>
           
-
+          <div *ngIf="errorMessage" class="error-alert">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ errorMessage }}</span>
+          </div>
           
-          <button type="submit" class="auth-btn">
-            <i class="fas fa-sign-in-alt"></i>
-            <span>Se connecter</span>
+          <button type="submit" class="auth-btn" [disabled]="isLoading">
+            <i *ngIf="!isLoading" class="fas fa-sign-in-alt"></i>
+            <i *ngIf="isLoading" class="fas fa-spinner fa-spin"></i>
+            <span>{{ isLoading ? 'Connexion...' : 'Se connecter' }}</span>
           </button>
         </form>
         
@@ -310,8 +333,13 @@ import { RouterModule } from '@angular/router';
 export class LoginComponent {
   credentials = { email: '', password: '' };
   showPassword = false;
+  errorMessage = '';
+  isLoading = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private cp2iApi: Cp2iApiService
+  ) {}
 
   togglePassword() {
     this.showPassword = !this.showPassword;
@@ -322,7 +350,31 @@ export class LoginComponent {
   }
 
   login() {
-    // Redirection vers le dashboard participant par défaut
-    this.router.navigate(['/dashboard-participant']);
+    this.errorMessage = '';
+    
+    if (!this.credentials.email || !this.credentials.password) {
+      this.errorMessage = 'Veuillez remplir tous les champs';
+      return;
+    }
+
+    this.isLoading = true;
+    this.cp2iApi.login(this.credentials).subscribe({
+      next: (response: AuthResponse) => {
+        this.cp2iApi.setAuthData(response.token, response.user);
+        
+        // Redirection selon le rôle
+        if (response.user.role === 'participant') {
+          this.router.navigate(['/dashboard-participant']);
+        } else if (response.user.role === 'correcteur') {
+          this.router.navigate(['/dashboard-correcteur']);
+        } else {
+          this.router.navigate(['/dashboard-admin']);
+        }
+      },
+      error: (error) => {
+        this.errorMessage = error.error?.error || 'Email ou mot de passe incorrect';
+        this.isLoading = false;
+      }
+    });
   }
 }

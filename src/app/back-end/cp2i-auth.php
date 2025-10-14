@@ -42,24 +42,21 @@ function registerUser($data) {
         return;
     }
     
+    // Générer token de vérification
+    $verificationToken = bin2hex(random_bytes(32));
+    
     // Créer l'utilisateur
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-    $stmt = $db->prepare("INSERT INTO cp2i_users (email, password, nom, prenom, telephone, role, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+    $stmt = $db->prepare("INSERT INTO cp2i_users (email, password, nom, prenom, telephone, role, email_verified, verification_token, created_at) VALUES (?, ?, ?, ?, ?, ?, FALSE, ?, NOW())");
     
-    if ($stmt->execute([$email, $hashedPassword, $nom, $prenom, $telephone, $role])) {
-        $userId = $db->lastInsertId();
-        $token = generateToken($userId, $email, $role);
+    if ($stmt->execute([$email, $hashedPassword, $nom, $prenom, $telephone, $role, $verificationToken])) {
+        // Envoyer email de vérification
+        sendVerificationEmail($email, $nom, $prenom, $verificationToken);
         
         echo json_encode([
             'success' => true,
-            'token' => $token,
-            'user' => [
-                'id' => $userId,
-                'email' => $email,
-                'nom' => $nom,
-                'prenom' => $prenom,
-                'role' => $role
-            ]
+            'message' => 'Inscription réussie ! Veuillez vérifier votre email pour activer votre compte.',
+            'email_sent' => true
         ]);
     } else {
         http_response_code(500);
@@ -79,13 +76,19 @@ function loginUser($data) {
         return;
     }
     
-    $stmt = $db->prepare("SELECT id, email, password, nom, prenom, role FROM cp2i_users WHERE email = ?");
+    $stmt = $db->prepare("SELECT id, email, password, nom, prenom, role, email_verified FROM cp2i_users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$user || !password_verify($password, $user['password'])) {
         http_response_code(401);
-        echo json_encode(['error' => 'Identifiants invalides']);
+        echo json_encode(['error' => 'Email ou mot de passe incorrect']);
+        return;
+    }
+    
+    if (!$user['email_verified']) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Veuillez vérifier votre email avant de vous connecter']);
         return;
     }
     
@@ -120,5 +123,40 @@ function generateToken($userId, $email, $role) {
     $signatureEncoded = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
     
     return $headerEncoded . '.' . $payloadEncoded . '.' . $signatureEncoded;
+}
+
+function sendVerificationEmail($email, $nom, $prenom, $token) {
+    $verificationUrl = "https://penccumndongo.com/src/app/back-end/cp2i-verify.php?token=" . $token;
+    
+    $subject = "CP2i - Vérification de votre compte";
+    $message = "
+    <html>
+    <head>
+        <title>Vérification de compte CP2i</title>
+    </head>
+    <body>
+        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+            <h2 style='color: #FF7F1A;'>Bienvenue sur CP2i !</h2>
+            <p>Bonjour $prenom $nom,</p>
+            <p>Merci de vous être inscrit au Concours de Poésie Inédit & Innovant (CP2i).</p>
+            <p>Pour activer votre compte, veuillez cliquer sur le lien ci-dessous :</p>
+            <p style='text-align: center; margin: 30px 0;'>
+                <a href='$verificationUrl' style='background: #FF7F1A; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block;'>Vérifier mon compte</a>
+            </p>
+            <p>Si le bouton ne fonctionne pas, copiez et collez ce lien dans votre navigateur :</p>
+            <p style='word-break: break-all; color: #666;'>$verificationUrl</p>
+            <p>Ce lien expire dans 24 heures.</p>
+            <hr style='margin: 30px 0; border: none; border-top: 1px solid #eee;'>
+            <p style='color: #666; font-size: 12px;'>Penccum Ndongo - CP2i<br>Email automatique, ne pas répondre.</p>
+        </div>
+    </body>
+    </html>
+    ";
+    
+    $headers = "MIME-Version: 1.0" . "\r\n";
+    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+    $headers .= "From: CP2i <noreply@penccumndongo.com>" . "\r\n";
+    
+    mail($email, $subject, $message, $headers);
 }
 ?>

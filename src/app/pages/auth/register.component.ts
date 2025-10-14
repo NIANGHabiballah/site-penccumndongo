@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
+import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
 
 @Component({
   selector: 'app-register',
@@ -73,10 +74,21 @@ import { RouterModule } from '@angular/router';
             </div>
           </div>
           
-          <div class="input-group">
-            <div class="input-wrapper">
-              <i class="fas fa-map-marker-alt input-icon"></i>
-              <input type="text" [(ngModel)]="user.ville" name="ville" placeholder="Ville (optionnel)">
+          <div class="form-row">
+            <div class="input-group">
+              <div class="input-wrapper">
+                <i class="fas fa-map-marker-alt input-icon"></i>
+                <input type="text" [(ngModel)]="user.ville" name="ville" placeholder="Ville (optionnel)">
+              </div>
+            </div>
+            <div class="input-group">
+              <div class="select-wrapper">
+                <i class="fas fa-user-tag input-icon"></i>
+                <select [(ngModel)]="selectedRole" name="role" required>
+                  <option value="participant">Participant</option>
+                  <option value="correcteur">Correcteur</option>
+                </select>
+              </div>
             </div>
           </div>
           
@@ -90,9 +102,25 @@ import { RouterModule } from '@angular/router';
             </label>
           </div>
           
-          <button type="submit" class="auth-btn" [disabled]="!acceptTerms">
-            <i class="fas fa-user-plus"></i>
-            <span>Créer mon compte</span>
+          <div *ngIf="errorMessage" class="error-alert">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ errorMessage }}</span>
+          </div>
+          
+          <div *ngIf="successMessage" class="success-alert">
+            <i class="fas fa-check-circle"></i>
+            <span>{{ successMessage }}</span>
+          </div>
+          
+          <div *ngIf="successMessage && successMessage.includes('email')" class="info-alert">
+            <i class="fas fa-info-circle"></i>
+            <span>Vérifiez votre boîte mail (y compris les spams) et cliquez sur le lien de vérification.</span>
+          </div>
+          
+          <button type="submit" class="auth-btn" [disabled]="!acceptTerms || isLoading">
+            <i *ngIf="!isLoading" class="fas fa-user-plus"></i>
+            <i *ngIf="isLoading" class="fas fa-spinner fa-spin"></i>
+            <span>{{ isLoading ? 'Inscription...' : 'Créer mon compte' }}</span>
           </button>
         </form>
         
@@ -376,6 +404,50 @@ import { RouterModule } from '@angular/router';
       color: #e67e22;
     }
     
+    .error-alert {
+      background: #fee;
+      border: 1px solid #fcc;
+      color: #c33;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .success-alert {
+      background: #efe;
+      border: 1px solid #cfc;
+      color: #3c3;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .info-alert {
+      background: #e7f3ff;
+      border: 1px solid #b3d9ff;
+      color: #0066cc;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .auth-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    
     @media (max-width: 480px) {
       .auth-card {
         padding: 2rem;
@@ -399,16 +471,73 @@ import { RouterModule } from '@angular/router';
 export class RegisterComponent {
   user = { nomComplet: '', email: '', telephone: '', password: '', confirmPassword: '', ville: '' };
   acceptTerms = false;
+  selectedRole: 'participant' | 'correcteur' = 'participant';
+  errorMessage = '';
+  successMessage = '';
+  isLoading = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private cp2iApi: Cp2iApiService
+  ) {}
 
   goToLogin() {
     this.router.navigate(['/auth/login']);
   }
 
   register() {
-    console.log('Inscription:', this.user);
-    this.router.navigate(['/auth/login']);
+    this.errorMessage = '';
+    this.successMessage = '';
+    
+    if (!this.user.nomComplet || !this.user.email || !this.user.password) {
+      this.errorMessage = 'Veuillez remplir tous les champs obligatoires';
+      return;
+    }
+    
+    if (this.user.password !== this.user.confirmPassword) {
+      this.errorMessage = 'Les mots de passe ne correspondent pas';
+      return;
+    }
+    
+    if (!this.acceptTerms) {
+      this.errorMessage = 'Veuillez accepter les conditions générales';
+      return;
+    }
+
+    this.isLoading = true;
+    
+    // Séparer le nom complet en prénom et nom
+    const nameParts = this.user.nomComplet.trim().split(' ');
+    const prenom = nameParts[0] || '';
+    const nom = nameParts.slice(1).join(' ') || nameParts[0] || '';
+
+    const registerData = {
+      email: this.user.email,
+      password: this.user.password,
+      nom: nom,
+      prenom: prenom,
+      telephone: this.user.telephone || '',
+      role: this.selectedRole
+    };
+
+    this.cp2iApi.register(registerData).subscribe({
+      next: (response: any) => {
+        if (response.email_sent) {
+          this.successMessage = 'Inscription réussie ! Un email de vérification a été envoyé à votre adresse.';
+          this.isLoading = false;
+          // Ne pas rediriger automatiquement
+        } else {
+          this.successMessage = 'Inscription réussie ! Redirection vers la connexion...';
+          setTimeout(() => {
+            this.router.navigate(['/auth/login']);
+          }, 2000);
+        }
+      },
+      error: (error) => {
+        this.errorMessage = error.error?.error || 'Erreur lors de l\'inscription';
+        this.isLoading = false;
+      }
+    });
   }
 
   voirReglements() {
