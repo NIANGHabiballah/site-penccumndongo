@@ -1,41 +1,91 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { Cp2iApiService, User } from '../../services/cp2i-api.service';
 
 @Component({
   selector: 'app-dashboard-participant',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './dashboard-participant.component.html',
   styleUrls: ['./dashboard-participant.component.css']
 })
-export class DashboardParticipantComponent implements OnInit {
+export class DashboardParticipantComponent implements OnInit, OnDestroy {
   mesSoumissions: any[] = [];
-  stats = { soumises: 0, enCours: 0, corrigees: 0 };
+  stats: any = {};
+  currentUser: User | null = null;
   mobileMenuOpen = false;
   desktopMenuHidden = false;
   chatOpen = false;
+  currentView = 'dashboard';
+  
+  private subscriptions: Subscription[] = [];
+
+  constructor(
+    private cp2iApi: Cp2iApiService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    this.chargerSoumissions();
+    // Vérifier l'authentification
+    if (!this.cp2iApi.isAuthenticated()) {
+      this.router.navigate(['/cp2i']);
+      return;
+    }
+    
+    this.currentUser = this.cp2iApi.getCurrentUser();
+    this.loadData();
   }
 
-  chargerSoumissions() {
-    this.mesSoumissions = [
-      { id: 1, titre: 'L\'espoir d\'un avenir meilleur', statut: 'corrige', note: 16 },
-      { id: 2, titre: 'Mon rêve africain', statut: 'en_cours' }
-    ];
-    this.calculerStats();
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  calculerStats() {
-    this.stats.soumises = this.mesSoumissions.length;
-    this.stats.enCours = this.mesSoumissions.filter(t => t.statut === 'en_cours').length;
-    this.stats.corrigees = this.mesSoumissions.filter(t => t.statut === 'corrige').length;
+  loadData() {
+    // Charger les statistiques
+    this.cp2iApi.getDashboardStats().subscribe({
+      next: (data) => {
+        this.stats = data.stats;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des stats:', error);
+      }
+    });
+    
+    // Charger les textes de l'utilisateur
+    this.cp2iApi.getUserTexts().subscribe({
+      next: (data) => {
+        this.mesSoumissions = data.textes;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des textes:', error);
+      }
+    });
   }
+
+
 
   nouvellesoumission() {
-    console.log('Nouvelle soumission');
+    this.router.navigate(['/soumission-texte']);
+  }
+
+  setCurrentView(view: string) {
+    this.currentView = view;
+  }
+
+  getStatusLabel(status: string): string {
+    const labels = {
+      'en_attente': 'En attente',
+      'accepte': 'Accepté',
+      'refuse': 'Refusé'
+    };
+    return labels[status as keyof typeof labels] || status;
+  }
+
+  getStatusClass(status: string): string {
+    return `status-${status}`;
   }
 
   toggleMobileMenu() {
@@ -53,6 +103,11 @@ export class DashboardParticipantComponent implements OnInit {
   sendMessage(message: string) {
     console.log('Message envoyé:', message);
     // Logique d'envoi de message
+  }
+  
+  logout() {
+    this.cp2iApi.logout();
+    this.router.navigate(['/cp2i']);
   }
 
   closeChat() {

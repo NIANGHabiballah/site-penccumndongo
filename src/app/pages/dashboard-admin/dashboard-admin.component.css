@@ -9,12 +9,13 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .logo span { font-size: 12px; opacity: 0.8; color: white; }
 
 .nav-menu { padding: 20px 0; }
-.nav-item { padding: 15px 25px; cursor: pointer; transition: all 0.3s; border-left: 3px solid transparent; }
+.nav-item { padding: 15px 25px; cursor: pointer; transition: all 0.3s; border-left: 3px solid transparent; display: flex; align-items: center; }
 .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); border-left-color: #FF7F1A; }
 .nav-item i { margin-right: 10px; width: 20px; }
 
-.main-content { flex: 1; padding: 30px; min-height: 100vh; overflow-x: auto; }
-.header { display: flex; justify-content: space-between; align-items: center; margin: 30px 0; position: static; background: none; box-shadow: none; border-radius: 0; }
+.main-content { flex: 1; padding: 30px; min-height: 100vh; overflow-x: auto; position: relative; }
+.header { display: flex; justify-content: space-between; align-items: center; margin: 30px 0; position: relative; background: none; box-shadow: none; border-radius: 0; }
+.header-right { display: flex; align-items: center; gap: 1rem; }
 .header h1 { background: linear-gradient(135deg, #1e3c72, #2a5298); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 1.8rem; margin-bottom: 0.5rem; }
 .user-info { display: flex; align-items: center; gap: 15px; }
 .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #FF7F1A; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
@@ -55,6 +56,51 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .user-details span { color: #666; font-size: 12px; }
 
 .quick-actions { display: flex; gap: 10px; margin-bottom: 20px; }
+
+/* Badge de notification */
+.badge {
+  background: #FF7F1A;
+  color: white;
+  border-radius: 50%;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: bold;
+  margin-left: auto;
+  min-width: 1.2rem;
+  text-align: center;
+}
+
+/* Section coming soon */
+.coming-soon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 2rem;
+}
+
+.coming-soon-content {
+  text-align: center;
+  max-width: 400px;
+}
+
+.coming-soon-content i {
+  font-size: 4rem;
+  color: #0380C2;
+  margin-bottom: 1rem;
+}
+
+.coming-soon-content h3 {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.coming-soon-content p {
+  color: #6c757d;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
 
 /* Menu Hamburger Mobile */
 .mobile-menu-toggle {

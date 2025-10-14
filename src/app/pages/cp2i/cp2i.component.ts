@@ -63,21 +63,9 @@ export class Cp2iComponent implements OnInit {
   galleryIndex = 0;
   selectedGalleryImage = '';
 
-  // États d'authentification
-  isLoggedIn = false;
-  userRole: 'participant' | 'correcteur' | 'admin' | null = null;
-  showAuthModal = false;
-  showDashboard = false;
-  authMode: 'login' | 'register' = 'login';
-  selectedRole: 'participant' | 'correcteur' | null = null;
-  
-  // Données utilisateur
-  currentUser = {
-    firstName: '',
-    lastName: '',
-    email: '',
-    role: ''
-  };
+
+
+
 
   ngOnInit() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -151,69 +139,5 @@ export class Cp2iComponent implements OnInit {
     }
   }
 
-  // Gestion authentification
-  openAuthModal(mode: 'login' | 'register') {
-    this.authMode = mode;
-    this.showAuthModal = true;
-    document.body.style.overflow = 'hidden';
-  }
 
-  closeAuthModal() {
-    this.showAuthModal = false;
-    document.body.style.overflow = 'auto';
-  }
-
-  switchAuthMode(mode: 'login' | 'register') {
-    this.authMode = mode;
-  }
-
-  selectRole(role: 'participant' | 'correcteur') {
-    this.selectedRole = role;
-  }
-
-  login(formData: any) {
-    // Simulation de connexion
-    this.isLoggedIn = true;
-    this.userRole = 'participant'; // Exemple
-    this.currentUser = {
-      firstName: 'Jean',
-      lastName: 'Dupont',
-      email: formData.email,
-      role: 'Participant'
-    };
-    this.closeAuthModal();
-  }
-
-  register(formData: any) {
-    // Simulation d'inscription
-    this.isLoggedIn = true;
-    this.userRole = this.selectedRole;
-    this.currentUser = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      role: this.selectedRole === 'participant' ? 'Participant' : 'Correcteur'
-    };
-    this.closeAuthModal();
-  }
-
-  logout() {
-    this.isLoggedIn = false;
-    this.userRole = null;
-    this.currentUser = { firstName: '', lastName: '', email: '', role: '' };
-  }
-
-  goToDashboard() {
-    this.showDashboard = true;
-    setTimeout(() => {
-      const dashboardElement = document.querySelector('.dashboard-section');
-      if (dashboardElement) {
-        dashboardElement.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, 100);
-  }
-
-  closeDashboard() {
-    this.showDashboard = false;
-  }
 }

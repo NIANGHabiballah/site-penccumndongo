@@ -101,34 +101,84 @@
   margin-bottom: 1.5rem;
   position: relative;
   display: inline-block;
-}
-
-.section-title::before,
-.section-title::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  width: 0;
-  height: 2px;
-  background: var(--primary-orange);
-  animation: expandDash 0.8s ease-out forwards;
+  padding-left: 50px;
 }
 
 .section-title::before {
-  right: 100%;
-  margin-right: 15px;
+  content: '' !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 50% !important;
+  width: 30px !important;
+  height: 2px !important;
+  background: var(--primary-orange) !important;
+  transform: translateY(-50%) !important;
+  display: block !important;
+  z-index: 999 !important;
 }
 
 .section-title::after {
-  left: 100%;
-  margin-left: 15px;
+  display: none !important;
+  content: none !important;
 }
 
-@keyframes expandDash {
-  to {
-    width: 30px;
-  }
+.section-title {
+  border-bottom: none !important;
+  text-decoration: none !important;
 }
+
+.section-title:before,
+.section-title:after {
+  border-bottom: none !important;
+}
+
+h2::after,
+h3::after,
+h4::after {
+  display: none !important;
+}
+
+/* Suppression complète de tous les tirets bleus */
+* {
+  border-bottom: none !important;
+}
+
+*::before,
+*::after {
+  border-bottom: none !important;
+  background: none !important;
+}
+
+.legal-content *::after {
+  display: none !important;
+  content: none !important;
+}
+
+.legal-section *::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Force l'affichage du tiret orange uniquement */
+.section-title {
+  position: relative !important;
+  padding-left: 50px !important;
+}
+
+.section-title::before {
+  content: '' !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 50% !important;
+  width: 30px !important;
+  height: 2px !important;
+  background: #FF7F1A !important;
+  transform: translateY(-50%) !important;
+  display: block !important;
+  z-index: 9999 !important;
+}
+
+
 
 .text-content {
   line-height: 1.7;
@@ -227,10 +277,7 @@
     font-size: 1.5rem;
   }
   
-  .section-title::before,
-  .section-title::after {
-    display: none;
-  }
+
   
   .conservation-grid {
     gap: 0.8rem;

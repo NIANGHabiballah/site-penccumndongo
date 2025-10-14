@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-chatbot',
@@ -19,6 +20,8 @@ export class ChatbotComponent implements OnInit {
     langues: ['français', 'wolof'],
     reponse_automatique: true
   };
+
+  constructor(private apiService: ApiService) {}
 
   faqItems = [
     {
@@ -64,33 +67,67 @@ export class ChatbotComponent implements OnInit {
   nouvelleQuestion = '';
   nouvelleReponse = '';
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.chargerDonnees();
+  }
+
+  chargerDonnees() {
+    this.apiService.getChatbotConfig().subscribe({
+      next: (config) => this.chatbotConfig = config,
+      error: (err) => console.error('Erreur config:', err)
+    });
+    
+    this.apiService.getChatbotFAQ().subscribe({
+      next: (faq) => this.faqItems = faq,
+      error: (err) => console.error('Erreur FAQ:', err)
+    });
+    
+    this.apiService.getChatbotConversations().subscribe({
+      next: (conv) => this.conversations = conv,
+      error: (err) => console.error('Erreur conversations:', err)
+    });
+    
+    this.apiService.getChatbotStats().subscribe({
+      next: (stats) => this.statistiques = stats,
+      error: (err) => console.error('Erreur stats:', err)
+    });
+  }
 
   switchTab(tab: string) {
     this.activeTab = tab;
   }
 
   sauvegarderConfig() {
-    console.log('Configuration sauvegardée:', this.chatbotConfig);
+    this.apiService.saveChatbotConfig(this.chatbotConfig).subscribe({
+      next: () => alert('Configuration sauvegardée'),
+      error: (err) => alert('Erreur sauvegarde')
+    });
   }
 
   ajouterFAQ() {
     if (this.nouvelleQuestion && this.nouvelleReponse) {
-      const newItem = {
-        id: this.faqItems.length + 1,
+      const newFAQ = {
         question: this.nouvelleQuestion,
         reponse: this.nouvelleReponse,
-        categorie: 'generale',
-        utilisation: 0
+        categorie: 'generale'
       };
-      this.faqItems.push(newItem);
-      this.nouvelleQuestion = '';
-      this.nouvelleReponse = '';
+      
+      this.apiService.addChatbotFAQ(newFAQ).subscribe({
+        next: () => {
+          this.chargerDonnees();
+          this.nouvelleQuestion = '';
+          this.nouvelleReponse = '';
+        },
+        error: (err) => alert('Erreur ajout FAQ')
+      });
     }
   }
 
   supprimerFAQ(id: number) {
-    this.faqItems = this.faqItems.filter(item => item.id !== id);
+    this.apiService.deleteChatbotFAQ(id).subscribe({
+      next: () => this.chargerDonnees(),
+      error: (err) => alert('Erreur suppression')
+    });
   }
 
   voirConversation(conversation: any) {

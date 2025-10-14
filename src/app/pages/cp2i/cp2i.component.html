@@ -36,12 +36,17 @@
       </div>
     </div>
     <div class="hero-cta">
-      <a href="#about" class="cta-primary">
-        <span>Découvrir le projet</span>
-        <i class="fas fa-arrow-down"></i>
+      <a routerLink="/auth/register" class="cta-primary">
+        <span>Participer maintenant</span>
+        <i class="fas fa-user-plus"></i>
+      </a>
+      <a routerLink="/auth/login" class="cta-secondary">
+        <span>Se connecter</span>
+        <i class="fas fa-sign-in-alt"></i>
       </a>
       <button (click)="scrollToGallery()" class="cta-secondary">
         <span>Voir la galerie</span>
+        <i class="fas fa-images"></i>
       </button>
     </div>
   </div>
@@ -223,9 +228,9 @@
       <h2>Rejoignez l'aventure CP2i</h2>
       <p>Participez à la prochaine édition ou soutenez notre initiative culturelle</p>
       <div class="cta-buttons">
-        <a href="mailto:pencc.penccumndongo@gmail.com" class="cta-primary">
+        <a routerLink="/auth/register" class="cta-primary">
           <span>Participer</span>
-          <i class="fas fa-paper-plane"></i>
+          <i class="fas fa-user-plus"></i>
         </a>
         <a routerLink="/opportunites" class="cta-secondary">
           <span>Nous soutenir</span>
@@ -270,3 +275,4 @@
     <img [src]="selectedGalleryImage" alt="Image agrandie" class="lightbox-image">
   </div>
 </div>
+

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-messages',
@@ -11,6 +12,8 @@ import { FormsModule } from '@angular/forms';
 })
 export class MessagesComponent implements OnInit {
   activeTab = 'envoyer';
+
+  constructor(private apiService: ApiService) {}
   
   messageForm = {
     destinataire: 'tous',
@@ -44,14 +47,55 @@ export class MessagesComponent implements OnInit {
     { nom: 'Résultats disponibles', contenu: 'Les résultats de votre évaluation sont maintenant disponibles...' }
   ];
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.chargerDonnees();
+  }
+
+  chargerDonnees() {
+    this.apiService.getConversations().subscribe({
+      next: (conv) => this.conversations = conv,
+      error: (err) => console.error('Erreur conversations:', err)
+    });
+    
+    this.apiService.getMessageTemplates().subscribe({
+      next: (templates) => this.templates = templates,
+      error: (err) => console.error('Erreur templates:', err)
+    });
+  }
 
   switchTab(tab: string) {
     this.activeTab = tab;
   }
 
   envoyerMessage() {
-    console.log('Envoi du message:', this.messageForm);
+    if (this.messageForm.destinataire === 'tous' || this.messageForm.destinataire === 'participants' || this.messageForm.destinataire === 'correcteurs') {
+      this.apiService.envoyerMessageGroupe(this.messageForm).subscribe({
+        next: (response) => {
+          alert(response.message);
+          this.resetForm();
+        },
+        error: (err) => alert('Erreur envoi message')
+      });
+    } else {
+      this.apiService.envoyerMessagePrive(this.messageForm).subscribe({
+        next: () => {
+          alert('Message envoyé');
+          this.resetForm();
+        },
+        error: (err) => alert('Erreur envoi message')
+      });
+    }
+  }
+
+  resetForm() {
+    this.messageForm = {
+      destinataire: 'tous',
+      type: 'information',
+      sujet: '',
+      contenu: '',
+      programmation: false,
+      dateEnvoi: ''
+    };
   }
 
   utiliserTemplate(template: any) {

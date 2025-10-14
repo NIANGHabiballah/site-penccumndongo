@@ -24,6 +24,7 @@ import { MentionsLegalesComponent } from './pages/mentions-legales/mentions-lega
 import { PolitiqueConfidentialiteComponent } from './pages/politique-confidentialite/politique-confidentialite.component';
 import { CgvComponent } from './pages/cgv/cgv.component';
 import { SecurityGuard } from './guards/security.guard';
+import { AuthGuard } from './guards/auth.guard';
 import { DashboardAdminComponent } from './pages/dashboard-admin/dashboard-admin.component';
 import { DashboardCorrecteurComponent } from './pages/dashboard-correcteur/dashboard-correcteur.component';
 import { DashboardParticipantComponent } from './pages/dashboard-participant/dashboard-participant.component';
@@ -32,6 +33,9 @@ import { ChatbotComponent } from './pages/chatbot/chatbot.component';
 import { GestionParticipantsComponent } from './pages/gestion-participants/gestion-participants.component';
 import { LoginComponent } from './pages/auth/login.component';
 import { RegisterComponent } from './pages/auth/register.component';
+import { ReglementsComponent } from './pages/reglements/reglements.component';
+import { ConditionsGeneralesComponent } from './pages/conditions-generales/conditions-generales.component';
+import { SoumissionTexteComponent } from './pages/soumission-texte/soumission-texte.component';
 
 export const routes: Routes = [
   { path: '', component: AccueilComponent },
@@ -67,9 +71,9 @@ export const routes: Routes = [
   { path: 'cgv', component: CgvComponent },
   
   // Routes du système CP2i
-  { path: 'dashboard-admin', component: DashboardAdminComponent, canActivate: [SecurityGuard] },
-  { path: 'dashboard-correcteur', component: DashboardCorrecteurComponent, canActivate: [SecurityGuard] },
-  { path: 'dashboard-participant', component: DashboardParticipantComponent, canActivate: [SecurityGuard] },
+  { path: 'dashboard-admin', component: DashboardAdminComponent, canActivate: [AuthGuard] },
+  { path: 'dashboard-correcteur', component: DashboardCorrecteurComponent, canActivate: [AuthGuard] },
+  { path: 'dashboard-participant', component: DashboardParticipantComponent, canActivate: [AuthGuard] },
   { path: 'admin/messages', component: MessagesComponent, canActivate: [SecurityGuard] },
   { path: 'admin/chatbot', component: ChatbotComponent, canActivate: [SecurityGuard] },
   { path: 'admin/participants', component: GestionParticipantsComponent, canActivate: [SecurityGuard] },
@@ -77,6 +81,15 @@ export const routes: Routes = [
   // Routes d'authentification
   { path: 'auth/login', component: LoginComponent },
   { path: 'auth/register', component: RegisterComponent },
+  
+  // Route des règlements
+  { path: 'reglements', component: ReglementsComponent },
+  
+  // Route des conditions générales
+  { path: 'conditions-generales', component: ConditionsGeneralesComponent },
+  
+  // Route de soumission de texte
+  { path: 'soumission-texte', component: SoumissionTexteComponent, canActivate: [AuthGuard] },
   
   // Wildcard route - doit être en dernier
   { path: '**', redirectTo: '', pathMatch: 'full' }

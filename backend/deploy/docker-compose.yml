@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: cp2i_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: cp2i_db
+      MYSQL_USER: cp2i_user
+      MYSQL_PASSWORD: cp2i_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ../database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    restart: unless-stopped
+
+  backend:
+    build: ..
+    container_name: cp2i_backend
+    environment:
+      DB_HOST: mysql
+      DB_USER: cp2i_user
+      DB_PASSWORD: cp2i_password
+      DB_NAME: cp2i_db
+      JWT_SECRET: your_production_jwt_secret
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
