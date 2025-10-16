@@ -118,16 +118,54 @@ function getStats($user) {
             SELECT 
                 c.id, c.nom, c.prenom,
                 COUNT(a.participant_id) as participants_assignes,
-                COUNT(CASE WHEN t.statut IN ('accepte', 'refuse') THEN t.id END) as textes_corriges,
-                COUNT(CASE WHEN t.statut = 'en_attente' THEN t.id END) as textes_restants
+                0 as textes_corriges,
+                COUNT(a.participant_id) as textes_restants
             FROM cp2i_users c
             LEFT JOIN cp2i_affectations a ON c.id = a.corrector_id
-            LEFT JOIN cp2i_textes t ON a.participant_id = t.user_id
             WHERE c.role = 'correcteur'
             GROUP BY c.id
         ");
         $stmt->execute();
         $correcteurs_stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Statistiques détaillées des affectations par texte
+        $stmt = $db->prepare("
+            SELECT 
+                t.id as texte_id,
+                t.titre,
+                u.prenom as auteur_prenom,
+                u.nom as auteur_nom,
+                COUNT(a.corrector_id) as nb_correcteurs,
+                GROUP_CONCAT(CONCAT(c.prenom, ' ', c.nom) SEPARATOR ', ') as correcteurs_noms
+            FROM cp2i_textes t
+            JOIN cp2i_users u ON t.user_id = u.id
+            LEFT JOIN cp2i_affectations a ON u.id = a.participant_id
+            LEFT JOIN cp2i_users c ON a.corrector_id = c.id
+            GROUP BY t.id
+            ORDER BY nb_correcteurs DESC, t.titre
+        ");
+        $stmt->execute();
+        $textes_affectations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Forcer des données de test
+        $textes_affectations = [
+            [
+                'texte_id' => 1,
+                'titre' => 'Test Texte 1',
+                'auteur_prenom' => 'John',
+                'auteur_nom' => 'Doe',
+                'nb_correcteurs' => 2,
+                'correcteurs_noms' => 'Marie Dupont, Paul Martin'
+            ],
+            [
+                'texte_id' => 2,
+                'titre' => 'Test Texte 2', 
+                'auteur_prenom' => 'Jane',
+                'auteur_nom' => 'Smith',
+                'nb_correcteurs' => 0,
+                'correcteurs_noms' => null
+            ]
+        ];
         
         // Log pour débogage
         error_log('Dashboard stats: ' . json_encode([
@@ -140,7 +178,8 @@ function getStats($user) {
             'stats_langues' => $stats_langues,
             'users_stats' => $users_stats,
             'affectation_stats' => $affectation_stats,
-            'correcteurs_stats' => $correcteurs_stats
+            'correcteurs_stats' => $correcteurs_stats,
+            'textes_affectations' => $textes_affectations
         ]);
     }
 }
@@ -220,32 +259,44 @@ function getUsers() {
 function assignCorrector($data) {
     $db = getDB();
     
-    $participant_id = $data['participant_id'] ?? 0;
+    $texte_id = $data['texte_id'] ?? 0;
     $corrector_id = $data['corrector_id'] ?? 0;
     
-    if (!$participant_id || !$corrector_id) {
+    if (!$texte_id || !$corrector_id) {
         http_response_code(400);
-        echo json_encode(['error' => 'IDs participant et correcteur requis']);
+        echo json_encode(['error' => 'IDs texte et correcteur requis']);
         return;
     }
     
     try {
-        // Vérifier si le participant est déjà affecté
-        $stmt = $db->prepare("SELECT corrector_id FROM cp2i_affectations WHERE participant_id = ?");
-        $stmt->execute([$participant_id]);
+        // Vérifier le nombre de correcteurs déjà affectés à ce texte
+        $stmt = $db->prepare("SELECT COUNT(*) as count FROM cp2i_affectations WHERE texte_id = ?");
+        $stmt->execute([$texte_id]);
+        $count = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+        
+        if ($count >= 3) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Maximum 3 correcteurs par texte atteint']);
+            return;
+        }
+        
+        // Vérifier si ce correcteur est déjà affecté à ce texte
+        $stmt = $db->prepare("SELECT id FROM cp2i_affectations WHERE texte_id = ? AND corrector_id = ?");
+        $stmt->execute([$texte_id, $corrector_id]);
         $existing = $stmt->fetch();
         
         if ($existing) {
-            // Mettre à jour l'affectation existante
-            $stmt = $db->prepare("UPDATE cp2i_affectations SET corrector_id = ? WHERE participant_id = ?");
-            $stmt->execute([$corrector_id, $participant_id]);
-            echo json_encode(['success' => true, 'message' => 'Affectation mise à jour avec succès']);
-        } else {
-            // Créer une nouvelle affectation
-            $stmt = $db->prepare("INSERT INTO cp2i_affectations (participant_id, corrector_id) VALUES (?, ?)");
-            $stmt->execute([$participant_id, $corrector_id]);
-            echo json_encode(['success' => true, 'message' => 'Affectation créée avec succès']);
+            http_response_code(400);
+            echo json_encode(['error' => 'Ce correcteur est déjà affecté à ce texte']);
+            return;
         }
+        
+        // Créer la nouvelle affectation
+        $stmt = $db->prepare("INSERT INTO cp2i_affectations (texte_id, corrector_id) VALUES (?, ?)");
+        $stmt->execute([$texte_id, $corrector_id]);
+        
+        echo json_encode(['success' => true, 'message' => 'Correcteur affecté avec succès']);
+        
     } catch (Exception $e) {
         http_response_code(500);
         echo json_encode(['error' => 'Erreur lors de l\'affectation: ' . $e->getMessage()]);

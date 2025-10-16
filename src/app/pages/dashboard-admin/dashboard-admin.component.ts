@@ -28,8 +28,9 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   allAccounts: any[] = [];
   history: any[] = [];
   
-  selectedParticipant: number = 0;
+  selectedTexte: number = 0;
   selectedCorrector: number = 0;
+  selectedTexteForEvaluation: any = null;
   
   // Filtres et recherche
   currentFilter = 'all';
@@ -59,7 +60,6 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   // Modal d'évaluation
   showEvaluationModal = false;
-  selectedTexte: any = null;
   evaluationForm = {
     note: 0,
     commentaire: '',
@@ -80,16 +80,6 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   // Gestion des paramètres
   currentSettingsTab = 'concours';
-  
-  // Gestion des thèmes
-  currentTheme = 'light';
-  themes = [
-    { id: 'light', name: 'Clair', primary: '#007bff', bg: '#ffffff', text: '#333333' },
-    { id: 'dark', name: 'Sombre', primary: '#0d6efd', bg: '#1a1a1a', text: '#ffffff' },
-    { id: 'blue', name: 'Bleu', primary: '#0066cc', bg: '#f0f8ff', text: '#003366' },
-    { id: 'green', name: 'Vert', primary: '#28a745', bg: '#f8fff8', text: '#1a5a1a' }
-  ];
-  
   settings = {
     start_date: '2025-01-01',
     end_date: '2025-01-31',
@@ -169,7 +159,6 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.filteredAccounts = [];
     
     this.loadData();
-    this.loadTheme();
   }
 
   ngOnDestroy() {
@@ -200,6 +189,18 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         console.log('Stats complètes:', this.stats);
         console.log('Affectation stats:', this.stats.affectation_stats);
         console.log('Correcteurs stats:', this.stats.correcteurs_stats);
+        console.log('Textes affectations:', this.stats.textes_affectations);
+        console.log('Nombre de textes affectations:', this.stats.textes_affectations?.length);
+        
+        // Debug pour vérifier la structure des données
+        if (this.stats.textes_affectations && this.stats.textes_affectations.length > 0) {
+          console.log('Premier élément textes_affectations:', this.stats.textes_affectations[0]);
+        }
+        
+        // Force update if data exists but not showing
+        if (this.stats.textes_affectations) {
+          console.log('Textes affectations data found:', this.stats.textes_affectations);
+        }
       },
       error: (error) => console.error('Erreur stats:', error)
     });
@@ -253,15 +254,15 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
 
   assignCorrector() {
-    if (!this.selectedParticipant || !this.selectedCorrector) {
-      this.showToast('Veuillez sélectionner un participant et un correcteur', 'error');
+    if (!this.selectedTexte || !this.selectedCorrector) {
+      this.showToast('Veuillez sélectionner un texte et un correcteur', 'error');
       return;
     }
     
-    this.cp2iApi.assignCorrector(this.selectedParticipant, this.selectedCorrector).subscribe({
+    this.cp2iApi.assignCorrector(this.selectedTexte, this.selectedCorrector).subscribe({
       next: (response) => {
-        this.showToast('Affectation réalisée avec succès!', 'success');
-        this.selectedParticipant = 0;
+        this.showToast('Correcteur affecté avec succès!', 'success');
+        this.selectedTexte = 0;
         this.selectedCorrector = 0;
         this.loadData();
       },
@@ -284,13 +285,13 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     return `status-${status}`;
   }
 
-  isAssigned(participantId: number): boolean {
-    return this.affectations.some(a => a.participant_id === participantId);
+  getCorrectorsCount(texteId: number): number {
+    return this.affectations.filter(a => a.texte_id === texteId).length;
   }
 
-  getAssignedCorrector(participantId: number): string {
-    const affectation = this.affectations.find(a => a.participant_id === participantId);
-    return affectation ? `${affectation.corrector_prenom} ${affectation.corrector_nom}` : 'Non assigné';
+  getAssignedCorrectorsNames(texteId: number): string {
+    const textAffectations = this.affectations.filter(a => a.texte_id === texteId);
+    return textAffectations.map(a => `${a.corrector_prenom} ${a.corrector_nom}`).join(', ') || 'Aucun';
   }
 
   logout() {
@@ -670,13 +671,12 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   viewTexte(texte: any) {
-    this.selectedTexte = texte;
     // Ouvrir modal de visualisation
     this.showToast(`Visualisation du texte: ${texte.titre}`, 'success');
   }
   
   openEvaluationModal(texte: any) {
-    this.selectedTexte = texte;
+    this.selectedTexteForEvaluation = texte;
     this.evaluationForm = {
       note: texte.note || 0,
       commentaire: texte.commentaire || '',
@@ -687,14 +687,14 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   closeEvaluationModal() {
     this.showEvaluationModal = false;
-    this.selectedTexte = null;
+    this.selectedTexteForEvaluation = null;
   }
   
   saveEvaluation() {
-    if (!this.selectedTexte) return;
+    if (!this.selectedTexteForEvaluation) return;
     
     const evaluationData = {
-      texte_id: this.selectedTexte.id,
+      texte_id: this.selectedTexteForEvaluation.id,
       note: this.evaluationForm.note,
       commentaire: this.evaluationForm.commentaire,
       statut: this.evaluationForm.statut
@@ -748,7 +748,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   generateEvaluationCSV(): string {
-    const headers = ['Titre', 'Auteur', 'Langue', 'Statut', 'Note', 'Commentaire', 'Correcteur', 'Date soumission'];
+    const headers = ['Titre', 'Auteur', 'Langue', 'Statut', 'Note', 'Commentaire', 'Correcteurs', 'Date soumission'];
     const rows = this.textes.map(texte => [
       texte.titre,
       `${texte.prenom} ${texte.nom}`,
@@ -756,7 +756,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       this.getStatusLabel(texte.statut),
       texte.note || '',
       texte.commentaire || '',
-      this.getAssignedCorrector(texte.user_id),
+      this.getAssignedCorrectorsNames(texte.id),
       new Date(texte.created_at).toLocaleDateString()
     ]);
     
@@ -965,39 +965,5 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       // Simuler le vidage du cache
       this.showToast('Cache vidé avec succès', 'success');
     }
-  }
-  
-  // Méthodes pour la gestion des thèmes
-  loadTheme() {
-    const savedTheme = localStorage.getItem('cp2i-theme') || 'light';
-    this.currentTheme = savedTheme;
-    this.applyTheme(savedTheme);
-  }
-  
-  selectTheme(themeId: string) {
-    this.currentTheme = themeId;
-    this.applyTheme(themeId);
-    localStorage.setItem('cp2i-theme', themeId);
-    this.showToast(`Thème ${this.getThemeName(themeId)} appliqué`, 'success');
-  }
-  
-  applyTheme(themeId: string) {
-    // Supprimer toutes les classes de thème existantes
-    document.body.className = document.body.className.replace(/theme-\w+/g, '');
-    document.documentElement.className = document.documentElement.className.replace(/theme-\w+/g, '');
-    
-    // Ajouter la nouvelle classe de thème
-    document.body.classList.add(`theme-${themeId}`);
-    document.documentElement.classList.add(`theme-${themeId}`);
-    
-    // Forcer le re-render
-    document.body.style.display = 'none';
-    document.body.offsetHeight; // Trigger reflow
-    document.body.style.display = '';
-  }
-  
-  getThemeName(themeId: string): string {
-    const theme = this.themes.find(t => t.id === themeId);
-    return theme ? theme.name : themeId;
   }
 }

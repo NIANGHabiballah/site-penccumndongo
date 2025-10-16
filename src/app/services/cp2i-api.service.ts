@@ -116,9 +116,9 @@ export class Cp2iApiService {
     return this.http.get(`${this.baseUrl}/cp2i-dashboard.php?action=users`, { headers: this.getHeaders() });
   }
 
-  assignCorrector(participantId: number, correctorId: number): Observable<any> {
+  assignCorrector(texteId: number, correctorId: number): Observable<any> {
     return this.http.post(`${this.baseUrl}/cp2i-dashboard.php?action=assign_corrector`, 
-      { participant_id: participantId, corrector_id: correctorId }, 
+      { texte_id: texteId, corrector_id: correctorId }, 
       { headers: this.getHeaders() }
     );
   }

@@ -305,11 +305,11 @@
           <div class="panel-content">
             <div class="assignment-form">
               <div class="form-group">
-                <label>Participant:</label>
-                <select [(ngModel)]="selectedParticipant" class="form-control">
-                  <option value="0">Sélectionner un participant</option>
-                  <option *ngFor="let participant of participants" [value]="participant.id">
-                    {{participant.prenom}} {{participant.nom}} ({{participant.nb_textes || 0}} textes)
+                <label>Texte à affecter:</label>
+                <select [(ngModel)]="selectedTexte" class="form-control">
+                  <option value="0">Sélectionner un texte</option>
+                  <option *ngFor="let texte of textes" [value]="texte.id">
+                    {{texte.titre}} - {{texte.prenom}} {{texte.nom}}
                   </option>
                 </select>
               </div>
@@ -322,24 +322,21 @@
                   </option>
                 </select>
               </div>
-              <button class="btn btn-primary" (click)="assignCorrector()" [disabled]="!selectedParticipant || !selectedCorrector">
-                Affecter
+              <button class="btn btn-primary" (click)="assignCorrector()" [disabled]="!selectedTexte || !selectedCorrector">
+                Affecter correcteur
               </button>
             </div>
             
             <div class="assignments-list">
-              <h4>Affectations actuelles</h4>
-              <div class="assignment-item" *ngFor="let participant of participants">
-                <div class="participant-info">
-                  <strong>{{participant.prenom}} {{participant.nom}}</strong>
-                  <span class="text-count">({{participant.nb_textes || 0}} textes)</span>
+              <h4>Affectations par texte (max 3 correcteurs/texte)</h4>
+              <div class="assignment-item" *ngFor="let texte of textes">
+                <div class="texte-info">
+                  <strong>{{texte.titre}}</strong>
+                  <span class="author-info">par {{texte.prenom}} {{texte.nom}}</span>
                 </div>
                 <div class="assignment-status">
-                  <span *ngIf="isAssigned(participant.id)" class="assigned">
-                    ✓ {{getAssignedCorrector(participant.id)}}
-                  </span>
-                  <span *ngIf="!isAssigned(participant.id)" class="not-assigned">
-                    Non assigné
+                  <span class="correcteurs-count">
+                    {{getCorrectorsCount(texte.id)}}/3 correcteurs
                   </span>
                 </div>
               </div>
@@ -683,8 +680,8 @@
             
             <div class="evaluation-details">
               <div class="detail-item">
-                <span class="label">Correcteur assigné:</span>
-                <span class="value">{{getAssignedCorrector(texte.user_id) || 'Non assigné'}}</span>
+                <span class="label">Correcteurs assignés:</span>
+                <span class="value">{{getAssignedCorrectorsNames(texte.id) || 'Non assigné'}}</span>
               </div>
               <div class="detail-item">
                 <span class="label">Date de soumission:</span>
@@ -817,8 +814,8 @@
                 </div>
                 <div class="correcteur-numbers">
                   <div class="stat-item">
-                    <span class="stat-value">{{correcteur.participants_assignes}}</span>
-                    <span class="stat-label">Participants assignés</span>
+                    <span class="stat-value">{{correcteur.textes_assignes}}</span>
+                    <span class="stat-label">Textes assignés</span>
                   </div>
                   <div class="stat-item">
                     <span class="stat-value">{{correcteur.textes_corriges}}</span>
@@ -831,6 +828,81 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+        
+        <!-- Statistiques détaillées des affectations -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3><i class="fas fa-list-alt"></i> Détail des affectations par texte ⭐ NOUVEAU</h3>
+          </div>
+          <div class="panel-content">
+            <div *ngIf="stats && stats.textes_affectations && stats.textes_affectations.length > 0; else noAffectations">
+              <div class="affectations-table">
+                <div class="affectation-header">
+                  <div class="col-titre">Titre du texte</div>
+                  <div class="col-auteur">Auteur (prénom et nom)</div>
+                  <div class="col-correcteurs">Correcteurs assignés (liste des noms)</div>
+                  <div class="col-count">Nombre d'affectations (badge coloré X/3)</div>
+                </div>
+                <div class="affectation-row" *ngFor="let affectation of stats.textes_affectations">
+                  <div class="col-titre" data-label="Titre:">
+                    <strong>{{affectation.titre}}</strong>
+                  </div>
+                  <div class="col-auteur" data-label="Auteur:">
+                    {{affectation.auteur_prenom}} {{affectation.auteur_nom}}
+                  </div>
+                  <div class="col-correcteurs" data-label="Correcteurs:">
+                    <span *ngIf="affectation.correcteurs_noms && affectation.correcteurs_noms.trim()" class="correcteurs-list">
+                      {{affectation.correcteurs_noms}}
+                    </span>
+                    <span *ngIf="!affectation.correcteurs_noms || !affectation.correcteurs_noms.trim()" class="no-corrector">
+                      Aucun correcteur assigné
+                    </span>
+                  </div>
+                  <div class="col-count" data-label="Affectations:">
+                    <span class="count-badge" 
+                          [class.full]="affectation.nb_correcteurs >= 3" 
+                          [class.partial]="affectation.nb_correcteurs > 0 && affectation.nb_correcteurs < 3" 
+                          [class.empty]="affectation.nb_correcteurs === 0">
+                      {{affectation.nb_correcteurs}}/3
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="affectations-summary">
+                <p><strong>Total:</strong> {{stats.textes_affectations.length}} textes soumis</p>
+                <div class="color-legend">
+                  <div class="legend-item">
+                    <span class="count-badge empty">0/3</span>
+                    <span>🔴 Rouge : Aucun correcteur</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="count-badge partial">1/3</span>
+                    <span>🟡 Orange : Partiellement assigné</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="count-badge full">3/3</span>
+                    <span>🟢 Vert : Complètement assigné</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ng-template #noAffectations>
+              <div class="no-data">
+                <i class="fas fa-clipboard-list"></i>
+                <h4>Aucune donnée d'affectation disponible</h4>
+                <p>Les statistiques d'affectation apparaîtront ici une fois que des textes seront soumis et des correcteurs assignés.</p>
+                <div class="debug-info" style="margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 4px; font-family: monospace; font-size: 0.8rem;">
+                  <strong>Debug:</strong><br>
+                  stats exists: {{!!stats}}<br>
+                  textes_affectations exists: {{!!stats?.textes_affectations}}<br>
+                  textes_affectations length: {{stats?.textes_affectations?.length || 0}}<br>
+                  textes_affectations data: {{stats?.textes_affectations | json}}<br>
+                  Toutes les stats: {{stats | json}}
+                </div>
+              </div>
+            </ng-template>
           </div>
         </div>
 
@@ -1407,21 +1479,8 @@
                 <h3><i class="fas fa-paint-brush"></i> Thème de l'interface</h3>
               </div>
               <div class="card-content">
-                <div class="theme-selector">
-                  <div class="theme-option" 
-                       *ngFor="let theme of themes"
-                       [class.active]="currentTheme === theme.id" 
-                       (click)="selectTheme(theme.id)">
-                    <div class="theme-preview" [ngClass]="theme.id + '-preview'">
-                      <div class="preview-header" [style.background-color]="theme.primary"></div>
-                      <div class="preview-sidebar" [style.background-color]="theme.bg"></div>
-                      <div class="preview-content" [style.background-color]="theme.bg" [style.color]="theme.text"></div>
-                    </div>
-                    <div class="theme-info">
-                      <h4>{{theme.name}}</h4>
-                      <p>Interface {{theme.name.toLowerCase()}}</p>
-                    </div>
-                  </div>
+                <div class="theme-placeholder">
+                  <p>Fonctionnalité de thèmes disponible prochainement</p>
                 </div>
               </div>
             </div>
@@ -1431,39 +1490,8 @@
                 <h3><i class="fas fa-cog"></i> Options d'affichage</h3>
               </div>
               <div class="card-content">
-                <div class="display-options">
-                  <div class="display-item">
-                    <div class="display-info">
-                      <strong>Mode compact</strong>
-                      <p>Réduit l'espacement pour plus de contenu</p>
-                    </div>
-                    <label class="toggle-switch">
-                      <input type="checkbox">
-                      <span class="slider"></span>
-                    </label>
-                  </div>
-                  
-                  <div class="display-item">
-                    <div class="display-info">
-                      <strong>Animations</strong>
-                      <p>Active les animations de l'interface</p>
-                    </div>
-                    <label class="toggle-switch">
-                      <input type="checkbox">
-                      <span class="slider"></span>
-                    </label>
-                  </div>
-                  
-                  <div class="display-item">
-                    <div class="display-info">
-                      <strong>Menu réduit par défaut</strong>
-                      <p>Démarre avec le menu latéral réduit</p>
-                    </div>
-                    <label class="toggle-switch">
-                      <input type="checkbox">
-                      <span class="slider"></span>
-                    </label>
-                  </div>
+                <div class="display-placeholder">
+                  <p>Options d'affichage disponibles prochainement</p>
                 </div>
               </div>
             </div>
@@ -1663,12 +1691,12 @@
       <button class="modal-close" (click)="closeEvaluationModal()"><i class="fas fa-times"></i></button>
     </div>
     <div class="modal-body">
-      <div class="evaluation-text-info">
-        <h4>{{selectedTexte?.titre}}</h4>
-        <p>par {{selectedTexte?.prenom}} {{selectedTexte?.nom}} - {{selectedTexte?.langue | titlecase}}</p>
+      <div class="evaluation-text-info" *ngIf="selectedTexteForEvaluation">
+        <h4>{{selectedTexteForEvaluation.titre}}</h4>
+        <p>par {{selectedTexteForEvaluation.prenom}} {{selectedTexteForEvaluation.nom}} - {{selectedTexteForEvaluation.langue | titlecase}}</p>
         <div class="text-preview">
           <strong>Extrait du texte:</strong>
-          <p>{{selectedTexte?.contenu | slice:0:200}}{{selectedTexte?.contenu?.length > 200 ? '...' : ''}}</p>
+          <p>{{selectedTexteForEvaluation.contenu | slice:0:200}}{{selectedTexteForEvaluation.contenu?.length > 200 ? '...' : ''}}</p>
         </div>
       </div>
       
