@@ -41,6 +41,17 @@ function submitText($data, $user) {
         return;
     }
     
+    // Vérifier si l'utilisateur a déjà soumis un texte
+    $stmt = $db->prepare("SELECT COUNT(*) as count FROM cp2i_textes WHERE user_id = ?");
+    $stmt->execute([$user['user_id']]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($result['count'] > 0) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Vous avez déjà soumis un texte pour cette édition. Un seul texte par participant est autorisé.']);
+        return;
+    }
+    
     // Vérifier le nombre de vers (max 40)
     $verses = explode("\n", trim($contenu));
     $verseCount = count(array_filter($verses, 'trim'));
@@ -54,6 +65,9 @@ function submitText($data, $user) {
     $stmt = $db->prepare("INSERT INTO cp2i_textes (user_id, titre, contenu, langue, nb_vers, statut, created_at) VALUES (?, ?, ?, ?, ?, 'en_attente', NOW())");
     
     if ($stmt->execute([$user['user_id'], $titre, $contenu, $langue, $verseCount])) {
+        // Enregistrer la soumission dans l'historique
+        logAction($user['user_id'], 'text_submission', "Soumission du texte: $titre");
+        
         echo json_encode([
             'success' => true,
             'message' => 'Texte soumis avec succès',

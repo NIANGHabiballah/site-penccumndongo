@@ -50,6 +50,10 @@ function registerUser($data) {
     $stmt = $db->prepare("INSERT INTO cp2i_users (email, password, nom, prenom, telephone, role, email_verified, verification_token, created_at) VALUES (?, ?, ?, ?, ?, ?, FALSE, ?, NOW())");
     
     if ($stmt->execute([$email, $hashedPassword, $nom, $prenom, $telephone, $role, $verificationToken])) {
+        // Enregistrer l'inscription dans l'historique
+        $userId = $db->lastInsertId();
+        logAction($userId, 'register', 'Inscription utilisateur');
+        
         // Envoyer email de vérification
         sendVerificationEmail($email, $nom, $prenom, $verificationToken);
         
@@ -92,6 +96,9 @@ function loginUser($data) {
         return;
     }
     
+    // Enregistrer la connexion dans l'historique
+    logAction($user['id'], 'login', 'Connexion utilisateur');
+    
     $token = generateToken($user['id'], $user['email'], $user['role']);
     
     echo json_encode([
@@ -126,7 +133,7 @@ function generateToken($userId, $email, $role) {
 }
 
 function sendVerificationEmail($email, $nom, $prenom, $token) {
-    $verificationUrl = "https://penccumndongo.com/src/app/back-end/cp2i-verify.php?token=" . $token;
+    $verificationUrl = "https://penccumndongo.com/cp2i-verify.php?token=" . $token;
     
     $subject = "CP2i - Vérification de votre compte";
     $message = "

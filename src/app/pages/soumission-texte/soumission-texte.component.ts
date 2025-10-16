@@ -31,6 +31,21 @@ export class SoumissionTexteComponent implements OnInit {
       this.router.navigate(['/cp2i']);
       return;
     }
+    
+    // Vérifier si l'utilisateur a déjà soumis un texte
+    this.cp2iApi.getUserTexts().subscribe({
+      next: (data) => {
+        if (data.textes && data.textes.length > 0) {
+          this.showToast('Vous avez déjà soumis un texte pour cette édition.', 'error');
+          setTimeout(() => {
+            this.router.navigate(['/dashboard-participant']);
+          }, 2000);
+        }
+      },
+      error: (error) => {
+        console.error('Erreur lors de la vérification:', error);
+      }
+    });
   }
 
   getLineCount(): number {
@@ -43,12 +58,16 @@ export class SoumissionTexteComponent implements OnInit {
            this.getLineCount() <= 40;
   }
 
+  showNotification = false;
+  notificationMessage = '';
+  notificationType: 'success' | 'error' = 'success';
+
   onSubmit() {
     if (!this.isFormValid()) {
       if (this.getLineCount() > 40) {
-        alert('Votre texte dépasse la limite de 40 vers. Veuillez le raccourcir.');
+        this.showToast('Votre texte dépasse la limite de 40 vers. Veuillez le raccourcir.', 'error');
       } else {
-        alert('Veuillez remplir tous les champs obligatoires.');
+        this.showToast('Veuillez remplir tous les champs obligatoires.', 'error');
       }
       return;
     }
@@ -57,17 +76,29 @@ export class SoumissionTexteComponent implements OnInit {
     
     this.cp2iApi.submitText(this.texte).subscribe({
       next: (response) => {
-        alert('Texte soumis avec succès ! Vous recevrez une notification une fois évalué.');
+        this.showToast('Texte soumis avec succès ! Vous recevrez une notification une fois évalué.', 'success');
         this.resetForm();
-        this.router.navigate(['/dashboard-participant']);
+        setTimeout(() => {
+          this.router.navigate(['/dashboard-participant']);
+        }, 2000);
       },
       error: (error) => {
-        alert(error.error?.error || 'Erreur lors de la soumission. Veuillez réessayer.');
+        this.showToast(error.error?.error || 'Erreur lors de la soumission. Veuillez réessayer.', 'error');
       },
       complete: () => {
         this.isSubmitting = false;
       }
     });
+  }
+
+  showToast(message: string, type: 'success' | 'error') {
+    this.notificationMessage = message;
+    this.notificationType = type;
+    this.showNotification = true;
+    
+    setTimeout(() => {
+      this.showNotification = false;
+    }, 4000);
   }
 
   resetForm() {

@@ -489,10 +489,147 @@ body {
   }
 }
 
+/* Submissions Section */
+.submissions-section {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  margin-top: 2rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.section-header h2 {
+  color: #0380C2;
+  font-size: 1.5rem;
+}
+
+.submissions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.submission-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s;
+}
+
+.submission-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.submission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.submission-header h3 {
+  color: #2c3e50;
+  font-size: 1.1rem;
+  margin: 0;
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.submission-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.detail-item i {
+  color: #0380C2;
+  width: 16px;
+}
+
+.submission-evaluation {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 4px solid #28a745;
+}
+
+.evaluation-note {
+  color: #28a745;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.evaluation-comment {
+  color: #2c3e50;
+  font-style: italic;
+}
+
+.evaluation-comment p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.status-en_attente {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-accepte {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-refuse {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.no-submissions {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #6c757d;
+}
+
+.no-submissions i {
+  font-size: 3rem;
+  color: #dee2e6;
+  margin-bottom: 1rem;
+}
+
+.no-submissions h3 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.no-submissions p {
+  margin-bottom: 2rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .mobile-menu-toggle {
     display: flex;
+    z-index: 1002;
   }
   
   .sidebar {
@@ -501,7 +638,7 @@ body {
     top: 0;
     width: 280px;
     height: 100vh;
-    z-index: 1000;
+    z-index: 1001;
     transition: left 0.3s ease;
   }
   
@@ -509,9 +646,15 @@ body {
     left: 0;
   }
   
+  .mobile-overlay {
+    z-index: 1000;
+  }
+  
   .main-content {
     width: 100%;
     padding-top: 80px;
+    position: relative;
+    z-index: 1;
   }
   
   .header {
@@ -523,4 +666,38 @@ body {
   .cards-grid {
     grid-template-columns: 1fr;
   }
+  
+  .section-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .submissions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .submission-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+  
+  .submission-details {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Bouton désactivé */
+.btn-disabled {
+  background: #ccc !important;
+  color: #666 !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+}
+
+.btn-disabled:hover {
+  background: #ccc !important;
+  transform: none !important;
 }

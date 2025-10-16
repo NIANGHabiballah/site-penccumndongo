@@ -10,6 +10,9 @@ Disallow: /api/
 Disallow: /*.log$
 Disallow: /*.sql$
 Disallow: /*.bak$
+Disallow: /*cp2i-*.php
+Disallow: /config.php
+Disallow: /back-end/
 
 # Allow important pages
 Allow: /
@@ -24,3 +27,11 @@ Allow: /services/community-management
 Allow: /services/design-graphique
 Allow: /services/marketing-digital
 Allow: /services/formations-professionnelles
+Allow: /cp2i
+Allow: /news
+Allow: /testimonials
+Allow: /formation-infographie
+Allow: /penc-boost
+Allow: /politique-confidentialite
+Allow: /cgv
+Allow: /mentions-legales

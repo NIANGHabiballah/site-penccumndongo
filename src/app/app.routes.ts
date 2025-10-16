@@ -36,6 +36,7 @@ import { RegisterComponent } from './pages/auth/register.component';
 import { ReglementsComponent } from './pages/reglements/reglements.component';
 import { ConditionsGeneralesComponent } from './pages/conditions-generales/conditions-generales.component';
 import { SoumissionTexteComponent } from './pages/soumission-texte/soumission-texte.component';
+import { ChangePasswordComponent } from './pages/change-password/change-password.component';
 
 export const routes: Routes = [
   { path: '', component: AccueilComponent },
@@ -90,6 +91,10 @@ export const routes: Routes = [
   
   // Route de soumission de texte
   { path: 'soumission-texte', component: SoumissionTexteComponent, canActivate: [AuthGuard] },
+  
+  // Routes de récupération de mot de passe
+  { path: 'forgot-password', component: ChangePasswordComponent },
+  { path: 'reset-password', component: ChangePasswordComponent },
   
   // Wildcard route - doit être en dernier
   { path: '**', redirectTo: '', pathMatch: 'full' }

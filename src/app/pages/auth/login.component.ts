@@ -270,7 +270,7 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
       <div class="auth-wrapper">
         <div class="welcome-card">
           <h2>Bienvenue sur CP2i</h2>
-          <p>Rejoignez la plus grande communauté de poètes de Côte d'Ivoire et participez à des concours prestigieux.</p>
+          <p>Rejoignez la plus grande communauté de poètes d'Afrique et participez à des concours prestigieux. Concours ouvert à tous les Africains !</p>
           <div class="welcome-actions">
             <button type="button" class="welcome-btn primary" (click)="goToRegister()">
               <i class="fas fa-user-plus"></i>
@@ -325,6 +325,8 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
         <div class="auth-footer">
           <p>Pas encore de compte ?</p>
           <a routerLink="/auth/register" class="link-btn">Créer un compte</a>
+          <br><br>
+          <a routerLink="/forgot-password" class="link-btn">Mot de passe oublié ?</a>
         </div>
       </div>
     </div>

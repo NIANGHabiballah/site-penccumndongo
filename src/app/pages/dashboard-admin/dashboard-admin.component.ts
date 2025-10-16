@@ -1,21 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { DashboardDataService, DashboardStats, Participant, Texte } from '../../services/dashboard-data.service';
-import { ActivityItem } from '../../types/dashboard.types';
-import { GestionUtilisateursComponent } from '../gestion-utilisateurs/gestion-utilisateurs.component';
-import { GestionTextesComponent } from '../gestion-textes/gestion-textes.component';
-import { StatistiquesComponent } from '../statistiques/statistiques.component';
-
-import { SyncIndicatorComponent } from '../../components/sync-indicator/sync-indicator.component';
-import { RealtimeSyncService } from '../../services/realtime-sync.service';
-import { AutoUpdateService } from '../../services/auto-update.service';
+import { Cp2iApiService, User } from '../../services/cp2i-api.service';
 
 @Component({
   selector: 'app-dashboard-admin',
   standalone: true,
-  imports: [CommonModule, RouterModule, GestionUtilisateursComponent, GestionTextesComponent, StatistiquesComponent, SyncIndicatorComponent],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './dashboard-admin.component.html',
   styleUrls: ['./dashboard-admin.component.css']
 })
@@ -23,33 +16,43 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   mobileMenuOpen = false;
   desktopMenuHidden = false;
   currentView = 'dashboard';
+  currentUser: User | null = null;
   
-  stats: DashboardStats = {
-    participants: 0,
-    correcteurs: 0,
-    textesTotal: 0,
-    textesEnAttente: 0,
-    textesEvalues: 0,
-    textesValides: 0,
-    concoursActifs: 0,
-    moyenneNotes: 0,
-    participantsActifs: 0,
-    messagesNonLus: 0
-  };
+  stats: any = {};
+  users: any[] = [];
+  participants: any[] = [];
+  correcteurs: any[] = [];
+  affectations: any[] = [];
+  textes: any[] = [];
+  allAccounts: any[] = [];
+  history: any[] = [];
   
-  participants: Participant[] = [];
-  textes: Texte[] = [];
-  recentActivity: ActivityItem[] = [];
+  selectedParticipant: number = 0;
+  selectedCorrector: number = 0;
+  
+  showNotification = false;
+  notificationMessage = '';
+  notificationType: 'success' | 'error' = 'success';
   
   private subscriptions: Subscription[] = [];
 
   constructor(
-    private dashboardService: DashboardDataService,
-    private realtimeService: RealtimeSyncService,
-    private autoUpdateService: AutoUpdateService
+    private cp2iApi: Cp2iApiService,
+    private router: Router
   ) {}
 
   ngOnInit() {
+    if (!this.cp2iApi.isAuthenticated()) {
+      this.router.navigate(['/cp2i']);
+      return;
+    }
+    
+    this.currentUser = this.cp2iApi.getCurrentUser();
+    if (this.currentUser?.role !== 'admin') {
+      this.router.navigate(['/cp2i']);
+      return;
+    }
+    
     this.loadData();
   }
 
@@ -58,104 +61,129 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
 
   loadData() {
-    this.subscriptions.push(
-      this.dashboardService.stats$.subscribe(stats => {
-        this.stats = stats;
-      })
-    );
-
-    this.subscriptions.push(
-      this.dashboardService.participants$.subscribe(participants => {
-        this.participants = participants;
-        this.generateRecentActivity();
-      })
-    );
-
-    this.subscriptions.push(
-      this.dashboardService.textes$.subscribe(textes => {
-        this.textes = textes;
-        this.generateRecentActivity();
-      })
-    );
-  }
-
-  generateRecentActivity() {
-    const activities: ActivityItem[] = [];
-    
-    const recentTextes = this.textes
-      .sort((a, b) => new Date(b.dateSubmission).getTime() - new Date(a.dateSubmission).getTime())
-      .slice(0, 3);
-    
-    recentTextes.forEach(texte => {
-      activities.push({
-        user: texte.participantNom,
-        action: 'Nouveau texte soumis',
-        time: this.getTimeAgo(texte.dateSubmission),
-        avatar: this.getInitials(texte.participantNom)
-      });
+    // Charger le profil admin
+    this.cp2iApi.getProfile().subscribe({
+      next: (data) => {
+        if (data.profile) {
+          this.currentUser = {
+            id: data.profile.id,
+            email: data.profile.email,
+            nom: data.profile.nom,
+            prenom: data.profile.prenom,
+            role: data.profile.role
+          };
+        }
+      },
+      error: (error) => console.error('Erreur profil:', error)
     });
-
-    const recentParticipants = this.participants
-      .sort((a, b) => new Date(b.dateInscription).getTime() - new Date(a.dateInscription).getTime())
-      .slice(0, 2);
     
-    recentParticipants.forEach(participant => {
-      activities.push({
-        user: participant.nom,
-        action: 'Inscription validée',
-        time: this.getTimeAgo(participant.dateInscription),
-        avatar: this.getInitials(participant.nom)
-      });
+    // Charger les statistiques
+    this.cp2iApi.getDashboardStats().subscribe({
+      next: (data) => {
+        this.stats = data.stats || {};
+      },
+      error: (error) => console.error('Erreur stats:', error)
     });
-
-    this.recentActivity = activities.slice(0, 4);
-  }
-
-  getInitials(name: string): string {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
-  }
-
-  getTimeAgo(date: string): string {
-    const now = new Date();
-    const past = new Date(date);
-    const diffInHours = Math.floor((now.getTime() - past.getTime()) / (1000 * 60 * 60));
     
-    if (diffInHours < 1) return 'Il y a moins d\'1h';
-    if (diffInHours < 24) return `Il y a ${diffInHours}h`;
-    const diffInDays = Math.floor(diffInHours / 24);
-    return `Il y a ${diffInDays}j`;
+    // Charger tous les utilisateurs
+    this.cp2iApi.getUsers().subscribe({
+      next: (data) => {
+        this.users = data.users || [];
+        this.participants = this.users.filter(u => u.role === 'participant');
+        this.correcteurs = this.users.filter(u => u.role === 'correcteur');
+        this.affectations = data.affectations || [];
+      },
+      error: (error) => console.error('Erreur utilisateurs:', error)
+    });
+    
+    // Charger tous les textes
+    this.cp2iApi.getAllTexts().subscribe({
+      next: (data) => {
+        this.textes = data.textes || [];
+      },
+      error: (error) => console.error('Erreur textes:', error)
+    });
+    
+    // Charger tous les comptes avec mots de passe
+    this.cp2iApi.getAllAccounts().subscribe({
+      next: (data) => {
+        this.allAccounts = data.accounts || [];
+      },
+      error: (error) => console.error('Erreur comptes:', error)
+    });
+    
+    // Charger l'historique
+    this.cp2iApi.getHistory().subscribe({
+      next: (data) => {
+        this.history = data.history || [];
+      },
+      error: (error) => {
+        console.error('Erreur historique:', error);
+        this.history = [];
+      }
+    });
   }
 
-  exportData() {
-    const data = {
-      stats: this.stats,
-      participants: this.participants,
-      textes: this.textes,
-      exportDate: new Date().toISOString()
+  assignCorrector() {
+    if (!this.selectedParticipant || !this.selectedCorrector) {
+      this.showToast('Veuillez sélectionner un participant et un correcteur', 'error');
+      return;
+    }
+    
+    this.cp2iApi.assignCorrector(this.selectedParticipant, this.selectedCorrector).subscribe({
+      next: (response) => {
+        this.showToast('Affectation réalisée avec succès!', 'success');
+        this.selectedParticipant = 0;
+        this.selectedCorrector = 0;
+        this.loadData();
+      },
+      error: (error) => {
+        this.showToast('Erreur lors de l\'affectation: ' + (error.error?.error || 'Erreur inconnue'), 'error');
+      }
+    });
+  }
+
+  getStatusLabel(status: string): string {
+    const labels = {
+      'en_attente': 'En attente',
+      'accepte': 'Accepté',
+      'refuse': 'Refusé'
     };
-    
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `cp2i-export-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    window.URL.revokeObjectURL(url);
+    return labels[status as keyof typeof labels] || status;
   }
 
-  sendAnnouncement() {
-    const message = {
-      expediteur: 'Admin Principal',
-      destinataire: 'Tous les participants',
-      sujet: 'Nouvelle annonce',
-      contenu: 'Message d\'information important...',
-      dateEnvoi: new Date().toISOString().split('T')[0],
-      lu: false,
-      type: 'info' as const
-    };
+  getStatusClass(status: string): string {
+    return `status-${status}`;
+  }
+
+  isAssigned(participantId: number): boolean {
+    return this.affectations.some(a => a.participant_id === participantId);
+  }
+
+  getAssignedCorrector(participantId: number): string {
+    const affectation = this.affectations.find(a => a.participant_id === participantId);
+    return affectation ? `${affectation.corrector_prenom} ${affectation.corrector_nom}` : 'Non assigné';
+  }
+
+  logout() {
+    this.cp2iApi.logout();
+    this.router.navigate(['/cp2i']);
+  }
+
+  copyToClipboard(text: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      this.showToast('Mot de passe copié !', 'success');
+    });
+  }
+
+  showToast(message: string, type: 'success' | 'error') {
+    this.notificationMessage = message;
+    this.notificationType = type;
+    this.showNotification = true;
     
-    this.dashboardService.addMessage(message);
-    alert('Annonce envoyée à tous les participants!');
+    setTimeout(() => {
+      this.showNotification = false;
+    }, 4000);
   }
 
   setCurrentView(view: string) {

@@ -64,6 +64,13 @@ ServerSignature Off
 
 # Angular routing
 RewriteEngine On
+# Allow access to Angular routes
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/cp2i-.*\.php$
 RewriteRule . /index.html [L]
+
+# Ensure Angular routes are accessible
+<LocationMatch "^/(cp2i|auth|dashboard|services)">
+    Require all granted
+</LocationMatch>

@@ -33,7 +33,7 @@ export interface Texte {
   providedIn: 'root'
 })
 export class Cp2iApiService {
-  private baseUrl = environment.apiUrl;
+  private baseUrl = 'https://penccumndongo.com';
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -109,5 +109,42 @@ export class Cp2iApiService {
 
   getProfile(): Observable<any> {
     return this.http.get(`${this.baseUrl}/cp2i-dashboard.php?action=profile`, { headers: this.getHeaders() });
+  }
+
+  // Méthodes admin
+  getUsers(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-dashboard.php?action=users`, { headers: this.getHeaders() });
+  }
+
+  assignCorrector(participantId: number, correctorId: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cp2i-dashboard.php?action=assign_corrector`, 
+      { participant_id: participantId, corrector_id: correctorId }, 
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getAllAccounts(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-accounts.php`, { headers: this.getHeaders() });
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cp2i-password.php`, {
+      current_password: currentPassword,
+      new_password: newPassword
+    }, { headers: this.getHeaders() });
+  }
+
+  getHistory(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-history.php`, { headers: this.getHeaders() });
+  }
+
+  requestPasswordReset(email: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cp2i-reset-password.php?action=request`, { email });
+  }
+
+  resetPassword(token: string, email: string, password: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cp2i-reset-password.php?action=reset`, {
+      token, email, password
+    });
   }
 }

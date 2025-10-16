@@ -1,3 +1,14 @@
+<!-- Notification Toast -->
+<div class="toast-notification" 
+     [class.show]="showNotification" 
+     [class.success]="notificationType === 'success'"
+     [class.error]="notificationType === 'error'">
+  <div class="toast-content">
+    <i class="fas" [class.fa-check-circle]="notificationType === 'success'" [class.fa-exclamation-circle]="notificationType === 'error'"></i>
+    <span>{{notificationMessage}}</span>
+  </div>
+</div>
+
 <div class="soumission-container">
   <div class="header">
     <h1>Soumettre un Texte</h1>

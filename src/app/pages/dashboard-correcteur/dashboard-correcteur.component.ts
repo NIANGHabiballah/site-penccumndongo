@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { Cp2iApiService } from '../../services/cp2i-api.service';
 import { Cp2iService, Texte } from '../../services/cp2i.service';
 
 @Component({
@@ -16,7 +17,11 @@ export class DashboardCorrecteurComponent implements OnInit {
   mobileMenuOpen = false;
   desktopMenuHidden = false;
 
-  constructor(private cp2iService: Cp2iService) {}
+  constructor(
+    private cp2iService: Cp2iService,
+    private cp2iApi: Cp2iApiService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.chargerTextes();
@@ -45,5 +50,10 @@ export class DashboardCorrecteurComponent implements OnInit {
 
   toggleDesktopMenu() {
     this.desktopMenuHidden = !this.desktopMenuHidden;
+  }
+
+  logout() {
+    this.cp2iApi.logout();
+    this.router.navigate(['/cp2i']);
   }
 }

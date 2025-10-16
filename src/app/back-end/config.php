@@ -1,15 +1,19 @@
 <?php
 // Configuration base de données CP2i
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'u122559880_cp2i_db');
+define('DB_NAME', 'u122559880_form_contact');
 define('DB_USER', 'u122559880_root');
 define('DB_PASS', 'Tafsir#27');
+
+// Désactiver l'affichage des erreurs pour éviter les problèmes JSON
+ini_set('display_errors', 0);
+error_reporting(0);
 define('JWT_SECRET', 'cp2i_secret_key_2024');
 
 // Headers CORS
 function setCorsHeaders() {
     header('Content-Type: application/json');
-    header("Access-Control-Allow-Origin: https://penccumndongo.com");
+    header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Headers: Content-Type, Authorization");
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
     
@@ -38,24 +42,53 @@ function getDB() {
 // Vérification JWT
 function verifyToken() {
     $headers = getallheaders();
-    $token = $headers['Authorization'] ?? '';
+    $token = '';
+    
+    // Chercher le token dans différents headers
+    if (isset($headers['Authorization'])) {
+        $token = $headers['Authorization'];
+    } elseif (isset($headers['authorization'])) {
+        $token = $headers['authorization'];
+    }
     
     if (!$token || !str_starts_with($token, 'Bearer ')) {
         http_response_code(401);
-        echo json_encode(['error' => 'Token manquant']);
+        echo json_encode(['error' => 'Token manquant', 'headers' => array_keys($headers)]);
         exit;
     }
     
     $token = substr($token, 7);
-    $decoded = base64_decode(str_replace(['-', '_'], ['+', '/'], explode('.', $token)[1]));
+    $parts = explode('.', $token);
+    
+    if (count($parts) !== 3) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Format token invalide']);
+        exit;
+    }
+    
+    $decoded = base64_decode(str_replace(['-', '_'], ['+', '/'], $parts[1]));
     $payload = json_decode($decoded, true);
     
-    if (!$payload || $payload['exp'] < time()) {
+    if (!$payload || !isset($payload['exp']) || $payload['exp'] < time()) {
         http_response_code(401);
-        echo json_encode(['error' => 'Token invalide']);
+        echo json_encode(['error' => 'Token expiré ou invalide']);
         exit;
     }
     
     return $payload;
+}
+
+// Fonction pour enregistrer une action dans l'historique
+function logAction($userId, $action, $description) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("
+            INSERT INTO cp2i_history (user_id, action, description) 
+            VALUES (?, ?, ?)
+        ");
+        $stmt->execute([$userId, $action, $description]);
+    } catch (Exception $e) {
+        // Ignorer les erreurs d'historique pour ne pas casser l'app
+    }
 }
 ?>

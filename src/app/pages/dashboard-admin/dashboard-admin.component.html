@@ -1,3 +1,14 @@
+<!-- Notification Toast -->
+<div class="toast-notification" 
+     [class.show]="showNotification" 
+     [class.success]="notificationType === 'success'"
+     [class.error]="notificationType === 'error'">
+  <div class="toast-content">
+    <i class="fas" [class.fa-check-circle]="notificationType === 'success'" [class.fa-exclamation-circle]="notificationType === 'error'"></i>
+    <span>{{notificationMessage}}</span>
+  </div>
+</div>
+
 <div class="container" [class.sidebar-collapsed]="desktopMenuHidden">
   <!-- Overlay pour fermer le menu -->
   <div class="mobile-overlay" *ngIf="mobileMenuOpen" (click)="toggleMobileMenu()"></div>
@@ -11,11 +22,14 @@
       <div class="nav-item" [class.active]="currentView === 'dashboard'" (click)="setCurrentView('dashboard')">
         <i class="fas fa-chart-bar"></i> Tableau de bord
       </div>
-      <div class="nav-item" [class.active]="currentView === 'concours'" (click)="setCurrentView('concours')">
-        <i class="fas fa-trophy"></i> Gestion des concours
+      <div class="nav-item" [class.active]="currentView === 'affectations'" (click)="setCurrentView('affectations')">
+        <i class="fas fa-user-tie"></i> Affectations
       </div>
       <div class="nav-item" [class.active]="currentView === 'utilisateurs'" (click)="setCurrentView('utilisateurs')">
         <i class="fas fa-users"></i> Utilisateurs
+      </div>
+      <div class="nav-item" [class.active]="currentView === 'comptes'" (click)="setCurrentView('comptes')">
+        <i class="fas fa-key"></i> Tous les comptes
       </div>
       <div class="nav-item" [class.active]="currentView === 'textes'" (click)="setCurrentView('textes')">
         <i class="fas fa-file-alt"></i> Textes soumis
@@ -28,12 +42,14 @@
       </div>
       <div class="nav-item" [class.active]="currentView === 'messages'" (click)="setCurrentView('messages')">
         <i class="fas fa-envelope"></i> Messages
-        <span class="badge" *ngIf="stats.messagesNonLus > 0">{{stats.messagesNonLus}}</span>
+      </div>
+      <div class="nav-item" [class.active]="currentView === 'historique'" (click)="setCurrentView('historique')">
+        <i class="fas fa-history"></i> Historique
       </div>
       <div class="nav-item" [class.active]="currentView === 'parametres'" (click)="setCurrentView('parametres')">
         <i class="fas fa-cog"></i> Paramètres
       </div>
-      <div class="nav-item">
+      <div class="nav-item" (click)="logout()">
         <i class="fas fa-sign-out-alt"></i> Déconnexion
       </div>
       <div class="nav-item desktop-toggle" (click)="toggleDesktopMenu()">
@@ -53,40 +69,39 @@
     <div class="header">
       <h1>Tableau de bord Administrateur</h1>
       <div class="header-right">
-        <app-sync-indicator></app-sync-indicator>
         <div class="user-info">
-          <span>Admin Principal</span>
-          <div class="user-avatar">AP</div>
+          <span>{{currentUser?.prenom}} {{currentUser?.nom}}</span>
+          <div class="user-avatar">{{currentUser?.prenom?.[0]}}{{currentUser?.nom?.[0]}}</div>
         </div>
       </div>
     </div>
 
     <div class="quick-actions">
-      <button class="btn btn-primary">+ Nouveau concours</button>
-      <button class="btn btn-secondary" (click)="exportData()">Exporter données</button>
-      <button class="btn btn-success" (click)="sendAnnouncement()">Envoyer notification</button>
+      <button class="btn btn-primary" (click)="setCurrentView('utilisateurs')">Gérer utilisateurs</button>
+      <button class="btn btn-secondary" (click)="setCurrentView('textes')">Gérer textes</button>
+      <button class="btn btn-success" (click)="setCurrentView('affectations')">Affecter correcteurs</button>
     </div>
 
     <div class="stats-grid">
       <div class="stat-card">
-        <h3>CONCOURS ACTIFS</h3>
-        <div class="number">3</div>
-        <div class="trend up">+1 ce mois</div>
+        <h3>PARTICIPANTS</h3>
+        <div class="number">{{participants.length}}</div>
+        <div class="trend up">Inscrits</div>
       </div>
       <div class="stat-card">
-        <h3>PARTICIPANTS INSCRITS</h3>
-        <div class="number">{{stats.participants}}</div>
-        <div class="trend up">+23 cette semaine</div>
+        <h3>CORRECTEURS</h3>
+        <div class="number">{{correcteurs.length}}</div>
+        <div class="trend up">Disponibles</div>
       </div>
       <div class="stat-card">
         <h3>TEXTES SOUMIS</h3>
-        <div class="number">{{stats.textesTotal}}</div>
-        <div class="trend up">+12 aujourd'hui</div>
+        <div class="number">{{stats.total_textes || 0}}</div>
+        <div class="trend up">Total</div>
       </div>
       <div class="stat-card">
-        <h3>ÉVALUATIONS EN COURS</h3>
-        <div class="number">{{stats.textesEnAttente}}</div>
-        <div class="trend down">-5 depuis hier</div>
+        <h3>EN ATTENTE</h3>
+        <div class="number">{{stats.textes_en_attente || 0}}</div>
+        <div class="trend down">À évaluer</div>
       </div>
     </div>
 
@@ -96,51 +111,222 @@
       <div *ngSwitchCase="'dashboard'" class="content-grid">
         <div class="panel">
           <div class="panel-header">
-            <h3>Concours récents</h3>
-            <button class="btn btn-primary" (click)="setCurrentView('concours')">Gérer tout</button>
+            <h3>Statistiques générales</h3>
           </div>
           <div class="panel-content">
-            <div class="contest-item">
-              <div class="contest-info">
-                <h4>Concours National de Poésie 2024</h4>
-                <p>{{stats.participants}} participants • Fin: 15 Mars 2024</p>
+            <div class="stats-summary">
+              <div class="summary-item">
+                <span class="label">Note moyenne:</span>
+                <span class="value">{{stats.note_moyenne ? (stats.note_moyenne | number:'1.1-1') + '/20' : 'N/A'}}</span>
               </div>
-              <span class="contest-status status-active">Actif</span>
-            </div>
-            <div class="contest-item">
-              <div class="contest-info">
-                <h4>Poésie Jeunesse</h4>
-                <p>89 participants • Fin: 28 Février 2024</p>
+              <div class="summary-item">
+                <span class="label">Textes acceptés:</span>
+                <span class="value">{{stats.textes_acceptes || 0}}</span>
               </div>
-              <span class="contest-status status-pending">Évaluation</span>
+              <div class="summary-item">
+                <span class="label">Textes refusés:</span>
+                <span class="value">{{stats.textes_refuses || 0}}</span>
+              </div>
             </div>
           </div>
         </div>
 
         <div class="panel">
           <div class="panel-header">
-            <h3>Activité récente</h3>
+            <h3>Derniers textes soumis</h3>
           </div>
           <div class="panel-content">
-            <div class="user-item" *ngFor="let activity of recentActivity">
-              <div class="user-avatar-small">{{activity.avatar}}</div>
-              <div class="user-details">
-                <h5>{{activity.user}}</h5>
-                <span>{{activity.action}} - {{activity.time}}</span>
+            <div class="text-item" *ngFor="let texte of textes.slice(0, 5)">
+              <div class="text-info">
+                <h5>{{texte.titre}}</h5>
+                <span>{{texte.prenom}} {{texte.nom}} - {{texte.created_at | date:'dd/MM/yyyy'}}</span>
               </div>
+              <span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span>
+            </div>
+            <div *ngIf="textes.length === 0" class="no-data">
+              <p>Aucun texte soumis pour le moment</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Gestion des utilisateurs -->
-      <app-gestion-utilisateurs *ngSwitchCase="'utilisateurs'"></app-gestion-utilisateurs>
+      <div *ngSwitchCase="'utilisateurs'" class="users-management">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Liste des utilisateurs</h3>
+          </div>
+          <div class="panel-content">
+            <div class="users-grid">
+              <div class="user-card" *ngFor="let user of users">
+                <div class="user-header">
+                  <div class="user-avatar-large">{{user.prenom?.[0]}}{{user.nom?.[0]}}</div>
+                  <div class="user-info">
+                    <h4>{{user.prenom}} {{user.nom}}</h4>
+                    <p>{{user.email}}</p>
+                    <span class="role-badge role-{{user.role}}">{{user.role | titlecase}}</span>
+                  </div>
+                </div>
+                <div class="user-stats" *ngIf="user.role === 'participant'">
+                  <div class="stat">
+                    <span class="stat-label">Textes:</span>
+                    <span class="stat-value">{{user.nb_textes || 0}}</span>
+                  </div>
+                  <div class="stat" *ngIf="user.note_moyenne">
+                    <span class="stat-label">Moyenne:</span>
+                    <span class="stat-value">{{user.note_moyenne | number:'1.1-1'}}/20</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Gestion des textes -->
-      <app-gestion-textes *ngSwitchCase="'textes'"></app-gestion-textes>
+      <div *ngSwitchCase="'textes'" class="texts-management">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Textes soumis ({{textes.length}})</h3>
+          </div>
+          <div class="panel-content">
+            <div class="texts-table">
+              <div class="text-row header">
+                <div>Titre</div>
+                <div>Auteur</div>
+                <div>Langue</div>
+                <div>Statut</div>
+                <div>Note</div>
+                <div>Date</div>
+              </div>
+              <div class="text-row" *ngFor="let texte of textes">
+                <div class="text-title">{{texte.titre}}</div>
+                <div>{{texte.prenom}} {{texte.nom}}</div>
+                <div>{{texte.langue | titlecase}}</div>
+                <div><span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span></div>
+                <div>{{texte.note ? (texte.note + '/20') : '-'}}</div>
+                <div>{{texte.created_at | date:'dd/MM/yyyy'}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- Statistiques -->
-      <app-statistiques *ngSwitchCase="'statistiques'"></app-statistiques>
+      <!-- Affectations correcteurs -->
+      <div *ngSwitchCase="'affectations'" class="assignments-management">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Affecter les correcteurs</h3>
+          </div>
+          <div class="panel-content">
+            <div class="assignment-form">
+              <div class="form-group">
+                <label>Participant:</label>
+                <select [(ngModel)]="selectedParticipant" class="form-control">
+                  <option value="0">Sélectionner un participant</option>
+                  <option *ngFor="let participant of participants" [value]="participant.id">
+                    {{participant.prenom}} {{participant.nom}} ({{participant.nb_textes || 0}} textes)
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Correcteur:</label>
+                <select [(ngModel)]="selectedCorrector" class="form-control">
+                  <option value="0">Sélectionner un correcteur</option>
+                  <option *ngFor="let correcteur of correcteurs" [value]="correcteur.id">
+                    {{correcteur.prenom}} {{correcteur.nom}}
+                  </option>
+                </select>
+              </div>
+              <button class="btn btn-primary" (click)="assignCorrector()" [disabled]="!selectedParticipant || !selectedCorrector">
+                Affecter
+              </button>
+            </div>
+            
+            <div class="assignments-list">
+              <h4>Affectations actuelles</h4>
+              <div class="assignment-item" *ngFor="let participant of participants">
+                <div class="participant-info">
+                  <strong>{{participant.prenom}} {{participant.nom}}</strong>
+                  <span class="text-count">({{participant.nb_textes || 0}} textes)</span>
+                </div>
+                <div class="assignment-status">
+                  <span *ngIf="isAssigned(participant.id)" class="assigned">
+                    ✓ {{getAssignedCorrector(participant.id)}}
+                  </span>
+                  <span *ngIf="!isAssigned(participant.id)" class="not-assigned">
+                    Non assigné
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Gestion de tous les comptes -->
+      <div *ngSwitchCase="'comptes'" class="accounts-management">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Tous les comptes ({{allAccounts.length}})</h3>
+          </div>
+          <div class="panel-content">
+            <div class="accounts-table">
+              <div class="account-row header">
+                <div>Email</div>
+                <div>Mot de passe</div>
+                <div>Nom</div>
+                <div>Rôle</div>
+                <div>Statut</div>
+              </div>
+              <div class="account-row" *ngFor="let account of allAccounts">
+                <div>{{account.email}}</div>
+                <div class="password-cell">
+                  <code *ngIf="account.role !== 'participant' && account.mot_de_passe_clair">{{account.mot_de_passe_clair}}</code>
+                  <span *ngIf="account.role === 'participant'" class="text-muted">
+                    <i class="fas fa-lock"></i> Privé
+                  </span>
+                  <button *ngIf="account.role !== 'participant' && account.mot_de_passe_clair" class="copy-btn" (click)="copyToClipboard(account.mot_de_passe_clair)">
+                    <i class="fas fa-copy"></i>
+                  </button>
+                </div>
+                <div>{{account.prenom}} {{account.nom}}</div>
+                <div><span class="role-badge role-{{account.role}}">{{account.role}}</span></div>
+                <div><span class="status-{{account.email_verified ? 'verified' : 'pending'}}">{{account.email_verified ? 'Vérifié' : 'En attente'}}</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Historique des actions -->
+      <div *ngSwitchCase="'historique'" class="history-management">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Historique des actions</h3>
+          </div>
+          <div class="panel-content">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Utilisateur</th>
+                  <th>Action</th>
+                  <th>Description</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of history">
+                  <td>{{item.prenom}} {{item.nom}}</td>
+                  <td><span class="action-badge">{{item.action}}</span></td>
+                  <td>{{item.description}}</td>
+                  <td>{{item.created_at | date:'dd/MM/yyyy HH:mm'}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
       <!-- Autres vues -->
       <div *ngSwitchDefault class="coming-soon">
