@@ -13,9 +13,9 @@
   <!-- Overlay pour fermer le menu -->
   <div class="mobile-overlay" *ngIf="mobileMenuOpen" (click)="toggleMobileMenu()"></div>
   
-  <div class="sidebar" [class.mobile-active]="mobileMenuOpen" [class.sidebar-hidden]="desktopMenuHidden">
+  <div class="sidebar" [class.mobile-active]="mobileMenuOpen" [class.sidebar-hidden]="desktopMenuHidden" (mouseleave)="closeMobileMenuOnLeave()">
     <div class="logo">
-      <h2>CP2i Admin</h2>
+      <h2>{{currentUser?.prenom}} {{currentUser?.nom}}</h2>
       <span>Concours de Poésie</span>
     </div>
     <nav class="nav-menu">
@@ -141,7 +141,10 @@
                 <h5>{{texte.titre}}</h5>
                 <span>{{texte.prenom}} {{texte.nom}} - {{texte.created_at | date:'dd/MM/yyyy'}}</span>
               </div>
-              <span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span>
+              <div class="text-status">
+                <small class="status-label">Statut:</small>
+                <span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span>
+              </div>
             </div>
             <div *ngIf="textes.length === 0" class="no-data">
               <p>Aucun texte soumis pour le moment</p>
@@ -152,32 +155,113 @@
 
       <!-- Gestion des utilisateurs -->
       <div *ngSwitchCase="'utilisateurs'" class="users-management">
-        <div class="panel">
-          <div class="panel-header">
-            <h3>Liste des utilisateurs</h3>
+        <div class="users-header">
+          <div class="header-content">
+            <h2><i class="fas fa-users"></i> Gestion des utilisateurs</h2>
+            <p>{{users.length}} utilisateurs inscrits au total</p>
           </div>
-          <div class="panel-content">
-            <div class="users-grid">
-              <div class="user-card" *ngFor="let user of users">
-                <div class="user-header">
-                  <div class="user-avatar-large">{{user.prenom?.[0]}}{{user.nom?.[0]}}</div>
-                  <div class="user-info">
-                    <h4>{{user.prenom}} {{user.nom}}</h4>
-                    <p>{{user.email}}</p>
-                    <span class="role-badge role-{{user.role}}">{{user.role | titlecase}}</span>
+          <div class="header-actions">
+            <button class="btn btn-outline" (click)="exportUsers()"><i class="fas fa-download"></i> Exporter</button>
+            <button class="btn btn-primary" (click)="openUserModal()"><i class="fas fa-plus"></i> Nouvel utilisateur</button>
+          </div>
+        </div>
+
+        <!-- Filtres -->
+        <div class="users-filters">
+          <div class="filter-group">
+            <button class="filter-btn" [class.active]="currentFilter === 'all'" (click)="filterUsers('all')">Tous ({{users.length}})</button>
+            <button class="filter-btn" [class.active]="currentFilter === 'participant'" (click)="filterUsers('participant')">Participants ({{participants.length}})</button>
+            <button class="filter-btn" [class.active]="currentFilter === 'correcteur'" (click)="filterUsers('correcteur')">Correcteurs ({{correcteurs.length}})</button>
+            <button class="filter-btn" [class.active]="currentFilter === 'admin'" (click)="filterUsers('admin')">Admins ({{usersAdminsCount}})</button>
+          </div>
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Rechercher un utilisateur..." (input)="onSearch($event)">
+          </div>
+        </div>
+
+        <!-- Tableau des utilisateurs -->
+        <div class="scroll-hint">
+          <i class="fas fa-arrows-alt-h"></i>
+          <span>Faites glisser pour voir toutes les colonnes</span>
+        </div>
+        <div class="users-table-container">
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th>Utilisateur</th>
+                <th>Rôle</th>
+                <th>Statut</th>
+                <th>Textes</th>
+                <th>Note moy.</th>
+                <th>Inscription</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of filteredUsers" class="user-row">
+                <td class="user-cell">
+                  <div class="user-profile">
+                    <div class="user-avatar-small">{{user.prenom?.[0]}}{{user.nom?.[0]}}</div>
+                    <div class="user-details">
+                      <strong>{{user.prenom}} {{user.nom}}</strong>
+                      <span>{{user.email}}</span>
+                    </div>
                   </div>
-                </div>
-                <div class="user-stats" *ngIf="user.role === 'participant'">
-                  <div class="stat">
-                    <span class="stat-label">Textes:</span>
-                    <span class="stat-value">{{user.nb_textes || 0}}</span>
+                </td>
+                <td>
+                  <span class="role-badge role-{{user.role}}">{{user.role | titlecase}}</span>
+                </td>
+                <td>
+                  <span class="status-badge status-active">Actif</span>
+                </td>
+                <td class="text-center">
+                  <span class="stat-number">{{user.nb_textes || 0}}</span>
+                </td>
+                <td class="text-center">
+                  <span class="note-badge" *ngIf="user.note_moyenne">{{user.note_moyenne | number:'1.1-1'}}/20</span>
+                  <span class="no-data" *ngIf="!user.note_moyenne">-</span>
+                </td>
+                <td>
+                  <span class="date-text">{{user.created_at | date:'dd/MM/yyyy'}}</span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn-icon" title="Voir détails" (click)="viewUser(user)"><i class="fas fa-eye"></i></button>
+                    <button class="btn-icon" title="Modifier" (click)="openUserModal(user)"><i class="fas fa-edit"></i></button>
+                    <button class="btn-icon danger" title="Supprimer" (click)="confirmDelete(user)"><i class="fas fa-trash"></i></button>
                   </div>
-                  <div class="stat" *ngIf="user.note_moyenne">
-                    <span class="stat-label">Moyenne:</span>
-                    <span class="stat-value">{{user.note_moyenne | number:'1.1-1'}}/20</span>
-                  </div>
-                </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Vue mobile -->
+        <div class="users-mobile">
+          <div class="mobile-user-card" *ngFor="let user of filteredUsers">
+            <div class="mobile-user-header">
+              <div class="user-avatar-small">{{user.prenom?.[0]}}{{user.nom?.[0]}}</div>
+              <div class="mobile-user-info">
+                <strong>{{user.prenom}} {{user.nom}}</strong>
+                <span>{{user.email}}</span>
               </div>
+              <span class="role-badge role-{{user.role}}">{{user.role | titlecase}}</span>
+            </div>
+            <div class="mobile-user-stats">
+              <div class="mobile-stat">
+                <span class="mobile-stat-label">Textes</span>
+                <span class="mobile-stat-value">{{user.nb_textes || 0}}</span>
+              </div>
+              <div class="mobile-stat">
+                <span class="mobile-stat-label">Note moy.</span>
+                <span class="mobile-stat-value">{{user.note_moyenne ? (user.note_moyenne | number:'1.1-1') + '/20' : '-'}}</span>
+              </div>
+            </div>
+            <div class="mobile-actions">
+              <button class="btn-icon" title="Voir" (click)="viewUser(user)"><i class="fas fa-eye"></i></button>
+              <button class="btn-icon" title="Modifier" (click)="openUserModal(user)"><i class="fas fa-edit"></i></button>
+              <button class="btn-icon danger" title="Supprimer" (click)="confirmDelete(user)"><i class="fas fa-trash"></i></button>
             </div>
           </div>
         </div>
@@ -266,33 +350,387 @@
       
       <!-- Gestion de tous les comptes -->
       <div *ngSwitchCase="'comptes'" class="accounts-management">
-        <div class="panel">
-          <div class="panel-header">
-            <h3>Tous les comptes ({{allAccounts.length}})</h3>
+        <!-- Header avec actions -->
+        <div class="accounts-header">
+          <div class="header-content">
+            <h2><i class="fas fa-key"></i> Tous les comptes</h2>
+            <p>{{allAccounts.length}} comptes au total</p>
           </div>
-          <div class="panel-content">
-            <div class="accounts-table">
-              <div class="account-row header">
-                <div>Email</div>
-                <div>Mot de passe</div>
-                <div>Nom</div>
-                <div>Rôle</div>
-                <div>Statut</div>
-              </div>
-              <div class="account-row" *ngFor="let account of allAccounts">
-                <div data-label="Email:">{{account.email}}</div>
-                <div class="password-cell" data-label="Mot de passe:">
-                  <code *ngIf="account.role !== 'participant' && account.mot_de_passe_clair">{{account.mot_de_passe_clair}}</code>
-                  <span *ngIf="account.role === 'participant'" class="text-muted">
-                    <i class="fas fa-lock"></i> Privé
+          <div class="header-actions">
+            <button class="btn btn-outline" (click)="exportAccounts()"><i class="fas fa-download"></i> Exporter</button>
+            <button class="btn btn-primary" (click)="openUserModal()"><i class="fas fa-plus"></i> Nouveau compte</button>
+          </div>
+        </div>
+
+        <!-- Filtres -->
+        <div class="accounts-filters">
+          <div class="filter-group">
+            <button class="filter-btn" [class.active]="currentAccountFilter === 'all'" (click)="filterAccounts('all')">Tous ({{allAccounts.length}})</button>
+            <button class="filter-btn" [class.active]="currentAccountFilter === 'participant'" (click)="filterAccounts('participant')">Participants ({{participantsCount}})</button>
+            <button class="filter-btn" [class.active]="currentAccountFilter === 'correcteur'" (click)="filterAccounts('correcteur')">Correcteurs ({{correcteursCount}})</button>
+            <button class="filter-btn" [class.active]="currentAccountFilter === 'admin'" (click)="filterAccounts('admin')">Admins ({{adminsCount}})</button>
+          </div>
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Rechercher un compte..." (input)="onAccountSearch($event)">
+          </div>
+        </div>
+
+        <!-- Tableau des comptes -->
+        <div class="scroll-hint">
+          <i class="fas fa-arrows-alt-h"></i>
+          <span>Faites glisser pour voir toutes les colonnes</span>
+        </div>
+        <div class="accounts-table-container">
+          <table class="accounts-table">
+            <thead>
+              <tr>
+                <th>Utilisateur</th>
+                <th>Email</th>
+                <th>Mot de passe</th>
+                <th>Rôle</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let account of filteredAccounts" class="account-row">
+                <td>
+                  <div class="user-profile">
+                    <div class="user-avatar-small">{{account.prenom?.[0]}}{{account.nom?.[0]}}</div>
+                    <div class="user-details">
+                      <strong>{{account.prenom}} {{account.nom}}</strong>
+                      <span>Inscrit le {{account.created_at | date:'dd/MM/yyyy'}}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>{{account.email}}</td>
+                <td class="password-cell">
+                  <span *ngIf="!account.mot_de_passe_clair" class="text-muted">
+                    <i class="fas fa-lock"></i> Non disponible
                   </span>
-                  <button *ngIf="account.role !== 'participant' && account.mot_de_passe_clair" class="copy-btn" (click)="copyToClipboard(account.mot_de_passe_clair)">
-                    <i class="fas fa-copy"></i>
-                  </button>
-                </div>
-                <div data-label="Nom:">{{account.prenom}} {{account.nom}}</div>
-                <div data-label="Rôle:"><span class="role-badge role-{{account.role}}">{{account.role}}</span></div>
-                <div data-label="Statut:"><span class="status-{{account.email_verified ? 'verified' : 'pending'}}">{{account.email_verified ? 'Vérifié' : 'En attente'}}</span></div>
+                  <div *ngIf="account.mot_de_passe_clair" class="password-actions">
+                    <button class="copy-btn" (click)="copyToClipboard(account.mot_de_passe_clair)" title="Copier">
+                      <i class="fas fa-copy"></i>
+                    </button>
+                    <button class="show-btn" (click)="showPasswordPopup(account.mot_de_passe_clair)" title="Afficher">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                </td>
+                <td>
+                  <span class="role-badge role-{{account.role}}">{{account.role | titlecase}}</span>
+                </td>
+                <td>
+                  <span class="status-badge" [class.status-verified]="account.email_verified" [class.status-pending]="!account.email_verified">
+                    {{account.email_verified ? 'Vérifié' : 'En attente'}}
+                  </span>
+                </td>
+                <td>
+                  <div class="account-actions">
+                    <button class="btn-icon" title="Voir détails" (click)="viewUser(account)">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn-icon" title="Modifier" (click)="openUserModal(account)">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon danger" title="Supprimer" (click)="confirmDelete(account)">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+<!-- Modal Utilisateur -->
+<div class="modal-overlay" *ngIf="showUserModal" (click)="closeUserModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{selectedUser ? 'Modifier' : 'Nouvel'}} utilisateur</h3>
+      <button class="modal-close" (click)="closeUserModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Prénom *</label>
+          <input type="text" [(ngModel)]="userForm.prenom" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Nom *</label>
+          <input type="text" [(ngModel)]="userForm.nom" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" [(ngModel)]="userForm.email" class="form-control" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Veuillez entrer un email valide">
+        </div>
+        <div class="form-group">
+          <label>Téléphone *</label>
+          <input type="tel" [(ngModel)]="userForm.telephone" class="form-control" required pattern="[0-9+\-\s()]{8,15}" title="Numéro de téléphone valide (8-15 chiffres)">
+        </div>
+        <div class="form-group">
+          <label>Mot de passe *</label>
+          <div class="password-input-group">
+            <input type="text" [(ngModel)]="userForm.password" class="form-control" required placeholder="Laissez vide pour conserver l'actuel">
+            <button type="button" class="generate-btn" (click)="userForm.password = generatePassword()" title="Générer un nouveau mot de passe">
+              <i class="fas fa-sync"></i>
+            </button>
+            <button type="button" class="copy-btn" *ngIf="userForm.password" (click)="copyToClipboard(userForm.password)" title="Copier le mot de passe">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+          <small class="form-text" *ngIf="selectedUser">Laissez vide pour conserver le mot de passe actuel</small>
+        </div>
+        <div class="form-group">
+          <label>Rôle *</label>
+          <select [(ngModel)]="userForm.role" class="form-control">
+            <option value="participant">Participant</option>
+            <option value="correcteur">Correcteur</option>
+            <option value="admin">Administrateur</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" (click)="closeUserModal()">Annuler</button>
+      <button class="btn btn-primary" (click)="saveUser()">{{selectedUser ? 'Modifier' : 'Créer'}}</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Confirmation Suppression -->
+<div class="modal-overlay" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+  <div class="modal-content small" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Confirmer la suppression</h3>
+      <button class="modal-close" (click)="closeDeleteModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p>Êtes-vous sûr de vouloir supprimer l'utilisateur <strong>{{selectedUser?.prenom}} {{selectedUser?.nom}}</strong> ?</p>
+      <p class="warning-text">Cette action est irréversible.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" (click)="closeDeleteModal()">Annuler</button>
+      <button class="btn btn-danger" (click)="deleteUser()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Détails Utilisateur -->
+<div class="modal-overlay" *ngIf="showUserDetailsModal" (click)="closeUserDetailsModal()">
+  <div class="modal-content large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="fas fa-user"></i> Détails de l'utilisateur</h3>
+      <button class="modal-close" (click)="closeUserDetailsModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="user-details-grid">
+        <!-- Informations personnelles -->
+        <div class="details-section">
+          <h4><i class="fas fa-id-card"></i> Informations personnelles</h4>
+          <div class="details-card">
+            <div class="user-profile-large">
+              <div class="user-avatar-xl">{{selectedUser?.prenom?.[0]}}{{selectedUser?.nom?.[0]}}</div>
+              <div class="user-main-info">
+                <h3>{{selectedUser?.prenom}} {{selectedUser?.nom}}</h3>
+                <p>{{selectedUser?.email}}</p>
+                <span class="role-badge role-{{selectedUser?.role}}">{{selectedUser?.role | titlecase}}</span>
+              </div>
+            </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Téléphone:</span>
+                <span class="info-value">{{selectedUser?.telephone || 'Non renseigné'}}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Date d'inscription:</span>
+                <span class="info-value">{{selectedUser?.created_at | date:'dd/MM/yyyy à HH:mm'}}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Statut:</span>
+                <span class="status-badge status-active">Actif</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Dernière connexion:</span>
+                <span class="info-value">Il y a 2 heures</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="details-section">
+          <h4><i class="fas fa-chart-bar"></i> Statistiques</h4>
+          <div class="stats-cards">
+            <div class="stat-card-small">
+              <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+              <div class="stat-info">
+                <span class="stat-number">{{selectedUser?.nb_textes || 0}}</span>
+                <span class="stat-label">Textes soumis</span>
+              </div>
+            </div>
+            <div class="stat-card-small">
+              <div class="stat-icon"><i class="fas fa-star"></i></div>
+              <div class="stat-info">
+                <span class="stat-number">{{selectedUser?.note_moyenne ? (selectedUser?.note_moyenne | number:'1.1-1') + '/20' : 'N/A'}}</span>
+                <span class="stat-label">Note moyenne</span>
+              </div>
+            </div>
+            <div class="stat-card-small">
+              <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+              <div class="stat-info">
+                <span class="stat-number">-</span>
+                <span class="stat-label">Classement</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- Historique récent -->
+        <div class="details-section full-width" *ngIf="selectedUser?.role === 'participant'">
+          <h4><i class="fas fa-history"></i> Activité récente</h4>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon"><i class="fas fa-plus"></i></div>
+              <div class="activity-content">
+                <span class="activity-text">Soumission d'un nouveau texte</span>
+                <span class="activity-date">Il y a 2 jours</span>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon"><i class="fas fa-user"></i></div>
+              <div class="activity-content">
+                <span class="activity-text">Inscription au concours</span>
+                <span class="activity-date">Il y a 1 semaine</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" (click)="closeUserDetailsModal()">Fermer</button>
+      <button class="btn btn-primary" (click)="openUserModal(selectedUser)">Modifier</button>
+    </div>
+  </div>
+</div>
+
+      <!-- Évaluations -->
+      <div *ngSwitchCase="'evaluations'" class="evaluations-management">
+        <!-- Statistiques d'évaluation -->
+        <div class="evaluation-stats">
+          <div class="eval-stat-card pending">
+            <div class="eval-stat-icon"><i class="fas fa-clock"></i></div>
+            <div class="eval-stat-content">
+              <h3>{{textesEnAttente}}</h3>
+              <p>En attente d'évaluation</p>
+            </div>
+          </div>
+          <div class="eval-stat-card progress">
+            <div class="eval-stat-icon"><i class="fas fa-edit"></i></div>
+            <div class="eval-stat-content">
+              <h3>0</h3>
+              <p>En cours d'évaluation</p>
+            </div>
+          </div>
+          <div class="eval-stat-card completed">
+            <div class="eval-stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="eval-stat-content">
+              <h3>{{textesTermines}}</h3>
+              <p>Évaluations terminées</p>
+            </div>
+          </div>
+          <div class="eval-stat-card average">
+            <div class="eval-stat-icon"><i class="fas fa-star"></i></div>
+            <div class="eval-stat-content">
+              <h3>{{stats.note_moyenne ? (stats.note_moyenne | number:'1.1-1') : 'N/A'}}</h3>
+              <p>Note moyenne générale</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filtres d'évaluation -->
+        <div class="evaluation-filters">
+          <div class="filter-tabs">
+            <button class="filter-tab" [class.active]="currentEvaluationFilter === 'all'" (click)="filterEvaluations('all')">Tous les textes</button>
+            <button class="filter-tab" [class.active]="currentEvaluationFilter === 'en_attente'" (click)="filterEvaluations('en_attente')">En attente</button>
+            <button class="filter-tab" [class.active]="currentEvaluationFilter === 'termines'" (click)="filterEvaluations('termines')">Terminés</button>
+          </div>
+          <div class="evaluation-actions">
+            <button class="btn btn-primary" (click)="generateEvaluationReport()"><i class="fas fa-download"></i> Rapport</button>
+            <button class="btn btn-secondary" (click)="sendReminders()"><i class="fas fa-bell"></i> Relancer</button>
+          </div>
+        </div>
+
+        <!-- Liste des évaluations -->
+        <div class="evaluations-list">
+          <div class="evaluation-card" *ngFor="let texte of filteredTextes">
+            <div class="evaluation-header">
+              <div class="text-info">
+                <h4>{{texte.titre}}</h4>
+                <span class="author">par {{texte.prenom}} {{texte.nom}}</span>
+                <span class="language-tag">{{texte.langue | titlecase}}</span>
+              </div>
+              <div class="evaluation-status">
+                <span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span>
+                <span class="priority-badge" *ngIf="texte.statut === 'en_attente'">Priorité</span>
+              </div>
+            </div>
+            
+            <div class="evaluation-details">
+              <div class="detail-item">
+                <span class="label">Correcteur assigné:</span>
+                <span class="value">{{getAssignedCorrector(texte.user_id) || 'Non assigné'}}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">Date de soumission:</span>
+                <span class="value">{{texte.created_at | date:'dd/MM/yyyy à HH:mm'}}</span>
+              </div>
+              <div class="detail-item" *ngIf="texte.note">
+                <span class="label">Note attribuée:</span>
+                <span class="value note-display">{{texte.note}}/20</span>
+              </div>
+              <div class="detail-item" *ngIf="texte.commentaire">
+                <span class="label">Commentaire:</span>
+                <span class="value comment-preview">{{texte.commentaire | slice:0:100}}{{texte.commentaire?.length > 100 ? '...' : ''}}</span>
+              </div>
+            </div>
+            
+            <div class="evaluation-actions">
+              <button class="btn-action view" title="Voir le texte" (click)="viewTexte(texte)">
+                <i class="fas fa-eye"></i> Voir
+              </button>
+              <button class="btn-action edit" *ngIf="texte.statut === 'en_attente'" title="Évaluer" (click)="openEvaluationModal(texte)">
+                <i class="fas fa-edit"></i> Évaluer
+              </button>
+              <button class="btn-action history" title="Historique" (click)="viewHistory(texte)">
+                <i class="fas fa-history"></i> Historique
+              </button>
+              <button class="btn-action reassign" *ngIf="texte.statut === 'en_attente'" title="Réassigner" (click)="reassignTexte(texte)">
+                <i class="fas fa-user-edit"></i> Réassigner
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panneau de correction rapide -->
+        <div class="quick-correction-panel" *ngIf="textesEnAttente > 0">
+          <div class="panel-header">
+            <h3><i class="fas fa-bolt"></i> Correction rapide</h3>
+            <p>Textes en attente d'évaluation urgente</p>
+          </div>
+          <div class="quick-items">
+            <div class="quick-item" *ngFor="let texte of textesEnAttenteList.slice(0, 3)">
+              <div class="quick-text-info">
+                <strong>{{texte.titre}}</strong>
+                <span>{{texte.prenom}} {{texte.nom}}</span>
+              </div>
+              <div class="quick-actions">
+                <button class="btn btn-sm btn-primary" (click)="quickEvaluate(texte)">Évaluer maintenant</button>
               </div>
             </div>
           </div>
@@ -328,6 +766,805 @@
         </div>
       </div>
 
+      <!-- Statistiques -->
+      <div *ngSwitchCase="'statistiques'" class="statistics-management">
+        <!-- KPIs d'affectation -->
+        <div class="kpi-grid">
+          <div class="kpi-card primary">
+            <div class="kpi-icon"><i class="fas fa-users"></i></div>
+            <div class="kpi-content">
+              <h3>{{participants.length}}</h3>
+              <p>Participants inscrits</p>
+              <span class="kpi-trend up">Total</span>
+            </div>
+          </div>
+          <div class="kpi-card success">
+            <div class="kpi-icon"><i class="fas fa-user-check"></i></div>
+            <div class="kpi-content">
+              <h3>{{stats.affectation_stats?.participants_affectes || 0}}</h3>
+              <p>Participants affectés</p>
+              <span class="kpi-trend up">Assignés</span>
+            </div>
+          </div>
+          <div class="kpi-card warning">
+            <div class="kpi-icon"><i class="fas fa-user-times"></i></div>
+            <div class="kpi-content">
+              <h3>{{stats.affectation_stats?.participants_non_affectes || 0}}</h3>
+              <p>Participants non affectés</p>
+              <span class="kpi-trend down">À assigner</span>
+            </div>
+          </div>
+          <div class="kpi-card info">
+            <div class="kpi-icon"><i class="fas fa-user-tie"></i></div>
+            <div class="kpi-content">
+              <h3>{{correcteurs.length}}</h3>
+              <p>Correcteurs disponibles</p>
+              <span class="kpi-trend up">Actifs</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charge de travail des correcteurs -->
+        <div class="panel" *ngIf="stats.correcteurs_stats?.length > 0">
+          <div class="panel-header">
+            <h3><i class="fas fa-tasks"></i> Charge de travail des correcteurs</h3>
+          </div>
+          <div class="panel-content">
+            <div class="correcteurs-stats">
+              <div class="correcteur-card" *ngFor="let correcteur of stats.correcteurs_stats">
+                <div class="correcteur-info">
+                  <h4>{{correcteur.prenom}} {{correcteur.nom}}</h4>
+                </div>
+                <div class="correcteur-numbers">
+                  <div class="stat-item">
+                    <span class="stat-value">{{correcteur.participants_assignes}}</span>
+                    <span class="stat-label">Participants assignés</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-value">{{correcteur.textes_corriges}}</span>
+                    <span class="stat-label">Textes corrigés</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-value">{{correcteur.textes_restants}}</span>
+                    <span class="stat-label">Textes restants</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistiques générales -->
+        <div class="kpi-grid">
+          <div class="kpi-card success">
+            <div class="kpi-icon"><i class="fas fa-file-alt"></i></div>
+            <div class="kpi-content">
+              <h3>{{textes.length}}</h3>
+              <p>Textes soumis</p>
+              <span class="kpi-trend up">Total</span>
+            </div>
+          </div>
+          <div class="kpi-card warning">
+            <div class="kpi-icon"><i class="fas fa-star"></i></div>
+            <div class="kpi-content">
+              <h3>{{stats.note_moyenne ? (stats.note_moyenne | number:'1.1-1') : 'N/A'}}</h3>
+              <p>Note moyenne</p>
+              <span class="kpi-trend neutral">Globale</span>
+            </div>
+          </div>
+          <div class="kpi-card primary">
+            <div class="kpi-icon"><i class="fas fa-check"></i></div>
+            <div class="kpi-content">
+              <h3>{{stats.textes_acceptes || 0}}</h3>
+              <p>Textes acceptés</p>
+              <span class="kpi-trend up">Validés</span>
+            </div>
+          </div>
+          <div class="kpi-card info">
+            <div class="kpi-icon"><i class="fas fa-clock"></i></div>
+            <div class="kpi-content">
+              <h3>{{stats.textes_en_attente || 0}}</h3>
+              <p>En attente</p>
+              <span class="kpi-trend neutral">À évaluer</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Graphiques -->
+        <div class="charts-grid">
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4><i class="fas fa-chart-line"></i> Évolution des soumissions</h4>
+            </div>
+            <div class="line-chart">
+              <div class="chart-bars">
+                <div class="bar" style="height: 60%"><span>Jan</span></div>
+                <div class="bar" style="height: 80%"><span>Fév</span></div>
+                <div class="bar" style="height: 45%"><span>Mar</span></div>
+                <div class="bar" style="height: 90%"><span>Avr</span></div>
+                <div class="bar" style="height: 75%"><span>Mai</span></div>
+                <div class="bar" style="height: 95%"><span>Jun</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4><i class="fas fa-globe"></i> Répartition par langue</h4>
+            </div>
+            <div class="pie-chart">
+              <div class="pie-segment french" data-percentage="65">Français 65%</div>
+              <div class="pie-segment wolof" data-percentage="25">Wolof 25%</div>
+              <div class="pie-segment other" data-percentage="10">Autres 10%</div>
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4><i class="fas fa-chart-pie"></i> Taux d'acceptation</h4>
+            </div>
+            <div class="donut-chart">
+              <div class="donut-center">
+                <span class="donut-percentage">78%</span>
+                <span class="donut-label">Acceptés</span>
+              </div>
+              <div class="donut-segments">
+                <div class="segment accepted" style="--percentage: 78"></div>
+                <div class="segment rejected" style="--percentage: 22"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4><i class="fas fa-calendar-week"></i> Soumissions par jour</h4>
+            </div>
+            <div class="weekly-activity">
+              <div class="day-stats">
+                <div class="day-item">
+                  <span class="day-name">Lun</span>
+                  <div class="day-bar" style="height: 60%"></div>
+                  <span class="day-count">12</span>
+                </div>
+                <div class="day-item">
+                  <span class="day-name">Mar</span>
+                  <div class="day-bar" style="height: 80%"></div>
+                  <span class="day-count">16</span>
+                </div>
+                <div class="day-item">
+                  <span class="day-name">Mer</span>
+                  <div class="day-bar" style="height: 45%"></div>
+                  <span class="day-count">9</span>
+                </div>
+                <div class="day-item">
+                  <span class="day-name">Jeu</span>
+                  <div class="day-bar" style="height: 90%"></div>
+                  <span class="day-count">18</span>
+                </div>
+                <div class="day-item">
+                  <span class="day-name">Ven</span>
+                  <div class="day-bar" style="height: 70%"></div>
+                  <span class="day-count">14</span>
+                </div>
+                <div class="day-item">
+                  <span class="day-name">Sam</span>
+                  <div class="day-bar" style="height: 35%"></div>
+                  <span class="day-count">7</span>
+                </div>
+                <div class="day-item">
+                  <span class="day-name">Dim</span>
+                  <div class="day-bar" style="height: 25%"></div>
+                  <span class="day-count">5</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4><i class="fas fa-flag"></i> Répartition par nationalité</h4>
+            </div>
+            <div class="nationality-chart">
+              <div class="nationality-item">
+                <span class="nationality-flag">🇸🇳</span>
+                <span class="nationality-name">Sénégal</span>
+                <div class="nationality-bar">
+                  <div class="bar-fill" style="width: 85%"></div>
+                </div>
+                <span class="nationality-count">85%</span>
+              </div>
+              <div class="nationality-item">
+                <span class="nationality-flag">🇫🇷</span>
+                <span class="nationality-name">France</span>
+                <div class="nationality-bar">
+                  <div class="bar-fill" style="width: 8%"></div>
+                </div>
+                <span class="nationality-count">8%</span>
+              </div>
+              <div class="nationality-item">
+                <span class="nationality-flag">🇲🇱</span>
+                <span class="nationality-name">Mali</span>
+                <div class="nationality-bar">
+                  <div class="bar-fill" style="width: 4%"></div>
+                </div>
+                <span class="nationality-count">4%</span>
+              </div>
+              <div class="nationality-item">
+                <span class="nationality-flag">🌍</span>
+                <span class="nationality-name">Autres</span>
+                <div class="nationality-bar">
+                  <div class="bar-fill" style="width: 3%"></div>
+                </div>
+                <span class="nationality-count">3%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4><i class="fas fa-map-marker-alt"></i> Top villes</h4>
+            </div>
+            <div class="cities-chart">
+              <div class="city-item">
+                <span class="city-name">Dakar</span>
+                <div class="city-progress">
+                  <div class="progress-fill dakar" style="width: 45%"></div>
+                </div>
+                <span class="city-count">45%</span>
+              </div>
+              <div class="city-item">
+                <span class="city-name">Thiès</span>
+                <div class="city-progress">
+                  <div class="progress-fill thies" style="width: 15%"></div>
+                </div>
+                <span class="city-count">15%</span>
+              </div>
+              <div class="city-item">
+                <span class="city-name">Saint-Louis</span>
+                <div class="city-progress">
+                  <div class="progress-fill saint-louis" style="width: 12%"></div>
+                </div>
+                <span class="city-count">12%</span>
+              </div>
+              <div class="city-item">
+                <span class="city-name">Kaolack</span>
+                <div class="city-progress">
+                  <div class="progress-fill kaolack" style="width: 10%"></div>
+                </div>
+                <span class="city-count">10%</span>
+              </div>
+              <div class="city-item">
+                <span class="city-name">Ziguinchor</span>
+                <div class="city-progress">
+                  <div class="progress-fill ziguinchor" style="width: 8%"></div>
+                </div>
+                <span class="city-count">8%</span>
+              </div>
+              <div class="city-item">
+                <span class="city-name">Autres</span>
+                <div class="city-progress">
+                  <div class="progress-fill autres" style="width: 10%"></div>
+                </div>
+                <span class="city-count">10%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4><i class="fas fa-map"></i> Répartition par région</h4>
+            </div>
+            <div class="regions-map">
+              <div class="region-grid">
+                <div class="region-item high">
+                  <span class="region-name">Dakar</span>
+                  <span class="region-count">45%</span>
+                </div>
+                <div class="region-item medium">
+                  <span class="region-name">Thiès</span>
+                  <span class="region-count">18%</span>
+                </div>
+                <div class="region-item medium">
+                  <span class="region-name">Saint-Louis</span>
+                  <span class="region-count">15%</span>
+                </div>
+                <div class="region-item low">
+                  <span class="region-name">Casamance</span>
+                  <span class="region-count">12%</span>
+                </div>
+                <div class="region-item low">
+                  <span class="region-name">Kaolack</span>
+                  <span class="region-count">6%</span>
+                </div>
+                <div class="region-item very-low">
+                  <span class="region-name">Autres</span>
+                  <span class="region-count">4%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tableau de performance -->
+        <div class="performance-table">
+          <div class="panel">
+            <div class="panel-header">
+              <h3><i class="fas fa-trophy"></i> Top Participants</h3>
+            </div>
+            <div class="panel-content">
+              <div class="top-participants">
+                <div class="participant-row" *ngFor="let participant of participants.slice(0,5); let i = index">
+                  <div class="rank">{{i + 1}}</div>
+                  <div class="participant-info">
+                    <strong>{{participant.prenom}} {{participant.nom}}</strong>
+                    <span>{{participant.nb_textes || 0}} textes</span>
+                  </div>
+                  <div class="score">{{participant.note_moyenne ? (participant.note_moyenne | number:'1.1-1') + '/20' : 'N/A'}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div *ngSwitchCase="'messages'" class="messages-management">
+        <!-- Header avec actions -->
+        <div class="messages-header">
+          <div class="header-content">
+            <h2><i class="fas fa-envelope"></i> Gestion des messages</h2>
+            <p>{{messages.length}} messages envoyés</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" (click)="openMessageModal()"><i class="fas fa-plus"></i> Nouveau message</button>
+          </div>
+        </div>
+
+        <!-- Statistiques des messages -->
+        <div class="message-stats">
+          <div class="message-stat-card">
+            <div class="stat-icon"><i class="fas fa-paper-plane"></i></div>
+            <div class="stat-content">
+              <h3>{{messages.length}}</h3>
+              <p>Messages envoyés</p>
+            </div>
+          </div>
+          <div class="message-stat-card">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-content">
+              <h3>{{getTotalRecipients()}}</h3>
+              <p>Destinataires touchés</p>
+            </div>
+          </div>
+          <div class="message-stat-card">
+            <div class="stat-icon"><i class="fas fa-eye"></i></div>
+            <div class="stat-content">
+              <h3>{{getTotalReads()}}</h3>
+              <p>Messages lus</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Liste des messages -->
+        <div class="messages-list">
+          <div class="message-card" *ngFor="let message of messages">
+            <div class="message-card-header">
+              <div class="message-info">
+                <h4>{{message.subject}}</h4>
+                <span class="message-meta">{{message.created_at | date:'dd/MM/yyyy à HH:mm'}}</span>
+              </div>
+              <div class="message-stats">
+                <span class="recipients-count">{{message.total_recipients}} destinataires</span>
+                <span class="read-count">{{message.read_count}} lus</span>
+              </div>
+            </div>
+            
+            <div class="message-content">
+              <p>{{message.content | slice:0:150}}{{message.content?.length > 150 ? '...' : ''}}</p>
+            </div>
+            
+            <div class="message-actions">
+              <span class="message-type" *ngIf="message.send_to_all">Message collectif</span>
+              <span class="message-type" *ngIf="!message.send_to_all">Message individuel</span>
+              <div class="action-buttons">
+                <button class="btn-icon" title="Voir détails" (click)="viewMessage(message)">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn-icon danger" title="Supprimer" (click)="deleteMessage(message)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="no-messages" *ngIf="messages.length === 0">
+            <i class="fas fa-envelope-open"></i>
+            <h3>Aucun message envoyé</h3>
+            <p>Commencez par envoyer votre premier message aux utilisateurs</p>
+            <button class="btn btn-primary" (click)="openMessageModal()">Créer un message</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paramètres -->
+      <div *ngSwitchCase="'parametres'" class="settings-management">
+        <!-- Header -->
+        <div class="settings-header">
+          <div class="header-content">
+            <h2><i class="fas fa-cog"></i> Paramètres du système</h2>
+            <p>Configuration générale du concours de poésie</p>
+          </div>
+        </div>
+
+        <!-- Onglets de paramètres -->
+        <div class="settings-tabs">
+          <button class="settings-tab" [class.active]="currentSettingsTab === 'concours'" (click)="setSettingsTab('concours')">
+            <i class="fas fa-trophy"></i> Concours
+          </button>
+          <button class="settings-tab" [class.active]="currentSettingsTab === 'systeme'" (click)="setSettingsTab('systeme')">
+            <i class="fas fa-server"></i> Système
+          </button>
+          <button class="settings-tab" [class.active]="currentSettingsTab === 'notifications'" (click)="setSettingsTab('notifications')">
+            <i class="fas fa-bell"></i> Notifications
+          </button>
+          <button class="settings-tab" [class.active]="currentSettingsTab === 'apparence'" (click)="setSettingsTab('apparence')">
+            <i class="fas fa-palette"></i> Apparence
+          </button>
+          <button class="settings-tab" [class.active]="currentSettingsTab === 'securite'" (click)="setSettingsTab('securite')">
+            <i class="fas fa-shield-alt"></i> Sécurité
+          </button>
+        </div>
+
+        <!-- Contenu des paramètres -->
+        <div class="settings-content">
+          <!-- Paramètres du concours -->
+          <div class="settings-section" *ngIf="currentSettingsTab === 'concours'">
+            <div class="settings-card">
+              <div class="card-header">
+                <h3><i class="fas fa-calendar-alt"></i> Dates et délais</h3>
+              </div>
+              <div class="card-content">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Date de début des soumissions</label>
+                    <input type="date" [(ngModel)]="settings.start_date" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label>Date limite de soumission</label>
+                    <input type="date" [(ngModel)]="settings.end_date" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label>Date limite d'évaluation</label>
+                    <input type="date" [(ngModel)]="settings.evaluation_deadline" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label>Date d'annonce des résultats</label>
+                    <input type="date" [(ngModel)]="settings.results_date" class="form-control">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-card">
+              <div class="card-header">
+                <h3><i class="fas fa-file-alt"></i> Règles des textes</h3>
+              </div>
+              <div class="card-content">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Nombre maximum de vers par texte</label>
+                    <input type="number" [(ngModel)]="settings.max_verses" class="form-control" min="1" max="200">
+                  </div>
+                  <div class="form-group">
+                    <label>Nombre maximum de textes par participant</label>
+                    <input type="number" [(ngModel)]="settings.max_texts_per_user" class="form-control" min="1" max="10">
+                  </div>
+                  <div class="form-group">
+                    <label>Taille minimale d'un texte (caractères)</label>
+                    <input type="number" [(ngModel)]="settings.min_text_length" class="form-control" min="50">
+                  </div>
+                  <div class="form-group">
+                    <label>Taille maximale d'un texte (caractères)</label>
+                    <input type="number" [(ngModel)]="settings.max_text_length" class="form-control" min="100">
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label>Langues autorisées</label>
+                  <div class="checkbox-grid">
+                    <label class="checkbox-item">
+                      <input type="checkbox" [(ngModel)]="settings.languages.francais">
+                      <span class="checkmark"></span>
+                      Français
+                    </label>
+                    <label class="checkbox-item">
+                      <input type="checkbox" [(ngModel)]="settings.languages.wolof">
+                      <span class="checkmark"></span>
+                      Wolof
+                    </label>
+                    <label class="checkbox-item">
+                      <input type="checkbox" [(ngModel)]="settings.languages.arabe">
+                      <span class="checkmark"></span>
+                      Arabe
+                    </label>
+                    <label class="checkbox-item">
+                      <input type="checkbox" [(ngModel)]="settings.languages.anglais">
+                      <span class="checkmark"></span>
+                      Anglais
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-card">
+              <div class="card-header">
+                <h3><i class="fas fa-star"></i> Système de notation</h3>
+              </div>
+              <div class="card-content">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Note minimale</label>
+                    <input type="number" [(ngModel)]="settings.min_score" class="form-control" min="0" max="20">
+                  </div>
+                  <div class="form-group">
+                    <label>Note maximale</label>
+                    <input type="number" [(ngModel)]="settings.max_score" class="form-control" min="0" max="20">
+                  </div>
+                  <div class="form-group">
+                    <label>Note de passage</label>
+                    <input type="number" [(ngModel)]="settings.passing_score" class="form-control" min="0" max="20">
+                  </div>
+                  <div class="form-group">
+                    <label>Nombre de correcteurs par texte</label>
+                    <input type="number" [(ngModel)]="settings.correctors_per_text" class="form-control" min="1" max="5">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paramètres système -->
+          <div class="settings-section" *ngIf="currentSettingsTab === 'systeme'">
+            <div class="settings-card">
+              <div class="card-header">
+                <h3><i class="fas fa-database"></i> Base de données</h3>
+              </div>
+              <div class="card-content">
+                <div class="system-info">
+                  <div class="info-item">
+                    <span class="info-label">Nombre total d'utilisateurs:</span>
+                    <span class="info-value">{{users.length}}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Nombre de textes soumis:</span>
+                    <span class="info-value">{{textes.length}}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Messages envoyés:</span>
+                    <span class="info-value">{{messages.length}}</span>
+                  </div>
+                </div>
+                
+                <div class="system-actions">
+                  <button class="btn btn-outline" (click)="exportAllData()">
+                    <i class="fas fa-download"></i> Exporter toutes les données
+                  </button>
+                  <button class="btn btn-warning" (click)="clearCache()">
+                    <i class="fas fa-broom"></i> Vider le cache
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-card">
+              <div class="card-header">
+                <h3><i class="fas fa-tools"></i> Maintenance</h3>
+              </div>
+              <div class="card-content">
+                <div class="maintenance-options">
+                  <div class="maintenance-item">
+                    <div class="maintenance-info">
+                      <strong>Mode maintenance</strong>
+                      <p>Empêche les utilisateurs d'accéder au système</p>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" [(ngModel)]="settings.maintenance_mode">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                  
+                  <div class="maintenance-item">
+                    <div class="maintenance-info">
+                      <strong>Nouvelles inscriptions</strong>
+                      <p>Autoriser de nouveaux utilisateurs à s'inscrire</p>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" [(ngModel)]="settings.allow_registration">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                  
+                  <div class="maintenance-item">
+                    <div class="maintenance-info">
+                      <strong>Soumissions actives</strong>
+                      <p>Permettre aux participants de soumettre des textes</p>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" [(ngModel)]="settings.allow_submissions">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paramètres apparence -->
+          <div class="settings-section" *ngIf="currentSettingsTab === 'apparence'">
+            <div class="settings-card">
+              <div class="card-header">
+                <h3><i class="fas fa-paint-brush"></i> Thème de l'interface</h3>
+              </div>
+              <div class="card-content">
+                <div class="theme-selector">
+                  <div class="theme-option" 
+                       *ngFor="let theme of themes"
+                       [class.active]="currentTheme === theme.id" 
+                       (click)="selectTheme(theme.id)">
+                    <div class="theme-preview" [ngClass]="theme.id + '-preview'">
+                      <div class="preview-header" [style.background-color]="theme.primary"></div>
+                      <div class="preview-sidebar" [style.background-color]="theme.bg"></div>
+                      <div class="preview-content" [style.background-color]="theme.bg" [style.color]="theme.text"></div>
+                    </div>
+                    <div class="theme-info">
+                      <h4>{{theme.name}}</h4>
+                      <p>Interface {{theme.name.toLowerCase()}}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="settings-card">
+              <div class="card-header">
+                <h3><i class="fas fa-cog"></i> Options d'affichage</h3>
+              </div>
+              <div class="card-content">
+                <div class="display-options">
+                  <div class="display-item">
+                    <div class="display-info">
+                      <strong>Mode compact</strong>
+                      <p>Réduit l'espacement pour plus de contenu</p>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                  
+                  <div class="display-item">
+                    <div class="display-info">
+                      <strong>Animations</strong>
+                      <p>Active les animations de l'interface</p>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                  
+                  <div class="display-item">
+                    <div class="display-info">
+                      <strong>Menu réduit par défaut</strong>
+                      <p>Démarre avec le menu latéral réduit</p>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paramètres notifications -->
+          <div class="settings-section" *ngIf="currentSettingsTab === 'notifications'">
+            <div class="settings-card">
+              <div class="card-header">
+                <h3><i class="fas fa-envelope"></i> Notifications email</h3>
+              </div>
+              <div class="card-content">
+                <div class="form-group">
+                  <label>Email administrateur</label>
+                  <input type="email" [(ngModel)]="settings.admin_email" class="form-control">
+                </div>
+                
+                <div class="notification-options">
+                  <div class="notification-item">
+                    <label class="checkbox-item">
+                      <input type="checkbox" [(ngModel)]="settings.notifications.new_registration">
+                      <span class="checkmark"></span>
+                      Nouvelles inscriptions
+                    </label>
+                  </div>
+                  <div class="notification-item">
+                    <label class="checkbox-item">
+                      <input type="checkbox" [(ngModel)]="settings.notifications.new_submission">
+                      <span class="checkmark"></span>
+                      Nouvelles soumissions
+                    </label>
+                  </div>
+                  <div class="notification-item">
+                    <label class="checkbox-item">
+                      <input type="checkbox" [(ngModel)]="settings.notifications.evaluation_completed">
+                      <span class="checkmark"></span>
+                      Évaluations terminées
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paramètres sécurité -->
+          <div class="settings-section" *ngIf="currentSettingsTab === 'securite'">
+            <div class="settings-card">
+              <div class="card-header">
+                <h3><i class="fas fa-lock"></i> Politique de mot de passe</h3>
+              </div>
+              <div class="card-content">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Longueur minimale</label>
+                    <input type="number" [(ngModel)]="settings.password.min_length" class="form-control" min="6" max="20">
+                  </div>
+                  <div class="form-group">
+                    <label>Durée de validité (jours)</label>
+                    <input type="number" [(ngModel)]="settings.password.validity_days" class="form-control" min="30">
+                  </div>
+                </div>
+                
+                <div class="security-options">
+                  <div class="security-item">
+                    <label class="checkbox-item">
+                      <input type="checkbox" [(ngModel)]="settings.password.require_uppercase">
+                      <span class="checkmark"></span>
+                      Exiger des majuscules
+                    </label>
+                  </div>
+                  <div class="security-item">
+                    <label class="checkbox-item">
+                      <input type="checkbox" [(ngModel)]="settings.password.require_numbers">
+                      <span class="checkmark"></span>
+                      Exiger des chiffres
+                    </label>
+                  </div>
+                  <div class="security-item">
+                    <label class="checkbox-item">
+                      <input type="checkbox" [(ngModel)]="settings.password.require_special">
+                      <span class="checkmark"></span>
+                      Exiger des caractères spéciaux
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions globales -->
+        <div class="settings-actions">
+          <button class="btn btn-outline" (click)="resetSettings()">
+            <i class="fas fa-undo"></i> Réinitialiser
+          </button>
+          <button class="btn btn-primary" (click)="saveSettings()">
+            <i class="fas fa-save"></i> Sauvegarder les paramètres
+          </button>
+        </div>
+      </div>
+
       <!-- Autres vues -->
       <div *ngSwitchDefault class="coming-soon">
         <div class="coming-soon-content">
@@ -342,4 +1579,123 @@
   
   <!-- Notifications temps réel temporairement désactivées -->
   <!-- <app-realtime-notifications></app-realtime-notifications> -->
+</div>
+
+<!-- Modal Nouveau Message -->
+<div class="modal-overlay" *ngIf="showMessageModal" (click)="closeMessageModal()">
+  <div class="modal-content large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="fas fa-envelope"></i> Nouveau message</h3>
+      <button class="modal-close" (click)="closeMessageModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="message-form">
+        <div class="form-group">
+          <label>Sujet du message *</label>
+          <input type="text" [(ngModel)]="messageForm.subject" class="form-control" placeholder="Objet du message" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Type d'envoi *</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" [(ngModel)]="messageForm.sendToAll" [value]="true" name="sendType">
+              <span class="radio-label">
+                <i class="fas fa-users"></i>
+                Envoyer à tous les utilisateurs
+              </span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" [(ngModel)]="messageForm.sendToAll" [value]="false" name="sendType">
+              <span class="radio-label">
+                <i class="fas fa-user"></i>
+                Sélectionner des destinataires
+              </span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group" *ngIf="!messageForm.sendToAll">
+          <label>Destinataires</label>
+          <div class="recipients-selector">
+            <div class="filter-recipients">
+              <button class="filter-btn" [class.active]="recipientFilter === 'all'" (click)="filterRecipients('all')">Tous</button>
+              <button class="filter-btn" [class.active]="recipientFilter === 'participant'" (click)="filterRecipients('participant')">Participants</button>
+              <button class="filter-btn" [class.active]="recipientFilter === 'correcteur'" (click)="filterRecipients('correcteur')">Correcteurs</button>
+              <button class="filter-btn" [class.active]="recipientFilter === 'admin'" (click)="filterRecipients('admin')">Admins</button>
+            </div>
+            <div class="recipients-list">
+              <label class="recipient-item" *ngFor="let recipient of filteredRecipients">
+                <input type="checkbox" [(ngModel)]="recipient.selected">
+                <span class="recipient-info">
+                  <strong>{{recipient.prenom}} {{recipient.nom}}</strong>
+                  <small>{{recipient.email}} - {{recipient.role | titlecase}}</small>
+                </span>
+              </label>
+            </div>
+            <div class="selected-count" *ngIf="getSelectedRecipientsCount() > 0">
+              {{getSelectedRecipientsCount()}} destinataire(s) sélectionné(s)
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Contenu du message *</label>
+          <textarea [(ngModel)]="messageForm.content" class="form-control" rows="6" placeholder="Tapez votre message ici..." required></textarea>
+          <small class="char-count">{{messageForm.content.length || 0}} caractères</small>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" (click)="closeMessageModal()">Annuler</button>
+      <button class="btn btn-primary" (click)="sendMessage()" [disabled]="!canSendMessage()">
+        <i class="fas fa-paper-plane"></i> Envoyer le message
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Évaluation -->
+<div class="modal-overlay" *ngIf="showEvaluationModal" (click)="closeEvaluationModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="fas fa-star"></i> Évaluer le texte</h3>
+      <button class="modal-close" (click)="closeEvaluationModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="evaluation-text-info">
+        <h4>{{selectedTexte?.titre}}</h4>
+        <p>par {{selectedTexte?.prenom}} {{selectedTexte?.nom}} - {{selectedTexte?.langue | titlecase}}</p>
+        <div class="text-preview">
+          <strong>Extrait du texte:</strong>
+          <p>{{selectedTexte?.contenu | slice:0:200}}{{selectedTexte?.contenu?.length > 200 ? '...' : ''}}</p>
+        </div>
+      </div>
+      
+      <div class="evaluation-form">
+        <div class="form-group">
+          <label>Note sur 20 *</label>
+          <input type="number" [(ngModel)]="evaluationForm.note" class="form-control" min="0" max="20" step="0.5" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Statut *</label>
+          <select [(ngModel)]="evaluationForm.statut" class="form-control" required>
+            <option value="en_attente">En attente</option>
+            <option value="accepte">Accepté</option>
+            <option value="refuse">Refusé</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Commentaire d'évaluation</label>
+          <textarea [(ngModel)]="evaluationForm.commentaire" class="form-control" rows="4" placeholder="Commentaires sur le texte, suggestions d'amélioration..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" (click)="closeEvaluationModal()">Annuler</button>
+      <button class="btn btn-primary" (click)="saveEvaluation()">Sauvegarder l'évaluation</button>
+    </div>
+  </div>
 </div>

@@ -3,7 +3,7 @@
   <!-- Overlay pour fermer le menu -->
   <div class="mobile-overlay" *ngIf="mobileMenuOpen" (click)="toggleMobileMenu()"></div>
   
-  <nav class="sidebar" [class.mobile-active]="mobileMenuOpen" [class.sidebar-hidden]="desktopMenuHidden">
+  <nav class="sidebar" [class.mobile-active]="mobileMenuOpen" [class.sidebar-hidden]="desktopMenuHidden" (mouseleave)="closeMobileMenuOnLeave()">
     <div class="logo">
       <h2>CP2i</h2>
       <p>Espace Correcteur</p>
@@ -13,8 +13,8 @@
       <div class="user-avatar">
         <i class="fas fa-user-tie"></i>
       </div>
-      <h4>Dr. Fatou Sow</h4>
-      <p>Correcteur Senior</p>
+      <h4>{{currentUser?.prenom}} {{currentUser?.nom}}</h4>
+      <p>{{currentUser?.role | titlecase}}</p>
     </div>
     
     <div class="nav-menu">

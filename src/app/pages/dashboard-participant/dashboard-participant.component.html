@@ -3,7 +3,7 @@
   <!-- Overlay pour fermer le menu -->
   <div class="mobile-overlay" *ngIf="mobileMenuOpen" (click)="toggleMobileMenu()"></div>
   
-  <nav class="sidebar" [class.mobile-active]="mobileMenuOpen" [class.sidebar-hidden]="desktopMenuHidden">
+  <nav class="sidebar" [class.mobile-active]="mobileMenuOpen" [class.sidebar-hidden]="desktopMenuHidden" (mouseleave)="closeMobileMenuOnLeave()">
     <div class="logo">
       <h2>CP2i</h2>
       <p>Concours de Poésie</p>

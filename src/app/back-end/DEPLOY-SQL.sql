@@ -55,9 +55,9 @@ CREATE TABLE IF NOT EXISTS cp2i_affectations (
     participant_id INT NOT NULL,
     corrector_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_participant (participant_id),
     FOREIGN KEY (participant_id) REFERENCES cp2i_users(id) ON DELETE CASCADE,
-    FOREIGN KEY (corrector_id) REFERENCES cp2i_users(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_affectation (participant_id, corrector_id)
+    FOREIGN KEY (corrector_id) REFERENCES cp2i_users(id) ON DELETE CASCADE
 );
 
 -- 6. INDEX POUR OPTIMISER LES PERFORMANCES

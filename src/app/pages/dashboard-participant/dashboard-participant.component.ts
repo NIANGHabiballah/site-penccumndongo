@@ -182,4 +182,10 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   closeChat() {
     this.chatOpen = false;
   }
+
+  closeMobileMenuOnLeave() {
+    if (window.innerWidth <= 768) {
+      this.mobileMenuOpen = false;
+    }
+  }
 }

@@ -2,6 +2,34 @@
 require_once 'config.php';
 setCorsHeaders();
 
+// Fonction centralisée pour gérer les mots de passe
+function setUserPassword($db, $userId, $plainPassword, $role) {
+    $hashedPassword = password_hash($plainPassword, PASSWORD_DEFAULT);
+    $plainPasswordToStore = ($role === 'admin' || $role === 'correcteur') ? $plainPassword : null;
+    
+    $stmt = $db->prepare("UPDATE cp2i_users SET password = ?, plain_password = ? WHERE id = ?");
+    return $stmt->execute([$hashedPassword, $plainPasswordToStore, $userId]);
+}
+
+// Fonction pour créer un utilisateur avec mot de passe cohérent
+function createUserWithPassword($db, $userData) {
+    $hashedPassword = password_hash($userData['password'], PASSWORD_DEFAULT);
+    $plainPasswordToStore = ($userData['role'] === 'admin' || $userData['role'] === 'correcteur') ? $userData['password'] : null;
+    
+    $stmt = $db->prepare("INSERT INTO cp2i_users (email, password, nom, prenom, telephone, role, email_verified, verification_token, plain_password, created_at) VALUES (?, ?, ?, ?, ?, ?, FALSE, ?, ?, NOW())");
+    
+    return $stmt->execute([
+        $userData['email'], 
+        $hashedPassword, 
+        $userData['nom'], 
+        $userData['prenom'], 
+        $userData['telephone'], 
+        $userData['role'], 
+        $userData['verification_token'],
+        $plainPasswordToStore
+    ]);
+}
+
 $method = $_SERVER['REQUEST_METHOD'];
 $input = json_decode(file_get_contents('php://input'), true);
 
@@ -45,14 +73,24 @@ function registerUser($data) {
     // Générer token de vérification
     $verificationToken = bin2hex(random_bytes(32));
     
-    // Créer l'utilisateur
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-    $stmt = $db->prepare("INSERT INTO cp2i_users (email, password, nom, prenom, telephone, role, email_verified, verification_token, created_at) VALUES (?, ?, ?, ?, ?, ?, FALSE, ?, NOW())");
+    // Créer l'utilisateur avec mot de passe cohérent
+    $userData = [
+        'email' => $email,
+        'password' => $password,
+        'nom' => $nom,
+        'prenom' => $prenom,
+        'telephone' => $telephone,
+        'role' => $role,
+        'verification_token' => $verificationToken
+    ];
     
-    if ($stmt->execute([$email, $hashedPassword, $nom, $prenom, $telephone, $role, $verificationToken])) {
+    if (createUserWithPassword($db, $userData)) {
         // Enregistrer l'inscription dans l'historique
         $userId = $db->lastInsertId();
         logAction($userId, 'register', 'Inscription utilisateur');
+        
+        // Log pour confirmation
+        error_log("User created with consistent password: $email");
         
         // Envoyer email de vérification
         sendVerificationEmail($email, $nom, $prenom, $verificationToken);

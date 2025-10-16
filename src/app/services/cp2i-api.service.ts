@@ -147,4 +147,72 @@ export class Cp2iApiService {
       token, email, password
     });
   }
+
+  updateUser(userId: number, userData: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/cp2i-accounts.php`, 
+      { id: userId, ...userData }, 
+      { headers: this.getHeaders() }
+    );
+  }
+
+  deleteUser(userId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/cp2i-accounts.php?id=${userId}`, 
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // Méthodes d'évaluation
+  getEvaluations(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-evaluations.php?action=list`, { headers: this.getHeaders() });
+  }
+
+  saveEvaluation(evaluationData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cp2i-evaluations.php?action=evaluate`, 
+      evaluationData, 
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getEvaluationHistory(texteId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-evaluations.php?action=history&texte_id=${texteId}`, 
+      { headers: this.getHeaders() }
+    );
+  }
+
+  reassignTexte(participantId: number, correctorId: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cp2i-evaluations.php?action=reassign`, 
+      { participant_id: participantId, corrector_id: correctorId }, 
+      { headers: this.getHeaders() }
+    );
+  }
+
+  sendEvaluationReminders(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cp2i-evaluations.php?action=send_reminders`, 
+      {}, 
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // Méthodes de messagerie
+  getMessages(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-dashboard.php?action=messages`, { headers: this.getHeaders() });
+  }
+
+  getRecipients(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-dashboard.php?action=recipients`, { headers: this.getHeaders() });
+  }
+
+  sendMessage(messageData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cp2i-dashboard.php?action=send_message`, 
+      messageData, 
+      { headers: this.getHeaders() }
+    );
+  }
+
+  deleteMessage(messageId: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cp2i-dashboard.php?action=delete_message`, 
+      { message_id: messageId }, 
+      { headers: this.getHeaders() }
+    );
+  }
 }
