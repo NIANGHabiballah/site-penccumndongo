@@ -29,6 +29,13 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .trend.down { color: #dc3545; }
 
 .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+
+@media (max-width: 1024px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
 .panel { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 .panel-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
 .panel-header h3 { font-size: 18px; font-weight: 600; color: #333; margin: 0; }
@@ -137,6 +144,17 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .desktop-toggle { display: none; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 1rem; padding-top: 1rem; }
 .sidebar-hidden { width: 0; overflow: hidden; transition: width 0.3s ease; }
 .container.sidebar-collapsed .main-content { margin-left: 0; }
+
+/* Tablettes */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 260px;
+  }
+  
+  .main-content {
+    padding: 1rem 1.5rem;
+  }
+}
 
 @media (min-width: 769px) {
   .desktop-toggle { display: block !important; }
@@ -452,21 +470,62 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
   }
   
   .texts-table {
-    grid-template-columns: 1fr;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .text-row {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #eee;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background: white;
+  }
+  
+  .text-row.header {
+    display: none;
   }
   
   .text-row > div {
-    grid-column: 1;
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .text-row > div:before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #666;
+    min-width: 100px;
   }
   
   .assignment-form {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
   
   .assignment-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  .stat-card {
+    padding: 1.5rem 1rem;
+    min-height: 120px;
+  }
+  
+  .stat-card .number {
+    font-size: 1.8rem;
   }
 }
 
@@ -562,11 +621,42 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 
 @media (max-width: 768px) {
   .accounts-table {
-    grid-template-columns: 1fr;
+    display: block;
+  }
+  
+  .account-row {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #eee;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background: white;
+  }
+  
+  .account-row.header {
+    display: none;
   }
   
   .account-row > div {
-    grid-column: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .account-row > div:before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #666;
+    min-width: 80px;
+  }
+  
+  .password-cell {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 }
 
@@ -684,5 +774,15 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
   .action-badge {
     font-size: 0.7rem;
     padding: 0.2rem 0.4rem;
+  }
+  
+  .quick-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .quick-actions .btn {
+    width: 100%;
+    justify-content: center;
   }
 }

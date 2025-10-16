@@ -200,12 +200,12 @@
                 <div>Date</div>
               </div>
               <div class="text-row" *ngFor="let texte of textes">
-                <div class="text-title">{{texte.titre}}</div>
-                <div>{{texte.prenom}} {{texte.nom}}</div>
-                <div>{{texte.langue | titlecase}}</div>
-                <div><span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span></div>
-                <div>{{texte.note ? (texte.note + '/20') : '-'}}</div>
-                <div>{{texte.created_at | date:'dd/MM/yyyy'}}</div>
+                <div class="text-title" data-label="Titre:">{{texte.titre}}</div>
+                <div data-label="Auteur:">{{texte.prenom}} {{texte.nom}}</div>
+                <div data-label="Langue:">{{texte.langue | titlecase}}</div>
+                <div data-label="Statut:"><span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span></div>
+                <div data-label="Note:">{{texte.note ? (texte.note + '/20') : '-'}}</div>
+                <div data-label="Date:">{{texte.created_at | date:'dd/MM/yyyy'}}</div>
               </div>
             </div>
           </div>
@@ -280,8 +280,8 @@
                 <div>Statut</div>
               </div>
               <div class="account-row" *ngFor="let account of allAccounts">
-                <div>{{account.email}}</div>
-                <div class="password-cell">
+                <div data-label="Email:">{{account.email}}</div>
+                <div class="password-cell" data-label="Mot de passe:">
                   <code *ngIf="account.role !== 'participant' && account.mot_de_passe_clair">{{account.mot_de_passe_clair}}</code>
                   <span *ngIf="account.role === 'participant'" class="text-muted">
                     <i class="fas fa-lock"></i> Privé
@@ -290,9 +290,9 @@
                     <i class="fas fa-copy"></i>
                   </button>
                 </div>
-                <div>{{account.prenom}} {{account.nom}}</div>
-                <div><span class="role-badge role-{{account.role}}">{{account.role}}</span></div>
-                <div><span class="status-{{account.email_verified ? 'verified' : 'pending'}}">{{account.email_verified ? 'Vérifié' : 'En attente'}}</span></div>
+                <div data-label="Nom:">{{account.prenom}} {{account.nom}}</div>
+                <div data-label="Rôle:"><span class="role-badge role-{{account.role}}">{{account.role}}</span></div>
+                <div data-label="Statut:"><span class="status-{{account.email_verified ? 'verified' : 'pending'}}">{{account.email_verified ? 'Vérifié' : 'En attente'}}</span></div>
               </div>
             </div>
           </div>
