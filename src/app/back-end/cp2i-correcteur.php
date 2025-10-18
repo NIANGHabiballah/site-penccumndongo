@@ -8,7 +8,7 @@ $action = $_GET['action'] ?? '';
 if ($method === 'GET') {
     $user = verifyToken();
     
-    if ($user['role'] !== 'correcteur') {
+    if (!$user || $user['role'] !== 'correcteur') {
         http_response_code(403);
         echo json_encode(['error' => 'Accès refusé']);
         exit;
@@ -33,7 +33,7 @@ if ($method === 'GET') {
 if ($method === 'POST') {
     $user = verifyToken();
     
-    if ($user['role'] !== 'correcteur') {
+    if (!$user || $user['role'] !== 'correcteur') {
         http_response_code(403);
         echo json_encode(['error' => 'Accès refusé']);
         exit;

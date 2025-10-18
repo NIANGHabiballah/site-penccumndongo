@@ -157,20 +157,20 @@
             
             <div class="criteria-grid">
               <div class="criteria-item">
-                <span class="criteria-name">Originalité</span>
-                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.originalite" class="rating-input">
+                <span class="criteria-name">Pertinence</span>
+                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.pertinence" class="rating-input">
               </div>
               <div class="criteria-item">
-                <span class="criteria-name">Style & Forme</span>
-                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.style" class="rating-input">
+                <span class="criteria-name">Cohérence</span>
+                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.coherence" class="rating-input">
               </div>
               <div class="criteria-item">
-                <span class="criteria-name">Respect du Thème</span>
-                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.theme" class="rating-input">
+                <span class="criteria-name">Correction de la langue</span>
+                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.correction" class="rating-input">
               </div>
               <div class="criteria-item">
-                <span class="criteria-name">Technique</span>
-                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.technique" class="rating-input">
+                <span class="criteria-name">Présentation</span>
+                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.presentation" class="rating-input">
               </div>
             </div>
             
@@ -263,24 +263,64 @@
         <h2>Guide de correction</h2>
         <div class="guide-content">
           <div class="guide-section">
-            <h3>Critères d'évaluation</h3>
-            <div class="criteria-guide">
-              <div class="criteria-item">
-                <h4>Originalité (0-5 points)</h4>
-                <p>Caractère novateur, créativité, approche personnelle du thème.</p>
+            <h3><i class="fas fa-clipboard-check"></i> Grille d'évaluation officielle CP2i</h3>
+            <div class="evaluation-grid">
+              <div class="eval-card">
+                <div class="eval-header">
+                  <span class="eval-number">1</span>
+                  <h4>Pertinence</h4>
+                  <span class="eval-points">5 points</span>
+                </div>
+                <div class="eval-items">
+                  <div class="eval-item"><span class="points">2 pts</span> Idée générale du thème rendue et respectée</div>
+                  <div class="eval-item"><span class="points">2 pts</span> Ordre des idées bien respecté</div>
+                  <div class="eval-item"><span class="points">1 pt</span> Transitions bien aménagées</div>
+                </div>
               </div>
-              <div class="criteria-item">
-                <h4>Style & Forme (0-5 points)</h4>
-                <p>Maîtrise de la langue, richesse du vocabulaire, structure poétique.</p>
+              
+              <div class="eval-card">
+                <div class="eval-header">
+                  <span class="eval-number">2</span>
+                  <h4>Cohérence</h4>
+                  <span class="eval-points">5 points</span>
+                </div>
+                <div class="eval-items">
+                  <div class="eval-item"><span class="points">1 pt</span> Connecteurs appropriés utilisés</div>
+                  <div class="eval-item"><span class="points">2 pts</span> Unité du thème - poème centré</div>
+                  <div class="eval-item"><span class="points">2 pts</span> Cohérence des idées</div>
+                </div>
               </div>
-              <div class="criteria-item">
-                <h4>Respect du Thème (0-5 points)</h4>
-                <p>Adéquation avec le thème "Espoir", pertinence du message.</p>
+              
+              <div class="eval-card">
+                <div class="eval-header">
+                  <span class="eval-number">3</span>
+                  <h4>Correction de la langue</h4>
+                  <span class="eval-points">5 points</span>
+                </div>
+                <div class="eval-items">
+                  <div class="eval-item"><span class="points">2 pts</span> Syntaxe correcte</div>
+                  <div class="eval-item"><span class="points">1 pt</span> Règles d'orthographe appliquées</div>
+                  <div class="eval-item"><span class="points">1 pt</span> Accords grammaticaux respectés</div>
+                  <div class="eval-item"><span class="points">1 pt</span> Vocabulaire approprié employé</div>
+                </div>
               </div>
-              <div class="criteria-item">
-                <h4>Technique (0-5 points)</h4>
-                <p>Rythme, rimes, métrique, figures de style.</p>
+              
+              <div class="eval-card">
+                <div class="eval-header">
+                  <span class="eval-number">4</span>
+                  <h4>Présentation</h4>
+                  <span class="eval-points">5 points</span>
+                </div>
+                <div class="eval-items">
+                  <div class="eval-item"><span class="points">2 pts</span> Structuration strophes et composition vers</div>
+                  <div class="eval-item"><span class="points">1 pt</span> Rythme (diérèse, synérèse, enjambement...)</div>
+                  <div class="eval-item"><span class="points">1 pt</span> Sons (rime, assonance, allitération...)</div>
+                  <div class="eval-item"><span class="points">1 pt</span> Utilisation des figures de style</div>
+                </div>
               </div>
+            </div>
+            <div class="total-eval">
+              <strong>TOTAL : 20 Points</strong>
             </div>
           </div>
           

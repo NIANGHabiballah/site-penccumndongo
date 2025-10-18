@@ -29,10 +29,10 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
   
   // Évaluation
   evaluationForm = {
-    originalite: 0,
-    style: 0,
-    theme: 0,
-    technique: 0,
+    pertinence: 0,
+    coherence: 0,
+    correction: 0,
+    presentation: 0,
     commentaire: '',
     statut: 'en_attente'
   };
@@ -185,10 +185,10 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
   loadEvaluationForm() {
     if (this.currentTexte) {
       this.evaluationForm = {
-        originalite: this.currentTexte.eval_originalite || 0,
-        style: this.currentTexte.eval_style || 0,
-        theme: this.currentTexte.eval_theme || 0,
-        technique: this.currentTexte.eval_technique || 0,
+        pertinence: this.currentTexte.eval_pertinence || 0,
+        coherence: this.currentTexte.eval_coherence || 0,
+        correction: this.currentTexte.eval_correction || 0,
+        presentation: this.currentTexte.eval_presentation || 0,
         commentaire: this.currentTexte.commentaire || '',
         statut: this.currentTexte.statut || 'en_attente'
       };
@@ -197,8 +197,8 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
 
   // Évaluation
   calculateTotal(): number {
-    return this.evaluationForm.originalite + this.evaluationForm.style + 
-           this.evaluationForm.theme + this.evaluationForm.technique;
+    return this.evaluationForm.pertinence + this.evaluationForm.coherence + 
+           this.evaluationForm.correction + this.evaluationForm.presentation;
   }
 
   saveDraft() {
@@ -206,10 +206,10 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
     
     const evaluationData = {
       texte_id: this.currentTexte.id,
-      originalite: this.evaluationForm.originalite,
-      style: this.evaluationForm.style,
-      theme: this.evaluationForm.theme,
-      technique: this.evaluationForm.technique,
+      pertinence: this.evaluationForm.pertinence,
+      coherence: this.evaluationForm.coherence,
+      correction: this.evaluationForm.correction,
+      presentation: this.evaluationForm.presentation,
       note: this.calculateTotal(),
       commentaire: this.evaluationForm.commentaire,
       statut: 'brouillon'
@@ -236,10 +236,10 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
     
     const evaluationData = {
       texte_id: this.currentTexte.id,
-      originalite: this.evaluationForm.originalite,
-      style: this.evaluationForm.style,
-      theme: this.evaluationForm.theme,
-      technique: this.evaluationForm.technique,
+      pertinence: this.evaluationForm.pertinence,
+      coherence: this.evaluationForm.coherence,
+      correction: this.evaluationForm.correction,
+      presentation: this.evaluationForm.presentation,
       note: this.calculateTotal(),
       commentaire: this.evaluationForm.commentaire,
       statut: this.calculateTotal() >= 10 ? 'accepte' : 'refuse'
