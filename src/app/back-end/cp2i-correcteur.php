@@ -16,13 +16,13 @@ if ($method === 'GET') {
     
     switch ($action) {
         case 'textes':
-            getCorrecteurTexts($user['id']);
+            getCorrecteurTexts($user['user_id']);
             break;
         case 'messages':
-            getCorrecteurMessages($user['id']);
+            getCorrecteurMessages($user['user_id']);
             break;
         case 'history':
-            getCorrecteurHistory($user['id']);
+            getCorrecteurHistory($user['user_id']);
             break;
         default:
             http_response_code(400);

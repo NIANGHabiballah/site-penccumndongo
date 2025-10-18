@@ -26,17 +26,20 @@ function getSimpleStats($user) {
     $stats['textes_en_attente'] = 5;
     $stats['note_moyenne'] = null;
     
-    // Textes simples
+    // Textes avec affectations
     $stmt = $db->prepare("
         SELECT 
             t.id as texte_id,
             t.titre,
             t.statut,
             CONCAT(u.prenom, ' ', u.nom) as auteur_nom_complet,
-            0 as nb_correcteurs,
-            '' as correcteurs_noms
+            COUNT(a.corrector_id) as nb_correcteurs,
+            COALESCE(GROUP_CONCAT(CONCAT(c.prenom, ' ', c.nom) SEPARATOR ', '), '') as correcteurs_noms
         FROM cp2i_textes t
         JOIN cp2i_users u ON t.user_id = u.id
+        LEFT JOIN cp2i_affectations a ON t.id = a.texte_id
+        LEFT JOIN cp2i_users c ON a.corrector_id = c.id
+        GROUP BY t.id, t.titre, t.statut, u.prenom, u.nom
     ");
     $stmt->execute();
     $textes_affectations = $stmt->fetchAll(PDO::FETCH_ASSOC);
