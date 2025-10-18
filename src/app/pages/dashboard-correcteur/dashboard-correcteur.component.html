@@ -47,7 +47,7 @@
       <div class="nav-item" [class.active]="currentView === 'messages'" (click)="setCurrentView('messages'); $event.preventDefault(); $event.stopPropagation()">
         <i class="fas fa-envelope"></i>
         <span>Messages Admin</span>
-        <span class="notification-badge" *ngIf="messages.length > 0">{{messages.length}}</span>
+        <span class="notification-badge" *ngIf="getUnreadMessagesCount() > 0">{{getUnreadMessagesCount()}}</span>
       </div>
       <div class="nav-item" [class.active]="currentView === 'guide'" (click)="setCurrentView('guide'); $event.preventDefault(); $event.stopPropagation()">
         <i class="fas fa-book"></i>
@@ -237,16 +237,15 @@
       <div *ngSwitchCase="'messages'" class="messages">
         <h2>Messages de l'administration</h2>
         <div class="messages-list" *ngIf="messages.length > 0; else noMessages">
-          <div class="message-item" *ngFor="let message of messages">
-            <div class="message-header">
-              <h4>{{message.subject}}</h4>
-              <span class="message-date">{{message.created_at | date:'dd/MM/yyyy à HH:mm'}}</span>
-            </div>
-            <div class="message-content">
-              <p>{{message.content}}</p>
-            </div>
-            <div class="message-sender">
-              <small>De: {{message.sender_prenom}} {{message.sender_nom}}</small>
+          <div class="message-item compact" *ngFor="let message of messages" [class.unread]="!message.read_at" (click)="readMessage(message)">
+            <div class="message-compact">
+              <div class="message-title">
+                <span *ngIf="!message.read_at" class="unread-dot"></span>
+                {{message.subject}}
+              </div>
+              <div class="message-date">{{message.created_at | date:'dd/MM/yyyy'}}</div>
+              <div class="message-preview">{{message.content | slice:0:60}}{{message.content?.length > 60 ? '...' : ''}}</div>
+              <div class="message-sender">De: {{message.sender_prenom}} {{message.sender_nom}}</div>
             </div>
           </div>
         </div>

@@ -314,7 +314,7 @@ function getMessages($user) {
     $stmt = $db->prepare("
         SELECT m.*, 
                COUNT(mr.id) as total_recipients,
-               COUNT(CASE WHEN mr.read_at IS NOT NULL THEN 1 END) as read_count
+               SUM(CASE WHEN mr.read_at IS NOT NULL THEN 1 ELSE 0 END) as read_count
         FROM cp2i_messages m
         LEFT JOIN cp2i_message_recipients mr ON m.id = mr.message_id
         WHERE m.sender_id = ?
@@ -369,8 +369,7 @@ function sendMessage($user, $data) {
         if ($send_to_all) {
             $stmt = $db->prepare("SELECT id FROM cp2i_users WHERE id != ?");
             $stmt->execute([$user['user_id']]);
-            $all_users = $stmt->fetchAll(PDO::FETCH_COLUMN);
-            $recipients = $all_users;
+            $recipients = $stmt->fetchAll(PDO::FETCH_COLUMN);
         }
         
         foreach ($recipients as $recipient_id) {

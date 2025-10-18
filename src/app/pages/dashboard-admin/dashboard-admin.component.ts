@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { Cp2iApiService, User } from '../../services/cp2i-api.service';
 
 @Component({
@@ -139,7 +140,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
 
   constructor(
     private cp2iApi: Cp2iApiService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
@@ -856,13 +858,22 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       recipients: this.messageForm.sendToAll ? [] : this.recipients.filter(r => r.selected).map(r => r.id)
     };
     
-    this.cp2iApi.sendMessage(messageData).subscribe({
-      next: (response) => {
+    console.log('Sending message:', messageData);
+    console.log('Using endpoint: cp2i-messages.php');
+    
+    // Forcer l'utilisation du bon endpoint
+    const token = localStorage.getItem('cp2i_token');
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token ? `Bearer ${token}` : ''
+    };
+    this.http.post(`https://penccumndongo.com/cp2i-messages.php`, messageData, { headers }).subscribe({
+      next: (response: any) => {
         this.showToast(response.message, 'success');
         this.closeMessageModal();
         this.loadMessages();
       },
-      error: (error) => {
+      error: (error: any) => {
         this.showToast('Erreur lors de l\'envoi: ' + (error.error?.error || 'Erreur inconnue'), 'error');
       }
     });
@@ -891,7 +902,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   getTotalReads(): number {
-    return this.messages.reduce((total, msg) => total + (msg.read_count || 0), 0);
+    return this.messages.reduce((total, msg) => total + parseInt(msg.read_count || 0), 0);
   }
   
   // Méthodes de gestion des paramètres

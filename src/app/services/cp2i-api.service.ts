@@ -92,13 +92,17 @@ export class Cp2iApiService {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const now = Math.floor(Date.now() / 1000);
       
+      // Token valide
+      
       if (payload.exp < now) {
+        console.log('Token expired, logging out');
         this.logout();
         return false;
       }
       
       return true;
     } catch (error) {
+      console.log('Token validation error:', error);
       this.logout();
       return false;
     }
@@ -227,7 +231,8 @@ export class Cp2iApiService {
   }
 
   sendMessage(messageData: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/cp2i-dashboard.php?action=send_message`, 
+    console.log('Sending to:', `${this.baseUrl}/cp2i-messages.php`);
+    return this.http.post(`${this.baseUrl}/cp2i-messages.php`, 
       messageData, 
       { headers: this.getHeaders() }
     );
@@ -292,5 +297,12 @@ export class Cp2iApiService {
 
   getCorrecteurHistory(): Observable<any> {
     return this.http.get(`${this.baseUrl}/cp2i-correcteur.php?action=history`, { headers: this.getHeaders() });
+  }
+
+  markMessageAsRead(messageId: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cp2i-correcteur.php?action=mark_read`, 
+      { message_id: messageId }, 
+      { headers: this.getHeaders() }
+    );
   }
 }

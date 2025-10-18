@@ -111,8 +111,10 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
   }
 
   loadMessages() {
+    console.log('Loading correcteur messages...');
     this.cp2iApi.getCorrecteurMessages().subscribe({
       next: (data) => {
+        console.log('Messages received:', data);
         this.messages = data.messages || [];
       },
       error: (error) => {
@@ -293,5 +295,20 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
   logout() {
     this.cp2iApi.logout();
     this.router.navigate(['/cp2i']);
+  }
+
+  getUnreadMessagesCount(): number {
+    return this.messages.filter(m => !m.read_at).length;
+  }
+
+  readMessage(message: any) {
+    if (!message.read_at) {
+      this.cp2iApi.markMessageAsRead(message.id).subscribe({
+        next: () => {
+          message.read_at = new Date().toISOString();
+        },
+        error: (error) => console.error('Erreur marquage lu:', error)
+      });
+    }
   }
 }
