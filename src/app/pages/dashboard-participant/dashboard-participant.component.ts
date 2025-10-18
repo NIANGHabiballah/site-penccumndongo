@@ -19,7 +19,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   mobileMenuOpen = false;
   desktopMenuHidden = false;
   chatOpen = false;
-  currentView = 'dashboard';
+  currentView = 'accueil';
   
   private subscriptions: Subscription[] = [];
 
@@ -142,6 +142,10 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
 
   setCurrentView(view: string) {
     this.currentView = view;
+    // Empêcher toute redirection automatique
+    if (typeof window !== 'undefined') {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
   }
 
   getStatusLabel(status: string): string {

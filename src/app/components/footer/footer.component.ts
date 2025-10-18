@@ -33,20 +33,33 @@ export class FooterComponent implements OnInit {
           inline: 'nearest'
         });
       } else {
-        // Si la section n'existe pas sur la page courante, rediriger vers l'accueil
-        this.router.navigate(['/']).then(() => {
-          // Attendre un court délai pour que la page se charge
-          setTimeout(() => {
-            const targetElement = document.getElementById(sectionId);
-            if (targetElement) {
-              targetElement.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-                inline: 'nearest'
-              });
-            }
-          }, 500);
-        });
+        // Si la section n'existe pas, rediriger vers l'accueil seulement si on n'est pas déjà sur une page spécifique
+        const currentUrl = this.router.url;
+        if (currentUrl === '/' || currentUrl === '/accueil') {
+          // On est déjà sur l'accueil, pas besoin de rediriger
+          return;
+        }
+        
+        // Rediriger vers l'accueil seulement pour les pages qui n'ont pas ces sections
+        // Exclure explicitement toutes les pages système de toute redirection automatique
+        if (!currentUrl.includes('cp2i') && 
+            !currentUrl.includes('dashboard') && 
+            !currentUrl.includes('auth') && 
+            currentUrl !== '/cp2i' &&
+            !currentUrl.startsWith('/dashboard-')) {
+          this.router.navigate(['/']).then(() => {
+            setTimeout(() => {
+              const targetElement = document.getElementById(sectionId);
+              if (targetElement) {
+                targetElement.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                  inline: 'nearest'
+                });
+              }
+            }, 500);
+          });
+        }
       }
     } catch (error) {
       console.error('Erreur lors du défilement vers la section:', error);

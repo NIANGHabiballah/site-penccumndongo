@@ -74,21 +74,10 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
             </div>
           </div>
           
-          <div class="form-row">
-            <div class="input-group">
-              <div class="input-wrapper">
-                <i class="fas fa-map-marker-alt input-icon"></i>
-                <input type="text" [(ngModel)]="user.ville" name="ville" placeholder="Ville (optionnel)">
-              </div>
-            </div>
-            <div class="input-group">
-              <div class="select-wrapper">
-                <i class="fas fa-user-tag input-icon"></i>
-                <select [(ngModel)]="selectedRole" name="role" required>
-                  <option value="participant">Participant</option>
-                  <option value="correcteur">Correcteur</option>
-                </select>
-              </div>
+          <div class="input-group">
+            <div class="input-wrapper">
+              <i class="fas fa-map-marker-alt input-icon"></i>
+              <input type="text" [(ngModel)]="user.ville" name="ville" placeholder="Ville (optionnel)">
             </div>
           </div>
           
@@ -471,7 +460,7 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
 export class RegisterComponent {
   user = { nomComplet: '', email: '', telephone: '', password: '', confirmPassword: '', ville: '' };
   acceptTerms = false;
-  selectedRole: 'participant' | 'correcteur' = 'participant';
+  selectedRole: 'participant' = 'participant';
   errorMessage = '';
   successMessage = '';
   isLoading = false;

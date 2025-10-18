@@ -508,3 +508,369 @@ body {
     line-height: 1.6;
   }
 }
+
+/* Toast Notification */
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  padding: 1rem 1.5rem;
+  z-index: 1000;
+  transform: translateX(400px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  max-width: 400px;
+}
+
+.toast-notification.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.toast-notification.success {
+  border-left: 4px solid #28a745;
+}
+
+.toast-notification.error {
+  border-left: 4px solid #dc3545;
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.toast-content i {
+  font-size: 1.2rem;
+}
+
+.toast-notification.success .toast-content i {
+  color: #28a745;
+}
+
+.toast-notification.error .toast-content i {
+  color: #dc3545;
+}
+
+/* Masquer tous les éléments flottants sur les dashboards */
+:host {
+  position: relative;
+  z-index: 1000;
+}
+
+/* Masquer les boutons flottants globaux */
+::ng-deep .whatsapp-btn,
+::ng-deep .scroll-to-top,
+::ng-deep .scroll-to-bottom,
+::ng-deep .floating-btn,
+::ng-deep .fab,
+::ng-deep [class*="float"],
+::ng-deep [class*="fixed"] {
+  display: none !important;
+}
+
+/* Sections du dashboard */
+.textes-list, .correction-interface, .historique, .messages, .guide, .statistiques {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  margin-bottom: 2rem;
+}
+
+.textes-list h2, .historique h2, .messages h2, .guide h2, .statistiques h2 {
+  color: #6f42c1;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #f8f9fa;
+  padding-bottom: 0.75rem;
+}
+
+/* Grille des textes */
+.textes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.texte-card {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 2px solid transparent;
+}
+
+.texte-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  border-color: #6f42c1;
+}
+
+.texte-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.texte-header h3 {
+  color: #2c3e50;
+  font-size: 1.1rem;
+  margin: 0;
+  flex: 1;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-en_attente { background: #fff3cd; color: #856404; }
+.status-brouillon { background: #d1ecf1; color: #0c5460; }
+.status-accepte { background: #d4edda; color: #155724; }
+.status-refuse { background: #f8d7da; color: #721c24; }
+
+.texte-info p {
+  margin: 0.5rem 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Messages vides */
+.no-textes, .no-historique, .no-messages {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #6c757d;
+}
+
+.no-textes i, .no-historique i, .no-messages i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #dee2e6;
+}
+
+.no-textes h3, .no-historique h3, .no-messages h3 {
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+/* Interface de correction */
+.select-texte {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #6c757d;
+}
+
+.select-texte i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #6f42c1;
+}
+
+.navigation-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navigation-buttons span {
+  color: #6c757d;
+  font-weight: 600;
+}
+
+.total-score {
+  text-align: center;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.score-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #6f42c1;
+}
+
+.score-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Historique */
+.historique-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.historique-item {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border-left: 4px solid #6f42c1;
+}
+
+.historique-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.historique-header h4 {
+  color: #2c3e50;
+  margin: 0;
+}
+
+.historique-details p {
+  margin: 0.5rem 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Messages */
+.messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.message-item {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border-left: 4px solid #FF7F1A;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.message-header h4 {
+  color: #2c3e50;
+  margin: 0;
+}
+
+.message-date {
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+.message-content p {
+  color: #495057;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.message-sender {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Guide */
+.guide-content {
+  max-width: 800px;
+}
+
+.guide-section {
+  margin-bottom: 2rem;
+}
+
+.guide-section h3 {
+  color: #6f42c1;
+  margin-bottom: 1rem;
+}
+
+.criteria-guide {
+  display: grid;
+  gap: 1rem;
+}
+
+.criteria-guide .criteria-item {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #6f42c1;
+}
+
+.criteria-guide h4 {
+  color: #2c3e50;
+  margin: 0 0 0.5rem 0;
+}
+
+.criteria-guide p {
+  color: #6c757d;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.guide-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.guide-section li {
+  background: #f8f9fa;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
+  border-radius: 6px;
+  border-left: 3px solid #28a745;
+  color: #495057;
+}
+
+/* Statistiques */
+.stats-detailed {
+  display: grid;
+  gap: 2rem;
+}
+
+.stat-card-large {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.stat-card-large h3 {
+  color: #6f42c1;
+  margin-bottom: 1.5rem;
+}
+
+.performance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.perf-item {
+  text-align: center;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+}
+
+.perf-number {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #6f42c1;
+  display: block;
+}
+
+.perf-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}

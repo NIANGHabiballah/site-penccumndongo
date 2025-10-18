@@ -39,6 +39,7 @@ export class Cp2iApiService {
 
   constructor(private http: HttpClient) {
     this.loadStoredUser();
+    this.setupActivityListener();
   }
 
   private getHeaders(): HttpHeaders {
@@ -51,8 +52,15 @@ export class Cp2iApiService {
 
   private loadStoredUser(): void {
     const user = localStorage.getItem('cp2i_user');
-    if (user) {
+    const token = localStorage.getItem('cp2i_token');
+    
+    if (user && token && this.isAuthenticated()) {
       this.currentUserSubject.next(JSON.parse(user));
+    } else if (token || user) {
+      // Nettoyer seulement s'il y a des données à nettoyer
+      localStorage.removeItem('cp2i_token');
+      localStorage.removeItem('cp2i_user');
+      this.currentUserSubject.next(null);
     }
   }
 
@@ -77,7 +85,23 @@ export class Cp2iApiService {
   }
 
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('cp2i_token');
+    const token = localStorage.getItem('cp2i_token');
+    if (!token) return false;
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const now = Math.floor(Date.now() / 1000);
+      
+      if (payload.exp < now) {
+        this.logout();
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      this.logout();
+      return false;
+    }
   }
 
   getCurrentUser(): User | null {
@@ -104,7 +128,7 @@ export class Cp2iApiService {
   }
 
   getDashboardStats(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/cp2i-dashboard.php?action=stats`, { headers: this.getHeaders() });
+    return this.http.get(`${this.baseUrl}/cp2i-dashboard-simple.php?action=stats&v=2`, { headers: this.getHeaders() });
   }
 
   getProfile(): Observable<any> {
@@ -113,7 +137,7 @@ export class Cp2iApiService {
 
   // Méthodes admin
   getUsers(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/cp2i-dashboard.php?action=users`, { headers: this.getHeaders() });
+    return this.http.get(`${this.baseUrl}/cp2i-dashboard.php?action=get_users`, { headers: this.getHeaders() });
   }
 
   assignCorrector(texteId: number, correctorId: number): Observable<any> {
@@ -214,5 +238,59 @@ export class Cp2iApiService {
       { message_id: messageId }, 
       { headers: this.getHeaders() }
     );
+  }
+
+  refreshTokenIfNeeded(): void {
+    const token = localStorage.getItem('cp2i_token');
+    if (!token) return;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const now = Math.floor(Date.now() / 1000);
+      const timeUntilExpiry = payload.exp - now;
+      
+      // Renouveler si le token expire dans moins de 30 minutes
+      if (timeUntilExpiry < 1800 && timeUntilExpiry > 0) {
+        this.refreshToken().subscribe({
+          next: (response: any) => {
+            if (response.token) {
+              localStorage.setItem('cp2i_token', response.token);
+            }
+          },
+          error: () => this.logout()
+        });
+      }
+    } catch (error) {
+      this.logout();
+    }
+  }
+
+  private refreshToken(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cp2i-auth.php?action=refresh`, {}, { headers: this.getHeaders() });
+  }
+
+  private setupActivityListener(): void {
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+    
+    events.forEach(event => {
+      document.addEventListener(event, () => {
+        if (this.isAuthenticated()) {
+          this.refreshTokenIfNeeded();
+        }
+      }, { passive: true });
+    });
+  }
+
+  // Méthodes pour le correcteur
+  getCorrecteurTexts(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-correcteur.php?action=textes`, { headers: this.getHeaders() });
+  }
+
+  getCorrecteurMessages(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-correcteur.php?action=messages`, { headers: this.getHeaders() });
+  }
+
+  getCorrecteurHistory(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-correcteur.php?action=history`, { headers: this.getHeaders() });
   }
 }

@@ -29,9 +29,10 @@ if ($method === 'GET') {
         
         updateUserAccount();
     } catch (Exception $e) {
-        error_log('PUT request auth error: ' . $e->getMessage());
-        http_response_code(401);
-        echo json_encode(['error' => 'Token invalide ou manquant']);
+        error_log('PUT request error: ' . $e->getMessage());
+        error_log('PUT request trace: ' . $e->getTraceAsString());
+        http_response_code(500);
+        echo json_encode(['error' => 'Erreur serveur: ' . $e->getMessage()]);
     }
 } elseif ($method === 'DELETE') {
     $user = verifyToken();
@@ -94,7 +95,6 @@ function updateUserAccount() {
     $db = getDB();
     $input = json_decode(file_get_contents('php://input'), true);
     
-    // Log pour débogage
     error_log('UPDATE REQUEST: ' . json_encode($input));
     
     $id = $input['id'] ?? null;
@@ -105,39 +105,18 @@ function updateUserAccount() {
     $role = $input['role'] ?? 'participant';
     $password = $input['password'] ?? null;
     
-    if (!$id || !$prenom || !$nom || !$email || !$telephone) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Tous les champs sont requis']);
-        return;
+    // Mise à jour simple sans mot de passe d'abord
+    $stmt = $db->prepare("UPDATE cp2i_users SET prenom = ?, nom = ?, email = ?, telephone = ?, role = ? WHERE id = ?");
+    $stmt->execute([$prenom, $nom, $email, $telephone, $role, $id]);
+    
+    // Mise à jour du mot de passe seulement si fourni
+    if ($password && trim($password) !== '') {
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $db->prepare("UPDATE cp2i_users SET password = ?, plain_password = ? WHERE id = ?");
+        $stmt->execute([$hashedPassword, $password, $id]);
     }
     
-    // Vérifier si l'email existe déjà pour un autre utilisateur
-    $stmt = $db->prepare("SELECT id FROM cp2i_users WHERE email = ? AND id != ?");
-    $stmt->execute([$email, $id]);
-    if ($stmt->fetch()) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Cet email est déjà utilisé']);
-        return;
-    }
-    
-    try {
-        // Mettre à jour les informations de base
-        $stmt = $db->prepare("UPDATE cp2i_users SET prenom = ?, nom = ?, email = ?, telephone = ?, role = ? WHERE id = ?");
-        $stmt->execute([$prenom, $nom, $email, $telephone, $role, $id]);
-        
-        // Mettre à jour le mot de passe si fourni
-        if ($password) {
-            setUserPassword($db, $id, $password, $role);
-            error_log("Password updated with consistency for user ID: $id");
-        }
-        
-        error_log('UPDATE SUCCESS for user ID: ' . $id);
-        echo json_encode(['success' => true, 'message' => 'Utilisateur modifié avec succès']);
-    } catch (Exception $e) {
-        error_log('UPDATE ERROR: ' . $e->getMessage());
-        http_response_code(500);
-        echo json_encode(['error' => 'Erreur lors de la modification: ' . $e->getMessage()]);
-    }
+    echo json_encode(['success' => true, 'message' => 'Utilisateur modifié avec succès']);
 }
 
 function deleteUserAccount() {

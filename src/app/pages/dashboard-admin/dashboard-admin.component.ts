@@ -185,22 +185,19 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     // Charger les statistiques
     this.cp2iApi.getDashboardStats().subscribe({
       next: (data) => {
-        this.stats = data || {};
-        console.log('Stats complètes:', this.stats);
-        console.log('Affectation stats:', this.stats.affectation_stats);
-        console.log('Correcteurs stats:', this.stats.correcteurs_stats);
+        // Mapper correctement les données du backend
+        this.stats = {
+          total_textes: data.stats?.total_textes || 0,
+          textes_acceptes: data.stats?.textes_acceptes || 0,
+          textes_refuses: data.stats?.textes_refuses || 0,
+          textes_en_attente: data.stats?.textes_en_attente || 0,
+          note_moyenne: data.stats?.note_moyenne || null,
+          affectation_stats: data.stats?.affectation_stats || {},
+          correcteurs_stats: data.stats?.correcteurs_stats || [],
+          textes_affectations: data.stats?.textes_affectations || []
+        };
+        console.log('Stats mappées:', this.stats);
         console.log('Textes affectations:', this.stats.textes_affectations);
-        console.log('Nombre de textes affectations:', this.stats.textes_affectations?.length);
-        
-        // Debug pour vérifier la structure des données
-        if (this.stats.textes_affectations && this.stats.textes_affectations.length > 0) {
-          console.log('Premier élément textes_affectations:', this.stats.textes_affectations[0]);
-        }
-        
-        // Force update if data exists but not showing
-        if (this.stats.textes_affectations) {
-          console.log('Textes affectations data found:', this.stats.textes_affectations);
-        }
       },
       error: (error) => console.error('Erreur stats:', error)
     });
@@ -208,13 +205,20 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     // Charger tous les utilisateurs
     this.cp2iApi.getUsers().subscribe({
       next: (data) => {
-        this.users = data.users || [];
+        this.users = data?.users || [];
         this.filteredUsers = [...this.users];
         this.participants = this.users.filter(u => u.role === 'participant');
         this.correcteurs = this.users.filter(u => u.role === 'correcteur');
-        this.affectations = data.affectations || [];
+        this.affectations = data?.affectations || [];
       },
-      error: (error) => console.error('Erreur utilisateurs:', error)
+      error: (error) => {
+        console.error('Erreur utilisateurs:', error);
+        this.users = [];
+        this.filteredUsers = [];
+        this.participants = [];
+        this.correcteurs = [];
+        this.affectations = [];
+      }
     });
     
     // Charger tous les textes
@@ -286,12 +290,15 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
 
   getCorrectorsCount(texteId: number): number {
-    return this.affectations.filter(a => a.texte_id === texteId).length;
+    // Chercher dans les données d'affectation par texte
+    const texteAffectation = this.stats.textes_affectations?.find((ta: any) => ta.texte_id === texteId);
+    return texteAffectation?.nb_correcteurs || 0;
   }
 
   getAssignedCorrectorsNames(texteId: number): string {
-    const textAffectations = this.affectations.filter(a => a.texte_id === texteId);
-    return textAffectations.map(a => `${a.corrector_prenom} ${a.corrector_nom}`).join(', ') || 'Aucun';
+    // Chercher dans les données d'affectation par texte
+    const texteAffectation = this.stats.textes_affectations?.find((ta: any) => ta.texte_id === texteId);
+    return texteAffectation?.correcteurs_noms || 'Aucun';
   }
 
   logout() {

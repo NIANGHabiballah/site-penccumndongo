@@ -41,6 +41,8 @@ switch ($method) {
             registerUser($input);
         } elseif ($action === 'login') {
             loginUser($input);
+        } elseif ($action === 'refresh') {
+            refreshToken();
         }
         break;
 }
@@ -158,7 +160,7 @@ function generateToken($userId, $email, $role) {
         'user_id' => $userId,
         'email' => $email,
         'role' => $role,
-        'exp' => time() + (24 * 60 * 60) // 24h
+        'exp' => time() + (2 * 60 * 60) // 2h
     ]);
     
     $headerEncoded = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($header));
@@ -203,5 +205,49 @@ function sendVerificationEmail($email, $nom, $prenom, $token) {
     $headers .= "From: CP2i <noreply@penccumndongo.com>" . "\r\n";
     
     mail($email, $subject, $message, $headers);
+}
+
+function refreshToken() {
+    $headers = getallheaders();
+    $authHeader = $headers['Authorization'] ?? '';
+    
+    if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Token manquant']);
+        return;
+    }
+    
+    $token = substr($authHeader, 7);
+    $userData = validateToken($token);
+    
+    if (!$userData) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Token invalide']);
+        return;
+    }
+    
+    $newToken = generateToken($userData['user_id'], $userData['email'], $userData['role']);
+    
+    echo json_encode([
+        'success' => true,
+        'token' => $newToken
+    ]);
+}
+
+function validateToken($token) {
+    try {
+        $parts = explode('.', $token);
+        if (count($parts) !== 3) return false;
+        
+        $payload = json_decode(base64_decode(str_replace(['-', '_'], ['+', '/'], $parts[1])), true);
+        
+        if (!$payload || $payload['exp'] < time()) {
+            return false;
+        }
+        
+        return $payload;
+    } catch (Exception $e) {
+        return false;
+    }
 }
 ?>

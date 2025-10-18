@@ -40,7 +40,7 @@ import { ChangePasswordComponent } from './pages/change-password/change-password
 
 export const routes: Routes = [
   { path: '', component: AccueilComponent },
-  { path: 'accueil', redirectTo: '', pathMatch: 'full' },
+  { path: 'accueil', component: AccueilComponent },
   { path: 'apropos', component: AproposComponent },
   { path: 'services', component: ServicesComponent },
   { path: 'portfolio', component: PortfolioComponent },
@@ -97,5 +97,5 @@ export const routes: Routes = [
   { path: 'reset-password', component: ChangePasswordComponent },
   
   // Wildcard route - doit être en dernier
-  { path: '**', redirectTo: '', pathMatch: 'full' }
+  { path: '**', redirectTo: '/cp2i', pathMatch: 'full' }
 ];
