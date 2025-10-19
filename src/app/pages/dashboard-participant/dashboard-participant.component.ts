@@ -174,26 +174,26 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   loadEvaluationsDetaillees() {
     console.log('Chargement des évaluations détaillées...', this.mesSoumissions);
     
-    // Utiliser directement les vraies données de cp2i_textes
+    // Charger les vraies évaluations depuis l'API
     this.mesSoumissions.forEach(texte => {
-      if (texte.note && texte.note > 0) {
-        const noteParCritere = Math.round((texte.note / 4) * 10) / 10;
-        texte.corrections = [{
-          id: 1,
-          texte_id: texte.id,
-          corrector_id: 2,
-          note: texte.note,
-          commentaire: texte.commentaire || 'Texte évalué par le correcteur',
-          correcteur_nom: 'Correcteur',
-          correcteur_prenom: '',
-          criteres: {
-            pertinence: noteParCritere,
-            coherence: noteParCritere,
-            correction: noteParCritere,
-            presentation: noteParCritere
+      if (texte.id && texte.note) {
+        console.log(`Appel API pour texte ${texte.id}...`);
+        this.cp2iApi.getTextCorrections(texte.id).subscribe({
+          next: (data) => {
+            console.log(`Réponse API pour texte ${texte.id}:`, data);
+            if (data && data.success && data.corrections && data.corrections.length > 0) {
+              texte.corrections = data.corrections;
+              console.log(`Corrections assignées pour texte ${texte.id}:`, texte.corrections);
+            } else {
+              console.warn(`Pas de corrections pour texte ${texte.id}`);
+            }
+          },
+          error: (error) => {
+            console.error(`Erreur API pour texte ${texte.id}:`, error);
           }
-        }];
-        console.log(`Corrections appliquées pour texte ${texte.id}: ${texte.note}/20, ${noteParCritere}/5 par critère`);
+        });
+      } else {
+        console.log(`Texte ${texte.id} ignoré - ID: ${texte.id}, Note: ${texte.note}`);
       }
     });
   }

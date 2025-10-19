@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-require_once 'config/database.php';
+require_once 'config.php';
 
 $texteId = $_GET['texte_id'] ?? null;
 
@@ -20,8 +20,10 @@ if (!$texteId) {
 }
 
 try {
-    // D'abord chercher dans cp2i_evaluations pour les vraies notes par critère
-    $stmt = $pdo->prepare("
+    $db = getDB();
+    
+    // Chercher dans cp2i_evaluations pour les vraies notes par critère
+    $stmt = $db->prepare("
         SELECT 
             e.*,
             u.nom as correcteur_nom,

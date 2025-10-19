@@ -455,19 +455,19 @@
                 <div class="grille-evaluation">
                   <div class="critere-item">
                     <span class="critere-label">Pertinence</span>
-                    <span class="critere-score">{{correction.criteres?.pertinence || correction.note_pertinence || (correction.note / 4 | number:'1.1-1')}}/5</span>
+                    <span class="critere-score">{{correction.criteres?.pertinence !== undefined ? correction.criteres.pertinence : '-'}}/5</span>
                   </div>
                   <div class="critere-item">
                     <span class="critere-label">Cohérence</span>
-                    <span class="critere-score">{{correction.criteres?.coherence || correction.note_coherence || (correction.note / 4 | number:'1.1-1')}}/5</span>
+                    <span class="critere-score">{{correction.criteres?.coherence !== undefined ? correction.criteres.coherence : '-'}}/5</span>
                   </div>
                   <div class="critere-item">
                     <span class="critere-label">Correction de la langue</span>
-                    <span class="critere-score">{{correction.criteres?.correction || correction.note_correction || (correction.note / 4 | number:'1.1-1')}}/5</span>
+                    <span class="critere-score">{{correction.criteres?.correction !== undefined ? correction.criteres.correction : '-'}}/5</span>
                   </div>
                   <div class="critere-item">
                     <span class="critere-label">Présentation</span>
-                    <span class="critere-score">{{correction.criteres?.presentation || correction.note_presentation || (correction.note / 4 | number:'1.1-1')}}/5</span>
+                    <span class="critere-score">{{correction.criteres?.presentation !== undefined ? correction.criteres.presentation : '-'}}/5</span>
                   </div>
                 </div>
                 
