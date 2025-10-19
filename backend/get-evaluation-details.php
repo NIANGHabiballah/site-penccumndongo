@@ -13,18 +13,39 @@ if (!$texteId) {
 }
 
 try {
-    // Vérifier dans la table corrections
+    // Vérifier dans la table cp2i_corrections
     $stmt = $pdo->prepare("
         SELECT 
             c.*,
             u.nom as correcteur_nom,
             u.prenom as correcteur_prenom
-        FROM corrections c
-        LEFT JOIN users u ON c.correcteur_id = u.id
+        FROM cp2i_corrections c
+        LEFT JOIN users u ON c.corrector_id = u.id
         WHERE c.texte_id = ?
     ");
     $stmt->execute([$texteId]);
     $corrections = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Formater les corrections avec les notes par critère
+    foreach ($corrections as &$correction) {
+        $correction['criteres'] = [
+            'pertinence' => $correction['note_pertinence'] ?: null,
+            'coherence' => $correction['note_coherence'] ?: null,
+            'correction' => $correction['note_correction'] ?: null,
+            'presentation' => $correction['note_presentation'] ?: null
+        ];
+        
+        // Si aucune note par critère, calculer à partir de la note totale
+        if (!$correction['note_pertinence'] && $correction['note']) {
+            $noteParCritere = round($correction['note'] / 4, 1);
+            $correction['criteres'] = [
+                'pertinence' => $noteParCritere,
+                'coherence' => $noteParCritere,
+                'correction' => $noteParCritere,
+                'presentation' => $noteParCritere
+            ];
+        }
+    }
     
     // Si pas de corrections, vérifier dans textes directement
     if (empty($corrections)) {
@@ -33,7 +54,7 @@ try {
                 note,
                 commentaire,
                 statut
-            FROM textes 
+            FROM cp2i_textes 
             WHERE id = ?
         ");
         $stmt->execute([$texteId]);

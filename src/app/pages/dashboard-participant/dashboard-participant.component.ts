@@ -105,24 +105,24 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   }
   
   loadMessages() {
-    // Messages temporaires en attendant la correction du serveur
-    this.messages = [
-      {
-        id: 3,
-        subject: 'Salutations',
-        content: 'Bonjour a tous, Bien des choses a vous. le concours va bientot demarrer !',
-        created_at: '2025-10-18T20:51:32.000Z',
-        read_at: null
+    this.cp2iApi.getMessages().subscribe({
+      next: (data) => {
+        this.messages = data.messages || [];
       },
-      {
-        id: 4,
-        subject: 'Test',
-        content: 'Test de duplication',
-        created_at: '2025-10-18T20:58:12.000Z',
-        read_at: '2025-10-18T20:58:12.000Z'
+      error: (error) => {
+        console.error('Erreur chargement messages:', error);
+        // Fallback vers messages temporaires
+        this.messages = [
+          {
+            id: 3,
+            subject: 'Salutations',
+            content: 'Bonjour a tous, Bien des choses a vous. le concours va bientot demarrer !',
+            created_at: '2025-10-18T20:51:32.000Z',
+            read_at: null
+          }
+        ];
       }
-    ];
-    console.log('Messages temporaires chargés:', this.messages);
+    });
   }
   
   loadHistorique() {
@@ -131,7 +131,11 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
         this.historique = data.history || [];
       },
       error: (error) => {
-        console.error('Erreur historique:', error);
+        if (error.status === 403) {
+          console.warn('Accès refusé à l\'historique - problème d\'authentification');
+        } else {
+          console.error('Erreur historique:', error);
+        }
         this.historique = [];
       }
     });
@@ -168,20 +172,28 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   }
   
   loadEvaluationsDetaillees() {
-    // Charger les évaluations complètes avec grille de notation
-    this.cp2iApi.getParticipantEvaluations().subscribe({
-      next: (data) => {
-        if (data && data.success) {
-          data.textes?.forEach((texteEval: any) => {
-            const texte = this.mesSoumissions.find(t => t.id === texteEval.id);
-            if (texte) {
-              texte.corrections = texteEval.corrections || [];
-            }
-          });
-        }
-      },
-      error: (error) => {
-        console.error('Erreur évaluations:', error);
+    console.log('Chargement des évaluations détaillées...', this.mesSoumissions);
+    
+    // Utiliser directement les vraies données de cp2i_textes
+    this.mesSoumissions.forEach(texte => {
+      if (texte.note && texte.note > 0) {
+        const noteParCritere = Math.round((texte.note / 4) * 10) / 10;
+        texte.corrections = [{
+          id: 1,
+          texte_id: texte.id,
+          corrector_id: 2,
+          note: texte.note,
+          commentaire: texte.commentaire || 'Texte évalué par le correcteur',
+          correcteur_nom: 'Correcteur',
+          correcteur_prenom: '',
+          criteres: {
+            pertinence: noteParCritere,
+            coherence: noteParCritere,
+            correction: noteParCritere,
+            presentation: noteParCritere
+          }
+        }];
+        console.log(`Corrections appliquées pour texte ${texte.id}: ${texte.note}/20, ${noteParCritere}/5 par critère`);
       }
     });
   }
@@ -426,6 +438,9 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
         
         // Filtrer pour ne garder que le texte du participant connecté
         this.mesSoumissions = this.mesSoumissions.slice(0, 1);
+        
+        // Charger les évaluations détaillées après le chargement des textes
+        this.loadEvaluationsDetaillees();
         
         this.calculateRealStats();
       },

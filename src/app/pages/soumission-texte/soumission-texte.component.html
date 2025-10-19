@@ -11,7 +11,7 @@
 
 <div class="soumission-container">
   <div class="header">
-    <h1>Soumettre un Texte</h1>
+    <h1>{{isEditing ? 'Modifier le Texte' : 'Soumettre un Texte'}}</h1>
     <a routerLink="/dashboard-participant" class="btn-back">
       <i class="fas fa-arrow-left"></i> Retour
     </a>
@@ -69,9 +69,9 @@
       <button type="button" (click)="resetForm()" class="btn btn-secondary">
         Effacer
       </button>
-      <button type="submit" [disabled]="!isFormValid()" class="btn btn-primary">
-        <i class="fas fa-paper-plane"></i>
-        Soumettre le texte
+      <button type="submit" [disabled]="!isFormValid() || isSubmitting" class="btn btn-primary">
+        <i class="fas" [class.fa-paper-plane]="!isEditing" [class.fa-save]="isEditing"></i>
+        {{isSubmitting ? 'En cours...' : (isEditing ? 'Modifier le texte' : 'Soumettre le texte')}}
       </button>
     </div>
   </form>

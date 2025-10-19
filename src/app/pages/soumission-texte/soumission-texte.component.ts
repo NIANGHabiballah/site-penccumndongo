@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { Cp2iApiService, Texte } from '../../services/cp2i-api.service';
 
 @Component({
@@ -19,10 +19,13 @@ export class SoumissionTexteComponent implements OnInit {
   };
 
   isSubmitting = false;
+  isEditing = false;
+  editingTexteId: number | null = null;
 
   constructor(
     private cp2iApi: Cp2iApiService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
@@ -32,7 +35,20 @@ export class SoumissionTexteComponent implements OnInit {
       return;
     }
     
-    // Vérifier si l'utilisateur a déjà soumis un texte
+    // Vérifier si c'est une modification
+    this.route.queryParams.subscribe(params => {
+      if (params['edit']) {
+        this.isEditing = true;
+        this.editingTexteId = +params['edit'];
+        this.loadTexteForEdit(this.editingTexteId);
+      } else {
+        // Vérifier si l'utilisateur a déjà soumis un texte (seulement pour nouvelle soumission)
+        this.checkExistingSubmission();
+      }
+    });
+  }
+  
+  checkExistingSubmission() {
     this.cp2iApi.getUserTexts().subscribe({
       next: (data) => {
         if (data.textes && data.textes.length > 0) {
@@ -44,6 +60,30 @@ export class SoumissionTexteComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erreur lors de la vérification:', error);
+      }
+    });
+  }
+  
+  loadTexteForEdit(texteId: number) {
+    this.cp2iApi.getUserTexts().subscribe({
+      next: (data) => {
+        const texteToEdit = data.textes?.find((t: any) => t.id === texteId);
+        if (texteToEdit) {
+          this.texte = {
+            id: texteToEdit.id,
+            titre: texteToEdit.titre,
+            contenu: texteToEdit.contenu,
+            langue: texteToEdit.langue
+          };
+        } else {
+          this.showToast('Texte non trouvé.', 'error');
+          this.router.navigate(['/dashboard-participant']);
+        }
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement du texte:', error);
+        this.showToast('Erreur lors du chargement du texte.', 'error');
+        this.router.navigate(['/dashboard-participant']);
       }
     });
   }
@@ -74,16 +114,30 @@ export class SoumissionTexteComponent implements OnInit {
 
     this.isSubmitting = true;
     
-    this.cp2iApi.submitText(this.texte).subscribe({
+    const apiCall = this.isEditing ? 
+      this.cp2iApi.updateText(this.texte) : 
+      this.cp2iApi.submitText(this.texte);
+    
+    apiCall.subscribe({
       next: (response) => {
-        this.showToast('Texte soumis avec succès ! Vous recevrez une notification une fois évalué.', 'success');
-        this.resetForm();
+        const message = this.isEditing ? 
+          'Texte modifié avec succès !' : 
+          'Texte soumis avec succès ! Vous recevrez une notification une fois évalué.';
+        this.showToast(message, 'success');
+        
+        if (!this.isEditing) {
+          this.resetForm();
+        }
+        
         setTimeout(() => {
           this.router.navigate(['/dashboard-participant']);
         }, 2000);
       },
       error: (error) => {
-        this.showToast(error.error?.error || 'Erreur lors de la soumission. Veuillez réessayer.', 'error');
+        const message = this.isEditing ? 
+          'Erreur lors de la modification. Veuillez réessayer.' :
+          'Erreur lors de la soumission. Veuillez réessayer.';
+        this.showToast(error.error?.error || message, 'error');
       },
       complete: () => {
         this.isSubmitting = false;

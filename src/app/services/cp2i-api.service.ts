@@ -115,6 +115,10 @@ export class Cp2iApiService {
   submitText(texte: Texte): Observable<any> {
     return this.http.post(`${this.baseUrl}/cp2i-textes.php`, texte, { headers: this.getHeaders() });
   }
+  
+  updateText(texte: Texte): Observable<any> {
+    return this.http.put(`${this.baseUrl}/cp2i-textes.php`, texte, { headers: this.getHeaders() });
+  }
 
   getUserTexts(): Observable<any> {
     return this.http.get(`${this.baseUrl}/cp2i-textes.php`, { headers: this.getHeaders() });
