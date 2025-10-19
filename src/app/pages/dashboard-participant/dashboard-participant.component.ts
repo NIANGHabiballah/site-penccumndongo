@@ -174,6 +174,14 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   loadEvaluationsDetaillees() {
     console.log('Chargement des évaluations détaillées...', this.mesSoumissions);
     
+    let evaluationsChargees = 0;
+    const totalTextes = this.mesSoumissions.filter(t => t.id && t.note).length;
+    
+    if (totalTextes === 0) {
+      this.calculateRealStats();
+      return;
+    }
+    
     // Charger les vraies évaluations depuis l'API
     this.mesSoumissions.forEach(texte => {
       if (texte.id && texte.note) {
@@ -187,9 +195,19 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
             } else {
               console.warn(`Pas de corrections pour texte ${texte.id}`);
             }
+            
+            evaluationsChargees++;
+            if (evaluationsChargees === totalTextes) {
+              // Recalculer les stats après avoir chargé toutes les évaluations
+              this.calculateRealStats();
+            }
           },
           error: (error) => {
             console.error(`Erreur API pour texte ${texte.id}:`, error);
+            evaluationsChargees++;
+            if (evaluationsChargees === totalTextes) {
+              this.calculateRealStats();
+            }
           }
         });
       } else {
@@ -397,11 +415,27 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   }
   
   calculateAverageNote(): number | null {
-    const textesAvecNote = this.mesSoumissions.filter(t => t.note !== null && t.note !== undefined);
-    if (textesAvecNote.length === 0) return null;
+    // Pour chaque texte, calculer la moyenne des évaluations de tous les correcteurs
+    let totalNotes = 0;
+    let nombreEvaluations = 0;
     
-    const somme = textesAvecNote.reduce((acc, t) => acc + (t.note || 0), 0);
-    return somme / textesAvecNote.length;
+    this.mesSoumissions.forEach(texte => {
+      if (texte.corrections && texte.corrections.length > 0) {
+        // Utiliser les vraies évaluations des correcteurs
+        texte.corrections.forEach((correction: any) => {
+          if (correction.note && !isNaN(correction.note)) {
+            totalNotes += parseFloat(correction.note);
+            nombreEvaluations++;
+          }
+        });
+      } else if (texte.note && !isNaN(texte.note)) {
+        // Fallback sur la note du texte si pas de corrections détaillées
+        totalNotes += parseFloat(texte.note);
+        nombreEvaluations++;
+      }
+    });
+    
+    return nombreEvaluations > 0 ? totalNotes / nombreEvaluations : null;
   }
   
   validateStats(serverStats: any) {
@@ -440,9 +474,8 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
         this.mesSoumissions = this.mesSoumissions.slice(0, 1);
         
         // Charger les évaluations détaillées après le chargement des textes
+        // calculateRealStats sera appelé automatiquement après le chargement des évaluations
         this.loadEvaluationsDetaillees();
-        
-        this.calculateRealStats();
       },
       error: (error) => {
         console.error('Erreur lors du chargement des textes (fallback):', error);
