@@ -10,7 +10,7 @@ import { Cp2iApiService, User } from '../../services/cp2i-api.service';
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './dashboard-correcteur.component.html',
-  styleUrls: ['./dashboard-correcteur.component.css']
+  styleUrls: ['./dashboard-correcteur.component.css', './guide-styles.css']
 })
 export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
   // Navigation
@@ -196,6 +196,18 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
   }
 
   // Évaluation
+  validateNote(field: string, event: any) {
+    const value = parseInt(event.target.value);
+    if (value > 5) {
+      (this.evaluationForm as any)[field] = 5;
+      event.target.value = 5;
+      this.showToast('La note maximum est de 5 points par critère', 'error');
+    } else if (value < 0) {
+      (this.evaluationForm as any)[field] = 0;
+      event.target.value = 0;
+    }
+  }
+
   calculateTotal(): number {
     return this.evaluationForm.pertinence + this.evaluationForm.coherence + 
            this.evaluationForm.correction + this.evaluationForm.presentation;
@@ -219,6 +231,7 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.showToast('Brouillon sauvegardé', 'success');
         this.loadTextesAssignes();
+        this.loadHistorique(); // Recharger l'historique
       },
       error: (error) => {
         this.showToast('Erreur lors de la sauvegarde', 'error');
@@ -234,6 +247,8 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
       return;
     }
     
+    const isModification = this.currentTexte.statut === 'accepte' || this.currentTexte.statut === 'refuse';
+    
     const evaluationData = {
       texte_id: this.currentTexte.id,
       pertinence: this.evaluationForm.pertinence,
@@ -247,9 +262,13 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
     
     this.cp2iApi.saveEvaluation(evaluationData).subscribe({
       next: (response) => {
-        this.showToast('Évaluation validée avec succès', 'success');
+        const message = isModification ? 'Note modifiée avec succès' : 'Évaluation validée avec succès';
+        this.showToast(message, 'success');
         this.loadTextesAssignes();
-        this.nextTexte();
+        this.loadHistorique(); // Recharger l'historique
+        if (!isModification) {
+          this.nextTexte();
+        }
       },
       error: (error) => {
         this.showToast('Erreur lors de la validation', 'error');
@@ -260,10 +279,10 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
   // Utilitaires
   getStatusLabel(status: string): string {
     const labels = {
-      'en_attente': 'En attente',
+      'en_attente': 'À corriger',
       'brouillon': 'Brouillon',
-      'accepte': 'Accepté',
-      'refuse': 'Refusé'
+      'accepte': 'Admis (≥10/20)',
+      'refuse': 'Non admis (<10/20)'
     };
     return labels[status as keyof typeof labels] || status;
   }
@@ -310,5 +329,52 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
         error: (error) => console.error('Erreur marquage lu:', error)
       });
     }
+  }
+
+  copyText() {
+    if (!this.currentTexte) return;
+    
+    navigator.clipboard.writeText(this.currentTexte.contenu).then(() => {
+      this.showToast('Texte copié dans le presse-papiers', 'success');
+    }).catch(() => {
+      this.showToast('Erreur lors de la copie', 'error');
+    });
+  }
+
+  downloadWord() {
+    if (!this.currentTexte) return;
+    
+    const htmlContent = `
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: 'Inter', Arial, sans-serif; font-size: 14pt; line-height: 1.8; margin: 20px; }
+            .header { margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 15px; }
+            .info { margin: 5px 0; font-weight: bold; }
+            .content { margin-top: 20px; white-space: pre-line; font-family: 'Inter', Arial, sans-serif; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="info">Titre: ${this.currentTexte.titre}</div>
+            <div class="info">Identifiant: CP2i-${this.currentTexte.id.toString().padStart(3, '0')}</div>
+            <div class="info">Langue: ${this.currentTexte.langue}</div>
+            <div class="info">Date de soumission: ${new Date(this.currentTexte.created_at).toLocaleDateString('fr-FR')}</div>
+          </div>
+          <div class="content">${this.currentTexte.contenu.replace(/\n/g, '<br>')}</div>
+        </body>
+      </html>
+    `;
+    
+    const blob = new Blob([htmlContent], { type: 'application/msword;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `CP2i-${this.currentTexte.id.toString().padStart(3, '0')}.doc`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    this.showToast('Téléchargement lancé', 'success');
   }
 }

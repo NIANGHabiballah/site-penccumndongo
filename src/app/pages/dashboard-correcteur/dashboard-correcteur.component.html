@@ -87,7 +87,7 @@
       </div>
       <div class="stat-card">
         <div class="stat-number" style="color: #FF7F1A;">{{stats.enCours}}</div>
-        <div class="stat-label">En attente</div>
+        <div class="stat-label">À corriger</div>
       </div>
       <div class="stat-card">
         <div class="stat-number" style="color: #dc3545;">{{stats.joursRestants}}</div>
@@ -108,7 +108,7 @@
               <span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span>
             </div>
             <div class="texte-info">
-              <p><strong>Auteur:</strong> {{texte.prenom}} {{texte.nom}}</p>
+              <p><strong>Identifiant:</strong> CP2i-{{texte.id | number:'3.0-0'}}</p>
               <p><strong>Langue:</strong> {{texte.langue | titlecase}}</p>
               <p><strong>Soumis le:</strong> {{texte.created_at | date:'dd/MM/yyyy'}}</p>
               <p *ngIf="texte.note"><strong>Note:</strong> {{texte.note}}/20</p>
@@ -142,9 +142,18 @@
             </div>
             
             <div class="text-meta">
-              <span class="meta-tag"><i class="fas fa-user"></i> {{currentTexte.prenom}} {{currentTexte.nom}}</span>
+              <span class="meta-tag"><i class="fas fa-id-card"></i> CP2i-{{currentTexte.id | number:'3.0-0'}}</span>
               <span class="meta-tag"><i class="fas fa-globe"></i> {{currentTexte.langue | titlecase}}</span>
               <span class="meta-tag"><i class="fas fa-calendar"></i> {{currentTexte.created_at | date:'dd/MM/yyyy'}}</span>
+            </div>
+            
+            <div class="text-actions">
+              <button class="btn btn-outline" (click)="copyText()" title="Copier le texte">
+                <i class="fas fa-copy"></i> Copier
+              </button>
+              <button class="btn btn-outline" (click)="downloadWord()" title="Télécharger en Word">
+                <i class="fas fa-download"></i> Word
+              </button>
             </div>
             
             <div class="text-content">
@@ -158,19 +167,19 @@
             <div class="criteria-grid">
               <div class="criteria-item">
                 <span class="criteria-name">Pertinence</span>
-                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.pertinence" class="rating-input">
+                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.pertinence" class="rating-input" (input)="validateNote('pertinence', $event)">
               </div>
               <div class="criteria-item">
                 <span class="criteria-name">Cohérence</span>
-                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.coherence" class="rating-input">
+                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.coherence" class="rating-input" (input)="validateNote('coherence', $event)">
               </div>
               <div class="criteria-item">
                 <span class="criteria-name">Correction de la langue</span>
-                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.correction" class="rating-input">
+                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.correction" class="rating-input" (input)="validateNote('correction', $event)">
               </div>
               <div class="criteria-item">
                 <span class="criteria-name">Présentation</span>
-                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.presentation" class="rating-input">
+                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.presentation" class="rating-input" (input)="validateNote('presentation', $event)">
               </div>
             </div>
             
@@ -189,7 +198,8 @@
                 <i class="fas fa-save"></i> Brouillon
               </button>
               <button class="btn btn-primary" (click)="validateEvaluation()">
-                <i class="fas fa-check"></i> Valider
+                <i class="fas" [class.fa-check]="currentTexte?.statut === 'en_attente' || currentTexte?.statut === 'brouillon'" [class.fa-edit]="currentTexte?.statut === 'accepte' || currentTexte?.statut === 'refuse'"></i> 
+                {{(currentTexte?.statut === 'accepte' || currentTexte?.statut === 'refuse') ? 'Modifier' : 'Valider'}}
               </button>
             </div>
           </div>
@@ -217,7 +227,7 @@
               <span class="status-badge" [ngClass]="getStatusClass(item.statut)">{{getStatusLabel(item.statut)}}</span>
             </div>
             <div class="historique-details">
-              <p><strong>Auteur:</strong> {{item.prenom}} {{item.nom}}</p>
+              <p><strong>Identifiant:</strong> CP2i-{{item.id | number:'3.0-0'}}</p>
               <p><strong>Note attribuée:</strong> {{item.note}}/20</p>
               <p><strong>Date d'évaluation:</strong> {{item.updated_at | date:'dd/MM/yyyy à HH:mm'}}</p>
               <p *ngIf="item.commentaire"><strong>Commentaire:</strong> {{item.commentaire}}</p>
@@ -325,14 +335,107 @@
           </div>
           
           <div class="guide-section">
-            <h3>Conseils pour l'évaluation</h3>
-            <ul>
-              <li>Lisez le texte plusieurs fois avant d'évaluer</li>
-              <li>Soyez objectif et bienveillant dans vos commentaires</li>
-              <li>Justifiez vos notes par des exemples concrets</li>
-              <li>Encouragez l'auteur tout en pointant les améliorations possibles</li>
-              <li>La note de passage est fixée à 10/20</li>
-            </ul>
+            <h3><i class="fas fa-route"></i> Guide étape par étape</h3>
+            <div class="steps-guide">
+              <div class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                  <h4>Accéder aux textes assignés</h4>
+                  <p>Cliquez sur "Textes Assignés" dans le menu pour voir la liste de vos textes à corriger.</p>
+                  <div class="step-visual">
+                    <div class="mock-card">
+                      <div class="mock-header">📝 Poème de Victor Hugo</div>
+                      <div class="mock-status status-pending">À corriger</div>
+                      <div class="mock-info">Identifiant: CP2i-001 • Français • 15/10/2025</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                  <h4>Sélectionner un texte</h4>
+                  <p>Cliquez sur une carte de texte pour l'ouvrir dans l'interface de correction.</p>
+                  <div class="step-visual">
+                    <div class="mock-interface">
+                      <div class="mock-text-panel">📄 Texte à corriger</div>
+                      <div class="mock-eval-panel">⭐ Grille d'évaluation</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                  <h4>Évaluer selon les 4 critères</h4>
+                  <p>Attribuez une note de 0 à 5 pour chaque critère (maximum 20 points au total).</p>
+                  <div class="step-visual">
+                    <div class="mock-criteria">
+                      <div class="criteria-row">Pertinence: <input type="number" value="4" readonly> /5</div>
+                      <div class="criteria-row">Cohérence: <input type="number" value="3" readonly> /5</div>
+                      <div class="criteria-row">Correction: <input type="number" value="4" readonly> /5</div>
+                      <div class="criteria-row">Présentation: <input type="number" value="2" readonly> /5</div>
+                      <div class="total-row">Total: 13/20</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="step-item">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                  <h4>Ajouter des commentaires</h4>
+                  <p>Rédigez des commentaires constructifs pour aider l'auteur à s'améliorer.</p>
+                  <div class="step-visual">
+                    <div class="mock-textarea">
+                      <div class="textarea-content">"Très beau poème avec de bonnes images poétiques. Attention aux accords grammaticaux..."</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="step-item">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                  <h4>Sauvegarder ou Valider</h4>
+                  <p>• <strong>Brouillon</strong> : Sauvegarde temporaire<br>• <strong>Valider</strong> : Finalise l'évaluation</p>
+                  <div class="step-visual">
+                    <div class="mock-buttons">
+                      <button class="btn-outline">💾 Brouillon</button>
+                      <button class="btn-primary">✅ Valider</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="guide-section">
+            <h3><i class="fas fa-lightbulb"></i> Conseils pour l'évaluation</h3>
+            <div class="tips-grid">
+              <div class="tip-card">
+                <div class="tip-icon">📖</div>
+                <h4>Lecture attentive</h4>
+                <p>Lisez le texte plusieurs fois avant d'évaluer pour bien comprendre le message.</p>
+              </div>
+              <div class="tip-card">
+                <div class="tip-icon">⚖️</div>
+                <h4>Objectivité</h4>
+                <p>Soyez objectif et bienveillant dans vos commentaires et notations.</p>
+              </div>
+              <div class="tip-card">
+                <div class="tip-icon">💡</div>
+                <h4>Exemples concrets</h4>
+                <p>Justifiez vos notes par des exemples précis tirés du texte.</p>
+              </div>
+              <div class="tip-card">
+                <div class="tip-icon">🎯</div>
+                <h4>Note de passage</h4>
+                <p>La note de passage est fixée à <strong>10/20</strong> pour l'admission.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -150,9 +150,10 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
 
   getStatusLabel(status: string): string {
     const labels = {
-      'en_attente': 'En attente',
-      'accepte': 'Accepté',
-      'refuse': 'Refusé'
+      'en_attente': 'À corriger',
+      'brouillon': 'Brouillon',
+      'accepte': 'Admis (≥10/20)',
+      'refuse': 'Non admis (<10/20)'
     };
     return labels[status as keyof typeof labels] || status;
   }
