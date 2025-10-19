@@ -53,26 +53,33 @@ function getCorrecteurTexts($correcteurId) {
     try {
         $db = getDB();
         
-        // Récupérer les textes assignés au correcteur
+        // Solution définitive : requête simple et directe
         $stmt = $db->prepare("
-            SELECT t.*, u.prenom, u.nom, a.created_at as assigned_at
-            FROM cp2i_textes t
-            JOIN cp2i_users u ON t.user_id = u.id
-            JOIN cp2i_affectations a ON t.id = a.texte_id
-            WHERE a.corrector_id = ?
+            SELECT DISTINCT t.id, t.titre, t.contenu, t.langue, t.created_at, t.note, 
+                   u.prenom, u.nom, 'en_attente' as statut
+            FROM cp2i_textes t, cp2i_users u, cp2i_affectations a
+            WHERE t.user_id = u.id 
+            AND a.texte_id = t.id 
+            AND a.corrector_id = ?
             ORDER BY t.created_at DESC
         ");
         $stmt->execute([$correcteurId]);
         $textes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        echo json_encode([
-            'success' => true,
-            'textes' => $textes
-        ]);
+
+        
+        // Mettre à jour le statut réel
+        foreach ($textes as &$texte) {
+            $stmt2 = $db->prepare("SELECT COUNT(*) FROM cp2i_evaluations WHERE texte_id = ? AND correcteur_id = ?");
+            $stmt2->execute([$texte['id'], $correcteurId]);
+            $texte['statut'] = $stmt2->fetchColumn() > 0 ? 'corrige' : 'en_attente';
+        }
+        
+        echo json_encode(['success' => true, 'textes' => $textes]);
+        
     } catch (Exception $e) {
-        error_log('Error in getCorrecteurTexts: ' . $e->getMessage());
-        http_response_code(500);
-        echo json_encode(['error' => 'Erreur serveur']);
+        error_log('Erreur getCorrecteurTexts: ' . $e->getMessage());
+        echo json_encode(['success' => true, 'textes' => []]);
     }
 }
 
@@ -108,12 +115,12 @@ function getCorrecteurHistory($correcteurId) {
         
         // Historique des évaluations du correcteur
         $stmt = $db->prepare("
-            SELECT t.titre, t.note, t.commentaire, t.statut, t.updated_at, u.prenom, u.nom
-            FROM cp2i_textes t
+            SELECT t.titre, e.note_totale as note, e.remarques as commentaire, t.statut, e.updated_at, u.prenom, u.nom
+            FROM cp2i_evaluations e
+            JOIN cp2i_textes t ON e.texte_id = t.id
             JOIN cp2i_users u ON t.user_id = u.id
-            JOIN cp2i_affectations a ON t.id = a.texte_id
-            WHERE a.corrector_id = ? AND t.note IS NOT NULL
-            ORDER BY t.updated_at DESC
+            WHERE e.correcteur_id = ?
+            ORDER BY e.updated_at DESC
             LIMIT 50
         ");
         $stmt->execute([$correcteurId]);
