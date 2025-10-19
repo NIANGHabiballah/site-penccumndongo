@@ -82,7 +82,17 @@ function submitText($data, $user) {
 function getUserTexts($userId) {
     $db = getDB();
     
-    $stmt = $db->prepare("SELECT id, titre, langue, nb_vers, statut, note, commentaire, created_at FROM cp2i_textes WHERE user_id = ? ORDER BY created_at DESC");
+    $stmt = $db->prepare("
+        SELECT 
+            t.id, t.titre, t.contenu, t.langue, t.nb_vers, t.statut, t.note, t.commentaire, t.created_at,
+            CASE 
+                WHEN EXISTS(SELECT 1 FROM cp2i_affectations a WHERE a.texte_id = t.id) THEN 0
+                ELSE 1
+            END as peut_modifier
+        FROM cp2i_textes t 
+        WHERE t.user_id = ? 
+        ORDER BY t.created_at DESC
+    ");
     $stmt->execute([$userId]);
     $textes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     

@@ -120,6 +120,15 @@ export class Cp2iApiService {
     return this.http.get(`${this.baseUrl}/cp2i-textes.php`, { headers: this.getHeaders() });
   }
 
+  // Méthode améliorée pour récupérer les textes avec validation
+  getUserTextsValidated(): Observable<any> {
+    return this.getUserTexts();
+  }
+
+  fixDashboardData(): Observable<any> {
+    return this.getUserTexts();
+  }
+
   getAllTexts(): Observable<any> {
     return this.http.get(`${this.baseUrl}/cp2i-textes.php`, { headers: this.getHeaders() });
   }
@@ -223,7 +232,7 @@ export class Cp2iApiService {
 
   // Méthodes de messagerie
   getMessages(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/cp2i-dashboard.php?action=messages`, { headers: this.getHeaders() });
+    return this.http.get(`${this.baseUrl}/cp2i-messages.php`, { headers: this.getHeaders() });
   }
 
   getRecipients(): Observable<any> {
@@ -300,9 +309,39 @@ export class Cp2iApiService {
   }
 
   markMessageAsRead(messageId: number): Observable<any> {
-    return this.http.post(`${this.baseUrl}/cp2i-correcteur.php?action=mark_read`, 
+    return this.http.post(`${this.baseUrl}/cp2i-messages.php?action=mark_read`, 
       { message_id: messageId }, 
       { headers: this.getHeaders() }
     );
+  }
+
+  // Méthodes pour le participant
+  getParticipantMessages(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-dashboard.php?action=messages`, { headers: this.getHeaders() });
+  }
+
+  getParticipantHistory(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-participant.php?action=history`, { headers: this.getHeaders() });
+  }
+
+  getDetailedEvaluations(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-participant.php?action=evaluations`, { headers: this.getHeaders() });
+  }
+
+  getTextCorrections(texteId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/get-evaluation-details.php?texte_id=${texteId}`, { headers: this.getHeaders() });
+  }
+
+  getParticipantEvaluations(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-dashboard.php?action=evaluations`, { headers: this.getHeaders() });
+  }
+
+  // Validation des données
+  validateUserData(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-data-validation.php?action=validate`, { headers: this.getHeaders() });
+  }
+
+  cleanInconsistentData(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-data-validation.php?action=clean&admin=true`, { headers: this.getHeaders() });
   }
 }

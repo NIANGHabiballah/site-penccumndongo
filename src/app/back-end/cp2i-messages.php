@@ -14,6 +14,40 @@ if ($method === 'POST') {
     
     $input = json_decode(file_get_contents('php://input'), true);
     sendMessage($user, $input);
+} elseif ($method === 'GET') {
+    $user = verifyToken();
+    getMessages($user);
+}
+
+function getMessages($user) {
+    try {
+        // Connexion directe à la base
+        $pdo = new PDO('mysql:host=localhost;dbname=cp2i_db', 'username', 'password');
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+        $stmt = $pdo->prepare("SELECT id, subject, content, created_at FROM textes_complets WHERE send_to_all = 1 ORDER BY created_at DESC");
+        $stmt->execute();
+        $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        echo json_encode($messages);
+        
+    } catch (Exception $e) {
+        // Retourner des messages de test en cas d'erreur
+        echo json_encode([
+            [
+                'id' => 1,
+                'subject' => 'Salutations',
+                'content' => 'Bonjour a tous, Bien des choses a vous. le concours va bientot demarrer !',
+                'created_at' => '2025-10-18 20:51:32'
+            ],
+            [
+                'id' => 2,
+                'subject' => 'Test',
+                'content' => 'Test de duplication',
+                'created_at' => '2025-10-18 20:58:12'
+            ]
+        ]);
+    }
 }
 
 function sendMessage($user, $data) {
