@@ -24,6 +24,9 @@ if ($method === 'GET') {
         case 'history':
             getCorrecteurHistory($user['user_id']);
             break;
+        case 'stats':
+            getCorrecteurStats($user['user_id']);
+            break;
         default:
             http_response_code(400);
             echo json_encode(['error' => 'Action non spécifiée']);
@@ -132,6 +135,38 @@ function getCorrecteurHistory($correcteurId) {
         ]);
     } catch (Exception $e) {
         error_log('Error in getCorrecteurHistory: ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['error' => 'Erreur serveur']);
+    }
+}
+
+function getCorrecteurStats($correcteurId) {
+    try {
+        $db = getDB();
+        
+        // Nombre total de textes assignés
+        $stmt = $db->prepare("SELECT COUNT(*) FROM cp2i_affectations WHERE corrector_id = ?");
+        $stmt->execute([$correcteurId]);
+        $totalAssignes = (int)$stmt->fetchColumn();
+        
+        // Nombre de textes corrigés (avec évaluations)
+        $stmt = $db->prepare("SELECT COUNT(DISTINCT texte_id) FROM cp2i_evaluations WHERE correcteur_id = ?");
+        $stmt->execute([$correcteurId]);
+        $corriges = (int)$stmt->fetchColumn();
+        
+        // Nombre à corriger
+        $aCorreger = $totalAssignes - $corriges;
+        
+        echo json_encode([
+            'success' => true,
+            'stats' => [
+                'total_assignes' => $totalAssignes,
+                'corriges' => $corriges,
+                'a_corriger' => $aCorreger
+            ]
+        ]);
+        
+    } catch (Exception $e) {
         http_response_code(500);
         echo json_encode(['error' => 'Erreur serveur']);
     }

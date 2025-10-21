@@ -312,6 +312,10 @@ export class Cp2iApiService {
     return this.http.get(`${this.baseUrl}/cp2i-correcteur.php?action=history`, { headers: this.getHeaders() });
   }
 
+  getCorrecteurStats(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-correcteur.php?action=stats`, { headers: this.getHeaders() });
+  }
+
   markMessageAsRead(messageId: number): Observable<any> {
     return this.http.post(`${this.baseUrl}/cp2i-messages.php?action=mark_read`, 
       { message_id: messageId }, 

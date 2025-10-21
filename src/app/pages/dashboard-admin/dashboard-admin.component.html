@@ -105,28 +105,182 @@
     <!-- Contenu dynamique selon la vue sélectionnée -->
     <div [ngSwitch]="currentView">
       <!-- Dashboard principal -->
-      <div *ngSwitchCase="'dashboard'" class="content-grid">
-        <div class="panel">
-          <div class="panel-header">
-            <h3>Statistiques générales</h3>
+      <div *ngSwitchCase="'dashboard'">
+        <!-- Calendrier moderne du concours -->
+        <div class="modern-calendar-container full-width">
+          <div class="calendar-header">
+            <div class="calendar-title">
+              <div class="title-icon">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+              <div class="title-content">
+                <h2>Calendrier CP2i 2025</h2>
+                <p>Concours de Poésie Internationale</p>
+              </div>
+            </div>
+            <div class="current-phase">
+              <span class="phase-label">Phase actuelle</span>
+              <div class="phase-badge" [ngClass]="getPhaseClass()">
+                {{getPhaseActuelle()}}
+              </div>
+            </div>
           </div>
-          <div class="panel-content">
-            <div class="stats-summary">
-              <div class="summary-item">
-                <span class="label">Note moyenne:</span>
-                <span class="value">{{stats.note_moyenne ? (stats.note_moyenne | number:'1.1-1') + '/20' : 'N/A'}}</span>
+
+          <div class="calendar-timeline">
+            <!-- Phase 1: Inscriptions -->
+            <div class="timeline-phase" [ngClass]="{'active': getPhaseActuelle() === 'Inscriptions ouvertes', 'completed': getJoursRestants(concoursSchedule.inscription_fin) < 0}">
+              <div class="phase-connector"></div>
+              <div class="phase-icon inscription">
+                <i class="fas fa-user-plus"></i>
               </div>
-              <div class="summary-item">
-                <span class="label">Textes acceptés:</span>
-                <span class="value">{{stats.textes_acceptes || 0}}</span>
+              <div class="phase-content">
+                <div class="phase-dates">
+                  <div class="date-range">
+                    <span class="start-date">03 Nov</span>
+                    <div class="date-separator"></div>
+                    <span class="end-date">23 Nov 2025</span>
+                  </div>
+                  <div class="duration">20 jours</div>
+                </div>
+                <div class="phase-info">
+                  <h3>Inscriptions & Soumissions</h3>
+                  <p>Ouverture des inscriptions et dépôt des textes poétiques</p>
+                  <div class="phase-stats">
+                    <div class="stat-item">
+                      <i class="fas fa-clock"></i>
+                      <span>{{getJoursRestants(concoursSchedule.inscription_fin)}} jours restants</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="summary-item">
-                <span class="label">Textes refusés:</span>
-                <span class="value">{{stats.textes_refuses || 0}}</span>
+            </div>
+
+            <!-- Phase 2: Corrections -->
+            <div class="timeline-phase" [ngClass]="{'active': getPhaseActuelle() === 'Période de correction', 'completed': getJoursRestants(concoursSchedule.correction_prolongement) < 0}">
+              <div class="phase-connector"></div>
+              <div class="phase-icon correction">
+                <i class="fas fa-edit"></i>
+              </div>
+              <div class="phase-content">
+                <div class="phase-dates">
+                  <div class="date-range">
+                    <span class="start-date">24 Nov</span>
+                    <div class="date-separator"></div>
+                    <span class="end-date">03 Déc 2025</span>
+                  </div>
+                  <div class="duration">10 jours</div>
+                </div>
+                <div class="phase-info">
+                  <h3>Évaluations & Corrections</h3>
+                  <p>Analyse et notation des textes par le jury de correcteurs</p>
+                  <div class="phase-stats">
+                    <div class="stat-item">
+                      <i class="fas fa-clock"></i>
+                      <span>{{getJoursRestants(concoursSchedule.correction_prolongement)}} jours restants</span>
+                    </div>
+                    <div class="stat-item">
+                      <i class="fas fa-info-circle"></i>
+                      <span>Prolongement possible</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Phase 3: Délibération -->
+            <div class="timeline-phase" [ngClass]="{'active': getPhaseActuelle() === 'Délibération', 'completed': getJoursRestants(concoursSchedule.deliberation) < 0}">
+              <div class="phase-connector"></div>
+              <div class="phase-icon deliberation">
+                <i class="fas fa-gavel"></i>
+              </div>
+              <div class="phase-content">
+                <div class="phase-dates">
+                  <div class="date-range">
+                    <span class="single-date">10 Décembre 2025</span>
+                  </div>
+                  <div class="duration">1 jour</div>
+                </div>
+                <div class="phase-info">
+                  <h3>Délibération du Jury</h3>
+                  <p>Réunion officielle et sélection des lauréats</p>
+                  <div class="phase-stats">
+                    <div class="stat-item">
+                      <i class="fas fa-clock"></i>
+                      <span>{{getJoursRestants(concoursSchedule.deliberation)}} jours restants</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Phase 4: Cérémonie -->
+            <div class="timeline-phase" [ngClass]="{'active': getPhaseActuelle() === 'Attente cérémonie', 'completed': getJoursRestants(concoursSchedule.ceremonie_remise) < 0}">
+              <div class="phase-connector"></div>
+              <div class="phase-icon ceremony">
+                <i class="fas fa-trophy"></i>
+              </div>
+              <div class="phase-content">
+                <div class="phase-dates">
+                  <div class="date-range">
+                    <span class="single-date">10 Janvier 2026</span>
+                  </div>
+                  <div class="duration">Evénement</div>
+                </div>
+                <div class="phase-info">
+                  <h3>Cérémonie de Remise</h3>
+                  <p>Célébration officielle et remise des prix aux gagnants</p>
+                  <div class="phase-stats">
+                    <div class="stat-item">
+                      <i class="fas fa-clock"></i>
+                      <span>{{getJoursRestants(concoursSchedule.ceremonie_remise)}} jours restants</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prochaine échéance mise en avant -->
+          <div class="next-milestone">
+            <div class="milestone-icon">
+              <i class="fas fa-flag-checkered"></i>
+            </div>
+            <div class="milestone-content">
+              <h4>Prochaine Échéance</h4>
+              <div class="milestone-details">
+                <span class="milestone-name">{{getProchaineEcheance().nom}}</span>
+                <div class="countdown-badge">
+                  <span class="countdown-number">{{getProchaineEcheance().jours}}</span>
+                  <span class="countdown-label">jours</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        
+        <!-- Grille pour les autres panneaux -->
+        <div class="content-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Statistiques générales</h3>
+            </div>
+            <div class="panel-content">
+              <div class="stats-summary">
+                <div class="summary-item">
+                  <span class="label">Note moyenne:</span>
+                  <span class="value">{{stats.note_moyenne ? (stats.note_moyenne | number:'1.1-1') + '/20' : 'N/A'}}</span>
+                </div>
+                <div class="summary-item">
+                  <span class="label">Textes acceptés:</span>
+                  <span class="value">{{stats.textes_acceptes || 0}}</span>
+                </div>
+                <div class="summary-item">
+                  <span class="label">Textes refusés:</span>
+                  <span class="value">{{stats.textes_refuses || 0}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
         <div class="panel">
           <div class="panel-header">

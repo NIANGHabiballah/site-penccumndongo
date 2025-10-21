@@ -81,11 +81,23 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   // Gestion des paramètres
   currentSettingsTab = 'concours';
+  
+  // Dates officielles du concours CP2i 2025
+  concoursSchedule = {
+    inscription_debut: '2025-11-03',
+    inscription_fin: '2025-11-23',
+    correction_debut: '2025-11-24',
+    correction_fin: '2025-11-30',
+    correction_prolongement: '2025-12-03',
+    deliberation: '2025-12-10',
+    ceremonie_remise: '2026-01-10'
+  };
+  
   settings = {
-    start_date: '2025-01-01',
-    end_date: '2025-01-31',
-    evaluation_deadline: '2025-02-15',
-    results_date: '2025-02-28',
+    start_date: '2025-11-03',
+    end_date: '2025-11-23',
+    evaluation_deadline: '2025-12-03',
+    results_date: '2025-12-10',
     max_verses: 50,
     max_texts_per_user: 3,
     min_text_length: 100,
@@ -984,5 +996,72 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       // Simuler le vidage du cache
       this.showToast('Cache vidé avec succès', 'success');
     }
+  }
+  
+  // Méthodes pour le calendrier du concours
+  getJoursRestants(dateStr: string): number {
+    const date = new Date(dateStr);
+    const today = new Date();
+    const diffTime = date.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+  
+  getPhaseActuelle(): string {
+    const today = new Date();
+    const inscriptionDebut = new Date(this.concoursSchedule.inscription_debut);
+    const inscriptionFin = new Date(this.concoursSchedule.inscription_fin);
+    const correctionDebut = new Date(this.concoursSchedule.correction_debut);
+    const correctionFin = new Date(this.concoursSchedule.correction_prolongement);
+    const deliberation = new Date(this.concoursSchedule.deliberation);
+    const ceremonie = new Date(this.concoursSchedule.ceremonie_remise);
+    
+    if (today < inscriptionDebut) {
+      return 'Préparation';
+    } else if (today >= inscriptionDebut && today <= inscriptionFin) {
+      return 'Inscriptions ouvertes';
+    } else if (today > inscriptionFin && today < correctionDebut) {
+      return 'Préparation corrections';
+    } else if (today >= correctionDebut && today <= correctionFin) {
+      return 'Période de correction';
+    } else if (today > correctionFin && today < deliberation) {
+      return 'Préparation délibération';
+    } else if (today.toDateString() === deliberation.toDateString()) {
+      return 'Délibération';
+    } else if (today > deliberation && today < ceremonie) {
+      return 'Attente cérémonie';
+    } else if (today >= ceremonie) {
+      return 'Concours terminé';
+    }
+    
+    return 'Phase inconnue';
+  }
+  
+  getProchaineEcheance(): { nom: string, date: string, jours: number } {
+    const today = new Date();
+    const echeances = [
+      { nom: 'Début des inscriptions', date: this.concoursSchedule.inscription_debut },
+      { nom: 'Fin des inscriptions', date: this.concoursSchedule.inscription_fin },
+      { nom: 'Début des corrections', date: this.concoursSchedule.correction_debut },
+      { nom: 'Fin des corrections', date: this.concoursSchedule.correction_prolongement },
+      { nom: 'Délibération', date: this.concoursSchedule.deliberation },
+      { nom: 'Cérémonie de remise', date: this.concoursSchedule.ceremonie_remise }
+    ];
+    
+    for (const echeance of echeances) {
+      const dateEcheance = new Date(echeance.date);
+      if (dateEcheance >= today) {
+        return {
+          nom: echeance.nom,
+          date: echeance.date,
+          jours: this.getJoursRestants(echeance.date)
+        };
+      }
+    }
+    
+    return { nom: 'Aucune échéance', date: '', jours: 0 };
+  }
+  
+  getPhaseClass(): string {
+    return 'phase-' + this.getPhaseActuelle().toLowerCase().replace(/\s+/g, '-');
   }
 }

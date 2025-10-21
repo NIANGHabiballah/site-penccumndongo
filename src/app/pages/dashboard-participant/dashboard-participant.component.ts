@@ -157,7 +157,8 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   }
   
   calculateDeadline() {
-    const deadline = new Date('2025-02-15');
+    // Date limite d'inscription pour les participants : 23 novembre 2025
+    const deadline = new Date('2025-11-23');
     const today = new Date();
     const diffTime = deadline.getTime() - today.getTime();
     this.joursRestants = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));

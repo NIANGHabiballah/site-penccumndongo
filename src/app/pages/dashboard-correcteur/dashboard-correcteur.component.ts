@@ -71,6 +71,7 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
   loadData() {
     this.loadProfile();
     this.loadTextesAssignes();
+    this.loadStats();
     this.loadMessages();
     this.loadHistorique();
     this.calculateDeadline();
@@ -97,7 +98,6 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
     this.cp2iApi.getCorrecteurTexts().subscribe({
       next: (data) => {
         this.textesAssignes = data.textes || [];
-        this.calculerStats();
         if (this.textesAssignes.length > 0) {
           this.currentTexte = this.textesAssignes[0];
           this.loadEvaluationForm();
@@ -136,14 +136,24 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
     });
   }
 
-  calculerStats() {
-    this.stats.assignes = this.textesAssignes.length;
-    this.stats.corriges = this.textesAssignes.filter(t => t.statut === 'accepte' || t.statut === 'refuse').length;
-    this.stats.enCours = this.textesAssignes.filter(t => t.statut === 'en_attente').length;
+  loadStats() {
+    this.cp2iApi.getCorrecteurStats().subscribe({
+      next: (data) => {
+        if (data.success && data.stats) {
+          this.stats.assignes = data.stats.total_assignes;
+          this.stats.corriges = data.stats.corriges;
+          this.stats.enCours = data.stats.a_corriger;
+        }
+      },
+      error: (error) => {
+        console.error('Erreur stats:', error);
+      }
+    });
   }
 
   calculateDeadline() {
-    const deadline = new Date('2025-02-15');
+    // Date limite de correction pour les correcteurs : 3 décembre 2025
+    const deadline = new Date('2025-12-03');
     const today = new Date();
     const diffTime = deadline.getTime() - today.getTime();
     this.stats.joursRestants = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -231,6 +241,7 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.showToast('Brouillon sauvegardé', 'success');
         this.loadTextesAssignes();
+        this.loadStats();
         this.loadHistorique(); // Recharger l'historique
       },
       error: (error) => {
@@ -265,6 +276,7 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
         const message = isModification ? 'Note modifiée avec succès' : 'Évaluation validée avec succès';
         this.showToast(message, 'success');
         this.loadTextesAssignes();
+        this.loadStats();
         this.loadHistorique(); // Recharger l'historique
         if (!isModification) {
           this.nextTexte();
