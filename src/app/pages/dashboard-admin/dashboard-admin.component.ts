@@ -155,6 +155,14 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     private router: Router,
     private http: HttpClient
   ) {}
+  
+  private getHeaders() {
+    const token = localStorage.getItem('cp2i_token');
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': token ? `Bearer ${token}` : ''
+    };
+  }
 
   ngOnInit() {
     if (!this.cp2iApi.isAuthenticated()) {
@@ -196,25 +204,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       error: (error) => console.error('Erreur profil:', error)
     });
     
-    // Charger les statistiques
-    this.cp2iApi.getDashboardStats().subscribe({
-      next: (data) => {
-        // Mapper correctement les données du backend
-        this.stats = {
-          total_textes: data.stats?.total_textes || 0,
-          textes_acceptes: data.stats?.textes_acceptes || 0,
-          textes_refuses: data.stats?.textes_refuses || 0,
-          textes_en_attente: data.stats?.textes_en_attente || 0,
-          note_moyenne: data.stats?.note_moyenne || null,
-          affectation_stats: data.stats?.affectation_stats || {},
-          correcteurs_stats: data.stats?.correcteurs_stats || [],
-          textes_affectations: data.stats?.textes_affectations || []
-        };
-        console.log('Stats mappées:', this.stats);
-        console.log('Textes affectations:', this.stats.textes_affectations);
-      },
-      error: (error) => console.error('Erreur stats:', error)
-    });
+    // Calculer les statistiques depuis les textes chargés
+    this.calculateStatsFromTexts();
     
     // Charger tous les utilisateurs
     this.cp2iApi.getUsers().subscribe({
@@ -241,6 +232,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         this.textes = data.textes || [];
         this.filteredTextes = [...this.textes];
         this.applyEvaluationFilters();
+        // Calculer les stats après avoir chargé les textes
+        this.calculateStatsFromTexts();
       },
       error: (error) => console.error('Erreur textes:', error)
     });
@@ -1063,5 +1056,40 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   getPhaseClass(): string {
     return 'phase-' + this.getPhaseActuelle().toLowerCase().replace(/\s+/g, '-');
+  }
+  
+  calculateStatsFromTexts() {
+    if (this.textes && this.textes.length > 0) {
+      const total = this.textes.length;
+      const acceptes = this.textes.filter(t => t.statut === 'accepte').length;
+      const refuses = this.textes.filter(t => t.statut === 'refuse').length;
+      const enAttente = this.textes.filter(t => t.statut === 'en_attente').length;
+      
+      const notesValides = this.textes.filter(t => t.note && t.note > 0).map(t => t.note);
+      const noteMoyenne = notesValides.length > 0 ? 
+        notesValides.reduce((sum, note) => sum + note, 0) / notesValides.length : null;
+      
+      this.stats = {
+        total_textes: total,
+        textes_acceptes: acceptes,
+        textes_refuses: refuses,
+        textes_en_attente: enAttente,
+        note_moyenne: noteMoyenne,
+        affectation_stats: {},
+        correcteurs_stats: [],
+        textes_affectations: []
+      };
+    } else {
+      this.stats = {
+        total_textes: 0,
+        textes_acceptes: 0,
+        textes_refuses: 0,
+        textes_en_attente: 0,
+        note_moyenne: null,
+        affectation_stats: {},
+        correcteurs_stats: [],
+        textes_affectations: []
+      };
+    }
   }
 }
