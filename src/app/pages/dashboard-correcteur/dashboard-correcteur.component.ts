@@ -138,8 +138,8 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
 
   calculerStats() {
     this.stats.assignes = this.textesAssignes.length;
-    this.stats.corriges = this.textesAssignes.filter(t => t.statut === 'accepte' || t.statut === 'refuse').length;
-    this.stats.enCours = this.textesAssignes.filter(t => t.statut === 'en_attente').length;
+    this.stats.corriges = this.textesAssignes.filter(t => t.statut === 'corrige' || (t.note && t.note > 0)).length;
+    this.stats.enCours = this.stats.assignes - this.stats.corriges;
   }
 
   calculateDeadline() {
