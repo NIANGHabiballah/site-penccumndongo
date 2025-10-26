@@ -185,14 +185,53 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
 
   loadEvaluationForm() {
     if (this.currentTexte) {
-      this.evaluationForm = {
-        pertinence: this.currentTexte.eval_pertinence || 0,
-        coherence: this.currentTexte.eval_coherence || 0,
-        correction: this.currentTexte.eval_correction || 0,
-        presentation: this.currentTexte.eval_presentation || 0,
-        commentaire: this.currentTexte.commentaire || '',
-        statut: this.currentTexte.statut || 'en_attente'
-      };
+      // Charger les évaluations détaillées depuis l'API
+      this.cp2iApi.getTextCorrections(this.currentTexte.id).subscribe({
+        next: (data) => {
+          console.log('📊 Évaluations reçues:', data);
+          if (data && data.corrections && data.corrections.length > 0) {
+            // Trouver l'évaluation du correcteur connecté
+            const evaluation = data.corrections.find((c: any) => c.correcteur_id === this.currentUser?.id) || data.corrections[0];
+            console.log('👤 Évaluation du correcteur:', evaluation);
+            console.log('🔑 Propriétés disponibles:', Object.keys(evaluation));
+            console.log('📊 Critères trouvés:', evaluation.criteres);
+            console.log('📊 Note globale:', evaluation.note);
+            
+            const criteres = evaluation.criteres || {};
+            this.evaluationForm = {
+              pertinence: criteres.pertinence || 0,
+              coherence: criteres.coherence || 0,
+              correction: criteres.correction || 0,
+              presentation: criteres.presentation || 0,
+              commentaire: evaluation.commentaire || '',
+              statut: this.currentTexte.statut || 'en_attente'
+            };
+          } else {
+            // Pas d'évaluation trouvée, formulaire vide
+            this.evaluationForm = {
+              pertinence: 0,
+              coherence: 0,
+              correction: 0,
+              presentation: 0,
+              commentaire: '',
+              statut: 'en_attente'
+            };
+          }
+          console.log('📋 Formulaire final:', this.evaluationForm);
+        },
+        error: (error) => {
+          console.log('❌ Erreur chargement évaluations:', error);
+          // Formulaire vide en cas d'erreur
+          this.evaluationForm = {
+            pertinence: 0,
+            coherence: 0,
+            correction: 0,
+            presentation: 0,
+            commentaire: '',
+            statut: 'en_attente'
+          };
+        }
+      });
     }
   }
 
