@@ -145,7 +145,7 @@ export class Cp2iApiService {
   }
 
   getDashboardStats(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/cp2i-dashboard-simple.php?action=stats&v=2`, { headers: this.getHeaders() });
+    return this.http.get(`${this.baseUrl}/cp2i-admin-stats.php`, { headers: this.getHeaders() });
   }
 
   getProfile(): Observable<any> {
@@ -310,6 +310,10 @@ export class Cp2iApiService {
 
   getCorrecteurHistory(): Observable<any> {
     return this.http.get(`${this.baseUrl}/cp2i-correcteur.php?action=history`, { headers: this.getHeaders() });
+  }
+
+  getCorrecteurStats(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-correcteur.php?action=stats`, { headers: this.getHeaders() });
   }
 
   markMessageAsRead(messageId: number): Observable<any> {

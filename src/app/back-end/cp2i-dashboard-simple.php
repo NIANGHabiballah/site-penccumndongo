@@ -5,16 +5,11 @@ setCorsHeaders();
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
+    $user = verifyToken();
     $action = $_GET['action'] ?? 'stats';
     
     if ($action === 'stats') {
-        // Mode debug sans authentification
-        if (isset($_GET['debug']) && $_GET['debug'] === 'true') {
-            getSimpleStats(['role' => 'admin', 'user_id' => 1]);
-        } else {
-            $user = verifyToken();
-            getSimpleStats($user);
-        }
+        getSimpleStats($user);
     }
 }
 
@@ -44,7 +39,7 @@ function getSimpleStats($user) {
         $stats['note_moyenne'] = $stats['note_moyenne'] ? (float)$stats['note_moyenne'] : null;
         
     } else {
-        // Stats globales pour admin/correcteur - DONNÉES RÉELLES
+        // Stats globales pour admin/correcteur
         $stmt = $db->prepare("
             SELECT 
                 COUNT(*) as total_textes,
@@ -58,7 +53,7 @@ function getSimpleStats($user) {
         $stmt->execute();
         $stats = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        // Textes avec affectations - DONNÉES RÉELLES (d'abord récupérer les données)
+        // Textes avec affectations
         $stmt = $db->prepare("
             SELECT 
                 t.id as texte_id,
@@ -77,22 +72,6 @@ function getSimpleStats($user) {
         ");
         $stmt->execute();
         $textes_affectations = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        // FORCER le recalcul des statistiques depuis les vraies données
-        $stats['total_textes'] = count($textes_affectations);
-        $stats['textes_acceptes'] = 0;
-        $stats['textes_refuses'] = 0;
-        $stats['textes_en_attente'] = 0;
-        
-        foreach ($textes_affectations as $texte) {
-            if ($texte['statut'] === 'accepte') {
-                $stats['textes_acceptes']++;
-            } elseif ($texte['statut'] === 'refuse') {
-                $stats['textes_refuses']++;
-            } else {
-                $stats['textes_en_attente']++;
-            }
-        }
         
         // Statistiques d'affectation
         $stmt = $db->prepare("

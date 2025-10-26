@@ -81,11 +81,22 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   // Gestion des paramètres
   currentSettingsTab = 'concours';
+  // Dates officielles du concours CP2i 2025
+  concoursSchedule = {
+    inscription_debut: '2025-11-03',
+    inscription_fin: '2025-11-23',
+    correction_debut: '2025-11-24',
+    correction_fin: '2025-11-30',
+    correction_prolongement: '2025-12-03',
+    deliberation: '2025-12-10',
+    ceremonie_remise: '2026-01-10'
+  };
+  
   settings = {
-    start_date: '2025-01-01',
-    end_date: '2025-01-31',
-    evaluation_deadline: '2025-02-15',
-    results_date: '2025-02-28',
+    start_date: '2025-11-03',
+    end_date: '2025-11-23',
+    evaluation_deadline: '2025-12-03',
+    results_date: '2025-12-10',
     max_verses: 50,
     max_texts_per_user: 3,
     min_text_length: 100,
@@ -143,6 +154,14 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     private router: Router,
     private http: HttpClient
   ) {}
+  
+  private getHeaders() {
+    const token = localStorage.getItem('cp2i_token');
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': token ? `Bearer ${token}` : ''
+    };
+  }
 
   ngOnInit() {
     if (!this.cp2iApi.isAuthenticated()) {
@@ -184,50 +203,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       error: (error) => console.error('Erreur profil:', error)
     });
     
-    // Charger les statistiques
-    this.cp2iApi.getDashboardStats().subscribe({
-      next: (data) => {
-        console.log('🔍 Données brutes reçues:', JSON.stringify(data, null, 2));
-        
-        // Calculer les statistiques depuis les données d'affectations (plus fiables)
-        const affectations = data.stats?.textes_affectations || [];
-        let acceptes = 0, refuses = 0, en_attente = 0;
-        
-        affectations.forEach((texte: any) => {
-          if (texte.statut === 'accepte') acceptes++;
-          else if (texte.statut === 'refuse') refuses++;
-          else en_attente++;
-        });
-        
-        // Calculer la note moyenne depuis les textes chargés (qui ont les vraies notes)
-        let totalNotes = 0, nombreNotes = 0;
-        this.textes.forEach((texte: any) => {
-          if (texte.note && texte.note > 0) {
-            totalNotes += parseFloat(texte.note);
-            nombreNotes++;
-          }
-        });
-        
-        const noteMoyenne = nombreNotes > 0 ? Math.round((totalNotes / nombreNotes) * 10) / 10 : null;
-        
-        this.stats = {
-          total_textes: affectations.length,
-          textes_acceptes: acceptes,
-          textes_refuses: refuses,
-          textes_en_attente: en_attente,
-          note_moyenne: noteMoyenne,
-          affectation_stats: data.stats?.affectation_stats || {},
-          correcteurs_stats: data.stats?.correcteurs_stats || [],
-          textes_affectations: affectations
-        };
-        
-        console.log('📊 Stats recalculées:', this.stats);
-        console.log('📈 Note moyenne calculée:', noteMoyenne, 'depuis', nombreNotes, 'textes notés');
-        console.log('✅ Acceptés:', this.stats.textes_acceptes);
-        console.log('❌ Refusés:', this.stats.textes_refuses);
-      },
-      error: (error) => console.error('❌ Erreur stats:', error)
-    });
+    // Calculer les statistiques depuis les textes chargés
+    this.calculateStatsFromTexts();
     
     // Charger tous les utilisateurs
     this.cp2iApi.getUsers().subscribe({
@@ -254,9 +231,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         this.textes = data.textes || [];
         this.filteredTextes = [...this.textes];
         this.applyEvaluationFilters();
-        
-        // Recalculer la note moyenne avec les vraies données
-        this.calculateNoteMoyenne();
+        // Calculer les stats après avoir chargé les textes
+        this.calculateStatsFromTexts();
       },
       error: (error) => console.error('Erreur textes:', error)
     });
@@ -1007,38 +983,117 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.showToast('Export des données réalisé', 'success');
   }
   
-  getDaysRemaining(dateString: string): number {
-    const targetDate = new Date(dateString);
-    const today = new Date();
-    const diffTime = targetDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays > 0 ? diffDays : 0;
-  }
-  
-  calculateNoteMoyenne() {
-    let totalNotes = 0, nombreNotes = 0;
-    
-    this.textes.forEach((texte: any) => {
-      if (texte.note && !isNaN(parseFloat(texte.note)) && parseFloat(texte.note) > 0) {
-        totalNotes += parseFloat(texte.note);
-        nombreNotes++;
-        console.log('📝 Texte:', texte.titre, 'Note:', texte.note);
-      }
-    });
-    
-    if (nombreNotes > 0) {
-      this.stats.note_moyenne = Math.round((totalNotes / nombreNotes) * 10) / 10;
-      console.log('📈 Note moyenne calculée:', this.stats.note_moyenne, 'depuis', nombreNotes, 'textes');
-    } else {
-      console.log('⚠️ Aucune note trouvée dans les textes');
-    }
-  }
-  
+
   clearCache() {
     if (confirm('Êtes-vous sûr de vouloir vider le cache ?')) {
       // Simuler le vidage du cache
       this.showToast('Cache vidé avec succès', 'success');
     }
   }
-
+  
+  // Méthodes pour le calendrier du concours
+  getJoursRestants(dateStr: string): number {
+    const date = new Date(dateStr);
+    const today = new Date();
+    const diffTime = date.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+  
+  getDaysRemaining(dateString: string): number {
+    return this.getJoursRestants(dateString);
+  }
+  
+  getPhaseActuelle(): string {
+    const today = new Date();
+    const inscriptionDebut = new Date(this.concoursSchedule.inscription_debut);
+    const inscriptionFin = new Date(this.concoursSchedule.inscription_fin);
+    const correctionDebut = new Date(this.concoursSchedule.correction_debut);
+    const correctionFin = new Date(this.concoursSchedule.correction_prolongement);
+    const deliberation = new Date(this.concoursSchedule.deliberation);
+    const ceremonie = new Date(this.concoursSchedule.ceremonie_remise);
+    
+    if (today < inscriptionDebut) {
+      return 'Préparation';
+    } else if (today >= inscriptionDebut && today <= inscriptionFin) {
+      return 'Inscriptions ouvertes';
+    } else if (today > inscriptionFin && today < correctionDebut) {
+      return 'Préparation corrections';
+    } else if (today >= correctionDebut && today <= correctionFin) {
+      return 'Période de correction';
+    } else if (today > correctionFin && today < deliberation) {
+      return 'Préparation délibération';
+    } else if (today.toDateString() === deliberation.toDateString()) {
+      return 'Délibération';
+    } else if (today > deliberation && today < ceremonie) {
+      return 'Attente cérémonie';
+    } else if (today >= ceremonie) {
+      return 'Concours terminé';
+    }
+    
+    return 'Phase inconnue';
+  }
+  
+  getProchaineEcheance(): { nom: string, date: string, jours: number } {
+    const today = new Date();
+    const echeances = [
+      { nom: 'Début des inscriptions', date: this.concoursSchedule.inscription_debut },
+      { nom: 'Fin des inscriptions', date: this.concoursSchedule.inscription_fin },
+      { nom: 'Début des corrections', date: this.concoursSchedule.correction_debut },
+      { nom: 'Fin des corrections', date: this.concoursSchedule.correction_prolongement },
+      { nom: 'Délibération', date: this.concoursSchedule.deliberation },
+      { nom: 'Cérémonie de remise', date: this.concoursSchedule.ceremonie_remise }
+    ];
+    
+    for (const echeance of echeances) {
+      const dateEcheance = new Date(echeance.date);
+      if (dateEcheance >= today) {
+        return {
+          nom: echeance.nom,
+          date: echeance.date,
+          jours: this.getJoursRestants(echeance.date)
+        };
+      }
+    }
+    
+    return { nom: 'Aucune échéance', date: '', jours: 0 };
+  }
+  
+  getPhaseClass(): string {
+    return 'phase-' + this.getPhaseActuelle().toLowerCase().replace(/\s+/g, '-');
+  }
+  
+  calculateStatsFromTexts() {
+    if (this.textes && this.textes.length > 0) {
+      const total = this.textes.length;
+      const acceptes = this.textes.filter(t => t.statut === 'accepte').length;
+      const refuses = this.textes.filter(t => t.statut === 'refuse').length;
+      const enAttente = this.textes.filter(t => t.statut === 'en_attente').length;
+      
+      const notesValides = this.textes.filter(t => t.note && t.note > 0).map(t => t.note);
+      const noteMoyenne = notesValides.length > 0 ? 
+        notesValides.reduce((sum, note) => sum + note, 0) / notesValides.length : null;
+      
+      this.stats = {
+        total_textes: total,
+        textes_acceptes: acceptes,
+        textes_refuses: refuses,
+        textes_en_attente: enAttente,
+        note_moyenne: noteMoyenne,
+        affectation_stats: {},
+        correcteurs_stats: [],
+        textes_affectations: []
+      };
+    } else {
+      this.stats = {
+        total_textes: 0,
+        textes_acceptes: 0,
+        textes_refuses: 0,
+        textes_en_attente: 0,
+        note_moyenne: null,
+        affectation_stats: {},
+        correcteurs_stats: [],
+        textes_affectations: []
+      };
+    }
+  }
 }

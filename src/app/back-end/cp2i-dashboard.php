@@ -163,11 +163,31 @@ function getStats($user) {
             'affectation_stats' => $affectation_stats
         ]));
         
-        // Forcer les valeurs correctes
-        $stats['total_textes'] = 5;
-        $stats['textes_en_attente'] = 5;
-        $stats['textes_acceptes'] = 0;
-        $stats['textes_refuses'] = 0;
+        // Calculer les vraies statistiques générales
+        try {
+            $stmt = $db->prepare("
+                SELECT 
+                    COUNT(*) as total_textes,
+                    SUM(CASE WHEN statut = 'accepte' THEN 1 ELSE 0 END) as textes_acceptes,
+                    SUM(CASE WHEN statut = 'refuse' THEN 1 ELSE 0 END) as textes_refuses,
+                    SUM(CASE WHEN statut = 'en_attente' THEN 1 ELSE 0 END) as textes_en_attente,
+                    AVG(CASE WHEN note IS NOT NULL AND note > 0 THEN note ELSE NULL END) as note_moyenne
+                FROM cp2i_textes
+            ");
+            $stmt->execute();
+            $real_stats = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            // Utiliser les vraies données
+            $stats = $real_stats;
+        } catch (Exception $e) {
+            error_log('Erreur stats SQL: ' . $e->getMessage());
+            // Fallback en cas d'erreur
+            $stats['total_textes'] = 0;
+            $stats['textes_acceptes'] = 0;
+            $stats['textes_refuses'] = 0;
+            $stats['textes_en_attente'] = 0;
+            $stats['note_moyenne'] = null;
+        }
         
         echo json_encode([
             'stats' => array_merge($stats, [
