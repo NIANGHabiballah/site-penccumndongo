@@ -1,0 +1,41 @@
+<div class="popup-overlay" *ngIf="showPopup" (click)="closePopup()">
+  <div class="popup-content" (click)="$event.stopPropagation()">
+    <button class="popup-close" (click)="closePopup()">
+      <i class="fas fa-times"></i>
+    </button>
+    
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="fas fa-trophy"></i>
+      </div>
+      <h2>Concours CP2i</h2>
+      <p class="popup-subtitle">Concours de Poésie Inédit &amp; Innovant</p>
+    </div>
+    
+    <div class="popup-body">
+      <div class="highlight-box">
+        <i class="fas fa-feather-pointed"></i>
+        <span>Concours ouvert à tous</span>
+      </div>
+      
+      <p>Rejoignez la plus grande communauté de poètes d'Afrique !</p>
+      
+      <ul class="benefits-list">
+        <li><i class="fas fa-check"></i> Les 5 premiers auront des prix distingués</li>
+        <li><i class="fas fa-check"></i> Attestations de participation pour tous les éligibles</li>
+        <li><i class="fas fa-check"></i> Promouvoir les jeunes talents de toute l'Afrique</li>
+      </ul>
+    </div>
+    
+    <div class="popup-actions">
+      <button class="btn btn-primary" (click)="goToInscription()">
+        <i class="fas fa-user-plus"></i>
+        S'inscrire maintenant
+      </button>
+      <button class="btn btn-secondary" (click)="goToLogin()">
+        <i class="fas fa-sign-in-alt"></i>
+        Se connecter
+      </button>
+    </div>
+  </div>
+</div>
