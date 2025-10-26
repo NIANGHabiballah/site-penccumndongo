@@ -250,10 +250,10 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
         <body>
           <div class="certificat">
             <h1>CERTIFICAT DE PARTICIPATION</h1>
-            <h2>Concours de Poésie Internationale CP2i 2025</h2>
+            <h2>Concours de Poésie Inédit & Innovant CP2i 2025</h2>
             <p>Ce certificat atteste que</p>
             <div class="nom">{{currentUser?.prenom}} {{currentUser?.nom}}</div>
-            <p>a participé au Concours de Poésie Internationale CP2i Édition 2025</p>
+            <p>a participé au Concours de Poésie Inédit & Innovant CP2i Édition 2025</p>
             <div class="date">Délivré le {{new Date().toLocaleDateString('fr-FR')}}</div>
           </div>
         </body>

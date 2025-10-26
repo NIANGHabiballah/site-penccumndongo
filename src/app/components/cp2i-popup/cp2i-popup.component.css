@@ -94,6 +94,10 @@
   color: white !important;
 }
 
+.white-text {
+  color: white !important;
+}
+
 .popup-body {
   padding: 2rem;
 }

@@ -375,6 +375,74 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
   color: #666;
 }
 
+/* Styles pour l'icône calendrier */
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  border-bottom: none;
+}
+
+.calendar-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.calendar-icon {
+  font-size: 2rem;
+  color: #FF7F1A;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px;
+  border-radius: 50%;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(255, 127, 26, 0.3);
+  transition: all 0.3s ease;
+}
+
+.calendar-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(255, 127, 26, 0.4);
+}
+
+.calendar-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.calendar-text h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  line-height: 1.2;
+}
+
+.calendar-text .subtitle {
+  font-size: 14px;
+  color: white !important;
+  font-weight: 400;
+  margin: 0;
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .calendar-header {
+    padding: 15px;
+  }
+  
+  .calendar-text h3 {
+    font-size: 16px;
+  }
+  
+  .calendar-text .subtitle {
+    font-size: 13px;
+  }
+}
+
 /* Gestion des utilisateurs améliorée */
 .users-header {
   display: flex;
