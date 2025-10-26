@@ -1,0 +1,3 @@
+.router-fade > * {
+  animation: fadeIn 0.7s;
+}

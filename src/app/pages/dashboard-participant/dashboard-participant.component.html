@@ -1,0 +1,726 @@
+<div class="dashboard" [class.sidebar-collapsed]="desktopMenuHidden">
+  <!-- Sidebar -->
+  <!-- Overlay pour fermer le menu -->
+  <div class="mobile-overlay" *ngIf="mobileMenuOpen" (click)="toggleMobileMenu()"></div>
+  
+  <nav class="sidebar" [class.mobile-active]="mobileMenuOpen" [class.sidebar-hidden]="desktopMenuHidden" (mouseleave)="closeMobileMenuOnLeave()">
+    <div class="logo">
+      <h2>CP2i</h2>
+      <p>Concours de Poésie</p>
+    </div>
+    
+    <div class="user-info">
+      <div class="user-avatar">
+        <i class="fas fa-user"></i>
+      </div>
+      <h4>{{currentUser?.prenom}} {{currentUser?.nom}}</h4>
+      <p>{{currentUser?.role | titlecase}}</p>
+    </div>
+    
+    <div class="nav-menu">
+      <div class="nav-item" [class.active]="currentView === 'accueil'" (click)="setCurrentView('accueil'); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-home"></i>
+        <span>Accueil</span>
+      </div>
+      <div class="nav-item" [class.active]="currentView === 'profil'" (click)="setCurrentView('profil'); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-user"></i>
+        <span>Mon Profil</span>
+      </div>
+      <div class="nav-item" (click)="nouvellesoumission(); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-edit"></i>
+        <span>Soumettre un texte</span>
+      </div>
+      <div class="nav-item" [class.active]="currentView === 'soumissions'" (click)="setCurrentView('soumissions'); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-file-alt"></i>
+        <span>Mes Soumissions</span>
+      </div>
+      <div class="nav-item" [class.active]="currentView === 'resultats'" (click)="setCurrentView('resultats'); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-chart-bar"></i>
+        <span>Résultats & Notes</span>
+      </div>
+      <div class="nav-item" [class.active]="currentView === 'messages'" (click)="setCurrentView('messages'); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-envelope"></i>
+        <span>Messages</span>
+        <span class="notification-badge" *ngIf="getUnreadMessagesCount() > 0">{{getUnreadMessagesCount()}}</span>
+      </div>
+      <div class="nav-item" [class.active]="currentView === 'support'" (click)="setCurrentView('support'); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-comments"></i>
+        <span>Chat Support</span>
+      </div>
+      <div class="nav-item" [class.active]="currentView === 'guide'" (click)="setCurrentView('guide'); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-book"></i>
+        <span>Guide d'Utilisation</span>
+      </div>
+      <div class="nav-item" [class.active]="currentView === 'historique'" (click)="setCurrentView('historique'); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-history"></i>
+        <span>Mon Historique</span>
+      </div>
+      <div class="nav-item" [class.active]="currentView === 'certificats'" (click)="setCurrentView('certificats'); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-certificate"></i>
+        <span>Mes Certificats</span>
+      </div>
+      <div class="nav-item" (click)="logout(); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Déconnexion</span>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Main Content -->
+  <!-- Menu Hamburger Mobile -->
+  <div class="mobile-menu-toggle" (click)="toggleMobileMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  
+  <main class="main-content">
+    <header class="header">
+      <div class="welcome">
+        <h1>Bienvenue, {{currentUser?.prenom}} !</h1>
+        <p>Tableau de bord - CP2i Édition 2025</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-outline btn-compact" (click)="setCurrentView('messages')">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge" *ngIf="getUnreadMessagesCount() > 0">{{getUnreadMessagesCount()}}</span>
+        </button>
+        <button class="btn" [class.btn-primary]="stats.total_textes === 0" [class.btn-disabled]="stats.total_textes > 0" (click)="nouvellesoumission()" [disabled]="stats.total_textes > 0">
+          <i class="fas fa-plus"></i>
+          {{stats.total_textes > 0 ? 'Texte déjà soumis' : 'Nouveau Texte'}}
+        </button>
+      </div>
+    </header>
+    
+    <!-- Contenu dynamique selon la vue -->
+    <div [ngSwitch]="currentView">
+      <!-- Accueil -->
+      <div *ngSwitchCase="'accueil'">
+        <!-- Cards Grid -->
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon blue">
+                <i class="fas fa-file-alt"></i>
+              </div>
+              <div>
+                <h3>Mes Soumissions</h3>
+                <p>Textes soumis au concours</p>
+              </div>
+            </div>
+            <div class="card-content">
+              <div>
+                <div class="number" [class.verified]="stats.total_textes === mesSoumissions.length">{{stats.total_textes || 0}}</div>
+                <div class="label">Textes soumis</div>
+                <div class="stats-verification" *ngIf="stats.total_textes === mesSoumissions.length">
+                  <i class="fas fa-check-circle"></i> Données vérifiées
+                </div>
+                <div class="stats-error" *ngIf="stats.total_textes !== mesSoumissions.length">
+                  <i class="fas fa-exclamation-triangle"></i> Données en cours de synchronisation
+                </div>
+              </div>
+              <span class="status-badge status-progress">En cours</span>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon orange">
+                <i class="fas fa-star"></i>
+              </div>
+              <div>
+                <h3>Évaluations</h3>
+                <p>Notes et commentaires</p>
+              </div>
+            </div>
+            <div class="card-content">
+              <div>
+                <div class="number">{{stats.note_moyenne ? (stats.note_moyenne | number:'1.1-1') + '/20' : 'N/A'}}</div>
+                <div class="label">Note moyenne</div>
+              </div>
+              <span class="status-badge status-completed">{{(stats.textes_acceptes || 0) + (stats.textes_refuses || 0)}} évalué{{((stats.textes_acceptes || 0) + (stats.textes_refuses || 0)) <= 1 ? '' : 's'}}</span>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon green">
+                <i class="fas fa-calendar"></i>
+              </div>
+              <div>
+                <h3>Délais</h3>
+                <p>Temps restant</p>
+              </div>
+            </div>
+            <div class="card-content">
+              <div>
+                <div class="number">{{joursRestants}}</div>
+                <div class="label">Jours restants</div>
+              </div>
+              <span class="status-badge status-pending">Inscription ouverte</span>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon purple">
+                <i class="fas fa-trophy"></i>
+              </div>
+              <div>
+                <h3>Classement</h3>
+                <p>Position actuelle</p>
+              </div>
+            </div>
+            <div class="card-content">
+              <div>
+                <div class="number">{{classement?.position || '-'}}</div>
+                <div class="label">Sur {{classement?.total || 0}} participants</div>
+              </div>
+              <span class="status-badge status-progress">Provisoire</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Alerte de validation des données -->
+        <div class="data-validation-warning" *ngIf="stats.total_textes !== mesSoumissions.length">
+          <div class="warning-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div class="warning-text">
+              <strong>Incohérence détectée:</strong> Les statistiques affichées ({{stats.total_textes}}) ne correspondent pas au nombre réel de textes ({{mesSoumissions.length}}).
+            </div>
+          </div>
+          <button class="btn btn-outline" (click)="fixDataInconsistency()">
+            <i class="fas fa-sync-alt"></i> Corriger les données
+          </button>
+        </div>
+        
+        <!-- Section Mes Soumissions -->
+        <section class="submissions-section">
+          <div class="section-header">
+            <h2>Mes Soumissions ({{mesSoumissions.length}})</h2>
+            <button class="btn" [class.btn-primary]="mesSoumissions.length === 0" [class.btn-disabled]="mesSoumissions.length > 0" (click)="nouvellesoumission()" [disabled]="mesSoumissions.length > 0">
+              <i class="fas fa-plus"></i>
+              {{mesSoumissions.length > 0 ? 'Texte déjà soumis' : 'Nouveau Texte'}}
+            </button>
+          </div>
+          
+          <div class="submissions-grid" *ngIf="mesSoumissions.length > 0; else noSubmissions">
+            <div class="submission-card" *ngFor="let texte of mesSoumissions">
+              <div class="submission-header">
+                <h3>{{texte.titre}}</h3>
+                <span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span>
+              </div>
+              <div class="submission-details">
+                <div class="detail-item">
+                  <i class="fas fa-language"></i>
+                  <span>{{texte.langue | titlecase}}</span>
+                </div>
+                <div class="detail-item">
+                  <i class="fas fa-list-ol"></i>
+                  <span>{{countVerses(texte.contenu)}} vers</span>
+                </div>
+                <div class="detail-item">
+                  <i class="fas fa-calendar"></i>
+                  <span>{{texte.created_at | date:'dd/MM/yyyy'}}</span>
+                </div>
+              </div>
+              <div class="submission-evaluation" *ngIf="texte.note || texte.commentaire">
+                <div class="evaluation-note" *ngIf="texte.note">
+                  <strong>Note: {{texte.note}}/20</strong>
+                </div>
+                <div class="evaluation-comment" *ngIf="texte.commentaire">
+                  <p>{{texte.commentaire}}</p>
+                </div>
+              </div>
+              <div class="submission-actions">
+                <button class="btn btn-outline" 
+                        [disabled]="!canModifyText(texte).canModify" 
+                        [class.btn-disabled]="!canModifyText(texte).canModify"
+                        (click)="modifierTexte(texte)"
+                        [title]="!canModifyText(texte).canModify ? canModifyText(texte).reason : 'Modifier ce texte'">
+                  <i class="fas fa-edit"></i> 
+                  {{canModifyText(texte).canModify ? 'Modifier' : 'Non modifiable'}}
+                </button>
+                <div class="modification-info" *ngIf="!canModifyText(texte).canModify">
+                  <small class="text-muted">{{canModifyText(texte).reason}}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <ng-template #noSubmissions>
+            <div class="no-submissions">
+              <i class="fas fa-file-alt"></i>
+              <h3>Aucune soumission</h3>
+              <p>Vous n'avez pas encore soumis de texte au concours.</p>
+              <button class="btn btn-primary btn-compact" (click)="nouvellesoumission()">
+                <i class="fas fa-plus"></i>
+                Soumettre un texte
+              </button>
+            </div>
+          </ng-template>
+        </section>
+      </div>
+      
+      <!-- Mon Profil -->
+      <div *ngSwitchCase="'profil'" class="profile-section">
+        <h2>Mon Profil</h2>
+        <div class="profile-card">
+          <div class="profile-header">
+            <div class="profile-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="profile-info">
+              <h3>{{currentUser?.prenom}} {{currentUser?.nom}}</h3>
+              <p>{{currentUser?.email}}</p>
+              <span class="role-badge">{{currentUser?.role | titlecase}}</span>
+            </div>
+          </div>
+          <div class="profile-stats">
+            <div class="stat-item">
+              <span class="stat-number">{{stats.total_textes || 0}}</span>
+              <span class="stat-label">Textes soumis</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">{{stats.note_moyenne ? (stats.note_moyenne | number:'1.1-1') : 'N/A'}}</span>
+              <span class="stat-label">Note moyenne</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">{{classement?.position || '-'}}</span>
+              <span class="stat-label">Classement</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Mes Soumissions -->
+      <div *ngSwitchCase="'soumissions'" class="soumissions-section">
+        <h2>Mes Soumissions</h2>
+        <div class="submissions-detailed" *ngIf="mesSoumissions.length > 0; else noSubmissionsDetailed">
+          <div class="submission-detailed-card" *ngFor="let texte of mesSoumissions">
+            <div class="submission-detailed-header">
+              <h3>{{texte.titre}}</h3>
+              <span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span>
+            </div>
+            <div class="submission-content">
+              <pre>{{texte.contenu}}</pre>
+            </div>
+            <div class="submission-meta">
+              <div class="meta-item">
+                <i class="fas fa-language"></i>
+                <span>{{texte.langue | titlecase}}</span>
+              </div>
+              <div class="meta-item">
+                <i class="fas fa-calendar"></i>
+                <span>Soumis le {{texte.created_at | date:'dd/MM/yyyy à HH:mm'}}</span>
+              </div>
+            </div>
+            <div class="submission-evaluation" *ngIf="texte.note || texte.commentaire">
+              <h4>Évaluation</h4>
+              <div class="evaluation-note" *ngIf="texte.note">
+                <strong>Note: {{texte.note}}/20</strong>
+              </div>
+              <div class="evaluation-comment" *ngIf="texte.commentaire">
+                <p><strong>Commentaires du correcteur:</strong></p>
+                <p>{{texte.commentaire}}</p>
+              </div>
+            </div>
+            <div class="submission-actions">
+              <button class="btn btn-outline" 
+                      [disabled]="!canModifyText(texte).canModify" 
+                      [class.btn-disabled]="!canModifyText(texte).canModify"
+                      (click)="modifierTexte(texte)"
+                      [title]="!canModifyText(texte).canModify ? canModifyText(texte).reason : 'Modifier ce texte'">
+                <i class="fas fa-edit"></i> 
+                {{canModifyText(texte).canModify ? 'Modifier le texte' : 'Texte non modifiable'}}
+              </button>
+              <div class="modification-info" *ngIf="!canModifyText(texte).canModify">
+                <small class="text-muted">{{canModifyText(texte).reason}}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ng-template #noSubmissionsDetailed>
+          <div class="no-submissions">
+            <i class="fas fa-file-alt"></i>
+            <h3>Aucune soumission</h3>
+            <p>Vous n'avez pas encore soumis de texte au concours.</p>
+            <button class="btn btn-primary" (click)="nouvellesoumission()">
+              <i class="fas fa-plus"></i>
+              Soumettre mon premier texte
+            </button>
+          </div>
+        </ng-template>
+      </div>
+      
+      <!-- Résultats & Notes -->
+      <div *ngSwitchCase="'resultats'" class="resultats-section">
+        <h2>Résultats & Notes</h2>
+        
+        <div class="results-overview">
+          <div class="result-card">
+            <h3>Performance Globale</h3>
+            <div class="performance-stats">
+              <div class="perf-item">
+                <span class="perf-number">{{stats.note_moyenne ? (stats.note_moyenne | number:'1.1-1') : 'N/A'}}</span>
+                <span class="perf-label">Note moyenne</span>
+              </div>
+              <div class="perf-item">
+                <span class="perf-number">{{stats.textes_acceptes || 0}}</span>
+                <span class="perf-label">{{(stats.textes_acceptes || 0) <= 1 ? 'Texte admis' : 'Textes admis'}}</span>
+              </div>
+              <div class="perf-item">
+                <span class="perf-number">{{stats.textes_refuses || 0}}</span>
+                <span class="perf-label">{{(stats.textes_refuses || 0) <= 1 ? 'Texte non admis' : 'Textes non admis'}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Notes détaillées par correcteur -->
+        <div class="detailed-evaluations" *ngIf="evaluationsDetaillees.length > 0">
+          <h3>Évaluations Détaillées</h3>
+          <div class="evaluation-card" *ngFor="let eval of evaluationsDetaillees">
+            <div class="evaluation-header">
+              <h4>{{eval.titre}}</h4>
+              <span class="evaluation-status" [ngClass]="getStatusClass(eval.statut)">{{getStatusLabel(eval.statut)}}</span>
+            </div>
+            
+            <div class="correcteurs-evaluations" *ngIf="eval.correcteurs && eval.correcteurs.length > 0">
+              <div class="correcteur-eval" *ngFor="let correcteur of eval.correcteurs">
+                <div class="correcteur-header">
+                  <h5>Correcteur {{correcteur.correcteur_numero}}</h5>
+                  <span class="note-finale">{{correcteur.note_totale}}/20</span>
+                </div>
+                
+                <div class="criteres-notes">
+                  <div class="critere" *ngIf="correcteur.pertinence !== null">
+                    <span class="critere-nom">Pertinence:</span>
+                    <span class="critere-note">{{correcteur.pertinence}}/5</span>
+                  </div>
+                  <div class="critere" *ngIf="correcteur.coherence !== null">
+                    <span class="critere-nom">Cohérence:</span>
+                    <span class="critere-note">{{correcteur.coherence}}/5</span>
+                  </div>
+                  <div class="critere" *ngIf="correcteur.correction !== null">
+                    <span class="critere-nom">Correction:</span>
+                    <span class="critere-note">{{correcteur.correction}}/5</span>
+                  </div>
+                  <div class="critere" *ngIf="correcteur.presentation !== null">
+                    <span class="critere-nom">Présentation:</span>
+                    <span class="critere-note">{{correcteur.presentation}}/5</span>
+                  </div>
+                </div>
+                
+                <div class="remarques" *ngIf="correcteur.remarques">
+                  <h6>Remarques du correcteur:</h6>
+                  <p>{{correcteur.remarques}}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="no-evaluations" *ngIf="!eval.correcteurs || eval.correcteurs.length === 0">
+              <p>Évaluation en cours...</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="no-results" *ngIf="evaluationsDetaillees.length === 0 && (!stats.note_moyenne || stats.note_moyenne === 0)">
+          <i class="fas fa-chart-bar"></i>
+          <h3>Aucune évaluation</h3>
+          <p>Vos résultats apparaîtront ici une fois les évaluations terminées.</p>
+        </div>
+        
+        <!-- Évaluations détaillées par correcteur -->
+        <div class="detailed-evaluations" *ngIf="mesSoumissions.length > 0">
+          <h3>Évaluations Détaillées par Correcteur</h3>
+          <div class="texte-evaluations" *ngFor="let texte of mesSoumissions">
+            <div class="texte-header">
+              <h4>{{texte.titre}}</h4>
+              <span class="texte-status" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span>
+            </div>
+            
+            <div class="correcteurs-list" *ngIf="texte.corrections && texte.corrections.length > 0; else noCorrections">
+              <div class="correcteur-card" *ngFor="let correction of texte.corrections; let i = index">
+                <div class="correcteur-header">
+                  <div class="correcteur-info">
+                    <i class="fas fa-user-graduate"></i>
+                    <h5>Correcteur {{i + 1}}</h5>
+                  </div>
+                  <div class="note-globale">
+                    <span class="note-value">{{correction.note}}/20</span>
+                  </div>
+                </div>
+                
+                <div class="grille-evaluation">
+                  <div class="critere-item">
+                    <span class="critere-label">Pertinence</span>
+                    <span class="critere-score">{{correction.criteres?.pertinence !== undefined ? correction.criteres.pertinence : '-'}}/5</span>
+                  </div>
+                  <div class="critere-item">
+                    <span class="critere-label">Cohérence</span>
+                    <span class="critere-score">{{correction.criteres?.coherence !== undefined ? correction.criteres.coherence : '-'}}/5</span>
+                  </div>
+                  <div class="critere-item">
+                    <span class="critere-label">Correction de la langue</span>
+                    <span class="critere-score">{{correction.criteres?.correction !== undefined ? correction.criteres.correction : '-'}}/5</span>
+                  </div>
+                  <div class="critere-item">
+                    <span class="critere-label">Présentation</span>
+                    <span class="critere-score">{{correction.criteres?.presentation !== undefined ? correction.criteres.presentation : '-'}}/5</span>
+                  </div>
+                </div>
+                
+                <div class="remarques-section" *ngIf="correction.commentaire">
+                  <h6><i class="fas fa-comment-dots"></i> Remarques du correcteur</h6>
+                  <div class="remarques-content">
+                    <p>{{correction.commentaire}}</p>
+                  </div>
+                </div>
+                
+                <div class="correction-date" *ngIf="correction.date_correction">
+                  <small><i class="fas fa-calendar"></i> Évalué le {{correction.date_correction | date:'dd/MM/yyyy à HH:mm'}}</small>
+                </div>
+              </div>
+            </div>
+            
+            <ng-template #noCorrections>
+              <!-- Affichage si note/commentaire sans corrections détaillées -->
+              <div class="correcteur-card" *ngIf="texte.note || texte.commentaire; else waitingCorrection">
+                <div class="correcteur-header">
+                  <div class="correcteur-info">
+                    <i class="fas fa-user-graduate"></i>
+                    <h5>Correcteur</h5>
+                  </div>
+                  <div class="note-globale" *ngIf="texte.note">
+                    <span class="note-value">{{texte.note}}/20</span>
+                  </div>
+                </div>
+                
+                <!-- Grille d'évaluation calculée -->
+                <div class="grille-evaluation">
+                  <div class="critere-item">
+                    <span class="critere-label">Pertinence</span>
+                    <span class="critere-score">{{(texte.note || 0) / 4 | number:'1.1-1'}}/5</span>
+                  </div>
+                  <div class="critere-item">
+                    <span class="critere-label">Cohérence</span>
+                    <span class="critere-score">{{(texte.note || 0) / 4 | number:'1.1-1'}}/5</span>
+                  </div>
+                  <div class="critere-item">
+                    <span class="critere-label">Correction de la langue</span>
+                    <span class="critere-score">{{(texte.note || 0) / 4 | number:'1.1-1'}}/5</span>
+                  </div>
+                  <div class="critere-item">
+                    <span class="critere-label">Présentation</span>
+                    <span class="critere-score">{{(texte.note || 0) / 4 | number:'1.1-1'}}/5</span>
+                  </div>
+                </div>
+                
+                <div class="remarques-section" *ngIf="texte.commentaire">
+                  <h6><i class="fas fa-comment-dots"></i> Remarques du correcteur</h6>
+                  <div class="remarques-content">
+                    <p>{{texte.commentaire}}</p>
+                  </div>
+                </div>
+                
+                <div class="correction-date">
+                  <small><i class="fas fa-info-circle"></i> Détails de la grille non disponibles</small>
+                </div>
+              </div>
+              
+              <ng-template #waitingCorrection>
+                <div class="no-corrections">
+                  <i class="fas fa-clock"></i>
+                  <p>Votre texte est en attente de correction par les correcteurs.</p>
+                </div>
+              </ng-template>
+            </ng-template>
+          </div>
+        </div>
+        
+        <!-- Affichage simple si pas d'évaluations détaillées mais note présente -->
+        <div class="simple-evaluation" *ngIf="(!mesSoumissions.length || !hasCorrections()) && stats.note_moyenne && stats.note_moyenne > 0">
+          <div class="evaluation-card">
+            <div class="evaluation-header">
+              <h4>Évaluation de votre texte</h4>
+              <span class="evaluation-status" [ngClass]="stats.textes_acceptes > 0 ? 'status-accepte' : 'status-refuse'">
+                {{stats.textes_acceptes > 0 ? 'Admis' : 'Non admis'}}
+              </span>
+            </div>
+            <div class="simple-note">
+              <span class="note-value">{{stats.note_moyenne}}/20</span>
+              <span class="note-label">Note finale</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Messages -->
+      <div *ngSwitchCase="'messages'" class="messages-section">
+        <h2>Messages</h2>
+        <div class="messages-list" *ngIf="messages.length > 0; else noMessages">
+          <div class="message-card" *ngFor="let message of messages" 
+               [class.unread]="!message.read_at" 
+               [class.read]="message.read_at"
+               (click)="markAsRead(message)">
+            <div class="message-header">
+              <div class="message-title">
+                <i class="fas fa-envelope" *ngIf="!message.read_at"></i>
+                <i class="fas fa-envelope-open" *ngIf="message.read_at"></i>
+                <h4>{{message.subject}}</h4>
+              </div>
+              <span class="message-date">{{message.created_at | date:'dd/MM/yyyy'}}</span>
+            </div>
+            <div class="message-content">
+              <p>{{message.content}}</p>
+            </div>
+            <div class="message-footer">
+              <small>De: Administration CP2i</small>
+              <span class="read-status" *ngIf="message.read_at">
+                <i class="fas fa-check"></i> Lu le {{message.read_at | date:'dd/MM/yyyy'}}
+              </span>
+            </div>
+          </div>
+        </div>
+        <ng-template #noMessages>
+          <div class="no-messages">
+            <i class="fas fa-envelope"></i>
+            <h3>Aucun message</h3>
+            <p>Vous n'avez pas de nouveaux messages.</p>
+          </div>
+        </ng-template>
+      </div>
+      
+      <!-- Guide d'Utilisation -->
+      <div *ngSwitchCase="'guide'" class="guide-section">
+        <h2>Guide d'Utilisation</h2>
+        <div class="guide-content">
+          <div class="guide-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h3>Inscription</h3>
+              <p>Créez votre compte participant avec vos informations personnelles.</p>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h3>Soumission</h3>
+              <p>Rédigez et soumettez votre poème en respectant les critères du concours.</p>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h3>Évaluation</h3>
+              <p>Votre texte sera évalué par nos correcteurs selon 4 critères.</p>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h3>Résultats</h3>
+              <p>Consultez vos notes et commentaires dans votre tableau de bord.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Historique -->
+      <div *ngSwitchCase="'historique'" class="historique-section">
+        <h2>Mon Historique</h2>
+        <div class="historique-timeline" *ngIf="historique.length > 0; else noHistorique">
+          <div class="timeline-item" *ngFor="let item of historique">
+            <div class="timeline-date">{{item.created_at | date:'dd/MM/yyyy'}}</div>
+            <div class="timeline-content">
+              <h4>{{item.action}}</h4>
+              <p>{{item.description}}</p>
+            </div>
+          </div>
+        </div>
+        <ng-template #noHistorique>
+          <div class="no-historique">
+            <i class="fas fa-history"></i>
+            <h3>Aucun historique</h3>
+            <p>Votre historique d'activité apparaîtra ici.</p>
+          </div>
+        </ng-template>
+      </div>
+      
+      <!-- Certificats -->
+      <div *ngSwitchCase="'certificats'" class="certificats-section">
+        <h2>Mes Certificats</h2>
+        <div class="certificats-grid" *ngIf="certificats.length > 0; else noCertificats">
+          <div class="certificat-card" *ngFor="let cert of certificats">
+            <div class="certificat-icon">
+              <i class="fas fa-certificate"></i>
+            </div>
+            <h3>{{cert.titre}}</h3>
+            <p>{{cert.description}}</p>
+            <button class="btn btn-primary" (click)="downloadCertificat(cert)">
+              <i class="fas fa-download"></i> Télécharger
+            </button>
+          </div>
+        </div>
+        <ng-template #noCertificats>
+          <div class="no-certificats">
+            <i class="fas fa-certificate"></i>
+            <h3>Aucun certificat</h3>
+            <p>Vos certificats de participation apparaîtront ici après évaluation.</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Chat Widget -->
+<div class="chat-widget">
+  <button class="chat-button" title="Chat Support CP2i" (click)="openChatSupport()" *ngIf="!chatOpen">
+    <i class="fas fa-comments"></i>
+  </button>
+  
+  <!-- Interface Chat -->
+  <div class="chat-interface" *ngIf="chatOpen">
+    <div class="chat-header">
+      <div class="chat-title">
+        <i class="fas fa-comments"></i>
+        <span>Support CP2i</span>
+      </div>
+      <button class="chat-close" (click)="closeChat()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="chat-messages">
+      <div class="message bot-message">
+        <div class="message-avatar">🤖</div>
+        <div class="message-content">
+          <p>Bonjour ! Je suis l'assistant CP2i. Comment puis-je vous aider ?</p>
+          <span class="message-time">Maintenant</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="chat-quick-actions">
+      <button class="quick-action" (click)="sendMessage('Comment soumettre un texte ?')">
+        📝 Comment soumettre un texte ?
+      </button>
+      <button class="quick-action" (click)="sendMessage('Voir mes résultats')">
+        📈 Voir mes résultats
+      </button>
+      <button class="quick-action" (click)="sendMessage('Problème technique')">
+        ⚙️ Problème technique
+      </button>
+    </div>
+    
+    <div class="chat-input">
+      <input type="text" placeholder="Tapez votre message..." #messageInput (keyup.enter)="sendMessage(messageInput.value); messageInput.value=''">
+      <button (click)="sendMessage(messageInput.value); messageInput.value=''">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+</div>

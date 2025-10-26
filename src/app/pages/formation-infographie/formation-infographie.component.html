@@ -1,0 +1,746 @@
+
+
+<div class="formation-container">
+  <!-- Hero Section -->
+  <section class="hero-section" @fadeIn>
+    <div class="hero-background">
+      <div class="animated-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+      </div>
+    </div>
+    
+    <div class="hero-content">
+      <div class="badge-new">
+        <span class="pulse"></span>
+        Nouvelle Session
+      </div>
+      
+      <h1 class="hero-title">
+        <span class="gradient-text animated-gradient hero-title-white">Formation Professionnelle en Infographie</span>
+      </h1>
+      
+      <p class="hero-subtitle">
+        Transformez votre passion créative en compétences professionnelles exploitables
+      </p>
+      
+      <div class="hero-features">
+        <div class="feature-item">
+          <i class="icon">✓</i>
+          <span>100% Pratique</span>
+        </div>
+        <div class="feature-item">
+          <i class="icon">✓</i>
+          <span>Projets Réels</span>
+        </div>
+        <div class="feature-item">
+          <i class="icon">✓</i>
+          <span>Certificat Délivré</span>
+        </div>
+      </div>
+      
+      <div class="hero-cta">
+        <button class="btn-primary" (click)="scrollToForm()">
+          <span>Inscrivez-vous Maintenant</span>
+          <i class="arrow">→</i>
+        </button>
+        <button class="btn-secondary" (click)="downloadBrochure()">
+          <i class="download">⬇</i>
+          <span>Télécharger la Brochure</span>
+        </button>
+      </div>
+      
+      <!-- Countdown Timer -->
+      <div class="countdown-wrapper">
+        <p class="countdown-label">Inscriptions ouvertes jusqu'au 3 octobre 2025</p>
+        <div class="countdown">
+          <div class="countdown-item">
+            <span class="countdown-value">{{countdown.days || 0}}</span>
+            <span class="countdown-unit">Jours</span>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-value">{{countdown.hours || 0}}</span>
+            <span class="countdown-unit">Heures</span>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-value">{{countdown.minutes || 0}}</span>
+            <span class="countdown-unit">Minutes</span>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-value">{{countdown.seconds || 0}}</span>
+            <span class="countdown-unit">Secondes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- Section à insérer APRÈS la section hero-section et AVANT la section about-section -->
+
+  <!-- Promo Section avec Affiche -->
+  <section class="promo-section">
+    <div class="promo-particles">
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+    </div>
+    
+    <div class="promo-container">
+      <div class="promo-content" @slideIn>
+        <div class="promo-badge">
+          <span class="pulse"></span>
+          Offre Spéciale
+        </div>
+        
+        <h2 class="promo-title">
+          Une formation qui fait la 
+          <span class="promo-highlight">différence</span>
+        </h2>
+        
+        <p class="promo-subtitle">
+          Découvrez tous les détails de notre programme intensif d'infographie, 
+          conçu pour transformer votre passion en expertise professionnelle.
+        </p>
+        
+        <div class="promo-features">
+          <div class="promo-feature">
+            <span class="promo-feature-icon">✓</span>
+            <span>Formation intensive de 4 semaines</span>
+          </div>
+          <div class="promo-feature">
+            <span class="promo-feature-icon">✓</span>
+            <span>Projets réels et portfolio professionnel</span>
+          </div>
+          <div class="promo-feature">
+            <span class="promo-feature-icon">✓</span>
+            <span>Accompagnement personnalisé</span>
+          </div>
+          <div class="promo-feature">
+            <span class="promo-feature-icon">✓</span>
+            <span>Certification reconnue</span>
+          </div>
+        </div>
+        
+        <div class="promo-cta">
+          <button class="btn-primary" (click)="scrollToForm()">
+            <span>Inscription Immédiate</span>
+            <i class="arrow">→</i>
+          </button>
+          <button class="btn-secondary" (click)="downloadBrochure()">
+            <i class="arrow">→</i>
+            <span>Plus d'Infos</span>
+          </button>
+        </div>
+      </div>
+      
+     <div class="promo-image-container" @scaleIn>
+      <div class="promo-image-wrapper">
+        <span class="floating-badge">Nouveau</span>
+        <img src="Formation-Infographie.jpg" 
+            alt="Affiche Formation Infographie - PENCCUM NDONGO" 
+            class="formation-poster"
+            loading="lazy">
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="about-section">
+    <div class="container">
+      <div class="section-header" @fadeIn>
+        <h2 class="section-title">Pourquoi Cette Formation?</h2>
+        <p class="section-subtitle">
+          Dans un monde où l'image est reine, maîtriser l'infographie est devenu indispensable
+        </p>
+      </div>
+      
+      <div class="about-grid">
+        <div class="about-card card-shadow animated-fade-in" @scaleIn>
+          <div class="card-icon">
+            <!-- Illustration cible (Objectifs Clairs) -->
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="24" cy="24" r="22" stroke="#0085CA" stroke-width="4" fill="#eaf6ff"/>
+              <circle cx="24" cy="24" r="12" stroke="#FF7F32" stroke-width="3" fill="#fff"/>
+              <circle cx="24" cy="24" r="4" fill="#0085CA"/>
+              <line x1="24" y1="2" x2="24" y2="10" stroke="#0085CA" stroke-width="2"/>
+              <line x1="24" y1="38" x2="24" y2="46" stroke="#0085CA" stroke-width="2"/>
+              <line x1="2" y1="24" x2="10" y2="24" stroke="#0085CA" stroke-width="2"/>
+              <line x1="38" y1="24" x2="46" y2="24" stroke="#0085CA" stroke-width="2"/>
+            </svg>
+          </div>
+          <h3 class="about-title-blue">Objectifs Clairs</h3>
+          <p>Acquérir des compétences concrètes et directement exploitables sur le marché du travail</p>
+        </div>
+        <div class="about-card card-shadow animated-fade-in" @scaleIn>
+          <div class="card-icon">
+            <!-- Illustration débouchés (Débouchés Professionnels) -->
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="6" y="18" width="36" height="20" rx="6" fill="#eaf6ff" stroke="#0085CA" stroke-width="3"/>
+              <circle cx="16" cy="28" r="4" fill="#FF7F32"/>
+              <circle cx="32" cy="28" r="4" fill="#0085CA"/>
+              <rect x="20" y="22" width="8" height="8" rx="2" fill="#fff" stroke="#FF7F32" stroke-width="2"/>
+              <rect x="12" y="10" width="24" height="8" rx="4" fill="#0085CA" fill-opacity="0.15"/>
+            </svg>
+          </div>
+          <h3 class="about-title-blue">Débouchés Professionnels</h3>
+          <p>Lancez votre activité freelance ou intégrez une agence de communication</p>
+        </div>
+        <div class="about-card card-shadow animated-fade-in" @scaleIn>
+          <div class="card-icon">
+            <!-- Illustration accompagnement (Accompagnement Personnalisé) -->
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="24" cy="34" rx="16" ry="8" fill="#eaf6ff" stroke="#0085CA" stroke-width="2"/>
+              <circle cx="24" cy="18" r="8" fill="#0085CA" fill-opacity="0.15" stroke="#0085CA" stroke-width="2"/>
+              <circle cx="24" cy="18" r="4" fill="#FF7F32"/>
+              <rect x="20" y="26" width="8" height="6" rx="2" fill="#fff" stroke="#0085CA" stroke-width="2"/>
+            </svg>
+          </div>
+          <h3 class="about-title-blue">Accompagnement Personnalisé</h3>
+          <p>Un suivi individuel pour garantir votre progression et votre réussite</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modules Section -->
+  <section class="modules-section">
+    <div class="container">
+      <div class="section-header" @fadeIn>
+        <h2 class="section-title">Programme de Formation</h2>
+        <p class="section-subtitle">4 semaines intensives pour devenir infographiste professionnel</p>
+      </div>
+      
+      <div class="modules-timeline">
+        <div class="timeline-line"></div>
+        <div *ngFor="let module of modules; let i = index" class="module-item module-card card-shadow animated-fade-in" @slideIn>
+          <div class="module-number">{{i + 1}}</div>
+          <div class="module-content module-content-centered">
+            <h3>{{module.title}}</h3>
+            <p>{{module.description}}</p>
+            <span class="module-week-label">Semaine {{i + 1}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Format Section -->
+  <section class="format-section">
+    <div class="container">
+      <div class="section-header" @fadeIn>
+        <h2 class="section-title">Choisissez Votre Format</h2>
+        <p class="section-subtitle">Deux options flexibles adaptées à vos besoins</p>
+      </div>
+      
+      <div class="format-cards">
+        <div class="format-card" [class.active]="selectedFormat === 'online'" (click)="selectFormat('online')">
+          <div class="format-badge">Plus Populaire</div>
+          <div class="format-icon">
+            <!-- Illustration SVG ordinateur (en ligne) -->
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="6" y="10" width="36" height="22" rx="4" fill="#eaf6ff" stroke="#0085CA" stroke-width="3"/>
+              <rect x="14" y="34" width="20" height="4" rx="2" fill="#0085CA" fill-opacity="0.15"/>
+              <rect x="20" y="38" width="8" height="3" rx="1.5" fill="#FF7F32"/>
+              <rect x="12" y="16" width="24" height="10" rx="2" fill="#fff"/>
+              <rect x="20" y="20" width="8" height="2" rx="1" fill="#0085CA" fill-opacity="0.3"/>
+            </svg>
+          </div>
+          <h3>Formation en Ligne</h3>
+          <div class="format-price">
+            <span class="currency">FCFA</span>
+            <span class="amount">50.000</span>
+          </div>
+          <ul class="format-features">
+            <li><i>✓</i> 1 mois de formation</li>
+            <li><i>✓</i> Lundi - Vendredi</li>
+            <li><i>✓</i> 20h00 - 22h00 GMT</li>
+            <li><i>✓</i> Sessions enregistrées</li>
+            <li><i>✓</i> Support 24/7</li>
+            <li><i>✓</i> Paiement en 2 tranches</li>
+          </ul>
+          <button class="btn-select" [class.selected]="selectedFormat === 'online'">
+            {{selectedFormat === 'online' ? 'Sélectionné' : 'Sélectionner'}}
+          </button>
+        </div>
+        
+        <div class="format-card" [class.active]="selectedFormat === 'presential'" (click)="selectFormat('presential')">
+          <div class="format-badge">Premium</div>
+          <div class="format-icon">
+            <!-- Illustration SVG bâtiment (présentiel) -->
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="8" y="18" width="32" height="18" rx="4" fill="#eaf6ff" stroke="#0085CA" stroke-width="3"/>
+              <rect x="16" y="26" width="6" height="10" rx="2" fill="#fff" stroke="#0085CA" stroke-width="2"/>
+              <rect x="26" y="26" width="6" height="10" rx="2" fill="#fff" stroke="#FF7F32" stroke-width="2"/>
+              <rect x="12" y="12" width="24" height="8" rx="4" fill="#0085CA" fill-opacity="0.15"/>
+              <rect x="20" y="22" width="8" height="2" rx="1" fill="#FF7F32" fill-opacity="0.3"/>
+            </svg>
+          </div>
+          <h3>Formation Présentielle</h3>
+          <div class="format-price">
+            <span class="currency">FCFA</span>
+            <span class="amount">150.000</span>
+          </div>
+          <ul class="format-features">
+            <li><i>✓</i> 2 mois de formation</li>
+            <li><i>✓</i> Week-ends uniquement</li>
+            <li><i>✓</i> Interaction directe</li>
+            <li><i>✓</i> Matériel fourni</li>
+            <li><i>✓</i> Networking facilité</li>
+            <li><i>✓</i> Paiement en 3 tranches</li>
+          </ul>
+          <button class="btn-select" [class.selected]="selectedFormat === 'presential'">
+            {{selectedFormat === 'presential' ? 'Sélectionné' : 'Sélectionner'}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- Formateur Section -->
+<!-- Section Formateur Modernisée -->
+<section class="formateur-modern-section">
+  <div class="section-header" @fadeIn>
+    <h2 class="formateur-modern-title">Votre Formateur Expert</h2>
+     <p class="formateur-modern-desc">
+    Découvrez le parcours et l’expertise de votre formateur, spécialiste en infographie.
+  </p>
+  </div>
+  
+  <div class="formateur-card" @scaleIn>
+    <div class="formateur-image-modern">
+      <div class="main-circle">
+        <img src="formateur-mouhamed.jpeg"
+             alt="Formateur Mouhamed - PENCCUM NDONGO"
+             class="formateur-photo-modern">
+        <div class="circle-anim circle-1"></div>
+        <div class="circle-anim circle-2"></div>
+        <div class="circle-anim circle-3"></div>
+        <div class="circle-anim circle-4"></div>
+      </div>
+    </div>
+    <div class="formateur-info">
+      <h3>{{formateur.name}}</h3>
+      <p class="formateur-title">{{formateur.title}}</p>
+      <div class="formateur-experience">
+        <h4>Expérience Professionnelle</h4>
+        <ul>
+          <li *ngFor="let exp of formateur.experience">
+            <i>▸</i> {{exp}}
+          </li>
+        </ul>
+      </div>
+      <div class="formateur-stats">
+        <div class="stat">
+          <span class="stat-value">500+</span>
+          <span class="stat-label">Étudiants Formés</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">8+</span>
+          <span class="stat-label">Années d'Expérience</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">95%</span>
+          <span class="stat-label">Taux de Satisfaction</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- Testimonials Section -->
+  <section class="testimonials-section">
+    <div class="container">
+      <div class="section-header" @fadeIn>
+        <h2 class="section-title">Ils Ont Suivi la Formation</h2>
+      </div>
+      
+      <div class="testimonials-carousel">
+        <div class="testimonial-card" [class.active]="i === currentTestimonial" 
+             *ngFor="let testimonial of testimonials; let i = index">
+          <div class="testimonial-content">
+            <div class="quote-icon">"</div>
+            <p>{{testimonial.text}}</p>
+            <div class="testimonial-author">
+              <h4>{{testimonial.name}}</h4>
+              <span>{{testimonial.role}}</span>
+            </div>
+            <div class="testimonial-rating">
+              <i *ngFor="let star of [1,2,3,4,5]">⭐</i>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="testimonials-dots">
+        <span *ngFor="let testimonial of testimonials; let i = index" 
+              class="dot" 
+              [class.active]="i === currentTestimonial"
+              (click)="currentTestimonial = i"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section">
+    <div class="container">
+      <div class="section-header" @fadeIn>
+        <h2 class="section-title">Questions Fréquentes</h2>
+      </div>
+      
+      <div class="faq-list">
+        <div class="faq-item" *ngFor="let faq of faqs; let i = index" 
+             [class.open]="faq.open" (click)="toggleFaq(i)">
+          <div class="faq-question">
+            <h3>{{faq.question}}</h3>
+            <span class="faq-icon">{{faq.open ? '−' : '+'}}</span>
+          </div>
+          <div class="faq-answer" *ngIf="faq.open">
+            <p>{{faq.answer}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Registration Form Section -->
+  <section class="form-section" #formSection>
+    <div class="container">
+      <div class="section-header" @fadeIn>
+        <h2 class="section-title">Inscription à la Formation</h2>
+        <p class="section-subtitle">Places limitées - Inscrivez-vous avant le 3 octobre 2025</p>
+      </div>
+      <div class="form-card card-shadow animated-fade-in">
+        <h3 class="form-main-title">Formulaire d'inscription</h3>
+        <form [formGroup]="inscriptionForm" (ngSubmit)="onSubmit()" class="inscription-form" @scaleIn>
+        <!-- Personal Information -->
+        <div class="form-section-title">
+          <span class="section-number">1</span>
+          <h3>Informations Personnelles</h3>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">Prénom *</label>
+            <input type="text" 
+                   id="firstName" 
+                   formControlName="firstName"
+                   class="form-control"
+                   [class.error]="inscriptionForm.get('firstName')?.touched && inscriptionForm.get('firstName')?.invalid"
+                   placeholder="Votre prénom">
+            <span class="error-message" *ngIf="inscriptionForm.get('firstName')?.touched && inscriptionForm.get('firstName')?.invalid">
+              {{getErrorMessage('firstName')}}
+            </span>
+          </div>
+          
+          <div class="form-group">
+            <label for="lastName">Nom *</label>
+            <input type="text" 
+                   id="lastName" 
+                   formControlName="lastName"
+                   class="form-control"
+                   [class.error]="inscriptionForm.get('lastName')?.touched && inscriptionForm.get('lastName')?.invalid"
+                   placeholder="Votre nom">
+            <span class="error-message" *ngIf="inscriptionForm.get('lastName')?.touched && inscriptionForm.get('lastName')?.invalid">
+              {{getErrorMessage('lastName')}}
+            </span>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input type="email" 
+                   id="email" 
+                   formControlName="email"
+                   class="form-control"
+                   [class.error]="inscriptionForm.get('email')?.touched && inscriptionForm.get('email')?.invalid"
+                   placeholder="votre.email@exemple.com">
+            <span class="error-message" *ngIf="inscriptionForm.get('email')?.touched && inscriptionForm.get('email')?.invalid">
+              {{getErrorMessage('email')}}
+            </span>
+          </div>
+          
+          <div class="form-group">
+            <label for="phone">Téléphone *</label>
+            <input type="tel" 
+                   id="phone" 
+                   formControlName="phone"
+                   class="form-control"
+                   [class.error]="inscriptionForm.get('phone')?.touched && inscriptionForm.get('phone')?.invalid"
+                   placeholder="+221 77 123 45 67">
+            <span class="error-message" *ngIf="inscriptionForm.get('phone')?.touched && inscriptionForm.get('phone')?.invalid">
+              {{getErrorMessage('phone')}}
+            </span>
+          </div>
+        </div>
+        
+        <!-- Professional Information -->
+        <div class="form-section-title">
+          <span class="section-number">2</span>
+          <h3>Informations Professionnelles</h3>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="profession">Statut Professionnel *</label>
+            <select id="profession" 
+                    formControlName="profession"
+                    class="form-control"
+                    [class.error]="inscriptionForm.get('profession')?.touched && inscriptionForm.get('profession')?.invalid">
+              <option value="">Sélectionnez votre statut</option>
+              <option value="etudiant">Étudiant</option>
+              <option value="salarie">Salarié</option>
+              <option value="entrepreneur">Entrepreneur</option>
+              <option value="freelance">Freelance</option>
+              <option value="demandeur_emploi">Demandeur d'emploi</option>
+              <option value="autre">Autre</option>
+            </select>
+            <span class="error-message" *ngIf="inscriptionForm.get('profession')?.touched && inscriptionForm.get('profession')?.invalid">
+              {{getErrorMessage('profession')}}
+            </span>
+          </div>
+          
+          <div class="form-group">
+            <label for="format">Format de Formation *</label>
+            <select id="format" 
+                    formControlName="format"
+                    class="form-control"
+                    [class.error]="inscriptionForm.get('format')?.touched && inscriptionForm.get('format')?.invalid">
+              <option value="online">En ligne (50.000 FCFA)</option>
+              <option value="presential">Présentiel (150.000 FCFA)</option>
+            </select>
+            <span class="error-message" *ngIf="inscriptionForm.get('format')?.touched && inscriptionForm.get('format')?.invalid">
+              {{getErrorMessage('format')}}
+            </span>
+          </div>
+        </div>
+        
+        <div class="form-group full-width">
+          <label for="motivation">Motivation *</label>
+          <textarea id="motivation" 
+                    formControlName="motivation"
+                    class="form-control"
+                    [class.error]="inscriptionForm.get('motivation')?.touched && inscriptionForm.get('motivation')?.invalid"
+                    rows="4"
+                    placeholder="Pourquoi souhaitez-vous suivre cette formation? (minimum 50 caractères)"></textarea>
+          <span class="error-message" *ngIf="inscriptionForm.get('motivation')?.touched && inscriptionForm.get('motivation')?.invalid">
+            {{getErrorMessage('motivation')}}
+          </span>
+        </div>
+        
+        <!-- Payment Information -->
+        <div class="form-section-title">
+          <span class="section-number">3</span>
+          <h3>Modalités de Paiement</h3>
+        </div>
+        
+        <div class="form-group">
+          <label class="payment-method-label">Méthode de Paiement *</label>
+          <div class="payment-options payment-cards">
+            <label class="payment-option card" [class.selected]="inscriptionForm.get('paymentMethod')?.value === 'orange'">
+              <input type="radio" formControlName="paymentMethod" value="orange">
+              <div class="option-content">
+                <img src="Orange_Money-Logo.wine.svg" alt="Orange Money" class="payment-logo"/>
+                <span class="option-label">Orange Money</span>
+              </div>
+            </label>
+            <label class="payment-option card" [class.selected]="inscriptionForm.get('paymentMethod')?.value === 'wave'">
+              <input type="radio" formControlName="paymentMethod" value="wave">
+              <div class="option-content">
+                <img src="logowave.png" alt="Wave" class="payment-logo"/>
+                <span class="option-label">Wave</span>
+              </div>
+            </label>
+            <label class="payment-option card" [class.selected]="inscriptionForm.get('paymentMethod')?.value === 'free'">
+              <input type="radio" formControlName="paymentMethod" value="free">
+              <div class="option-content">
+                <img src="free-money.png" alt="Free Money" class="payment-logo"/>
+                <span class="option-label">Free Money</span>
+              </div>
+            </label>
+          </div>
+          <span class="error-message" *ngIf="inscriptionForm.get('paymentMethod')?.touched && inscriptionForm.get('paymentMethod')?.invalid">
+            {{getErrorMessage('paymentMethod')}}
+          </span>
+        </div>
+        
+        <!-- Terms and Conditions -->
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label cgu-card">
+            <input type="checkbox" formControlName="acceptTerms">
+            <span class="checkbox-custom"></span>
+            <span class="checkbox-text">
+              <strong>J'accepte les conditions générales</strong> et je confirme que les informations fournies sont exactes *
+            </span>
+          </label>
+          <span class="error-message" *ngIf="inscriptionForm.get('acceptTerms')?.touched && inscriptionForm.get('acceptTerms')?.invalid">
+            Vous devez accepter les conditions pour continuer
+          </span>
+        </div>
+        
+        <!-- Submit Button -->
+        <div class="form-actions">
+          <button type="submit" class="btn-submit" [disabled]="loading">
+            <span *ngIf="!loading">
+              <i class="fa-solid fa-check"></i> Confirmer l'Inscription
+              <i class="submit-arrow">→</i>
+            </span>
+            <span *ngIf="loading" class="loading-spinner">
+              <i class="spinner"></i>
+              Traitement en cours...
+            </span>
+          </button>
+        </div>
+        
+        <!-- Success/Error Messages -->
+        <div class="alert alert-success" *ngIf="showSuccessMessage" @fadeIn>
+          <i class="alert-icon">✅</i>
+          <div>
+            <h4>Inscription réussie!</h4>
+            <p>Vous recevrez un email de confirmation avec les détails de paiement et l'accès à la formation.</p>
+          </div>
+        </div>
+        <div class="alert alert-error" *ngIf="showErrorMessage" @fadeIn>
+          <i class="alert-icon">❌</i>
+          <div>
+            <h4>Erreur lors de l'inscription</h4>
+            <p>Veuillez réessayer ou contacter le support à pennc.penccumndongo&#64;gmail.com</p>
+          </div>
+        </div>
+      </form>
+    </div>
+    </div>
+  </section>
+  
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content" @scaleIn>
+        <h2>Prêt à Transformer Votre Carrière?</h2>
+        <p>Rejoignez des centaines d'apprenants qui ont déjà fait le pas vers le succès</p>
+         <!-- Bouton WhatsApp Communauté -->
+        <a href="https://chat.whatsapp.com/H2HX0arxjCA70EgrcbRWUG?mode=ems_copy_c"
+          target="_blank"
+          rel="noopener"
+          class="btn-whatsapp-community">
+          <i class="fab fa-whatsapp"></i>
+          Rejoindre le groupe WhatsApp Penc'Boost
+        </a>
+        <div class="cta-buttons">
+          <button class="btn-primary" (click)="scrollToForm()">
+            S'inscrire Maintenant
+          </button>
+           <a routerLink="/formations"  class="btn-secondary">
+            Découvrir Nos Autres Formations
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <!-- <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>PENCCUM NDONGO</h3>
+          <p>Centre de formation professionnelle dédié à l'excellence et à l'innovation</p>
+          <div class="social-links">
+            <a href="#" aria-label="Facebook"><i>📘</i></a>
+            <a href="#" aria-label="Twitter"><i>🐦</i></a>
+            <a href="#" aria-label="LinkedIn"><i>💼</i></a>
+            <a href="#" aria-label="Instagram"><i>📷</i></a>
+          </div>
+        </div>
+        
+        <div class="footer-section">
+          <h4>Contact</h4>
+          <ul>
+            <li><i>📍</i> Penccum Ndongo, Dakar</li>
+            <li><i>📞</i> +221 76 841 54 14</li>
+            <li><i>📧</i> pennc.penccumndongo&#64;gmail.com</li>
+            <li><i>🌐</i> <a href="https://penccumndongo.com">penccumndongo.com</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h4>Liens Rapides</h4>
+          <ul>
+            <li><a href="/formations">Nos Formations</a></li>
+            <li><a href="/about">À Propos</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h4>Newsletter</h4>
+          <p>Restez informé de nos nouvelles formations</p>
+          <form class="newsletter-form">
+            <input type="email" placeholder="Votre email">
+            <button type="submit">S'abonner</button>
+          </form>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2025 PENCCUM NDONGO. Tous droits réservés.</p>
+      </div>
+    </div>
+  </footer> -->
+</div>
+
+<!-- Modal Inscriptions Clôturées -->
+<div class="modal-overlay" *ngIf="showClosedModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()" @scaleIn>
+    <div class="modal-header">
+      <h3 class="modal-title-closed">Inscriptions Clôturées</h3>
+      <button class="modal-close" (click)="closeModal()">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="modal-icon">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 2V5" stroke="#dc3545" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 2V5" stroke="#dc3545" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3.5 9.09H20.5" stroke="#dc3545" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="#dc3545" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M15.6947 13.7002H15.7037" stroke="#dc3545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M15.6947 16.7002H15.7037" stroke="#dc3545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M11.9955 13.7002H12.0045" stroke="#dc3545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M11.9955 16.7002H12.0045" stroke="#dc3545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8.29431 13.7002H8.30329" stroke="#dc3545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8.29431 16.7002H8.30329" stroke="#dc3545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <p class="modal-message">
+        Les inscriptions pour cette session de formation en infographie sont désormais <strong>clôturées</strong>.
+      </p>
+      <p class="modal-submessage">
+        Ne manquez pas les prochaines sessions ! Restez connecté avec nous :
+      </p>
+    </div>
+    
+    <div class="modal-actions">
+      <button class="btn-whatsapp-group" (click)="joinWhatsAppGroup()">
+        <i class="fab fa-whatsapp"></i>
+        Rejoindre le groupe Penc'Boost
+      </button>
+      <button class="btn-whatsapp-contact" (click)="contactWhatsApp()">
+        <i class="fab fa-whatsapp"></i>
+        Contacter PENCCUM NDONGO
+      </button>
+    </div>
+    
+    <div class="modal-footer">
+      <p class="modal-note">
+        Vous serez informé en priorité des nouvelles sessions de formation.
+      </p>
+    </div>
+  </div>
+</div>
+

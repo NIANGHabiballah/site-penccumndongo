@@ -1,0 +1,78 @@
+<!-- Notification Toast -->
+<div class="toast-notification" 
+     [class.show]="showNotification" 
+     [class.success]="notificationType === 'success'"
+     [class.error]="notificationType === 'error'">
+  <div class="toast-content">
+    <i class="fas" [class.fa-check-circle]="notificationType === 'success'" [class.fa-exclamation-circle]="notificationType === 'error'"></i>
+    <span>{{notificationMessage}}</span>
+  </div>
+</div>
+
+<div class="soumission-container">
+  <div class="header">
+    <h1>{{isEditing ? 'Modifier le Texte' : 'Soumettre un Texte'}}</h1>
+    <a routerLink="/dashboard-participant" class="btn-back">
+      <i class="fas fa-arrow-left"></i> Retour
+    </a>
+  </div>
+
+  <form (ngSubmit)="onSubmit()" #texteForm="ngForm" class="soumission-form">
+    <div class="form-group">
+      <label for="titre">Titre du texte *</label>
+      <input 
+        type="text" 
+        id="titre" 
+        name="titre"
+        [(ngModel)]="texte.titre" 
+        required
+        placeholder="Entrez le titre de votre poème">
+    </div>
+
+
+
+    <div class="form-group">
+      <label for="langue">Langue</label>
+      <select 
+        id="langue" 
+        name="langue"
+        [(ngModel)]="texte.langue">
+        <option value="francais">Français</option>
+        <option value="wolof">Wolof</option>
+        <option value="anglais">Anglais</option>
+        <option value="arabe">Arabe</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="contenu">Votre texte *</label>
+      <textarea 
+        id="contenu" 
+        name="contenu"
+        [(ngModel)]="texte.contenu" 
+        required
+        rows="15"
+        placeholder="Écrivez votre poème ici..."></textarea>
+      <div class="char-count">
+        {{texte.contenu.length}} caractères | {{getLineCount()}} vers (max 40)
+        <span *ngIf="getLineCount() > 40" class="error-text">⚠️ Limite dépassée</span>
+      </div>
+      
+      <div class="validation-errors" *ngIf="(!texte.titre || !texte.contenu || getLineCount() > 40) && (texte.titre || texte.contenu)">
+        <div class="error-message" *ngIf="!texte.titre && texte.contenu">• Le titre est requis</div>
+        <div class="error-message" *ngIf="!texte.contenu && texte.titre">• Le contenu du texte est requis</div>
+        <div class="error-message" *ngIf="getLineCount() > 40">• Le texte ne peut pas dépasser 40 vers</div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" (click)="resetForm()" class="btn btn-secondary">
+        Effacer
+      </button>
+      <button type="submit" [disabled]="!isFormValid() || isSubmitting" class="btn btn-primary">
+        <i class="fas" [class.fa-paper-plane]="!isEditing" [class.fa-save]="isEditing"></i>
+        {{isSubmitting ? 'En cours...' : (isEditing ? 'Modifier le texte' : 'Soumettre le texte')}}
+      </button>
+    </div>
+  </form>
+</div>

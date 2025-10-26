@@ -1,0 +1,468 @@
+<!-- Notification Toast -->
+<div class="toast-notification" 
+     [class.show]="showNotification" 
+     [class.success]="notificationType === 'success'"
+     [class.error]="notificationType === 'error'">
+  <div class="toast-content">
+    <i class="fas" [class.fa-check-circle]="notificationType === 'success'" [class.fa-exclamation-circle]="notificationType === 'error'"></i>
+    <span>{{notificationMessage}}</span>
+  </div>
+</div>
+
+<div class="dashboard" [class.sidebar-collapsed]="desktopMenuHidden">
+  <!-- Sidebar -->
+  <div class="mobile-overlay" *ngIf="mobileMenuOpen" (click)="toggleMobileMenu()"></div>
+  
+  <nav class="sidebar" [class.mobile-active]="mobileMenuOpen" [class.sidebar-hidden]="desktopMenuHidden" (mouseleave)="closeMobileMenuOnLeave()">
+    <div class="logo">
+      <h2>CP2i</h2>
+      <p>Espace Correcteur</p>
+    </div>
+    
+    <div class="user-info">
+      <div class="user-avatar">
+        <i class="fas fa-user-tie"></i>
+      </div>
+      <h4>{{currentUser?.prenom}} {{currentUser?.nom}}</h4>
+      <p>{{currentUser?.role | titlecase}}</p>
+    </div>
+    
+    <div class="nav-menu">
+      <div class="nav-item" [class.active]="currentView === 'textes-assignes'" (click)="setCurrentView('textes-assignes'); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-clipboard-list"></i>
+        <span>Textes Assignés</span>
+      </div>
+      <div class="nav-item" [class.active]="currentView === 'interface-correction'" (click)="setCurrentView('interface-correction'); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-edit"></i>
+        <span>Interface Correction</span>
+      </div>
+      <div class="nav-item" [class.active]="currentView === 'historique'" (click)="setCurrentView('historique'); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-history"></i>
+        <span>Historique</span>
+      </div>
+      <div class="nav-item" [class.active]="currentView === 'statistiques'" (click)="setCurrentView('statistiques'); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-chart-bar"></i>
+        <span>Mes Statistiques</span>
+      </div>
+      <div class="nav-item" [class.active]="currentView === 'messages'" (click)="setCurrentView('messages'); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-envelope"></i>
+        <span>Messages Admin</span>
+        <span class="notification-badge" *ngIf="getUnreadMessagesCount() > 0">{{getUnreadMessagesCount()}}</span>
+      </div>
+      <div class="nav-item" [class.active]="currentView === 'guide'" (click)="setCurrentView('guide'); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-book"></i>
+        <span>Guide Correction</span>
+      </div>
+      <div class="nav-item" (click)="logout(); $event.preventDefault(); $event.stopPropagation()">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Déconnexion</span>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Menu Hamburger Mobile -->
+  <div class="mobile-menu-toggle" (click)="toggleMobileMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  
+  <main class="main-content">
+    <header class="header">
+      <div class="welcome">
+        <h1>Interface de Correction</h1>
+        <p>CP2i Édition 2025 - Évaluation en cours</p>
+      </div>
+    </header>
+    
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number" style="color: #6f42c1;">{{stats.assignes}}</div>
+        <div class="stat-label">Textes assignés</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" style="color: #28a745;">{{stats.corriges}}</div>
+        <div class="stat-label">Corrigés</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" style="color: #FF7F1A;">{{stats.enCours}}</div>
+        <div class="stat-label">À corriger</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" style="color: #dc3545;">{{stats.joursRestants}}</div>
+        <div class="stat-label">Jours restants</div>
+      </div>
+    </div>
+    
+    <!-- Contenu dynamique -->
+    <div [ngSwitch]="currentView">
+      
+      <!-- Liste des textes assignés -->
+      <div *ngSwitchCase="'textes-assignes'" class="textes-list">
+        <h2>Mes textes assignés</h2>
+        <div class="textes-grid" *ngIf="textesAssignes.length > 0; else noTextes">
+          <div class="texte-card" *ngFor="let texte of textesAssignes; let i = index" (click)="selectTexte(texte, i)">
+            <div class="texte-header">
+              <h3>{{texte.titre}}</h3>
+              <span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span>
+            </div>
+            <div class="texte-info">
+              <p><strong>Identifiant:</strong> CP2i-{{texte.id | number:'3.0-0'}}</p>
+              <p><strong>Langue:</strong> {{texte.langue | titlecase}}</p>
+              <p><strong>Soumis le:</strong> {{texte.created_at | date:'dd/MM/yyyy'}}</p>
+              <p *ngIf="texte.note"><strong>Note:</strong> {{texte.note}}/20</p>
+            </div>
+          </div>
+        </div>
+        <ng-template #noTextes>
+          <div class="no-textes">
+            <i class="fas fa-clipboard-list"></i>
+            <h3>Aucun texte assigné</h3>
+            <p>Vous n'avez pas encore de textes à corriger.</p>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Interface de correction -->
+      <div *ngSwitchCase="'interface-correction'" class="correction-interface">
+        <div *ngIf="currentTexte; else selectTexte" class="correction-grid">
+          <div class="text-panel">
+            <div class="text-header">
+              <h3>{{currentTexte.titre}}</h3>
+              <div class="navigation-buttons">
+                <button class="btn btn-outline" (click)="previousTexte()" [disabled]="currentTexteIndex === 0">
+                  <i class="fas fa-chevron-left"></i> Précédent
+                </button>
+                <span>{{currentTexteIndex + 1}} / {{textesAssignes.length}}</span>
+                <button class="btn btn-outline" (click)="nextTexte()" [disabled]="currentTexteIndex === textesAssignes.length - 1">
+                  Suivant <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="text-meta">
+              <span class="meta-tag"><i class="fas fa-id-card"></i> CP2i-{{currentTexte.id | number:'3.0-0'}}</span>
+              <span class="meta-tag"><i class="fas fa-globe"></i> {{currentTexte.langue | titlecase}}</span>
+              <span class="meta-tag"><i class="fas fa-calendar"></i> {{currentTexte.created_at | date:'dd/MM/yyyy'}}</span>
+            </div>
+            
+            <div class="text-actions">
+              <button class="btn btn-outline" (click)="copyText()" title="Copier le texte">
+                <i class="fas fa-copy"></i> Copier
+              </button>
+              <button class="btn btn-outline" (click)="downloadWord()" title="Télécharger en Word">
+                <i class="fas fa-download"></i> Word
+              </button>
+            </div>
+            
+            <div class="text-content">
+              <pre>{{currentTexte.contenu}}</pre>
+            </div>
+          </div>
+          
+          <div class="evaluation-panel">
+            <h3><i class="fas fa-star"></i> Grille d'Évaluation</h3>
+            
+            <div class="criteria-grid">
+              <div class="criteria-item">
+                <span class="criteria-name">Pertinence</span>
+                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.pertinence" class="rating-input" (input)="validateNote('pertinence', $event)">
+              </div>
+              <div class="criteria-item">
+                <span class="criteria-name">Cohérence</span>
+                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.coherence" class="rating-input" (input)="validateNote('coherence', $event)">
+              </div>
+              <div class="criteria-item">
+                <span class="criteria-name">Correction de la langue</span>
+                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.correction" class="rating-input" (input)="validateNote('correction', $event)">
+              </div>
+              <div class="criteria-item">
+                <span class="criteria-name">Présentation</span>
+                <input type="number" min="0" max="5" [(ngModel)]="evaluationForm.presentation" class="rating-input" (input)="validateNote('presentation', $event)">
+              </div>
+            </div>
+            
+            <div class="total-score">
+              <div class="score-number">{{calculateTotal()}}/20</div>
+              <div class="score-label">Note finale</div>
+            </div>
+            
+            <div class="comments-section">
+              <label>Commentaires et observations :</label>
+              <textarea [(ngModel)]="evaluationForm.commentaire" placeholder="Vos commentaires constructifs..."></textarea>
+            </div>
+            
+            <div class="submit-section">
+              <button class="btn btn-outline" (click)="saveDraft()">
+                <i class="fas fa-save"></i> Brouillon
+              </button>
+              <button class="btn btn-primary" (click)="validateEvaluation()">
+                <i class="fas" [class.fa-check]="currentTexte?.statut === 'en_attente' || currentTexte?.statut === 'brouillon'" [class.fa-edit]="currentTexte?.statut === 'accepte' || currentTexte?.statut === 'refuse'"></i> 
+                {{(currentTexte?.statut === 'accepte' || currentTexte?.statut === 'refuse') ? 'Modifier' : 'Valider'}}
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <ng-template #selectTexte>
+          <div class="select-texte">
+            <i class="fas fa-arrow-left"></i>
+            <h3>Sélectionnez un texte à corriger</h3>
+            <p>Choisissez un texte dans la liste des textes assignés.</p>
+            <button class="btn btn-primary" (click)="setCurrentView('textes-assignes')">
+              Voir mes textes assignés
+            </button>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Historique -->
+      <div *ngSwitchCase="'historique'" class="historique">
+        <h2>Historique de mes corrections</h2>
+        <div class="historique-list" *ngIf="historique.length > 0; else noHistorique">
+          <div class="historique-item" *ngFor="let item of historique">
+            <div class="historique-header">
+              <h4>{{item.titre}}</h4>
+              <span class="status-badge" [ngClass]="getStatusClass(item.statut)">{{getStatusLabel(item.statut)}}</span>
+            </div>
+            <div class="historique-details">
+              <p><strong>Identifiant:</strong> CP2i-{{item.id | number:'3.0-0'}}</p>
+              <p><strong>Note attribuée:</strong> {{item.note}}/20</p>
+              <p><strong>Date d'évaluation:</strong> {{item.updated_at | date:'dd/MM/yyyy à HH:mm'}}</p>
+              <p *ngIf="item.commentaire"><strong>Commentaire:</strong> {{item.commentaire}}</p>
+            </div>
+          </div>
+        </div>
+        <ng-template #noHistorique>
+          <div class="no-historique">
+            <i class="fas fa-history"></i>
+            <h3>Aucun historique</h3>
+            <p>Vous n'avez pas encore évalué de textes.</p>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Messages -->
+      <div *ngSwitchCase="'messages'" class="messages">
+        <h2>Messages de l'administration</h2>
+        <div class="messages-list" *ngIf="messages.length > 0; else noMessages">
+          <div class="message-item compact" *ngFor="let message of messages" [class.unread]="!message.read_at" (click)="readMessage(message)">
+            <div class="message-compact">
+              <div class="message-title">
+                <span *ngIf="!message.read_at" class="unread-dot"></span>
+                {{message.subject}}
+              </div>
+              <div class="message-date">{{message.created_at | date:'dd/MM/yyyy'}}</div>
+              <div class="message-preview">{{message.content | slice:0:60}}{{message.content?.length > 60 ? '...' : ''}}</div>
+              <div class="message-sender">De: {{message.sender_prenom}} {{message.sender_nom}}</div>
+            </div>
+          </div>
+        </div>
+        <ng-template #noMessages>
+          <div class="no-messages">
+            <i class="fas fa-envelope"></i>
+            <h3>Aucun message</h3>
+            <p>Vous n'avez pas de nouveaux messages.</p>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Guide de correction -->
+      <div *ngSwitchCase="'guide'" class="guide">
+        <h2>Guide de correction</h2>
+        <div class="guide-content">
+          <div class="guide-section">
+            <h3><i class="fas fa-clipboard-check"></i> Grille d'évaluation officielle CP2i</h3>
+            <div class="evaluation-grid">
+              <div class="eval-card">
+                <div class="eval-header">
+                  <span class="eval-number">1</span>
+                  <h4>Pertinence</h4>
+                  <span class="eval-points">5 points</span>
+                </div>
+                <div class="eval-items">
+                  <div class="eval-item"><span class="points">2 pts</span> Idée générale du thème rendue et respectée</div>
+                  <div class="eval-item"><span class="points">2 pts</span> Ordre des idées bien respecté</div>
+                  <div class="eval-item"><span class="points">1 pt</span> Transitions bien aménagées</div>
+                </div>
+              </div>
+              
+              <div class="eval-card">
+                <div class="eval-header">
+                  <span class="eval-number">2</span>
+                  <h4>Cohérence</h4>
+                  <span class="eval-points">5 points</span>
+                </div>
+                <div class="eval-items">
+                  <div class="eval-item"><span class="points">1 pt</span> Connecteurs appropriés utilisés</div>
+                  <div class="eval-item"><span class="points">2 pts</span> Unité du thème - poème centré</div>
+                  <div class="eval-item"><span class="points">2 pts</span> Cohérence des idées</div>
+                </div>
+              </div>
+              
+              <div class="eval-card">
+                <div class="eval-header">
+                  <span class="eval-number">3</span>
+                  <h4>Correction de la langue</h4>
+                  <span class="eval-points">5 points</span>
+                </div>
+                <div class="eval-items">
+                  <div class="eval-item"><span class="points">2 pts</span> Syntaxe correcte</div>
+                  <div class="eval-item"><span class="points">1 pt</span> Règles d'orthographe appliquées</div>
+                  <div class="eval-item"><span class="points">1 pt</span> Accords grammaticaux respectés</div>
+                  <div class="eval-item"><span class="points">1 pt</span> Vocabulaire approprié employé</div>
+                </div>
+              </div>
+              
+              <div class="eval-card">
+                <div class="eval-header">
+                  <span class="eval-number">4</span>
+                  <h4>Présentation</h4>
+                  <span class="eval-points">5 points</span>
+                </div>
+                <div class="eval-items">
+                  <div class="eval-item"><span class="points">2 pts</span> Structuration strophes et composition vers</div>
+                  <div class="eval-item"><span class="points">1 pt</span> Rythme (diérèse, synérèse, enjambement...)</div>
+                  <div class="eval-item"><span class="points">1 pt</span> Sons (rime, assonance, allitération...)</div>
+                  <div class="eval-item"><span class="points">1 pt</span> Utilisation des figures de style</div>
+                </div>
+              </div>
+            </div>
+            <div class="total-eval">
+              <strong>TOTAL : 20 Points</strong>
+            </div>
+          </div>
+          
+          <div class="guide-section">
+            <h3><i class="fas fa-route"></i> Guide étape par étape</h3>
+            <div class="steps-guide">
+              <div class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                  <h4>Accéder aux textes assignés</h4>
+                  <p>Cliquez sur "Textes Assignés" dans le menu pour voir la liste de vos textes à corriger.</p>
+                  <div class="step-visual">
+                    <div class="mock-card">
+                      <div class="mock-header">📝 Poème de Victor Hugo</div>
+                      <div class="mock-status status-pending">À corriger</div>
+                      <div class="mock-info">Identifiant: CP2i-001 • Français • 15/10/2025</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                  <h4>Sélectionner un texte</h4>
+                  <p>Cliquez sur une carte de texte pour l'ouvrir dans l'interface de correction.</p>
+                  <div class="step-visual">
+                    <div class="mock-interface">
+                      <div class="mock-text-panel">📄 Texte à corriger</div>
+                      <div class="mock-eval-panel">⭐ Grille d'évaluation</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                  <h4>Évaluer selon les 4 critères</h4>
+                  <p>Attribuez une note de 0 à 5 pour chaque critère (maximum 20 points au total).</p>
+                  <div class="step-visual">
+                    <div class="mock-criteria">
+                      <div class="criteria-row">Pertinence: <input type="number" value="4" readonly> /5</div>
+                      <div class="criteria-row">Cohérence: <input type="number" value="3" readonly> /5</div>
+                      <div class="criteria-row">Correction: <input type="number" value="4" readonly> /5</div>
+                      <div class="criteria-row">Présentation: <input type="number" value="2" readonly> /5</div>
+                      <div class="total-row">Total: 13/20</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="step-item">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                  <h4>Ajouter des commentaires</h4>
+                  <p>Rédigez des commentaires constructifs pour aider l'auteur à s'améliorer.</p>
+                  <div class="step-visual">
+                    <div class="mock-textarea">
+                      <div class="textarea-content">"Très beau poème avec de bonnes images poétiques. Attention aux accords grammaticaux..."</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="step-item">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                  <h4>Sauvegarder ou Valider</h4>
+                  <p>• <strong>Brouillon</strong> : Sauvegarde temporaire<br>• <strong>Valider</strong> : Finalise l'évaluation</p>
+                  <div class="step-visual">
+                    <div class="mock-buttons">
+                      <button class="btn-outline">💾 Brouillon</button>
+                      <button class="btn-primary">✅ Valider</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="guide-section">
+            <h3><i class="fas fa-lightbulb"></i> Conseils pour l'évaluation</h3>
+            <div class="tips-grid">
+              <div class="tip-card">
+                <div class="tip-icon">📖</div>
+                <h4>Lecture attentive</h4>
+                <p>Lisez le texte plusieurs fois avant d'évaluer pour bien comprendre le message.</p>
+              </div>
+              <div class="tip-card">
+                <div class="tip-icon">⚖️</div>
+                <h4>Objectivité</h4>
+                <p>Soyez objectif et bienveillant dans vos commentaires et notations.</p>
+              </div>
+              <div class="tip-card">
+                <div class="tip-icon">💡</div>
+                <h4>Exemples concrets</h4>
+                <p>Justifiez vos notes par des exemples précis tirés du texte.</p>
+              </div>
+              <div class="tip-card">
+                <div class="tip-icon">🎯</div>
+                <h4>Note de passage</h4>
+                <p>La note de passage est fixée à <strong>10/20</strong> pour l'admission.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistiques -->
+      <div *ngSwitchCase="'statistiques'" class="statistiques">
+        <h2>Mes statistiques</h2>
+        <div class="stats-detailed">
+          <div class="stat-card-large">
+            <h3>Performance globale</h3>
+            <div class="performance-grid">
+              <div class="perf-item">
+                <span class="perf-number">{{stats.assignes}}</span>
+                <span class="perf-label">Textes assignés</span>
+              </div>
+              <div class="perf-item">
+                <span class="perf-number">{{stats.corriges}}</span>
+                <span class="perf-label">Textes corrigés</span>
+              </div>
+              <div class="perf-item">
+                <span class="perf-number">{{((stats.corriges / stats.assignes) * 100) || 0 | number:'1.0-0'}}%</span>
+                <span class="perf-label">Taux de completion</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

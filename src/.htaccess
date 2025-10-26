@@ -1,0 +1,76 @@
+# Security Headers
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options SAMEORIGIN
+Header always set X-XSS-Protection "1; mode=block"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
+Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://cdnjs.cloudflare.com https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://penccumndongo.com https://www.google.com https://www.gstatic.com; frame-src https://www.google.com https://www.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self'"
+
+# HTTPS Redirect et normalisation domaine
+RewriteEngine On
+
+# Force HTTPS et supprime www en une seule redirection
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteRule ^(.*)$ https://penccumndongo.com/$1 [L,R=301]
+
+# Redirections spécifiques pour éviter les boucles et problèmes d'indexation
+RewriteRule ^accueil/?$ / [L,R=301]
+
+# Redirections canoniques pour les pages principales
+RewriteRule ^index\.html?$ / [L,R=301]
+RewriteRule ^home/?$ / [L,R=301]
+
+# Redirections pour les pages avec trailing slash
+RewriteRule ^apropos/$ /apropos [L,R=301]
+RewriteRule ^formations/$ /formations [L,R=301]
+RewriteRule ^opportunites/$ /opportunites [L,R=301]
+RewriteRule ^politique-confidentialite/$ /politique-confidentialite [L,R=301]
+RewriteRule ^cgv/$ /cgv [L,R=301]
+
+# Hide sensitive files
+<Files ~ "^\.">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files ~ "\.(log|sql|bak|backup)$">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Prevent access to PHP files in uploads
+# PHP files blocked - commented out for forms
+# <FilesMatch "\.(php|php3|php4|php5|phtml)$">
+#     Order Deny,Allow
+#     Deny from all
+# </FilesMatch>
+
+# Rate limiting (basic)
+<IfModule mod_evasive24.c>
+    DOSHashTableSize    2048
+    DOSPageCount        10
+    DOSPageInterval     1
+    DOSSiteCount        50
+    DOSSiteInterval     1
+    DOSBlockingPeriod   600
+</IfModule>
+
+# Disable server signature
+ServerTokens Prod
+ServerSignature Off
+
+
+
+# Angular routing
+RewriteEngine On
+# Allow access to Angular routes
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/cp2i-.*\.php$
+RewriteRule . /index.html [L]
+
+# Ensure Angular routes are accessible
+<LocationMatch "^/(cp2i|auth|dashboard|services)">
+    Require all granted
+</LocationMatch>

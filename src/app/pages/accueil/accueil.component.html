@@ -1,0 +1,555 @@
+  <div class="home fade-in">
+  <app-banner></app-banner>
+
+<!-- Section Services -->
+<section id="services" class="services-section scroll-section">
+  <div class="services-header">
+    <div class="services-title">Nos Services</div>
+    <div class="services-desc">
+      Découvrez nos expertises pour booster votre présence digitale et votre performance.
+    </div>
+  </div>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-laptop-code"></i></div>
+      <h3>Développement web & mobile</h3>
+      <p>Sites web, applications mobiles modernes et performants, adaptés à vos besoins.</p>
+      <button class="service-btn" routerLink="/services/developpement-web">
+        <span>Voir plus</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-users"></i></div>
+      <h3>Community management & réseaux sociaux</h3>
+      <p>Gestion de vos réseaux sociaux, animation de communauté et création de contenus engageants.</p>
+      <button class="service-btn" routerLink="/services/community-management">
+        <span>Voir plus</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-bullhorn"></i></div>
+      <h3>Communication & marketing digital</h3>
+      <p>Stratégies digitales, campagnes publicitaires et optimisation de votre visibilité en ligne.</p>
+      <button class="service-btn" routerLink="/services/marketing-digital">
+        <span>Voir plus</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-paint-brush"></i></div>
+      <h3>Design graphique & sérigraphie</h3>
+      <p>Identité visuelle, supports de communication, sérigraphie personnalisée sur tous supports.</p>
+      <button class="service-btn" routerLink="/services/design-graphique">
+        <span>Voir plus</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+      <h3>Formations professionnelles</h3>
+      <p>Formations en digital, communication, design, réseaux sociaux et outils numériques.</p>
+      <button class="service-btn" routerLink="/services/formations-professionnelles">
+        <span>Voir plus</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-star"></i></div>
+      <h3>Promotion de la culture & jeunes talents</h3>
+      <p>Valorisation de la culture locale et accompagnement des jeunes talents dans leur développement digital.</p>
+      <button class="service-btn" routerLink="/cp2i">
+        <span>Voir plus</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Section Vision & Mission -->
+<section class="vision-mission-section">
+  <div class="tabs">
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'mission'" 
+      (click)="setTab('mission')">
+      Mission
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'vision'" 
+      (click)="setTab('vision')">
+      Vision
+    </button>
+  </div>
+  <div class="tab-content">
+    <div 
+      class="tab-panel" 
+      *ngIf="activeTab === 'mission'" 
+      [@fadeIn]>
+      <h2>Notre Mission</h2>
+      <p>
+        <!-- Remplace ce texte par ta mission -->
+        Accompagner les entreprises et organisations dans leur transformation digitale, en proposant des solutions innovantes et adaptées à leurs besoins.
+      </p>
+    </div>
+    <div 
+      class="tab-panel" 
+      *ngIf="activeTab === 'vision'" 
+      [@fadeIn]>
+      <h2>Notre Vision</h2>
+      <p>
+        <!-- Remplace ce texte par ta vision -->
+        Être un acteur de référence dans la promotion de la culture digitale et l'émergence des talents en Afrique.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<!-- Section Réalisations -->
+<section class="realisations-section" id="portfolio">
+
+  <!-- BLOC 1 : Réalisations Web -->
+  <div id="web-projects" class="web-realizations-bloc">
+    <div class="container">
+      
+      <!-- En-tête -->
+      <div class="section-header">
+        <h2 class="section-title">Quelques Sites Web</h2>
+        <p class="section-subtitle">conçus pour performer et soutenir votre croissance</p>
+      </div>
+
+      <!-- Navigation par onglets -->
+      <div class="tabs-navigation">
+      <button 
+        *ngFor="let tab of webTabs"
+        class="tab-btn"
+        [class.active]="activeWebTab === tab"
+        (click)="setActiveTab(tab)">
+        {{ getTabLabel(tab) }}
+      </button>
+      </div>
+
+      <!-- Grille des projets web -->
+      <div class="web-projects-grid">
+        <div 
+          class="web-project-card"
+          *ngFor="let project of filteredWebProjects">
+          
+          <div class="project-image-container">
+            <img [src]="project.image" [alt]="project.title" class="project-image">
+            <div class="project-overlay">
+              <button 
+                class="btn-voir-projet"
+                (click)="openWebProject(project.url)">
+                Voir Le Projet →
+              </button>
+            </div>
+          </div>
+          
+          <div class="project-info">
+            <h3 class="project-title">{{ project.title }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOC 2 : Conceptions Graphiques -->
+  <div id="graphic-projects" class="graphic-realizations-bloc">
+    <div class="container">
+      
+      <!-- En-tête -->
+      <div class="graphic-section-header">
+        <p class="section-subtitle">Votre identité, sublimée par nos</p>
+        <h2 class="graphic-title">Conceptions Graphiques</h2>
+      </div>
+
+      <!-- Grille des conceptions graphiques -->
+      <div class="graphics-grid">
+        <div 
+          class="graphic-card"
+          *ngFor="let graphic of graphicProjects"
+          (click)="openLightbox(graphic)">
+          
+          <div class="graphic-image-container">
+            <img [src]="graphic.image" [alt]="graphic.title" class="graphic-image">
+            <div class="graphic-overlay">
+              <div class="zoom-icon">🔍</div>
+              <span class="view-text">Voir en grand</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div 
+    class="lightbox-modal"
+    *ngIf="isLightboxOpen"
+    (click)="closeLightbox()"
+    (keydown)="onKeydown($event)"
+    tabindex="0">
+    
+    <div class="lightbox-content" (click)="$event.stopPropagation()">
+      
+      <!-- Bouton fermer -->
+      <button class="lightbox-close" (click)="closeLightbox()">
+        ✕
+      </button>
+
+      <!-- Actions en haut -->
+      <div class="lightbox-actions-top">
+        <button 
+          class="action-btn download-btn"
+          *ngIf="selectedGraphic?.downloadUrl"
+          (click)="downloadGraphic(selectedGraphic!)">
+          ⬇ Télécharger
+        </button>
+        <button 
+          class="action-btn share-btn"
+          (click)="shareGraphic(selectedGraphic!)">
+          📤 Partager
+        </button>
+      </div>
+
+      <!-- Image principale -->
+      <div class="lightbox-image-container">
+        <img 
+          [src]="selectedGraphic?.image" 
+          [alt]="selectedGraphic?.title"
+          [class]="'lightbox-image ' + getImageStyleClass(selectedGraphic)"
+          (load)="onImageLoad($event)">
+      </div>
+
+      <!-- Informations -->
+      <div class="lightbox-info">
+        <h3 class="lightbox-title">{{ selectedGraphic?.title }}</h3>
+        <span class="lightbox-category">{{ selectedGraphic?.category }}</span>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+
+
+<!-- Section Actualités -->
+<div id="news"  class="actualites-section">
+  <div class="container">
+    <!-- En-tête de section -->
+    <div class="section-header" [@fadeInUp]>
+      <div class="header-content">
+        <h2 class="section-title">Actualités</h2>
+        <span class="section-subtitle">Restez connectés</span>
+      </div>
+    </div>
+
+    <!-- Grille des actualités -->
+    <div class="news-grid">
+      <div 
+        class="news-card"
+        *ngFor="let article of articles; let i = index"
+        [@slideInUp]="{ value: '', params: { delay: i * 100 + 'ms' } }"
+        (click)="redirectToLinkedIn(article.linkedinUrl)"
+        [class.featured]="article.featured">
+        
+        <!-- Image de l'article -->
+        <div class="card-image">
+          <img [src]="article.image" [alt]="article.title" loading="lazy">
+          <div class="image-overlay">
+            <div class="category-badge" [ngClass]="article.category.toLowerCase()">
+              {{ article.category }}
+            </div>
+            <div class="read-more-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M7 17L17 7M17 7H7M17 7V17"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenu de l'article -->
+        <div class="card-content">
+          <h3 class="article-title">{{ article.title }}</h3>
+          <p class="article-excerpt">{{ article.excerpt }}</p>
+          
+          <div class="article-footer">
+            <div class="article-meta">
+              <span class="date">{{ formatDate(article.date) }}</span>
+              <span class="separator">•</span>
+              <span class="author">{{ article.author }}</span>
+            </div>
+            <div class="linkedin-indicator">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Animation de hover -->
+        <div class="hover-effect"></div>
+      </div>
+    </div>
+
+    <!-- Bouton voir plus -->
+    <div class="view-more-section" [@fadeIn]>
+      <button class="view-more-btn" (click)="viewAllNews()">
+        <span>Voir toutes les actualités</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12H19M19 12L12 5M19 12L12 19"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Section Chiffres Clés -->
+<section class="key-numbers">
+  <div class="white-subtitle">Chiffres Clés</div>
+  <div class="numbers-cards">
+    
+    <div class="number-card">
+      <div class="number" data-target="50">+0</div>
+      <div class="number-label">Clients accompagnés</div>
+    </div>
+
+    <div class="number-card">
+  <div class="number" data-target="03">+0</div>
+      <div class="number-label">Projets réalisés</div>
+    </div>
+
+    <div class="number-card">
+  <div class="number" data-target="11">+0</div>
+      <div class="number-label">Partenaires</div>
+    </div>
+
+    <div class="number-card">
+  <div class="number" data-target="03">+0</div>
+      <div class="number-label">Années d'expérience</div>
+    </div>
+  </div>
+</section>
+
+  <!-- Section Témoignages -->
+<!-- Exemple de structure HTML pour le carousel de témoignages -->
+<section class="testimonials-section" [@staggerAnimation]>
+  <!-- En-tête de la section -->
+  <div class="section-header" [@fadeInUp]>
+    <div class="header-decoration"></div>
+    <h2 class="section-title">Témoignages</h2>
+    <p class="section-subtitle">Découvrez ce que disent nos clients satisfaits</p>
+    <div class="header-decoration"></div>
+  </div>
+
+  <!-- Grille des témoignages -->
+  <div class="testimonials-grid">
+    <div 
+      class="testimonial-card" 
+      *ngFor="let temoignage of temoignages; let i = index"
+      [@fadeInUp]
+      [@cardHover]="getCardState(i)"
+      (mouseenter)="onCardHover(i)"
+      (mouseleave)="onCardLeave()">
+      
+      <!-- Citation -->
+      <div class="quote-icon">
+        <svg width="40" height="30" viewBox="0 0 40 30" fill="none">
+          <path d="M0 15C0 6.716 6.716 0 15 0c1.657 0 3 1.343 3 3s-1.343 3-3 3C9.477 6 6 9.477 6 15c0 1.657-1.343 3-3 3S0 16.657 0 15z" fill="currentColor"/>
+          <path d="M22 15C22 6.716 28.716 0 37 0c1.657 0 3 1.343 3 3s-1.343 3-3 3c-5.523 0-9 3.477-9 9 0 1.657-1.343 3-3 3s-3-1.343-3-3z" fill="currentColor"/>
+        </svg>
+      </div>
+
+      <!-- Texte du témoignage -->
+      <div class="testimonial-text">
+        <p>{{ temoignage.text }}</p>
+      </div>
+
+      <!-- Profil du client -->
+      <div class="client-profile">
+        <div class="profile-image">
+          <img [src]="temoignage.photo" 
+          [alt]="temoignage.nom"
+          width="70" height="70"
+          loading="lazy"
+          (error)="onImageError($event)">
+          <div class="image-overlay"></div>
+        </div>
+        
+        <div class="profile-info">
+          <h4 class="client-name">{{ temoignage.nom }}</h4>
+          <p class="client-title">{{ temoignage.titre }}</p>
+        </div>
+      </div>
+
+      <!-- Décoration de carte -->
+      <div class="card-decoration"></div>
+    </div>
+  </div>
+
+  <!-- Décoration de fond -->
+  <div class="background-decoration">
+    <div class="decoration-circle circle-1"></div>
+    <div class="decoration-circle circle-2"></div>
+    <div class="decoration-circle circle-3"></div>
+  </div>
+</section>
+
+  <!-- Section Partenaires -->
+<section class="partners">
+  <h2 class="orange-title">Ils nous font confiance</h2>
+  <div class="blue-subtitle">Nos Clients & Partenaires</div>
+  <div class="partner-logos-carousel">
+    <div class="logos-track">
+    <img src="P1.jpg" alt="Partenaire 1" width="150" height="90" loading="lazy">
+    <img src="P2.png" alt="Partenaire 2" width="150" height="90" loading="lazy">
+    <img src="P3.jpg" alt="Partenaire 3" width="150" height="90" loading="lazy">
+    <img src="P4.jpeg" alt="Partenaire 4" width="150" height="90" loading="lazy">
+    <img src="P5.png" alt="Partenaire 5" width="150" height="90" loading="lazy">
+    <img src="P6.jpg" alt="Partenaire 6" width="150" height="90" loading="lazy">
+    <img src="P7.jpg" alt="Partenaire 7" width="150" height="90" loading="lazy">
+    <img src="P8.jpg" alt="Partenaire 8" width="150" height="90" loading="lazy">
+    <img src="P9.jpg" alt="Partenaire 9" width="150" height="90" loading="lazy">
+    <img src="P10.png" alt="Partenaire 10" width="150" height="90" loading="lazy">
+    <!-- Dupliquez pour effet infini -->
+    <img src="P1.jpg" alt="Partenaire 1" width="150" height="90" loading="lazy">
+    <img src="P2.png" alt="Partenaire 2" width="150" height="90" loading="lazy">
+    <img src="P3.jpg" alt="Partenaire 3" width="150" height="90" loading="lazy">
+    <img src="P4.jpeg" alt="Partenaire 4" width="150" height="90" loading="lazy">
+    <img src="P5.png" alt="Partenaire 5" width="150" height="90" loading="lazy">
+    <img src="P6.jpg" alt="Partenaire 6" width="150" height="90" loading="lazy">
+    <img src="P7.jpg" alt="Partenaire 7" width="150" height="90" loading="lazy">
+    <img src="P8.jpg" alt="Partenaire 8" width="150" height="90" loading="lazy">
+    <img src="P9.jpg" alt="Partenaire 9" width="150" height="90" loading="lazy">
+    <img src="P10.png" alt="Partenaire 10" width="150" height="90" loading="lazy">
+    </div>
+  </div>
+  </section>
+
+
+  <!-- Section Newsletter -->
+<app-newsletter></app-newsletter>
+
+<!-- Section Contact -->
+<section id="contact" class="contact-section scroll-section">
+  <div class="contact-banner">
+    <div class="banner-content">
+      <h2 class="banner-title">Contactez-nous</h2>
+      <p class="banner-subtitle">
+        Un projet, une question? Notre équipe vous répond rapidement et vous accompagne dans votre démarche digitale.
+      </p>
+    </div>
+  </div>
+
+  <div class="contact-container">
+    <div class="contact-content">
+      <div class="contact-info">
+        <h3>Nos coordonnées</h3>
+        <div class="info-item">
+          <i class="fas fa-envelope"></i>
+          <div>
+            <h4>Email</h4>
+            <p>pencc.penccumndongo&#64;gmail.com</p>
+          </div>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-phone"></i>
+          <div>
+            <h4>Téléphone</h4>
+            <p>+221 77 629 06 39</p>
+            <p>+221 76 841 54 14</p>
+          </div>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <div>
+            <h4>Adresse</h4>
+            <p>Yeumbeul, Comico Série B 156<br>Dakar, Sénégal</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-form-section">
+        <h3>Envoyez-nous un message</h3>
+        
+        <div *ngIf="successMsg" class="success-message">{{successMsg}}</div>
+        <div *ngIf="errorMsg" class="error-message">{{errorMsg}}</div>
+
+        <form (ngSubmit)="onSubmit()" #contactForm="ngForm" class="modern-contact-form" novalidate>
+          <div class="form-row-modern">
+            <div class="form-group-modern">
+              <label for="firstname">Prénom <span class="required">*</span></label>
+              <input id="firstname" type="text" placeholder="Ex : Malik ibrah"
+                [(ngModel)]="contactData.firstname" name="firstname" required #firstname="ngModel">
+              <div class="field-error" *ngIf="firstname.invalid && (firstname.dirty || firstname.touched)">
+                Le prénom est obligatoire.
+              </div>
+            </div>
+            <div class="form-group-modern">
+              <label for="lastname">Nom de famille <span class="required">*</span></label>
+              <input id="lastname" type="text" placeholder="Nom de famille"
+                [(ngModel)]="contactData.lastname" name="lastname" required #lastname="ngModel">
+              <div class="field-error" *ngIf="lastname.invalid && (lastname.dirty || lastname.touched)">
+                Le nom de famille est obligatoire.
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-row-modern">
+            <div class="form-group-modern">
+              <label for="phone">Téléphone <span class="required">*</span></label>
+              <input id="phone" type="tel" placeholder="Numéro de portable"
+                [(ngModel)]="contactData.phone" name="phone" required #phone="ngModel">
+              <div class="field-error" *ngIf="phone.invalid && (phone.dirty || phone.touched)">
+                Le numéro de portable est obligatoire.
+              </div>
+            </div>
+            <div class="form-group-modern">
+              <label for="email">E-mail <span class="required">*</span></label>
+              <input id="email" type="email" placeholder="Ex : malik@ibrah.com"
+                [(ngModel)]="contactData.email" name="email" required email #email="ngModel">
+              <div class="field-error" *ngIf="email.invalid && (email.dirty || email.touched)">
+                Un e-mail valide est obligatoire.
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group-modern">
+            <label for="company">Entreprise / Organisation</label>
+            <input id="company" type="text" placeholder="Ex : Penccum Ndongo"
+              [(ngModel)]="contactData.company" name="company">
+          </div>
+          
+          <div class="form-group-modern">
+            <label for="message">Détaillez votre projet <span class="required">*</span></label>
+            <textarea id="message" placeholder="Saisissez votre message..."
+              [(ngModel)]="contactData.message" name="message" required #message="ngModel" rows="5"></textarea>
+            <div class="field-error" *ngIf="message.invalid && (message.dirty || message.touched)">
+              Merci de détailler votre projet.
+            </div>
+          </div>
+          
+          <div class="form-group-modern recaptcha-group">
+            <re-captcha
+              (resolved)="onCaptchaResolved($event)"
+              siteKey="6LcOtdMrAAAAAKCPKLTLIONtTqumHbVTm316iyzT"
+              size="normal"
+              theme="light">
+            </re-captcha>
+          </div>
+          
+          <div class="form-group-modern">
+            <button type="submit" class="modern-contact-btn" [disabled]="!contactForm.valid || !captchaResolved">
+              <span>Envoyer le message</span>
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

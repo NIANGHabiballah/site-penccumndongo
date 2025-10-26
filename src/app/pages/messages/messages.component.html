@@ -1,0 +1,142 @@
+<div class="messages-container">
+  <div class="messages-header">
+    <h1>💬 Hub Communication</h1>
+    <div class="tab-navigation">
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'envoyer'"
+        (click)="switchTab('envoyer')">
+        📤 Envoyer Message
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'conversations'"
+        (click)="switchTab('conversations')">
+        💬 Conversations
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'templates'"
+        (click)="switchTab('templates')">
+        📋 Templates
+      </button>
+    </div>
+  </div>
+
+  <!-- Onglet Envoyer Message -->
+  <div *ngIf="activeTab === 'envoyer'" class="tab-content">
+    <div class="message-form-container">
+      <form class="message-form" (ngSubmit)="envoyerMessage()">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Destinataire</label>
+            <select [(ngModel)]="messageForm.destinataire" name="destinataire">
+              <option value="tous">Tous les participants</option>
+              <option value="correcteurs">Tous les correcteurs</option>
+              <option value="participants">Participants uniquement</option>
+              <option value="individuel">Destinataire spécifique</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Type de message</label>
+            <select [(ngModel)]="messageForm.type" name="type">
+              <option value="information">📘 Information</option>
+              <option value="urgence">🚨 Urgence</option>
+              <option value="felicitation">🎉 Félicitation</option>
+              <option value="rappel">⏰ Rappel</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Sujet</label>
+          <input 
+            type="text" 
+            [(ngModel)]="messageForm.sujet" 
+            name="sujet"
+            placeholder="Objet du message">
+        </div>
+
+        <div class="form-group">
+          <label>Contenu du message</label>
+          <textarea 
+            [(ngModel)]="messageForm.contenu" 
+            name="contenu"
+            rows="8"
+            placeholder="Rédigez votre message ici..."></textarea>
+        </div>
+
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="messageForm.programmation" 
+              name="programmation">
+            <span>📅 Programmer l'envoi</span>
+          </label>
+          
+          <div *ngIf="messageForm.programmation" class="form-group">
+            <input 
+              type="datetime-local" 
+              [(ngModel)]="messageForm.dateEnvoi" 
+              name="dateEnvoi">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary">💾 Sauvegarder brouillon</button>
+          <button type="submit" class="btn-primary">📤 Envoyer maintenant</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Onglet Conversations -->
+  <div *ngIf="activeTab === 'conversations'" class="tab-content">
+    <div class="conversations-list">
+      <div class="search-bar">
+        <input type="text" placeholder="🔍 Rechercher une conversation...">
+      </div>
+      
+      <div class="conversation-item" 
+           *ngFor="let conv of conversations"
+           [class.non-lu]="conv.statut === 'non_lu'"
+           (click)="ouvrirConversation(conv)">
+        <div class="conversation-avatar">
+          <span>{{conv.participant.charAt(0)}}</span>
+        </div>
+        <div class="conversation-content">
+          <div class="conversation-header">
+            <h4>{{conv.participant}}</h4>
+            <span class="conversation-date">{{conv.date}}</span>
+          </div>
+          <p class="last-message">{{conv.dernier_message}}</p>
+        </div>
+        <div class="conversation-status" [class]="conv.statut"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onglet Templates -->
+  <div *ngIf="activeTab === 'templates'" class="tab-content">
+    <div class="templates-grid">
+      <div class="template-card" *ngFor="let template of templates">
+        <h3>{{template.nom}}</h3>
+        <p>{{template.contenu.substring(0, 100)}}...</p>
+        <div class="template-actions">
+          <button class="btn-primary" (click)="utiliserTemplate(template)">
+            📝 Utiliser
+          </button>
+          <button class="btn-secondary">✏️ Modifier</button>
+        </div>
+      </div>
+      
+      <div class="template-card add-template">
+        <div class="add-icon">➕</div>
+        <h3>Nouveau Template</h3>
+        <p>Créer un nouveau modèle de message</p>
+      </div>
+    </div>
+  </div>
+</div>
