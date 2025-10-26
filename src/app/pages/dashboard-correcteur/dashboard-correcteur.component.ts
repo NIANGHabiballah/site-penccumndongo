@@ -143,10 +143,11 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
   }
 
   calculateDeadline() {
-    const deadline = new Date('2025-02-15');
+    // Date limite pour les corrections : 3 décembre 2025
+    const deadline = new Date('2025-12-03');
     const today = new Date();
     const diffTime = deadline.getTime() - today.getTime();
-    this.stats.joursRestants = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    this.stats.joursRestants = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
   }
 
   // Navigation

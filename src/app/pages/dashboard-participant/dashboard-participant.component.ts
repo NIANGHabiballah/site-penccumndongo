@@ -27,6 +27,17 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   joursRestants = 0;
   evaluationsDetaillees: any[] = [];
   
+  // Dates officielles du concours CP2i 2025
+  concoursSchedule = {
+    inscription_debut: '2025-11-03',
+    inscription_fin: '2025-11-23',
+    correction_debut: '2025-11-24',
+    correction_fin: '2025-11-30',
+    correction_prolongement: '2025-12-03',
+    deliberation: '2025-12-10',
+    ceremonie_remise: '2026-01-10'
+  };
+  
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -157,10 +168,40 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   }
   
   calculateDeadline() {
-    const deadline = new Date('2025-02-15');
+    const prochaineEcheance = this.getProchaineEcheance();
+    this.joursRestants = prochaineEcheance.jours;
+  }
+  
+  getJoursRestants(dateStr: string): number {
+    const date = new Date(dateStr);
     const today = new Date();
-    const diffTime = deadline.getTime() - today.getTime();
-    this.joursRestants = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+    const diffTime = date.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+  
+  getProchaineEcheance(): { nom: string, date: string, jours: number } {
+    const today = new Date();
+    const echeances = [
+      { nom: 'Début des inscriptions', date: this.concoursSchedule.inscription_debut },
+      { nom: 'Fin des inscriptions', date: this.concoursSchedule.inscription_fin },
+      { nom: 'Début des corrections', date: this.concoursSchedule.correction_debut },
+      { nom: 'Fin des corrections', date: this.concoursSchedule.correction_prolongement },
+      { nom: 'Délibération', date: this.concoursSchedule.deliberation },
+      { nom: 'Cérémonie de remise', date: this.concoursSchedule.ceremonie_remise }
+    ];
+    
+    for (const echeance of echeances) {
+      const dateEcheance = new Date(echeance.date);
+      if (dateEcheance >= today) {
+        return {
+          nom: echeance.nom,
+          date: echeance.date,
+          jours: this.getJoursRestants(echeance.date)
+        };
+      }
+    }
+    
+    return { nom: 'Aucune échéance', date: '', jours: 0 };
   }
   
   loadClassement() {
