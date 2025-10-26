@@ -233,6 +233,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         this.applyEvaluationFilters();
         // Calculer les stats après avoir chargé les textes
         this.calculateStatsFromTexts();
+        // Forcer le recalcul après un délai pour s'assurer que les données sont chargées
+        setTimeout(() => this.calculateStatsFromTexts(), 500);
       },
       error: (error) => console.error('Erreur textes:', error)
     });
@@ -1069,31 +1071,27 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       const refuses = this.textes.filter(t => t.statut === 'refuse').length;
       const enAttente = this.textes.filter(t => t.statut === 'en_attente').length;
       
-      const notesValides = this.textes.filter(t => t.note && t.note > 0).map(t => t.note);
+      const notesValides = this.textes.filter(t => t.note && t.note > 0).map(t => parseFloat(t.note));
       const noteMoyenne = notesValides.length > 0 ? 
-        notesValides.reduce((sum, note) => sum + note, 0) / notesValides.length : null;
+        Math.round((notesValides.reduce((sum, note) => sum + note, 0) / notesValides.length) * 10) / 10 : null;
       
       this.stats = {
+        ...this.stats,
         total_textes: total,
         textes_acceptes: acceptes,
         textes_refuses: refuses,
         textes_en_attente: enAttente,
-        note_moyenne: noteMoyenne,
-        affectation_stats: {},
-        correcteurs_stats: [],
-        textes_affectations: []
+        note_moyenne: noteMoyenne
       };
-    } else {
-      this.stats = {
-        total_textes: 0,
-        textes_acceptes: 0,
-        textes_refuses: 0,
-        textes_en_attente: 0,
-        note_moyenne: null,
-        affectation_stats: {},
-        correcteurs_stats: [],
-        textes_affectations: []
-      };
+      
+      console.log('📊 Note moyenne calculée:', noteMoyenne, 'depuis', notesValides.length, 'notes:', notesValides);
     }
+  }
+  
+  getNoteMoyenne(): string {
+    if (this.stats.note_moyenne !== null && this.stats.note_moyenne !== undefined && this.stats.note_moyenne > 0) {
+      return this.stats.note_moyenne.toFixed(1) + '/20';
+    }
+    return 'N/A';
   }
 }

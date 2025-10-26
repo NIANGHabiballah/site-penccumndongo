@@ -192,7 +192,7 @@
             <div class="stats-summary">
               <div class="summary-item">
                 <span class="label">Note moyenne:</span>
-                <span class="value" [class.highlight]="stats.note_moyenne">{{stats.note_moyenne ? (stats.note_moyenne | number:'1.1-1') + '/20' : 'N/A'}}</span>
+                <span class="value" [class.highlight]="stats.note_moyenne > 0">{{getNoteMoyenne()}}</span>
               </div>
               <div class="summary-item">
                 <span class="label">Textes admis:</span>
