@@ -34,6 +34,7 @@ function submitText($data, $user) {
     $titre = $data['titre'] ?? '';
     $contenu = $data['contenu'] ?? '';
     $langue = $data['langue'] ?? 'francais';
+    $theme = $data['theme'] ?? '';
     
     if (!$titre || !$contenu) {
         http_response_code(400);
@@ -62,9 +63,9 @@ function submitText($data, $user) {
         return;
     }
     
-    $stmt = $db->prepare("INSERT INTO cp2i_textes (user_id, titre, contenu, langue, nb_vers, statut, created_at) VALUES (?, ?, ?, ?, ?, 'en_attente', NOW())");
+    $stmt = $db->prepare("INSERT INTO cp2i_textes (user_id, titre, contenu, langue, theme, nb_vers, statut, created_at) VALUES (?, ?, ?, ?, ?, ?, 'en_attente', NOW())");
     
-    if ($stmt->execute([$user['user_id'], $titre, $contenu, $langue, $verseCount])) {
+    if ($stmt->execute([$user['user_id'], $titre, $contenu, $langue, $theme, $verseCount])) {
         // Enregistrer la soumission dans l'historique
         logAction($user['user_id'], 'text_submission', "Soumission du texte: $titre");
         
@@ -84,7 +85,7 @@ function getUserTexts($userId) {
     
     $stmt = $db->prepare("
         SELECT 
-            t.id, t.titre, t.contenu, t.langue, t.nb_vers, t.statut, t.note, t.commentaire, t.created_at,
+            t.id, t.titre, t.contenu, t.langue, t.theme, t.nb_vers, t.statut, t.note, t.commentaire, t.created_at,
             CASE 
                 WHEN EXISTS(SELECT 1 FROM cp2i_affectations a WHERE a.texte_id = t.id) THEN 0
                 ELSE 1
@@ -103,7 +104,7 @@ function getAllTexts() {
     $db = getDB();
     
     $stmt = $db->prepare("
-        SELECT t.id, t.titre, t.contenu, t.langue, t.nb_vers, t.statut, t.note, t.commentaire, t.created_at,
+        SELECT t.id, t.titre, t.contenu, t.langue, t.theme, t.nb_vers, t.statut, t.note, t.commentaire, t.created_at,
                u.nom, u.prenom, u.email
         FROM cp2i_textes t 
         JOIN cp2i_users u ON t.user_id = u.id 

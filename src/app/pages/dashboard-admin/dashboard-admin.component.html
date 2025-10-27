@@ -359,6 +359,7 @@
               <div class="text-row header">
                 <div>Titre</div>
                 <div>Auteur</div>
+                <div>Thème</div>
                 <div>Langue</div>
                 <div>Statut</div>
                 <div>Note</div>
@@ -367,6 +368,7 @@
               <div class="text-row" *ngFor="let texte of textes">
                 <div class="text-title" data-label="Titre:">{{texte.titre}}</div>
                 <div data-label="Auteur:">{{texte.prenom}} {{texte.nom}}</div>
+                <div data-label="Thème:">{{getThemeLabel(texte.theme)}}</div>
                 <div data-label="Langue:">{{texte.langue | titlecase}}</div>
                 <div data-label="Statut:"><span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span></div>
                 <div data-label="Note:">{{getParticipantAverageNote(texte.prenom, texte.nom) ? (getParticipantAverageNote(texte.prenom, texte.nom) | number:'1.1-1') + '/20' : '-'}}</div>
@@ -542,7 +544,7 @@
         </div>
         <div class="form-group">
           <label>Email *</label>
-          <input type="email" [(ngModel)]="userForm.email" class="form-control" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Veuillez entrer un email valide">
+          <input type="email" [(ngModel)]="userForm.email" class="form-control" required pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$" title="Veuillez entrer un email valide">
         </div>
         <div class="form-group">
           <label>Téléphone *</label>

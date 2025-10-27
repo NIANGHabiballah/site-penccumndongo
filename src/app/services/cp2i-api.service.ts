@@ -22,6 +22,7 @@ export interface Texte {
   titre: string;
   contenu: string;
   langue: string;
+  theme: string;
   nb_vers?: number;
   statut?: string;
   note?: number;

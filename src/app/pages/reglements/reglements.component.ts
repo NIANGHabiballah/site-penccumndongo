@@ -24,7 +24,8 @@ import { ApiService } from '../../services/api.service';
           <section class="reglement-section">
             <h2><i class="fas fa-users"></i> 2. PARTICIPATION</h2>
             <p>{{reglements.participation.ouverture}}</p>
-            <p><strong>Période :</strong> {{reglements.participation.periode_inscription}}</p>
+            <p><strong>Période d'inscription :</strong> {{reglements.participation.periode_inscription}}</p>
+            <p><strong>Date limite de soumission :</strong> {{reglements.participation.date_limite_soumission}}</p>
             
             <h3>Langues :</h3>
             <ul>
@@ -54,7 +55,7 @@ import { ApiService } from '../../services/api.service';
             <h2><i class="fas fa-search"></i> 4. PROCESSUS DE SÉLECTION</h2>
             <p>{{reglements.selection.comite}}</p>
             <p>{{reglements.selection.criteres}}</p>
-            <p><strong>Annonce des finalistes :</strong> {{reglements.selection.annonce_finalistes}}</p>
+
             <p>{{reglements.selection.publication}}</p>
             <p><strong>Mention spéciale :</strong> {{reglements.selection.mention_speciale}}</p>
           </section>
@@ -111,7 +112,10 @@ import { ApiService } from '../../services/api.service';
             <p><strong>Téléphone :</strong> {{reglements.contact.telephone}}</p>
             <p><strong>Email :</strong> {{reglements.contact.email}}</p>
             <p><strong>Site web :</strong> {{reglements.contact.site}}</p>
-            <p><strong>Suivez-nous sur :</strong> {{reglements.contact.reseaux.join(', ')}}</p>
+            <p><strong>Suivez-nous sur :</strong></p>
+            <div class="reseaux-sociaux">
+              <a *ngFor="let reseau of reglements.contact.reseaux" [href]="reseau.lien" target="_blank" class="reseau-link">{{reseau.nom}}</a>
+            </div>
           </section>
         </div>
       </div>
@@ -484,6 +488,47 @@ import { ApiService } from '../../services/api.service';
         grid-template-columns: 1fr;
       }
     }
+
+    .reseaux-sociaux {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      position: relative;
+      z-index: 5;
+    }
+
+    .reseau-link {
+      color: rgba(255,255,255,0.9) !important;
+      text-decoration: none !important;
+      padding: 1rem 2rem;
+      background: rgba(255,255,255,0.2);
+      border-radius: 30px;
+      transition: none;
+      font-weight: 600;
+      display: inline-block !important;
+      cursor: pointer !important;
+      min-height: 50px;
+      min-width: 120px;
+      text-align: center;
+      line-height: 1.5;
+      border: 2px solid rgba(255,255,255,0.3);
+      margin: 0.5rem;
+      position: relative;
+      z-index: 10;
+      pointer-events: auto;
+    }
+
+    .reseau-link:hover {
+      background: var(--primary-orange);
+      color: white;
+      border-color: var(--primary-orange);
+    }
+
+    .reseau-link:active {
+      background: #e67e22;
+      transform: scale(0.98);
+    }
   `]
 })
 export class ReglementsComponent implements OnInit {
@@ -502,9 +547,10 @@ export class ReglementsComponent implements OnInit {
       },
       participation: {
         ouverture: 'Le concours est ouvert à toute personne résidant au Sénégal et à l\'international.',
-        periode_inscription: 'du 1er au 31 janvier 2025',
+        periode_inscription: 'du 3 au 23 novembre 2025',
+        date_limite_soumission: '23 novembre 2025 à 23h59',
         langues: ['français', 'wolof', 'anglais', 'arabe'],
-        themes: ['Femme Modèle', 'Jeunesse et l\'Avenir', 'L\'Afrique de Demain', 'Tendances et Valeurs', 'L\'Influence des Réseaux Sociaux', 'Innovation et Tradition', 'Paix et Réconciliation']
+        themes: ['Patriotisme', 'Justice et dignité', 'Beauté Africaine', 'Jeunesse responsable', 'Sous l\'emprise des écrans']
       },
       soumission: {
         format: 'Un seul poème par participant en format numérique',
@@ -515,7 +561,7 @@ export class ReglementsComponent implements OnInit {
       selection: {
         comite: 'Les poèmes seront évalués par un comité de lecture composé d\'\u00e9crivains, d\'universitaires et de professionnels du milieu artistique et littéraire.',
         criteres: 'Les meilleurs textes dans chaque langue seront sélectionnés pour la finale.',
-        annonce_finalistes: 'fin février 2025',
+
         publication: 'Les poèmes finalistes seront publiés sur nos plateformes sociales pour une phase d\'appréciation publique.',
         mention_speciale: 'Le poème le plus aimé et commenté recevra une mention spéciale.'
       },
@@ -531,14 +577,14 @@ export class ReglementsComponent implements OnInit {
         acceptation: 'La participation au concours implique l\'acceptation pleine et entière de ce règlement'
       },
       nouveautes_2025: {
-        themes_supplementaires: 'Innovation et Tradition + Paix et Réconciliation',
+        themes_officiels: 'Patriotisme, Justice et dignité, Beauté Africaine, Jeunesse responsable, Sous l\'emprise des écrans',
         limite_vers_augmentee: '40 vers (au lieu de 30)',
         periode_prolongee: 'Inscriptions prolongées jusqu\'au 31 janvier',
         plateforme_numerique: 'Soumission entièrement numérique via le site web',
         suivi_temps_reel: 'Suivi en temps réel du statut de participation'
       },
       participation_info: {
-        lien_inscription: 'https://bit.ly/3uyj2zz',
+        lien_inscription: 'https://penccumndongo.com/cp2i',
         telephone: '+221 76 841 54 14'
       },
       partenaires: [
@@ -555,8 +601,14 @@ export class ReglementsComponent implements OnInit {
       contact: {
         email: 'penc.pencumndongo@gmail.com',
         site: 'https://penccumndongo.com',
-        telephone: '+221 76 841 54 14',
-        reseaux: ['Instagram', 'TikTok', 'LinkedIn', 'WhatsApp', 'Facebook']
+        telephone: '+221 76 841 54 14 / +221 77 629 06 39',
+        reseaux: [
+          { nom: 'Instagram', lien: 'https://www.instagram.com/penccumndongo' },
+          { nom: 'TikTok', lien: 'https://www.tiktok.com/@penccumndongo' },
+          { nom: 'LinkedIn', lien: 'https://www.linkedin.com/company/penccum-ndongo' },
+          { nom: 'WhatsApp', lien: 'https://wa.me/221768415414' },
+          { nom: 'Facebook', lien: 'https://www.facebook.com/penccumndongo' }
+        ]
       }
     };
     

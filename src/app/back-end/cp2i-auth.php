@@ -16,7 +16,7 @@ function createUserWithPassword($db, $userData) {
     $hashedPassword = password_hash($userData['password'], PASSWORD_DEFAULT);
     $plainPasswordToStore = ($userData['role'] === 'admin' || $userData['role'] === 'correcteur') ? $userData['password'] : null;
     
-    $stmt = $db->prepare("INSERT INTO cp2i_users (email, password, nom, prenom, telephone, role, email_verified, verification_token, plain_password, created_at) VALUES (?, ?, ?, ?, ?, ?, FALSE, ?, ?, NOW())");
+    $stmt = $db->prepare("INSERT INTO cp2i_users (email, password, nom, prenom, telephone, ville, role, email_verified, verification_token, plain_password, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, FALSE, ?, ?, NOW())");
     
     return $stmt->execute([
         $userData['email'], 
@@ -24,6 +24,7 @@ function createUserWithPassword($db, $userData) {
         $userData['nom'], 
         $userData['prenom'], 
         $userData['telephone'], 
+        $userData['ville'], 
         $userData['role'], 
         $userData['verification_token'],
         $plainPasswordToStore
@@ -55,11 +56,12 @@ function registerUser($data) {
     $nom = $data['nom'] ?? '';
     $prenom = $data['prenom'] ?? '';
     $telephone = $data['telephone'] ?? '';
+    $ville = $data['ville'] ?? '';
     $role = $data['role'] ?? 'participant';
     
-    if (!$email || !$password || !$nom || !$prenom) {
+    if (!$email || !$password || !$nom || !$prenom || !$telephone || !$ville) {
         http_response_code(400);
-        echo json_encode(['error' => 'Données manquantes']);
+        echo json_encode(['error' => 'Tous les champs sont obligatoires']);
         return;
     }
     
@@ -82,6 +84,7 @@ function registerUser($data) {
         'nom' => $nom,
         'prenom' => $prenom,
         'telephone' => $telephone,
+        'ville' => $ville,
         'role' => $role,
         'verification_token' => $verificationToken
     ];

@@ -15,7 +15,8 @@ export class SoumissionTexteComponent implements OnInit {
   texte: Texte = {
     titre: '',
     contenu: '',
-    langue: 'francais'
+    langue: 'francais',
+    theme: ''
   };
 
   isSubmitting = false;
@@ -73,7 +74,8 @@ export class SoumissionTexteComponent implements OnInit {
             id: texteToEdit.id,
             titre: texteToEdit.titre,
             contenu: texteToEdit.contenu,
-            langue: texteToEdit.langue
+            langue: texteToEdit.langue,
+            theme: texteToEdit.theme || ''
           };
         } else {
           this.showToast('Texte non trouvé.', 'error');
@@ -95,6 +97,7 @@ export class SoumissionTexteComponent implements OnInit {
   isFormValid(): boolean {
     return !!this.texte.titre && 
            !!this.texte.contenu && 
+           !!this.texte.theme &&
            this.getLineCount() <= 40;
   }
 
@@ -159,7 +162,8 @@ export class SoumissionTexteComponent implements OnInit {
     this.texte = {
       titre: '',
       contenu: '',
-      langue: 'francais'
+      langue: 'francais',
+      theme: ''
     };
   }
 }

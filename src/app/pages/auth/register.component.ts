@@ -54,8 +54,9 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
             <div class="input-group">
               <div class="input-wrapper">
                 <i class="fas fa-phone input-icon"></i>
-                <input type="tel" [(ngModel)]="user.telephone" name="telephone" placeholder="Téléphone" required>
+                <input type="tel" [(ngModel)]="user.telephone" name="telephone" placeholder="Téléphone (+221 77 123 45 67)" required title="Incluez l'indicatif de votre pays (ex: +221 pour le Sénégal)">
               </div>
+              <small class="field-help">Incluez l'indicatif de votre pays (ex: +221 77 123 45 67)</small>
             </div>
           </div>
           
@@ -77,8 +78,9 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
           <div class="input-group">
             <div class="input-wrapper">
               <i class="fas fa-map-marker-alt input-icon"></i>
-              <input type="text" [(ngModel)]="user.ville" name="ville" placeholder="Ville (optionnel)">
+              <input type="text" [(ngModel)]="user.ville" name="ville" placeholder="Ville, Région, Pays" required title="Indiquez votre ville, région/département et pays">
             </div>
+            <small class="field-help">Exemple: Dakar, Région de Dakar, Sénégal</small>
           </div>
           
           <div class="checkbox-group">
@@ -393,6 +395,14 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
       color: #e67e22;
     }
     
+    .field-help {
+      display: block;
+      font-size: 0.8rem;
+      color: #7f8c8d;
+      margin-top: 0.3rem;
+      font-style: italic;
+    }
+    
     .error-alert {
       background: #fee;
       border: 1px solid #fcc;
@@ -478,7 +488,7 @@ export class RegisterComponent {
     this.errorMessage = '';
     this.successMessage = '';
     
-    if (!this.user.nomComplet || !this.user.email || !this.user.password) {
+    if (!this.user.nomComplet || !this.user.email || !this.user.password || !this.user.telephone || !this.user.ville) {
       this.errorMessage = 'Veuillez remplir tous les champs obligatoires';
       return;
     }
@@ -505,7 +515,8 @@ export class RegisterComponent {
       password: this.user.password,
       nom: nom,
       prenom: prenom,
-      telephone: this.user.telephone || '',
+      telephone: this.user.telephone,
+      ville: this.user.ville,
       role: this.selectedRole
     };
 

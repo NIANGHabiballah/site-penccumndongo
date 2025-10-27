@@ -228,6 +228,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.cp2iApi.getAllTexts().subscribe({
       next: (data) => {
         this.textes = data.textes || [];
+        // Le champ theme est maintenant supporté par l'API
         this.filteredTextes = [...this.textes];
         this.applyEvaluationFilters();
         
@@ -1127,5 +1128,16 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     
     const moyenne = toutesLesNotes.reduce((sum, note) => sum + note, 0) / toutesLesNotes.length;
     return Math.round(moyenne * 10) / 10;
+  }
+  
+  getThemeLabel(theme: string): string {
+    const themes = {
+      'patriotisme': 'Patriotisme',
+      'justice_dignite': 'Justice et dignité',
+      'beaute_africaine': 'Beauté Africaine',
+      'jeunesse_responsable': 'Jeunesse responsable',
+      'emprise_ecrans': 'Sous l\'emprise des écrans'
+    };
+    return themes[theme as keyof typeof themes] || theme || 'Non spécifié';
   }
 }
