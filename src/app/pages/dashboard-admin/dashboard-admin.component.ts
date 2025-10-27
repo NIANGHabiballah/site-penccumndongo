@@ -203,7 +203,6 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       error: (error) => console.error('Erreur profil:', error)
     });
     
-    // Calculer les statistiques depuis les textes chargés
     this.calculateStatsFromTexts();
     
     // Charger tous les utilisateurs
@@ -225,15 +224,17 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       }
     });
     
-    // Charger tous les textes
+    // Charger tous les textes avec évaluations
     this.cp2iApi.getAllTexts().subscribe({
       next: (data) => {
         this.textes = data.textes || [];
         this.filteredTextes = [...this.textes];
         this.applyEvaluationFilters();
-        // Calculer les stats après avoir chargé les textes
+        
+        // Charger les évaluations détaillées pour chaque texte
+        this.loadDetailedEvaluations();
+        
         this.calculateStatsFromTexts();
-        // Forcer le recalcul après un délai pour s'assurer que les données sont chargées
         setTimeout(() => this.calculateStatsFromTexts(), 500);
       },
       error: (error) => console.error('Erreur textes:', error)
@@ -299,9 +300,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
 
   getCorrectorsCount(texteId: number): number {
-    // Chercher dans les données d'affectation par texte
-    const texteAffectation = this.stats.textes_affectations?.find((ta: any) => ta.texte_id === texteId);
-    return texteAffectation?.nb_correcteurs || 0;
+    return this.affectations.filter(a => a.texte_id === texteId).length;
   }
 
   getAssignedCorrectorsNames(texteId: number): string {
@@ -1093,5 +1092,40 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       return this.stats.note_moyenne.toFixed(1) + '/20';
     }
     return 'N/A';
+  }
+  
+  loadDetailedEvaluations() {
+    this.textes.forEach(texte => {
+      this.cp2iApi.getTextCorrections(texte.id).subscribe({
+        next: (data) => {
+          texte.evaluations = data.corrections || [];
+        },
+        error: (error) => console.error(`Erreur évaluations texte ${texte.id}:`, error)
+      });
+    });
+  }
+
+  getParticipantAverageNote(prenom: string, nom: string): number | null {
+    const participantTextes = this.textes.filter(t => t.prenom === prenom && t.nom === nom);
+    
+    if (participantTextes.length === 0) return null;
+    
+    let toutesLesNotes: number[] = [];
+    
+    participantTextes.forEach(texte => {
+      if (texte.evaluations && Array.isArray(texte.evaluations)) {
+        const notesEvaluations = texte.evaluations
+          .filter((evaluation: any) => evaluation.note && evaluation.note > 0)
+          .map((evaluation: any) => parseFloat(evaluation.note));
+        toutesLesNotes.push(...notesEvaluations);
+      } else if (texte.note && texte.note > 0) {
+        toutesLesNotes.push(parseFloat(texte.note));
+      }
+    });
+    
+    if (toutesLesNotes.length === 0) return null;
+    
+    const moyenne = toutesLesNotes.reduce((sum, note) => sum + note, 0) / toutesLesNotes.length;
+    return Math.round(moyenne * 10) / 10;
   }
 }

@@ -369,7 +369,7 @@
                 <div data-label="Auteur:">{{texte.prenom}} {{texte.nom}}</div>
                 <div data-label="Langue:">{{texte.langue | titlecase}}</div>
                 <div data-label="Statut:"><span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span></div>
-                <div data-label="Note:">{{texte.note ? (texte.note + '/20') : '-'}}</div>
+                <div data-label="Note:">{{getParticipantAverageNote(texte.prenom, texte.nom) ? (getParticipantAverageNote(texte.prenom, texte.nom) | number:'1.1-1') + '/20' : '-'}}</div>
                 <div data-label="Date:">{{texte.created_at | date:'dd/MM/yyyy'}}</div>
               </div>
             </div>
