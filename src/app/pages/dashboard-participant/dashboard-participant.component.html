@@ -766,24 +766,130 @@
       
       <!-- Certificats -->
       <div *ngSwitchCase="'certificats'" class="certificats-section">
-        <h2>Mes Certificats</h2>
+        <div class="certificats-header">
+          <h2><i class="fas fa-award"></i> Mes Certificats Digitaux</h2>
+          <p class="certificats-subtitle">Vos attestations officielles du concours CP2i</p>
+        </div>
+        
         <div class="certificats-grid" *ngIf="certificats.length > 0; else noCertificats">
           <div class="certificat-card" *ngFor="let cert of certificats">
-            <div class="certificat-icon">
-              <i class="fas fa-certificate"></i>
+            <div class="certificat-preview">
+              <div class="certificat-digital" [id]="'cert-' + cert.id">
+                <!-- En-tête du certificat -->
+                <div class="cert-header">
+                  <div class="cert-logo">
+                    <img src="/logo-penccumndongo.png" alt="Penccum Ndongo" class="logo-img">
+                  </div>
+                  <div class="cert-title-section">
+                    <h1 class="cert-main-title">ATTESTATION DE PARTICIPATION</h1>
+                    <h2 class="cert-subtitle">Concours de Poésie Inédit & Innovant</h2>
+                    <h3 class="cert-edition">CP2i - Édition 2025</h3>
+                  </div>
+                </div>
+                
+                <!-- Corps du certificat -->
+                <div class="cert-body">
+                  <div class="cert-decoration-line"></div>
+                  
+                  <div class="cert-content">
+                    <p class="cert-intro">Il est certifié par les présentes que</p>
+                    
+                    <div class="cert-participant">
+                      <span class="participant-name">{{currentUser?.prenom}} {{currentUser?.nom}}</span>
+                    </div>
+                    
+                    <p class="cert-text">
+                      a participé avec distinction au Concours de Poésie Inédit & Innovant CP2i Édition 2025,
+                      organisé par Penccum Ndongo, et a soumis une œuvre poétique 
+                      <span *ngIf="stats.textes_acceptes > 0" class="cert-status admis">admise au concours</span>
+                      <span *ngIf="stats.textes_acceptes === 0" class="cert-status participe">dans le cadre de ce concours</span>
+                      avec une note de <strong>{{stats.note_moyenne ? (stats.note_moyenne | number:'1.1-1') : 'N/A'}}/20</strong>.
+                    </p>
+                    
+                    <div class="cert-performance" *ngIf="classement?.position">
+                      <p class="cert-ranking">
+                        Classement : <strong>{{classement.position}}{{getOrdinalSuffix(classement.position)}}</strong> 
+                        sur {{classement.total}} participants
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div class="cert-decoration-line"></div>
+                </div>
+                
+                <!-- Pied du certificat -->
+                <div class="cert-footer">
+                  <div class="cert-date">
+                    <p>Délivré le {{getCurrentDate()}}</p>
+                    <p class="cert-location">Dakar, Sénégal</p>
+                  </div>
+                  
+                  <div class="cert-signatures">
+                    <div class="signature-section">
+                      <div class="signature-image">
+                        <img src="/signature-penccum.png" alt="Signature" class="signature-img">
+                      </div>
+                      <div class="signature-info">
+                        <p class="signature-name">Direction Penccum Ndongo</p>
+                        <p class="signature-title">Organisateur CP2i</p>
+                      </div>
+                    </div>
+                    
+                    <div class="cert-seal">
+                      <div class="seal-container">
+                        <img src="/cachet-penccum.png" alt="Cachet officiel" class="seal-img">
+                      </div>
+                    </div>
+                  </div>
+                  
+
+                </div>
+              </div>
             </div>
-            <h3>{{cert.titre}}</h3>
-            <p>{{cert.description}}</p>
-            <button class="btn btn-primary" (click)="downloadCertificat(cert)">
-              <i class="fas fa-download"></i> Télécharger
-            </button>
+            
+            <div class="certificat-actions">
+              <h4>{{cert.titre}}</h4>
+              <p>{{cert.description}}</p>
+              <div class="cert-buttons">
+                <button class="btn btn-primary" (click)="downloadCertificatPDF(cert)">
+                  <i class="fas fa-download"></i> Télécharger PDF
+                </button>
+                <button class="btn btn-outline" (click)="previewCertificat(cert)">
+                  <i class="fas fa-eye"></i> Aperçu
+                </button>
+                <button class="btn btn-secondary" (click)="shareCertificat(cert)">
+                  <i class="fas fa-share-alt"></i> Partager
+                </button>
+              </div>
+              <div class="cert-verification-external">
+                <p class="verification-code">Code de vérification : CP2i-{{currentUser?.id}}-{{getCurrentYear()}}</p>
+                <p class="verification-url">Vérifiable sur : penccumndongo.com/verification</p>
+              </div>
+            </div>
           </div>
         </div>
+        
         <ng-template #noCertificats>
           <div class="no-certificats">
-            <i class="fas fa-certificate"></i>
-            <h3>Aucun certificat</h3>
-            <p>Vos certificats de participation apparaîtront ici après évaluation.</p>
+            <div class="no-cert-icon">
+              <i class="fas fa-award"></i>
+            </div>
+            <h3>Aucun certificat disponible</h3>
+            <p>Vos certificats de participation apparaîtront ici après l'évaluation de votre texte.</p>
+            <div class="cert-info">
+              <div class="info-item">
+                <i class="fas fa-check-circle"></i>
+                <span>Certificat automatique après soumission</span>
+              </div>
+              <div class="info-item">
+                <i class="fas fa-medal"></i>
+                <span>Certificat de mérite si texte admis</span>
+              </div>
+              <div class="info-item">
+                <i class="fas fa-trophy"></i>
+                <span>Certificat d'excellence pour les lauréats</span>
+              </div>
+            </div>
           </div>
         </ng-template>
       </div>
@@ -957,6 +1063,51 @@
       </button>
       <button class="btn btn-danger" (click)="confirmSuppression()">
         <i class="fas fa-trash"></i> Supprimer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal d'aperçu certificat -->
+<div class="certificat-preview-modal" *ngIf="showCertificatPreview" (click)="closeCertificatPreview()">
+  <div class="preview-content" (click)="$event.stopPropagation()">
+    <div class="preview-header">
+      <h3>Aperçu du Certificat</h3>
+      <button class="preview-close" (click)="closeCertificatPreview()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="preview-body">
+      <div class="certificat-digital-preview" *ngIf="selectedCertificat">
+        <div class="cert-header">
+          <h1 class="cert-main-title">ATTESTATION DE PARTICIPATION</h1>
+          <h2 class="cert-subtitle">Concours de Poésie Inédit & Innovant</h2>
+          <h3 class="cert-edition">CP2i - Édition 2025</h3>
+        </div>
+        <div class="cert-body">
+          <div class="cert-decoration-line"></div>
+          <p class="cert-intro">Il est certifié par les présentes que</p>
+          <div class="cert-participant">
+            <span class="participant-name">{{currentUser?.prenom}} {{currentUser?.nom}}</span>
+          </div>
+          <p class="cert-text">
+            a participé avec distinction au Concours de Poésie Inédit & Innovant CP2i Édition 2025,
+            organisé par Penccum Ndongo.
+          </p>
+          <div class="cert-decoration-line"></div>
+        </div>
+        <div class="cert-footer">
+          <p>Délivré le {{getCurrentDate()}}</p>
+          <p>Direction Penccum Ndongo</p>
+        </div>
+      </div>
+    </div>
+    <div class="preview-actions">
+      <button class="btn btn-primary" (click)="downloadCertificatPDF(selectedCertificat)">
+        <i class="fas fa-download"></i> Télécharger PDF
+      </button>
+      <button class="btn btn-secondary" (click)="closeCertificatPreview()">
+        <i class="fas fa-times"></i> Fermer
       </button>
     </div>
   </div>

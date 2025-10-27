@@ -10,7 +10,7 @@ import { Cp2iApiService, User } from '../../services/cp2i-api.service';
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './dashboard-participant.component.html',
-  styleUrls: ['./dashboard-participant.component.css', './participant-sections.css']
+  styleUrls: ['./dashboard-participant.component.css', './participant-sections.css', './certificats-styles.css']
 })
 export class DashboardParticipantComponent implements OnInit, OnDestroy {
   mesSoumissions: any[] = [];
@@ -49,6 +49,10 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   // Modal de confirmation suppression
   showConfirmationModal = false;
   texteToDelete: any = null;
+  
+  // Modal d'aperçu certificat
+  showCertificatPreview = false;
+  selectedCertificat: any = null;
   
   // Dates officielles du concours CP2i 2025
   concoursSchedule = {
@@ -146,15 +150,14 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
     // Charger l'historique
     this.loadHistorique();
     
-    // Charger les certificats
-    this.loadCertificats();
-    
     // Calculer les jours restants
     this.calculateDeadline();
     
     // Charger le classement après les autres données
     setTimeout(() => {
       this.loadClassement();
+      // Charger les certificats après le classement
+      this.loadCertificats();
     }, 1000);
     
     // Charger les évaluations détaillées
@@ -199,17 +202,37 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   }
   
   loadCertificats() {
-    // Simuler des certificats pour l'instant
     this.certificats = [];
+    
+    // Toujours afficher au moins le certificat de participation pour les tests
+    this.certificats.push({
+      id: 1,
+      titre: 'Certificat de Participation',
+      description: 'Attestation officielle de participation au concours CP2i 2025',
+      type: 'participation',
+      date: new Date()
+    });
+    
+    // Certificat de mérite (si texte admis)
     if (this.stats.textes_acceptes > 0) {
-      this.certificats = [
-        {
-          id: 1,
-          titre: 'Certificat de Participation CP2i 2025',
-          description: 'Certificat officiel de participation au concours',
-          date: new Date()
-        }
-      ];
+      this.certificats.push({
+        id: 2,
+        titre: 'Certificat de Mérite',
+        description: 'Attestation de mérite pour texte admis au concours',
+        type: 'merite',
+        date: new Date()
+      });
+    }
+    
+    // Certificat d'excellence (si dans le top 10)
+    if (this.classement?.position && this.classement.position <= 10) {
+      this.certificats.push({
+        id: 3,
+        titre: 'Certificat d\'Excellence',
+        description: 'Attestation d\'excellence pour performance remarquable',
+        type: 'excellence',
+        date: new Date()
+      });
     }
   }
   
@@ -398,42 +421,174 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
     }
   }
   
-  downloadCertificat(cert: any) {
-    const htmlContent = `
+  async downloadCertificatPDF(cert: any) {
+    const element = document.getElementById('cert-' + cert.id);
+    if (!element) {
+      this.downloadCertificatFallback(cert);
+      return;
+    }
+    
+    try {
+      const html2canvas = (await import('html2canvas')).default;
+      const { jsPDF } = await import('jspdf');
+      
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: element.scrollWidth,
+        height: element.scrollHeight
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = (pdfHeight - imgHeight * ratio) / 2;
+      
+      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      pdf.save(`Certificat_CP2i_${this.currentUser?.nom}_${this.currentUser?.prenom}.pdf`);
+      
+      this.showToast('Certificat PDF téléchargé avec succès', 'success');
+    } catch (error) {
+      console.error('Erreur génération PDF:', error);
+      this.downloadCertificatFallback(cert);
+    }
+  }
+  
+  downloadCertificatFallback(cert: any) {
+    const htmlContent = this.generateCertificatHTML();
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Certificat_CP2i_${this.currentUser?.nom}_${this.currentUser?.prenom}.html`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    this.showToast('Certificat téléchargé avec succès', 'success');
+  }
+  
+  generateCertificatHTML(): string {
+    const statusText = this.stats.textes_acceptes > 0 ? 'admise au concours' : 'dans le cadre de ce concours';
+    const noteText = this.stats.note_moyenne ? `avec une note de ${this.stats.note_moyenne.toFixed(1)}/20` : '';
+    const classementText = this.classement?.position ? `Classement : ${this.classement.position}${this.getOrdinalSuffix(this.classement.position)} sur ${this.classement.total} participants` : '';
+    
+    return `
+      <!DOCTYPE html>
       <html>
         <head>
           <meta charset="UTF-8">
+          <title>Certificat CP2i - ${this.currentUser?.prenom} ${this.currentUser?.nom}</title>
           <style>
-            body { font-family: 'Times New Roman', serif; text-align: center; padding: 50px; }
-            .certificat { border: 10px solid #FFD700; padding: 50px; margin: 20px; }
-            h1 { color: #8B4513; font-size: 36px; margin-bottom: 30px; }
-            h2 { color: #2F4F4F; font-size: 24px; margin: 20px 0; }
-            .nom { font-size: 28px; color: #8B0000; font-weight: bold; margin: 30px 0; }
-            .date { margin-top: 50px; font-size: 16px; }
+            @page { size: A4 landscape; margin: 0; }
+            body { margin: 0; padding: 0; font-family: 'Georgia', serif; background: white; }
+            .certificat-digital { width: 297mm; height: 210mm; margin: 0; background: white; position: relative; }
+            .cert-header { background: linear-gradient(135deg, #1e3c72, #2a5298, #FF7F1A); color: white; padding: 2rem; text-align: center; height: 80px; display: flex; flex-direction: column; justify-content: center; }
+            .cert-main-title { font-size: 2.2rem; margin: 0; font-weight: 900; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+            .cert-subtitle { font-size: 1.3rem; margin: 0.5rem 0; font-weight: 600; }
+            .cert-edition { font-size: 1rem; margin: 0; opacity: 0.9; }
+            .cert-body { padding: 3rem 2rem; text-align: center; background: linear-gradient(135deg, #ffffff, #f8f9fa); }
+            .cert-decoration-line { height: 3px; background: linear-gradient(90deg, transparent, #FF7F1A, transparent); margin: 1rem auto; width: 200px; }
+            .cert-intro { font-size: 1.1rem; color: #6c757d; margin: 0 0 1rem 0; font-style: italic; }
+            .cert-participant { margin: 2rem 0; padding: 1.5rem; background: linear-gradient(135deg, #fff3e0, #ffebcc); border-radius: 12px; border: 3px solid #FF7F1A; }
+            .participant-name { font-size: 2.5rem; color: #FF7F1A; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+            .cert-text { font-size: 1.2rem; line-height: 1.6; color: #2c3e50; margin: 1.5rem 0; font-weight: 500; }
+            .cert-performance { margin: 1rem 0; padding: 1rem; background: #e8f5e8; border-radius: 8px; border-left: 4px solid #28a745; }
+            .cert-ranking { margin: 0; font-size: 1.1rem; color: #2c3e50; font-weight: 700; }
+            .cert-footer { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 2rem; border-top: 2px solid #dee2e6; display: flex; justify-content: space-between; align-items: center; }
+            .cert-date { text-align: left; }
+            .cert-date p { margin: 0.25rem 0; color: #495057; font-weight: 600; }
+            .cert-location { font-style: italic; color: #6c757d; }
+            .cert-signature { text-align: right; }
+            .signature-name { font-weight: 700; color: #2c3e50; margin: 0; }
+            .signature-title { color: #6c757d; margin: 0; font-size: 0.9rem; font-style: italic; }
+            .cert-verification { text-align: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #dee2e6; }
+            .verification-code { font-family: 'Courier New', monospace; font-size: 0.9rem; color: #495057; font-weight: 600; }
           </style>
         </head>
         <body>
-          <div class="certificat">
-            <h1>CERTIFICAT DE PARTICIPATION</h1>
-            <h2>Concours de Poésie Inédit & Innovant CP2i 2025</h2>
-            <p>Ce certificat atteste que</p>
-            <div class="nom">{{currentUser?.prenom}} {{currentUser?.nom}}</div>
-            <p>a participé au Concours de Poésie Inédit & Innovant CP2i Édition 2025</p>
-            <div class="date">Délivré le {{new Date().toLocaleDateString('fr-FR')}}</div>
+          <div class="certificat-digital">
+            <div class="cert-header">
+              <h1 class="cert-main-title">ATTESTATION DE PARTICIPATION</h1>
+              <h2 class="cert-subtitle">Concours de Poésie Inédit & Innovant</h2>
+              <h3 class="cert-edition">CP2i - Édition 2025</h3>
+            </div>
+            <div class="cert-body">
+              <div class="cert-decoration-line"></div>
+              <p class="cert-intro">Il est certifié par les présentes que</p>
+              <div class="cert-participant">
+                <div class="participant-name">${this.currentUser?.prenom} ${this.currentUser?.nom}</div>
+              </div>
+              <p class="cert-text">
+                a participé avec distinction au Concours de Poésie Inédit & Innovant CP2i Édition 2025,
+                organisé par Penccum Ndongo, et a soumis une œuvre poétique ${statusText} ${noteText}.
+              </p>
+              ${classementText ? `<div class="cert-performance"><p class="cert-ranking">${classementText}</p></div>` : ''}
+              <div class="cert-decoration-line"></div>
+            </div>
+            <div class="cert-footer">
+              <div class="cert-date">
+                <p>Délivré le ${this.getCurrentDate()}</p>
+                <p class="cert-location">Dakar, Sénégal</p>
+              </div>
+              <div class="cert-signature">
+                <p class="signature-name">Direction Penccum Ndongo</p>
+                <p class="signature-title">Organisateur CP2i</p>
+              </div>
+            </div>
+            <div class="cert-verification">
+              <p class="verification-code">Code de vérification : CP2i-${this.currentUser?.id}-${this.getCurrentYear()}</p>
+            </div>
           </div>
         </body>
       </html>
     `;
-    
-    const blob = new Blob([htmlContent], { type: 'application/msword;charset=utf-8' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Certificat_CP2i_${this.currentUser?.nom}_${this.currentUser?.prenom}.doc`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-    
-    this.showToast('Certificat téléchargé avec succès', 'success');
+  }
+  
+  previewCertificat(cert: any) {
+    this.showCertificatPreview = true;
+    this.selectedCertificat = cert;
+  }
+  
+  shareCertificat(cert: any) {
+    if (navigator.share) {
+      navigator.share({
+        title: 'Mon Certificat CP2i 2025',
+        text: `J'ai participé au Concours de Poésie CP2i 2025 !`,
+        url: window.location.href
+      });
+    } else {
+      // Fallback : copier le lien
+      navigator.clipboard.writeText(window.location.href);
+      this.showToast('Lien copié pour partage', 'success');
+    }
+  }
+  
+  getCurrentDate(): string {
+    return new Date().toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+  
+  getCurrentYear(): number {
+    return new Date().getFullYear();
+  }
+  
+  getOrdinalSuffix(position: number): string {
+    if (position === 1) return 'er';
+    return 'ème';
   }
 
 
@@ -682,6 +837,9 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
     
     // Calculer le classement après les stats
     this.loadClassement();
+    
+    // Recharger les certificats après le calcul des stats
+    this.loadCertificats();
   }
   
   calculateAverageNote(): number | null {
@@ -817,6 +975,11 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   closeConfirmationModal() {
     this.showConfirmationModal = false;
     this.texteToDelete = null;
+  }
+  
+  closeCertificatPreview() {
+    this.showCertificatPreview = false;
+    this.selectedCertificat = null;
   }
   
   // Méthodes pour le guide d'utilisation
