@@ -250,12 +250,12 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
             total: totalParticipants || 50
           };
         } else {
-          this.classement = { position: 1, total: 50 };
+          this.classement = { position: null, total: 0 };
         }
       },
       error: (error) => {
         console.warn('Classement indisponible:', error.status);
-        this.classement = { position: 1, total: 50 };
+        this.classement = { position: null, total: 0 };
       }
     });
   }
@@ -303,10 +303,10 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
     } else {
       // Pas de données de corrections disponibles
       this.classement = {
-        position: this.stats.note_moyenne ? 1 : null,
-        total: 1,
+        position: null,
+        total: 0,
         note_moyenne: this.stats.note_moyenne,
-        percentile: this.stats.note_moyenne ? 100 : null
+        percentile: null
       };
     }
     

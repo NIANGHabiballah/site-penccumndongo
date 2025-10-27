@@ -794,6 +794,47 @@ body {
   margin-right: 0.4rem;
 }
 
+.btn-small {
+  padding: 0.4rem 0.8rem !important;
+  font-size: 0.8rem !important;
+  border-radius: 20px !important;
+  min-height: auto !important;
+}
+
+.btn-small i {
+  font-size: 0.7rem !important;
+  margin-right: 0.3rem !important;
+  vertical-align: middle !important;
+}
+
+.btn.btn-small {
+  padding: 0.4rem 0.8rem !important;
+  font-size: 0.8rem !important;
+  border-radius: 20px !important;
+  min-height: auto !important;
+}
+
+.btn.btn-small i {
+  font-size: 0.7rem !important;
+  margin-right: 0.3rem !important;
+  vertical-align: middle !important;
+}
+
+.btn-primary.btn-small,
+.btn-disabled.btn-small {
+  padding: 0.4rem 0.8rem !important;
+  font-size: 0.8rem !important;
+  border-radius: 20px !important;
+  min-height: auto !important;
+}
+
+.btn-primary.btn-small i,
+.btn-disabled.btn-small i {
+  font-size: 0.7rem !important;
+  margin-right: 0.3rem !important;
+  vertical-align: middle !important;
+}
+
 .simple-evaluation {
   margin-top: 2rem;
 }
@@ -1224,6 +1265,19 @@ body {
     border-radius: 6px !important;
     min-height: 44px !important;
     font-weight: 500;
+  }
+  
+  .btn.btn-small {
+    padding: 0.4rem 0.8rem !important;
+    font-size: 0.8rem !important;
+    min-height: auto !important;
+    border-radius: 20px !important;
+  }
+  
+  .btn.btn-small i {
+    font-size: 0.7rem !important;
+    margin-right: 0.3rem !important;
+    vertical-align: middle !important;
   }
   
   .btn i {

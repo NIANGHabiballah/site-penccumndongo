@@ -32,7 +32,7 @@
       </div>
       <div class="nav-item" [class.active]="currentView === 'soumissions'" (click)="setCurrentView('soumissions'); $event.preventDefault(); $event.stopPropagation()">
         <i class="fas fa-file-alt"></i>
-        <span>Mes Soumissions</span>
+        <span>Ma Soumission</span>
       </div>
       <div class="nav-item" [class.active]="currentView === 'resultats'" (click)="setCurrentView('resultats'); $event.preventDefault(); $event.stopPropagation()">
         <i class="fas fa-chart-bar"></i>
@@ -85,7 +85,7 @@
           <i class="fas fa-bell"></i>
           <span class="notification-badge" *ngIf="getUnreadMessagesCount() > 0">{{getUnreadMessagesCount()}}</span>
         </button>
-        <button class="btn" [class.btn-primary]="stats.total_textes === 0" [class.btn-disabled]="stats.total_textes > 0" (click)="nouvellesoumission()" [disabled]="stats.total_textes > 0">
+        <button class="btn btn-small" [class.btn-primary]="stats.total_textes === 0" [class.btn-disabled]="stats.total_textes > 0" (click)="nouvellesoumission()" [disabled]="stats.total_textes > 0">
           <i class="fas fa-plus"></i>
           {{stats.total_textes > 0 ? 'Texte déjà soumis' : 'Nouveau Texte'}}
         </button>
@@ -104,20 +104,15 @@
                 <i class="fas fa-file-alt"></i>
               </div>
               <div>
-                <h3>Mes Soumissions</h3>
-                <p>Textes soumis au concours</p>
+                <h3>Ma Soumission</h3>
+                <p>Texte soumis au concours</p>
               </div>
             </div>
             <div class="card-content">
               <div>
                 <div class="number" [class.verified]="stats.total_textes === mesSoumissions.length">{{stats.total_textes || 0}}</div>
-                <div class="label">Textes soumis</div>
-                <div class="stats-verification" *ngIf="stats.total_textes === mesSoumissions.length">
-                  <i class="fas fa-check-circle"></i> Données vérifiées
-                </div>
-                <div class="stats-error" *ngIf="stats.total_textes !== mesSoumissions.length">
-                  <i class="fas fa-exclamation-triangle"></i> Données en cours de synchronisation
-                </div>
+                <div class="label">Texte soumis</div>
+
               </div>
               <span class="status-badge status-progress">En cours</span>
             </div>
@@ -199,24 +194,13 @@
           </div>
         </div>
         
-        <!-- Alerte de validation des données -->
-        <div class="data-validation-warning" *ngIf="stats.total_textes !== mesSoumissions.length">
-          <div class="warning-content">
-            <i class="fas fa-exclamation-triangle"></i>
-            <div class="warning-text">
-              <strong>Incohérence détectée:</strong> Les statistiques affichées ({{stats.total_textes}}) ne correspondent pas au nombre réel de textes ({{mesSoumissions.length}}).
-            </div>
-          </div>
-          <button class="btn btn-outline" (click)="fixDataInconsistency()">
-            <i class="fas fa-sync-alt"></i> Corriger les données
-          </button>
-        </div>
+
         
         <!-- Section Mes Soumissions -->
         <section class="submissions-section">
           <div class="section-header">
-            <h2>Mes Soumissions ({{mesSoumissions.length}})</h2>
-            <button class="btn" [class.btn-primary]="mesSoumissions.length === 0" [class.btn-disabled]="mesSoumissions.length > 0" (click)="nouvellesoumission()" [disabled]="mesSoumissions.length > 0">
+            <h2>Ma Soumission ({{mesSoumissions.length}})</h2>
+            <button class="btn btn-small" [class.btn-primary]="mesSoumissions.length === 0" [class.btn-disabled]="mesSoumissions.length > 0" (click)="nouvellesoumission()" [disabled]="mesSoumissions.length > 0">
               <i class="fas fa-plus"></i>
               {{mesSoumissions.length > 0 ? 'Texte déjà soumis' : 'Nouveau Texte'}}
             </button>
@@ -271,7 +255,7 @@
               <i class="fas fa-file-alt"></i>
               <h3>Aucune soumission</h3>
               <p>Vous n'avez pas encore soumis de texte au concours.</p>
-              <button class="btn btn-primary btn-compact" (click)="nouvellesoumission()">
+              <button class="btn btn-primary btn-small" (click)="nouvellesoumission()">
                 <i class="fas fa-plus"></i>
                 Soumettre un texte
               </button>
@@ -313,7 +297,7 @@
       
       <!-- Mes Soumissions -->
       <div *ngSwitchCase="'soumissions'" class="soumissions-section">
-        <h2>Mes Soumissions</h2>
+        <h2>Ma Soumission</h2>
         <div class="submissions-detailed" *ngIf="mesSoumissions.length > 0; else noSubmissionsDetailed">
           <div class="submission-detailed-card" *ngFor="let texte of mesSoumissions">
             <div class="submission-detailed-header">
@@ -363,7 +347,7 @@
             <i class="fas fa-file-alt"></i>
             <h3>Aucune soumission</h3>
             <p>Vous n'avez pas encore soumis de texte au concours.</p>
-            <button class="btn btn-primary" (click)="nouvellesoumission()">
+            <button class="btn btn-primary btn-small" (click)="nouvellesoumission()">
               <i class="fas fa-plus"></i>
               Soumettre mon premier texte
             </button>
