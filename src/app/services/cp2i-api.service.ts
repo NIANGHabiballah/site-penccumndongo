@@ -352,4 +352,9 @@ export class Cp2iApiService {
   cleanInconsistentData(): Observable<any> {
     return this.http.get(`${this.baseUrl}/cp2i-data-validation.php?action=clean&admin=true`, { headers: this.getHeaders() });
   }
+
+  // Méthode pour récupérer le classement réel
+  getClassement(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-classement.php`, { headers: this.getHeaders() });
+  }
 }

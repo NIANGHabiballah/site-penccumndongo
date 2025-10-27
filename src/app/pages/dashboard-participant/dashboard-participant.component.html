@@ -173,10 +173,28 @@
             </div>
             <div class="card-content">
               <div>
-                <div class="number">{{classement?.position || '-'}}</div>
-                <div class="label">Sur {{classement?.total || 0}} participants</div>
+                <div class="number" *ngIf="classement?.position; else noRanking">{{classement.position}}</div>
+                <ng-template #noRanking>
+                  <div class="number">-</div>
+                </ng-template>
+                <div class="label" *ngIf="classement?.total > 0; else noParticipants">
+                  Sur {{classement.total}} participants
+                  <small *ngIf="classement?.percentile" class="percentile">
+                    Top {{classement.percentile}}%
+                  </small>
+                </div>
+                <ng-template #noParticipants>
+                  <div class="label">Classement en cours</div>
+                </ng-template>
               </div>
-              <span class="status-badge status-progress">Provisoire</span>
+              <span class="status-badge" 
+                    [class.status-completed]="classement?.position && classement?.position <= 5"
+                    [class.status-progress]="classement?.position && classement?.position > 5 && classement?.position <= 20"
+                    [class.status-pending]="!classement?.position || classement?.position > 20">
+                <span *ngIf="classement?.position && classement?.position <= 5">Excellent</span>
+                <span *ngIf="classement?.position && classement?.position > 5 && classement?.position <= 20">Bon niveau</span>
+                <span *ngIf="!classement?.position || classement?.position > 20">En cours</span>
+              </span>
             </div>
           </div>
         </div>

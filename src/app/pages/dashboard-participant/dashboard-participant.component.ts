@@ -54,10 +54,43 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
     
     this.currentUser = this.cp2iApi.getCurrentUser();
     this.loadData();
+    
+    // Forcer le recalcul du layout mobile
+    this.handleMobileLayout();
+  }
+  
+  handleMobileLayout() {
+    if (typeof window !== 'undefined') {
+      // Détecter si on est sur mobile
+      const isMobile = window.innerWidth <= 480;
+      
+      if (isMobile) {
+        // Forcer le recalcul des styles
+        setTimeout(() => {
+          const mainContent = document.querySelector('.main-content');
+          if (mainContent) {
+            (mainContent as HTMLElement).style.display = 'none';
+            setTimeout(() => {
+              (mainContent as HTMLElement).style.display = 'block';
+            }, 10);
+          }
+        }, 100);
+      }
+      
+      // Écouter les changements de taille d'écran
+      window.addEventListener('resize', () => {
+        this.handleMobileLayout();
+      });
+    }
   }
 
   ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
+    
+    // Nettoyer les event listeners
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', this.handleMobileLayout);
+    }
   }
 
   loadData() {
@@ -82,19 +115,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
     // Charger les données validées
     this.loadDataFallback();
     
-    // Charger les statistiques du serveur pour validation
-    this.cp2iApi.getDashboardStats().subscribe({
-      next: (data) => {
-        const serverStats = data.stats || {};
-        console.log('Stats serveur:', serverStats);
-        
-        // Vérifier la cohérence avec les stats calculées
-        this.validateStats(serverStats);
-      },
-      error: (error) => {
-        console.error('Erreur lors du chargement des stats serveur:', error);
-      }
-    });
+    // Pas d'appel serveur en développement
     
     // Charger les messages
     this.loadMessages();
@@ -108,8 +129,10 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
     // Calculer les jours restants
     this.calculateDeadline();
     
-    // Charger le classement
-    this.loadClassement();
+    // Charger le classement après les autres données
+    setTimeout(() => {
+      this.loadClassement();
+    }, 1000);
     
     // Charger les évaluations détaillées
     this.loadEvaluationsDetaillees();
@@ -205,11 +228,89 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   }
   
   loadClassement() {
-    // Simuler un classement pour l'instant
-    this.classement = {
-      position: Math.floor(Math.random() * 50) + 1,
-      total: 50
-    };
+    this.cp2iApi.getClassement().subscribe({
+      next: (data) => {
+        if (data.success && data.participants && this.stats.note_moyenne) {
+          const participants = data.participants;
+          const maNoteMoyenne = this.stats.note_moyenne;
+          const monUserId = this.currentUser?.id;
+          
+          let position = null;
+          let totalParticipants = participants.length;
+          
+          for (let i = 0; i < participants.length; i++) {
+            if (participants[i].user_id == monUserId) {
+              position = i + 1;
+              break;
+            }
+          }
+          
+          this.classement = {
+            position: position || 1,
+            total: totalParticipants || 50
+          };
+        } else {
+          this.classement = { position: 1, total: 50 };
+        }
+      },
+      error: (error) => {
+        console.warn('Classement indisponible:', error.status);
+        this.classement = { position: 1, total: 50 };
+      }
+    });
+  }
+  
+  calculateRealRanking() {
+    // Utiliser les données réelles des textes chargés
+    let totalParticipants = 1;
+    let notesDesAutres: number[] = [];
+    
+    // Analyser les données des corrections chargées
+    this.mesSoumissions.forEach(texte => {
+      if (texte.corrections && texte.corrections.length > 0) {
+        texte.corrections.forEach((correction: any) => {
+          if (correction.note && !isNaN(correction.note)) {
+            notesDesAutres.push(parseFloat(correction.note));
+          }
+        });
+      }
+    });
+    
+    // Si on a des données de corrections, les utiliser
+    if (notesDesAutres.length > 0) {
+      totalParticipants = notesDesAutres.length;
+      
+      if (this.stats.note_moyenne && this.stats.note_moyenne > 0) {
+        // Compter combien de notes sont supérieures à la mienne
+        const notesSuperieures = notesDesAutres.filter(note => note > this.stats.note_moyenne).length;
+        const position = notesSuperieures + 1;
+        const percentile = Math.round((1 - (position - 1) / totalParticipants) * 100);
+        
+        this.classement = {
+          position: position,
+          total: totalParticipants,
+          note_moyenne: this.stats.note_moyenne,
+          percentile: percentile
+        };
+      } else {
+        this.classement = {
+          position: null,
+          total: totalParticipants,
+          note_moyenne: null,
+          percentile: null
+        };
+      }
+    } else {
+      // Pas de données de corrections disponibles
+      this.classement = {
+        position: this.stats.note_moyenne ? 1 : null,
+        total: 1,
+        note_moyenne: this.stats.note_moyenne,
+        percentile: this.stats.note_moyenne ? 100 : null
+      };
+    }
+    
+    console.log('Classement calculé avec', totalParticipants, 'notes réelles:', notesDesAutres);
   }
   
   loadEvaluationsDetaillees() {
@@ -453,6 +554,9 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
     };
     
     console.log('Stats calculées:', this.stats);
+    
+    // Calculer le classement après les stats
+    this.loadClassement();
   }
   
   calculateAverageNote(): number | null {
