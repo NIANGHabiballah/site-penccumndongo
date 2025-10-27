@@ -199,6 +199,10 @@
                 <span class="value success" [class.highlight]="stats.textes_acceptes > 0">{{stats.textes_acceptes || 0}}</span>
               </div>
               <div class="summary-item">
+                <span class="label">Textes à corriger:</span>
+                <span class="value warning" [class.highlight]="stats.textes_en_attente > 0">{{stats.textes_en_attente || 0}}</span>
+              </div>
+              <div class="summary-item">
                 <span class="label">Textes non admis:</span>
                 <span class="value danger" [class.highlight]="stats.textes_refuses > 0">{{stats.textes_refuses || 0}}</span>
               </div>

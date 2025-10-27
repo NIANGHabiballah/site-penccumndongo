@@ -3950,6 +3950,10 @@ input:checked + .slider:before {
   color: #e74c3c;
 }
 
+.stats-summary .summary-item .value.warning {
+  color: #FF7F1A;
+}
+
 .stats-summary .summary-item .value.primary {
   color: #3498db;
 }
