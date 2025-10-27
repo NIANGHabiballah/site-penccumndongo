@@ -125,7 +125,7 @@
               </div>
               <div>
                 <h3>Évaluations</h3>
-                <p>Notes et commentaires</p>
+                <p>Voir détails dans Résultats & Notes</p>
               </div>
             </div>
             <div class="card-content">
@@ -133,7 +133,7 @@
                 <div class="number">{{stats.note_moyenne ? (stats.note_moyenne | number:'1.1-1') + '/20' : 'N/A'}}</div>
                 <div class="label">Note moyenne</div>
               </div>
-              <span class="status-badge status-completed">{{(stats.textes_acceptes || 0) + (stats.textes_refuses || 0)}} évalué{{((stats.textes_acceptes || 0) + (stats.textes_refuses || 0)) <= 1 ? '' : 's'}}</span>
+              <span class="status-badge status-completed">Évalué</span>
             </div>
           </div>
           
@@ -183,12 +183,13 @@
                 </ng-template>
               </div>
               <span class="status-badge" 
-                    [class.status-completed]="classement?.position && classement?.position <= 5"
-                    [class.status-progress]="classement?.position && classement?.position > 5 && classement?.position <= 20"
-                    [class.status-pending]="!classement?.position || classement?.position > 20">
-                <span *ngIf="classement?.position && classement?.position <= 5">Excellent</span>
-                <span *ngIf="classement?.position && classement?.position > 5 && classement?.position <= 20">Bon niveau</span>
-                <span *ngIf="!classement?.position || classement?.position > 20">En cours</span>
+                    [class.status-completed]="classement?.position && classement?.position <= 3"
+                    [class.status-progress]="classement?.position && classement?.position > 3 && classement?.position <= Math.ceil(classement?.total * 0.5)"
+                    [class.status-pending]="!classement?.position || classement?.position > Math.ceil(classement?.total * 0.5)">
+                <span *ngIf="classement?.position && classement?.position <= 3">Excellent</span>
+                <span *ngIf="classement?.position && classement?.position > 3 && classement?.position <= Math.ceil(classement?.total * 0.5)">Bon niveau</span>
+                <span *ngIf="classement?.position && classement?.position > Math.ceil(classement?.total * 0.5)">À améliorer</span>
+                <span *ngIf="!classement?.position">En cours</span>
               </span>
             </div>
           </div>
@@ -226,12 +227,12 @@
                   <span>{{texte.created_at | date:'dd/MM/yyyy'}}</span>
                 </div>
               </div>
-              <div class="submission-evaluation" *ngIf="texte.note || texte.commentaire">
-                <div class="evaluation-note" *ngIf="texte.note">
-                  <strong>Note: {{texte.note}}/20</strong>
+              <div class="submission-evaluation" *ngIf="stats.note_moyenne">
+                <div class="evaluation-note">
+                  <strong>Note moyenne: {{stats.note_moyenne | number:'1.1-1'}}/20</strong>
                 </div>
-                <div class="evaluation-comment" *ngIf="texte.commentaire">
-                  <p>{{texte.commentaire}}</p>
+                <div class="evaluation-comment">
+                  <p><em>Voir détails dans Résultats & Notes</em></p>
                 </div>
               </div>
               <div class="submission-actions">
@@ -242,6 +243,14 @@
                         [title]="!canModifyText(texte).canModify ? canModifyText(texte).reason : 'Modifier ce texte'">
                   <i class="fas fa-edit"></i> 
                   {{canModifyText(texte).canModify ? 'Modifier' : 'Non modifiable'}}
+                </button>
+                <button class="btn btn-danger btn-small" 
+                        [disabled]="!canModifyText(texte).canModify"
+                        [class.btn-disabled]="!canModifyText(texte).canModify"
+                        (click)="supprimerTexte(texte)"
+                        [title]="!canModifyText(texte).canModify ? 'Texte non supprimable' : 'Supprimer ce texte'">
+                  <i class="fas fa-trash"></i> 
+                  Supprimer
                 </button>
                 <div class="modification-info" *ngIf="!canModifyText(texte).canModify">
                   <small class="text-muted">{{canModifyText(texte).reason}}</small>
@@ -335,6 +344,14 @@
                       [title]="!canModifyText(texte).canModify ? canModifyText(texte).reason : 'Modifier ce texte'">
                 <i class="fas fa-edit"></i> 
                 {{canModifyText(texte).canModify ? 'Modifier le texte' : 'Texte non modifiable'}}
+              </button>
+              <button class="btn btn-danger btn-small" 
+                      [disabled]="!canModifyText(texte).canModify"
+                      [class.btn-disabled]="!canModifyText(texte).canModify"
+                      (click)="supprimerTexte(texte)"
+                      [title]="!canModifyText(texte).canModify ? 'Texte non supprimable' : 'Supprimer ce texte'">
+                <i class="fas fa-trash"></i> 
+                Supprimer
               </button>
               <div class="modification-info" *ngIf="!canModifyText(texte).canModify">
                 <small class="text-muted">{{canModifyText(texte).reason}}</small>
@@ -722,6 +739,127 @@
       <input type="text" placeholder="Tapez votre message..." #messageInput (keyup.enter)="sendMessage(messageInput.value); messageInput.value=''">
       <button (click)="sendMessage(messageInput.value); messageInput.value=''">
         <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast-notification" 
+     [class.show]="showNotification" 
+     [class.success]="notificationType === 'success'"
+     [class.error]="notificationType === 'error'">
+  <div class="toast-content">
+    <i class="fas" [class.fa-check-circle]="notificationType === 'success'" [class.fa-exclamation-circle]="notificationType === 'error'"></i>
+    <span>{{notificationMessage}}</span>
+  </div>
+</div>
+
+<!-- Modal de soumission de texte -->
+<div class="soumission-modal" *ngIf="showSoumissionModal" (click)="closeSoumissionModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{isEditing ? 'Modifier le Texte' : 'Soumettre un Texte'}}</h2>
+      <button class="modal-close" (click)="closeSoumissionModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <form (ngSubmit)="onSubmitTexte()" class="soumission-form">
+      <div class="form-group">
+        <label for="titre">Titre du texte *</label>
+        <input 
+          type="text" 
+          id="titre" 
+          name="titre"
+          [(ngModel)]="texte.titre" 
+          required
+          placeholder="Entrez le titre de votre poème">
+      </div>
+
+      <div class="form-group">
+        <label for="theme">Thème *</label>
+        <select 
+          id="theme" 
+          name="theme"
+          [(ngModel)]="texte.theme"
+          required>
+          <option value="">Sélectionnez un thème</option>
+          <option value="patriotisme">Patriotisme</option>
+          <option value="justice_dignite">Justice et dignité</option>
+          <option value="beaute_africaine">Beauté Africaine</option>
+          <option value="jeunesse_responsable">Jeunesse responsable</option>
+          <option value="emprise_ecrans">Sous l'emprise des écrans</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="langue">Langue *</label>
+        <select 
+          id="langue" 
+          name="langue"
+          [(ngModel)]="texte.langue"
+          required>
+          <option value="">Sélectionnez une langue</option>
+          <option value="francais">Français</option>
+          <option value="wolof">Wolof</option>
+          <option value="anglais">Anglais</option>
+          <option value="arabe">Arabe</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="contenu">Votre texte *</label>
+        <textarea 
+          id="contenu" 
+          name="contenu"
+          [(ngModel)]="texte.contenu" 
+          required
+          rows="12"
+          placeholder="Écrivez votre poème ici..."></textarea>
+        <div class="char-count">
+          {{texte.contenu.length}} caractères | {{getLineCount()}} vers (max 40)
+          <span *ngIf="getLineCount() > 40" class="error-text">⚠️ Limite dépassée</span>
+        </div>
+        
+        <div class="validation-errors" *ngIf="(!texte.titre || !texte.contenu || !texte.theme || !texte.langue || getLineCount() > 40) && (texte.titre || texte.contenu || texte.theme || texte.langue)">
+          <div class="error-message" *ngIf="!texte.titre && (texte.contenu || texte.theme || texte.langue)">• Le titre est requis</div>
+          <div class="error-message" *ngIf="!texte.theme && (texte.titre || texte.contenu || texte.langue)">• Le thème est requis</div>
+          <div class="error-message" *ngIf="!texte.langue && (texte.titre || texte.contenu || texte.theme)">• La langue est requise</div>
+          <div class="error-message" *ngIf="!texte.contenu && (texte.titre || texte.theme || texte.langue)">• Le contenu du texte est requis</div>
+          <div class="error-message" *ngIf="getLineCount() > 40">• Le texte ne peut pas dépasser 40 vers</div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" (click)="resetForm()" class="btn btn-secondary">
+          Effacer
+        </button>
+        <button type="submit" [disabled]="!isFormValid() || isSubmitting" class="btn btn-primary">
+          <i class="fas" [class.fa-paper-plane]="!isEditing" [class.fa-save]="isEditing"></i>
+          {{isSubmitting ? 'En cours...' : (isEditing ? 'Modifier le texte' : 'Soumettre le texte')}}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="confirmation-modal" *ngIf="showConfirmationModal" (click)="closeConfirmationModal()">
+  <div class="confirmation-content" (click)="$event.stopPropagation()">
+    <div class="confirmation-header">
+      <h3><i class="fas fa-exclamation-triangle"></i> Confirmer la suppression</h3>
+    </div>
+    <div class="confirmation-body">
+      <p>Êtes-vous sûr de vouloir supprimer ce texte ?</p>
+      <p><strong>Cette action est irréversible.</strong></p>
+    </div>
+    <div class="confirmation-actions">
+      <button class="btn btn-secondary" (click)="closeConfirmationModal()">
+        <i class="fas fa-times"></i> Annuler
+      </button>
+      <button class="btn btn-danger" (click)="confirmSuppression()">
+        <i class="fas fa-trash"></i> Supprimer
       </button>
     </div>
   </div>

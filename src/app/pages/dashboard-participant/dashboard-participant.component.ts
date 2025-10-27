@@ -26,6 +26,26 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   classement: any = {};
   joursRestants = 0;
   evaluationsDetaillees: any[] = [];
+  Math = Math;
+  
+  // Modal de soumission
+  showSoumissionModal = false;
+  isEditing = false;
+  editingTexteId: number | null = null;
+  texte = {
+    titre: '',
+    theme: '',
+    langue: '',
+    contenu: ''
+  };
+  isSubmitting = false;
+  showNotification = false;
+  notificationMessage = '';
+  notificationType: 'success' | 'error' = 'success';
+  
+  // Modal de confirmation suppression
+  showConfirmationModal = false;
+  texteToDelete: any = null;
   
   // Dates officielles du concours CP2i 2025
   concoursSchedule = {
@@ -420,7 +440,132 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
       this.showToast('Vous avez déjà soumis un texte pour cette édition. Un seul texte par participant est autorisé.', 'error');
       return;
     }
-    this.router.navigate(['/soumission-texte']);
+    this.openSoumissionModal();
+  }
+  
+  openSoumissionModal(texte?: any) {
+    this.isEditing = !!texte;
+    this.editingTexteId = texte?.id || null;
+    
+    if (texte) {
+      this.texte = {
+        titre: texte.titre || '',
+        theme: texte.theme || '',
+        langue: texte.langue || '',
+        contenu: texte.contenu || ''
+      };
+    } else {
+      this.resetForm();
+    }
+    
+    this.showSoumissionModal = true;
+  }
+  
+  closeSoumissionModal() {
+    this.showSoumissionModal = false;
+    this.resetForm();
+  }
+  
+  resetForm() {
+    this.texte = {
+      titre: '',
+      theme: '',
+      langue: '',
+      contenu: ''
+    };
+    this.isEditing = false;
+    this.editingTexteId = null;
+  }
+  
+  getLineCount(): number {
+    if (!this.texte.contenu) return 0;
+    return this.texte.contenu.split('\n').filter(line => line.trim().length > 0).length;
+  }
+  
+  isFormValid(): boolean {
+    return !!(this.texte.titre && this.texte.contenu && this.texte.theme && this.texte.langue && this.getLineCount() <= 40);
+  }
+  
+  onSubmitTexte() {
+    if (this.isSubmitting) return;
+    
+    // Vérifier et alerter pour chaque champ manquant
+    if (!this.texte.titre) {
+      this.showToast('Le titre est requis', 'error');
+      return;
+    }
+    
+    if (!this.texte.theme) {
+      this.showToast('Le thème est requis', 'error');
+      return;
+    }
+    
+    if (!this.texte.langue) {
+      this.showToast('La langue est requise', 'error');
+      return;
+    }
+    
+    if (!this.texte.contenu) {
+      this.showToast('Le contenu du texte est requis', 'error');
+      return;
+    }
+    
+    if (this.getLineCount() > 40) {
+      this.showToast('Le texte ne peut pas dépasser 40 vers', 'error');
+      return;
+    }
+    
+    this.isSubmitting = true;
+    
+    const texteData = {
+      titre: this.texte.titre,
+      theme: this.texte.theme,
+      langue: this.texte.langue,
+      contenu: this.texte.contenu
+    };
+    
+    if (this.isEditing && this.editingTexteId) {
+      const texteToUpdate = { ...texteData, id: this.editingTexteId };
+      this.cp2iApi.updateText(texteToUpdate).subscribe({
+        next: (response) => {
+          this.isSubmitting = false;
+          if (response && response.success) {
+            this.showToast('Texte modifié avec succès !', 'success');
+            this.closeSoumissionModal();
+            this.loadDataFallback();
+          } else {
+            this.showToast('Erreur lors de la modification: ' + (response?.error || 'Erreur inconnue'), 'error');
+          }
+        },
+        error: (error) => {
+          this.isSubmitting = false;
+          this.showToast('Erreur lors de la modification du texte', 'error');
+        }
+      });
+    } else {
+      this.cp2iApi.submitText(texteData).subscribe({
+        next: (response) => {
+          this.isSubmitting = false;
+          if (response && response.success) {
+            this.showToast('Texte soumis avec succès !', 'success');
+            this.closeSoumissionModal();
+            this.loadDataFallback();
+          } else {
+            this.showToast('Erreur lors de la soumission: ' + (response?.error || 'Erreur inconnue'), 'error');
+          }
+        },
+        error: (error) => {
+          this.isSubmitting = false;
+          let errorMessage = 'Erreur lors de la soumission du texte';
+          if (error.error && error.error.error) {
+            errorMessage = error.error.error;
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+          this.showToast(errorMessage, 'error');
+        }
+      });
+    }
   }
 
   fixDataInconsistency() {
@@ -453,35 +598,12 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   }
 
   showToast(message: string, type: 'success' | 'error') {
-    // Utiliser la notification toast existante du composant soumission-texte
-    const notification = document.createElement('div');
-    notification.className = `toast-notification show ${type}`;
-    notification.innerHTML = `
-      <div class="toast-content">
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-        <span>${message}</span>
-      </div>
-    `;
+    this.notificationMessage = message;
+    this.notificationType = type;
+    this.showNotification = true;
     
-    // Styles inline pour la notification
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-      padding: 1rem 1.5rem;
-      z-index: 1000;
-      border-left: 4px solid ${type === 'success' ? '#28a745' : '#dc3545'};
-      max-width: 400px;
-    `;
-    
-    document.body.appendChild(notification);
     setTimeout(() => {
-      if (document.body.contains(notification)) {
-        document.body.removeChild(notification);
-      }
+      this.showNotification = false;
     }, 4000);
   }
 
@@ -604,8 +726,8 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
       return;
     }
     
-    // Rediriger vers la page de modification avec l'ID du texte
-    this.router.navigate(['/soumission-texte'], { queryParams: { edit: texte.id } });
+    // Ouvrir la modal de modification
+    this.openSoumissionModal(texte);
   }
   
   loadDataFallback() {
@@ -657,5 +779,40 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
     }
     
     return { canModify: false, reason: 'Ce texte ne peut pas être modifié dans son état actuel.' };
+  }
+  
+  supprimerTexte(texte: any) {
+    if (!this.canModifyText(texte).canModify) {
+      this.showToast('Ce texte ne peut pas être supprimé', 'error');
+      return;
+    }
+    
+    this.showConfirmationModal = true;
+    this.texteToDelete = texte;
+  }
+  
+  confirmSuppression() {
+    if (this.texteToDelete) {
+      this.cp2iApi.deleteTexte(this.texteToDelete.id).subscribe({
+        next: (response) => {
+          if (response && response.success) {
+            this.showToast('Texte supprimé avec succès', 'success');
+            this.loadDataFallback();
+          } else {
+            this.showToast('Erreur lors de la suppression: ' + (response?.error || 'Erreur inconnue'), 'error');
+          }
+          this.closeConfirmationModal();
+        },
+        error: (error) => {
+          this.showToast('Erreur lors de la suppression du texte', 'error');
+          this.closeConfirmationModal();
+        }
+      });
+    }
+  }
+  
+  closeConfirmationModal() {
+    this.showConfirmationModal = false;
+    this.texteToDelete = null;
   }
 }

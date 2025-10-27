@@ -358,4 +358,8 @@ export class Cp2iApiService {
   getClassement(): Observable<any> {
     return this.http.get(`${this.baseUrl}/cp2i-classement.php`, { headers: this.getHeaders() });
   }
+
+  deleteTexte(texteId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/cp2i-textes.php?id=${texteId}`, { headers: this.getHeaders() });
+  }
 }

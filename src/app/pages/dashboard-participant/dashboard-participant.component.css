@@ -542,6 +542,22 @@ body {
   font-size: 1.5rem;
 }
 
+.resultats-section h2,
+.resultats-section h3,
+.profile-section h2,
+.soumissions-section h2,
+.messages-section h2,
+.guide-section h2,
+.historique-section h2,
+.certificats-section h2 {
+  color: #0380C2;
+  font-size: 1.5rem;
+}
+
+.results-overview {
+  margin-top: 2rem;
+}
+
 .submissions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -1624,4 +1640,313 @@ body {
 .percentile i {
   color: #FF7F1A;
   margin-right: 0.25rem;
+}
+
+/* Toast Notification */
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  padding: 1rem 1.5rem;
+  z-index: 3000;
+  transform: translateX(400px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  border-left: 4px solid #28a745;
+  max-width: 400px;
+}
+
+.toast-notification.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.toast-notification.success {
+  border-left-color: #28a745;
+}
+
+.toast-notification.error {
+  border-left-color: #dc3545;
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.toast-content i {
+  font-size: 1.2rem;
+}
+
+.toast-notification.success .toast-content i {
+  color: #28a745;
+}
+
+.toast-notification.error .toast-content i {
+  color: #dc3545;
+}
+
+.toast-content span {
+  color: #2c3e50;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #c82333;
+  transform: translateY(-2px);
+}
+
+.submission-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+/* Modal de confirmation */
+.confirmation-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2500;
+}
+
+.confirmation-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  max-width: 400px;
+  width: 90%;
+  overflow: hidden;
+}
+
+.confirmation-header {
+  background: #fff3cd;
+  padding: 1.5rem;
+  border-bottom: 1px solid #ffeaa7;
+}
+
+.confirmation-header h3 {
+  margin: 0;
+  color: #856404;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.confirmation-header i {
+  color: #f39c12;
+}
+
+.confirmation-body {
+  padding: 1.5rem;
+}
+
+.confirmation-body p {
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+}
+
+.confirmation-body p:last-child {
+  margin-bottom: 0;
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.confirmation-actions {
+  padding: 1rem 1.5rem;
+  background: #f8f9fa;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+@media (max-width: 480px) {
+  .confirmation-actions {
+    flex-direction: column;
+  }
+}
+
+/* Modal de soumission */
+.soumission-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 2rem;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 2rem 1rem;
+  border-bottom: 2px solid #0380C2;
+}
+
+.modal-header h2 {
+  color: #0380C2;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+
+.modal-close:hover {
+  background: #f8f9fa;
+  color: #0380C2;
+}
+
+.soumission-form {
+  padding: 2rem;
+}
+
+.soumission-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.soumission-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.soumission-form input,
+.soumission-form select,
+.soumission-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.soumission-form input:focus,
+.soumission-form select:focus,
+.soumission-form textarea:focus {
+  outline: none;
+  border-color: #0380C2;
+}
+
+.soumission-form textarea {
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.char-count {
+  text-align: right;
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-top: 0.5rem;
+}
+
+.error-text {
+  color: #dc3545;
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+
+.validation-errors {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 5px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.error-message {
+  color: #721c24;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.error-message:last-child {
+  margin-bottom: 0;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .soumission-modal {
+    padding: 1rem;
+  }
+  
+  .modal-content {
+    max-height: 95vh;
+  }
+  
+  .modal-header {
+    padding: 1.5rem 1.5rem 1rem;
+  }
+  
+  .soumission-form {
+    padding: 1.5rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .toast-notification {
+    top: 10px !important;
+    right: 10px !important;
+    left: 10px !important;
+    max-width: none !important;
+    transform: translateY(-100px) !important;
+  }
+  
+  .toast-notification.show {
+    transform: translateY(0) !important;
+  }
 }
