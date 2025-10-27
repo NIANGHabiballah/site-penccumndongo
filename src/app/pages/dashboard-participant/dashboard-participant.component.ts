@@ -20,6 +20,9 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   desktopMenuHidden = false;
   chatOpen = false;
   currentView = 'accueil';
+  currentGuideSection = 'steps';
+  currentHistoryFilter = 'all';
+  openFaq: number | null = null;
   messages: any[] = [];
   historique: any[] = [];
   certificats: any[] = [];
@@ -814,5 +817,62 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   closeConfirmationModal() {
     this.showConfirmationModal = false;
     this.texteToDelete = null;
+  }
+  
+  // Méthodes pour le guide d'utilisation
+  toggleFaq(faqNumber: number) {
+    this.openFaq = this.openFaq === faqNumber ? null : faqNumber;
+  }
+  
+  // Méthodes pour l'historique
+  getFilteredHistory(): any[] {
+    if (this.currentHistoryFilter === 'all') {
+      return this.historique;
+    }
+    return this.historique.filter(item => item.type === this.currentHistoryFilter);
+  }
+  
+  getHistoryCount(type: string): number {
+    return this.historique.filter(item => item.type === type).length;
+  }
+  
+  getHistoryIconClass(type: string): string {
+    const classes = {
+      'submission': 'submission',
+      'evaluation': 'evaluation', 
+      'message': 'message',
+      'login': 'login'
+    };
+    return classes[type as keyof typeof classes] || 'default';
+  }
+  
+  getHistoryIcon(type: string): string {
+    const icons = {
+      'submission': 'fa-file-alt',
+      'evaluation': 'fa-star',
+      'message': 'fa-envelope',
+      'login': 'fa-sign-in-alt'
+    };
+    return icons[type as keyof typeof icons] || 'fa-circle';
+  }
+  
+  getHistoryTitle(item: any): string {
+    const titles = {
+      'submission': 'Soumission de texte',
+      'evaluation': 'Évaluation reçue',
+      'message': 'Message reçu',
+      'login': 'Connexion au tableau de bord'
+    };
+    return titles[item.type as keyof typeof titles] || item.action || 'Action';
+  }
+  
+  getHistoryDescription(item: any): string {
+    const descriptions = {
+      'submission': `Vous avez soumis votre texte "${item.details?.titre || 'Sans titre'}" au concours.`,
+      'evaluation': `Votre texte a été évalué avec une note de ${item.details?.note || 'N/A'}/20.`,
+      'message': `Nouveau message reçu de l'administration : "${item.details?.subject || 'Message'}".`,
+      'login': 'Vous vous êtes connecté à votre tableau de bord participant.'
+    };
+    return descriptions[item.type as keyof typeof descriptions] || item.description || 'Aucune description disponible';
   }
 }

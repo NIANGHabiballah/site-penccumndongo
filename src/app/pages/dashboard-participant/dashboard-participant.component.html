@@ -613,34 +613,71 @@
       
       <!-- Guide d'Utilisation -->
       <div *ngSwitchCase="'guide'" class="guide-section">
-        <h2>Guide d'Utilisation</h2>
+        <h2>Guide d'Utilisation CP2i</h2>
         <div class="guide-content">
           <div class="guide-step">
             <div class="step-number">1</div>
             <div class="step-content">
-              <h3>Inscription</h3>
-              <p>Créez votre compte participant avec vos informations personnelles.</p>
+              <h3>Inscription au concours</h3>
+              <p>Créez votre compte participant sur <strong>penccumndongo.com/cp2i</strong> avec vos informations personnelles complètes.</p>
+              <ul class="step-details">
+                <li>Accédez à la page d'inscription CP2i</li>
+                <li>Renseignez vos nom, prénom, email et téléphone</li>
+                <li>Choisissez un mot de passe sécurisé</li>
+                <li>Confirmez votre inscription par email</li>
+              </ul>
             </div>
           </div>
           <div class="guide-step">
             <div class="step-number">2</div>
             <div class="step-content">
-              <h3>Soumission</h3>
-              <p>Rédigez et soumettez votre poème en respectant les critères du concours.</p>
+              <h3>Connexion à votre tableau de bord</h3>
+              <p>Connectez-vous avec vos identifiants pour accéder à votre espace personnel.</p>
+              <ul class="step-details">
+                <li>Allez sur <strong>penccumndongo.com/cp2i</strong></li>
+                <li>Cliquez sur "Se connecter"</li>
+                <li>Saisissez votre email et mot de passe</li>
+                <li>Accédez à votre tableau de bord participant</li>
+              </ul>
             </div>
           </div>
           <div class="guide-step">
             <div class="step-number">3</div>
             <div class="step-content">
-              <h3>Évaluation</h3>
-              <p>Votre texte sera évalué par nos correcteurs selon 4 critères.</p>
+              <h3>Rédaction et soumission</h3>
+              <p>Composez et soumettez votre poème en respectant les contraintes du concours.</p>
+              <ul class="step-details">
+                <li>Cliquez sur <strong>"Soumettre un texte"</strong> dans le menu de gauche</li>
+                <li>Choisissez un des 5 thèmes proposés</li>
+                <li>Rédigez maximum 40 vers dans la langue de votre choix</li>
+                <li>Donnez un titre accrocheur et confirmez votre soumission</li>
+              </ul>
             </div>
           </div>
           <div class="guide-step">
             <div class="step-number">4</div>
             <div class="step-content">
-              <h3>Résultats</h3>
-              <p>Consultez vos notes et commentaires dans votre tableau de bord.</p>
+              <h3>Évaluation par le jury</h3>
+              <p>Votre texte sera évalué par des correcteurs qualifiés selon une grille précise sur 20 points.</p>
+              <ul class="step-details">
+                <li>Évaluation anonyme par 1 à 3 correcteurs</li>
+                <li>Notation selon 4 critères : Pertinence, Cohérence, Correction, Présentation</li>
+                <li>Commentaires constructifs des correcteurs</li>
+                <li>Délai d'évaluation : 7 à 10 jours ouvrables</li>
+              </ul>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="step-number">5</div>
+            <div class="step-content">
+              <h3>Consultation des résultats</h3>
+              <p>Consultez vos notes détaillées et votre classement dans les sections dédiées.</p>
+              <ul class="step-details">
+                <li>Notes globales et par critère dans <strong>"Résultats & Notes"</strong></li>
+                <li>Commentaires personnalisés des correcteurs dans <strong>"Résultats & Notes"</strong></li>
+                <li>Classement général dans l'onglet <strong>"Accueil"</strong></li>
+                <li>Certificat téléchargeable dans <strong>"Mes Certificats"</strong></li>
+              </ul>
             </div>
           </div>
         </div>
@@ -648,21 +685,81 @@
       
       <!-- Historique -->
       <div *ngSwitchCase="'historique'" class="historique-section">
-        <h2>Mon Historique</h2>
-        <div class="historique-timeline" *ngIf="historique.length > 0; else noHistorique">
-          <div class="timeline-item" *ngFor="let item of historique">
-            <div class="timeline-date">{{item.created_at | date:'dd/MM/yyyy'}}</div>
+        <h2>Mon Historique d'Activité</h2>
+        
+        <!-- Filtres d'historique -->
+        <div class="historique-filters">
+          <button class="filter-btn" [class.active]="currentHistoryFilter === 'all'" (click)="currentHistoryFilter = 'all'">
+            <i class="fas fa-list"></i> Tout
+          </button>
+          <button class="filter-btn" [class.active]="currentHistoryFilter === 'submissions'" (click)="currentHistoryFilter = 'submissions'">
+            <i class="fas fa-file-alt"></i> Soumissions
+          </button>
+          <button class="filter-btn" [class.active]="currentHistoryFilter === 'evaluations'" (click)="currentHistoryFilter = 'evaluations'">
+            <i class="fas fa-star"></i> Évaluations
+          </button>
+          <button class="filter-btn" [class.active]="currentHistoryFilter === 'messages'" (click)="currentHistoryFilter = 'messages'">
+            <i class="fas fa-envelope"></i> Messages
+          </button>
+        </div>
+        
+        <div class="historique-timeline" *ngIf="getFilteredHistory().length > 0; else noHistorique">
+          <div class="timeline-item" *ngFor="let item of getFilteredHistory(); let i = index">
+            <div class="timeline-marker">
+              <div class="timeline-icon" [ngClass]="getHistoryIconClass(item.type)">
+                <i class="fas" [ngClass]="getHistoryIcon(item.type)"></i>
+              </div>
+              <div class="timeline-line" *ngIf="i < getFilteredHistory().length - 1"></div>
+            </div>
+            
             <div class="timeline-content">
-              <h4>{{item.action}}</h4>
-              <p>{{item.description}}</p>
+              <div class="timeline-header">
+                <h4>{{getHistoryTitle(item)}}</h4>
+                <span class="timeline-date">
+                  <i class="fas fa-clock"></i>
+                  {{item.created_at | date:'dd/MM/yyyy à HH:mm'}}
+                </span>
+              </div>
+              
+              <div class="timeline-description">
+                <p>{{getHistoryDescription(item)}}</p>
+              </div>
+              
+              <!-- Actions rapides -->
+              <div class="timeline-actions" *ngIf="item.type === 'submission' || item.type === 'evaluation'">
+                <button class="btn btn-small btn-outline" (click)="setCurrentView('soumissions')" *ngIf="item.type === 'submission'">
+                  <i class="fas fa-eye"></i> Voir le texte
+                </button>
+                <button class="btn btn-small btn-outline" (click)="setCurrentView('resultats')" *ngIf="item.type === 'evaluation'">
+                  <i class="fas fa-chart-bar"></i> Voir les résultats
+                </button>
+              </div>
             </div>
           </div>
         </div>
+        
         <ng-template #noHistorique>
           <div class="no-historique">
-            <i class="fas fa-history"></i>
-            <h3>Aucun historique</h3>
-            <p>Votre historique d'activité apparaîtra ici.</p>
+            <div class="no-history-icon">
+              <i class="fas fa-history"></i>
+            </div>
+            <h3>Aucun historique disponible</h3>
+            <p *ngIf="currentHistoryFilter === 'all'">Votre historique d'activité apparaîtra ici au fur et à mesure de vos actions.</p>
+            <p *ngIf="currentHistoryFilter === 'submissions'">Aucune soumission de texte enregistrée.</p>
+            <p *ngIf="currentHistoryFilter === 'evaluations'">Aucune évaluation reçue pour le moment.</p>
+            <p *ngIf="currentHistoryFilter === 'messages'">Aucun message reçu.</p>
+            
+            <div class="history-suggestions" *ngIf="currentHistoryFilter === 'all'">
+              <h4>Commencez par :</h4>
+              <div class="suggestion-actions">
+                <button class="btn btn-primary btn-small" (click)="nouvellesoumission()" *ngIf="stats.total_textes === 0">
+                  <i class="fas fa-pen-fancy"></i> Soumettre votre premier texte
+                </button>
+                <button class="btn btn-outline btn-small" (click)="setCurrentView('guide')">
+                  <i class="fas fa-book"></i> Consulter le guide
+                </button>
+              </div>
+            </div>
           </div>
         </ng-template>
       </div>
