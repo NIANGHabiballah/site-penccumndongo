@@ -54,6 +54,29 @@
         <i class="fas fa-images"></i>
       </button>
     </div>
+    
+    <!-- Countdown Timer -->
+    <div class="countdown-wrapper">
+      <p class="countdown-label">Inscriptions ouvertes jusqu'au 23 novembre 2025</p>
+      <div class="countdown">
+        <div class="countdown-item">
+          <span class="countdown-value">{{countdown.days || 0}}</span>
+          <span class="countdown-unit">Jours</span>
+        </div>
+        <div class="countdown-item">
+          <span class="countdown-value">{{countdown.hours || 0}}</span>
+          <span class="countdown-unit">Heures</span>
+        </div>
+        <div class="countdown-item">
+          <span class="countdown-value">{{countdown.minutes || 0}}</span>
+          <span class="countdown-unit">Minutes</span>
+        </div>
+        <div class="countdown-item">
+          <span class="countdown-value">{{countdown.seconds || 0}}</span>
+          <span class="countdown-unit">Secondes</span>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 

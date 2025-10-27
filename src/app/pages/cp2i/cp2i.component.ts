@@ -62,12 +62,10 @@ export class Cp2iComponent implements OnInit {
   currentBookImg = 0;
   galleryIndex = 0;
   selectedGalleryImage = '';
-
-
-
-
+  countdown: any = {};
 
   ngOnInit() {
+    this.startCountdown();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -139,5 +137,20 @@ export class Cp2iComponent implements OnInit {
     }
   }
 
-
+  // Countdown pour les inscriptions CP2i
+  startCountdown(): void {
+    const deadline = new Date('2025-11-23T23:59:59').getTime();
+    
+    setInterval(() => {
+      const now = new Date().getTime();
+      const distance = deadline - now;
+      
+      this.countdown = {
+        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((distance % (1000 * 60)) / 1000)
+      };
+    }, 1000);
+  }
 }
