@@ -903,54 +903,10 @@
   </main>
 </div>
 
-<!-- Chat Widget -->
-<div class="chat-widget">
-  <button class="chat-button" title="Chat Support CP2i" (click)="openChatSupport()" *ngIf="!chatOpen">
-    <i class="fas fa-comments"></i>
-  </button>
-  
-  <!-- Interface Chat -->
-  <div class="chat-interface" *ngIf="chatOpen">
-    <div class="chat-header">
-      <div class="chat-title">
-        <i class="fas fa-comments"></i>
-        <span>Support CP2i</span>
-      </div>
-      <button class="chat-close" (click)="closeChat()">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    
-    <div class="chat-messages">
-      <div class="message bot-message">
-        <div class="message-avatar">🤖</div>
-        <div class="message-content">
-          <p>Bonjour ! Je suis l'assistant CP2i. Comment puis-je vous aider ?</p>
-          <span class="message-time">Maintenant</span>
-        </div>
-      </div>
-    </div>
-    
-    <div class="chat-quick-actions">
-      <button class="quick-action" (click)="sendMessage('Comment soumettre un texte ?')">
-        📝 Comment soumettre un texte ?
-      </button>
-      <button class="quick-action" (click)="sendMessage('Voir mes résultats')">
-        📈 Voir mes résultats
-      </button>
-      <button class="quick-action" (click)="sendMessage('Problème technique')">
-        ⚙️ Problème technique
-      </button>
-    </div>
-    
-    <div class="chat-input">
-      <input type="text" placeholder="Tapez votre message..." #messageInput (keyup.enter)="sendMessage(messageInput.value); messageInput.value=''">
-      <button (click)="sendMessage(messageInput.value); messageInput.value=''">
-        <i class="fas fa-paper-plane"></i>
-      </button>
-    </div>
-  </div>
-</div>
+<!-- Widget de chat support -->
+<app-chat-widget></app-chat-widget>
+
+
 
 <!-- Toast Notification -->
 <div class="toast-notification" 

@@ -30,7 +30,7 @@ export interface ChatConversation {
   providedIn: 'root'
 })
 export class ChatSupportService {
-  private baseUrl = 'https://penccumndongo.com/src/app/back-end';
+  private baseUrl = 'https://penccumndongo.com';
   private conversationsSubject = new BehaviorSubject<ChatConversation[]>([]);
   private messagesSubject = new BehaviorSubject<ChatMessage[]>([]);
   private unreadCountSubject = new BehaviorSubject<number>(0);
@@ -48,66 +48,87 @@ export class ChatSupportService {
 
   // Créer une nouvelle conversation
   createConversation(subject: string, initialMessage: string): Observable<any> {
+    const token = localStorage.getItem('cp2i_token');
+    const headers = { 'Authorization': `Bearer ${token}` };
     return this.http.post(`${this.baseUrl}/chat-support.php?action=create`, {
       subject,
       message: initialMessage
-    }, { headers: this.apiService['getHeaders']() });
+    }, { headers });
   }
 
   // Obtenir toutes les conversations
   getConversations(): Observable<ChatConversation[]> {
+    const token = localStorage.getItem('cp2i_token');
+    const headers = { 
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
     return this.http.get<ChatConversation[]>(`${this.baseUrl}/chat-support.php?action=conversations`, 
-      { headers: this.apiService['getHeaders']() });
+      { headers });
   }
 
   // Obtenir les messages d'une conversation
   getMessages(conversationId: number): Observable<ChatMessage[]> {
+    const token = localStorage.getItem('cp2i_token');
+    const headers = { 'Authorization': `Bearer ${token}` };
     return this.http.get<ChatMessage[]>(`${this.baseUrl}/chat-support.php?action=messages&conversation_id=${conversationId}`, 
-      { headers: this.apiService['getHeaders']() });
+      { headers });
   }
 
   // Envoyer un message
   sendMessage(conversationId: number, message: string): Observable<any> {
+    const token = localStorage.getItem('cp2i_token');
+    const headers = { 'Authorization': `Bearer ${token}` };
     return this.http.post(`${this.baseUrl}/chat-support.php?action=send`, {
       conversation_id: conversationId,
       message
-    }, { headers: this.apiService['getHeaders']() });
+    }, { headers });
   }
 
   // Marquer les messages comme lus
   markAsRead(conversationId: number): Observable<any> {
+    const token = localStorage.getItem('cp2i_token');
+    const headers = { 'Authorization': `Bearer ${token}` };
     return this.http.post(`${this.baseUrl}/chat-support.php?action=mark_read`, {
       conversation_id: conversationId
-    }, { headers: this.apiService['getHeaders']() });
+    }, { headers });
   }
 
   // Assigner une conversation à un admin
   assignConversation(conversationId: number, adminId: number): Observable<any> {
+    const token = localStorage.getItem('cp2i_token');
+    const headers = { 'Authorization': `Bearer ${token}` };
     return this.http.post(`${this.baseUrl}/chat-support.php?action=assign`, {
       conversation_id: conversationId,
       admin_id: adminId
-    }, { headers: this.apiService['getHeaders']() });
+    }, { headers });
   }
 
   // Fermer une conversation
   closeConversation(conversationId: number): Observable<any> {
+    const token = localStorage.getItem('cp2i_token');
+    const headers = { 'Authorization': `Bearer ${token}` };
     return this.http.post(`${this.baseUrl}/chat-support.php?action=close`, {
       conversation_id: conversationId
-    }, { headers: this.apiService['getHeaders']() });
+    }, { headers });
   }
 
   // Changer la priorité
   setPriority(conversationId: number, priority: string): Observable<any> {
+    const token = localStorage.getItem('cp2i_token');
+    const headers = { 'Authorization': `Bearer ${token}` };
     return this.http.post(`${this.baseUrl}/chat-support.php?action=priority`, {
       conversation_id: conversationId,
       priority
-    }, { headers: this.apiService['getHeaders']() });
+    }, { headers });
   }
 
   // Obtenir le nombre de messages non lus
   getUnreadCount(): Observable<number> {
+    const token = localStorage.getItem('cp2i_token');
+    const headers = { 'Authorization': `Bearer ${token}` };
     return this.http.get<{count: number}>(`${this.baseUrl}/chat-support.php?action=unread_count`, 
-      { headers: this.apiService['getHeaders']() }).pipe(
+      { headers }).pipe(
         map(result => result.count)
       );
   }
@@ -124,7 +145,12 @@ export class ChatSupportService {
 
   // Obtenir les statistiques du support
   getSupportStats(): Observable<any> {
+    const token = localStorage.getItem('cp2i_token');
+    const headers = { 
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
     return this.http.get(`${this.baseUrl}/chat-support.php?action=stats`, 
-      { headers: this.apiService['getHeaders']() });
+      { headers });
   }
 }

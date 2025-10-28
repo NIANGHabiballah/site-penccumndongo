@@ -5,11 +5,13 @@ import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Cp2iApiService, User } from '../../services/cp2i-api.service';
 import { ChatSupportComponent } from '../chat-support/chat-support.component';
+import { ChatWidgetComponent } from '../../components/chat-widget/chat-widget.component';
+
 
 @Component({
   selector: 'app-dashboard-participant',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ChatSupportComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ChatSupportComponent, ChatWidgetComponent],
   templateUrl: './dashboard-participant.component.html',
   styleUrls: ['./dashboard-participant.component.css', './participant-sections.css', './certificats-styles.css']
 })
@@ -187,19 +189,21 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   }
   
   loadHistorique() {
+    // Désactiver temporairement l'historique pour éviter l'erreur 403
+    this.historique = [];
+    
+    // Optionnel : essayer de charger l'historique mais ignorer les erreurs
+    /*
     this.cp2iApi.getParticipantHistory().subscribe({
       next: (data) => {
         this.historique = data.history || [];
       },
       error: (error) => {
-        if (error.status === 403) {
-          console.warn('Accès refusé à l\'historique - problème d\'authentification');
-        } else {
-          console.error('Erreur historique:', error);
-        }
+        // Ignorer silencieusement les erreurs d'historique
         this.historique = [];
       }
     });
+    */
   }
   
   loadCertificats() {

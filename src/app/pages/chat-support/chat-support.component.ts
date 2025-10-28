@@ -86,8 +86,11 @@ export class ChatSupportComponent implements OnInit, OnDestroy {
   createNewConversation() {
     if (!this.newSubject.trim() || !this.newInitialMessage.trim()) return;
 
+    console.log('Création conversation:', this.newSubject, this.newInitialMessage);
+
     this.chatService.createConversation(this.newSubject, this.newInitialMessage).subscribe({
       next: (response) => {
+        console.log('Conversation créée:', response);
         this.newSubject = '';
         this.newInitialMessage = '';
         this.showNewChatForm = false;

@@ -1,8 +1,21 @@
 <?php
 require_once 'config.php';
+header('Content-Type: application/json');
 setCorsHeaders();
 
-$user = verifyToken();
+try {
+    $user = verifyToken();
+    if (!$user) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Token invalide']);
+        exit;
+    }
+} catch (Exception $e) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Erreur authentification: ' . $e->getMessage()]);
+    exit;
+}
+
 $method = $_SERVER['REQUEST_METHOD'];
 $data = json_decode(file_get_contents("php://input"), true);
 $action = $_GET['action'] ?? '';
@@ -44,7 +57,7 @@ function getConversations($user) {
             SELECT c.*, u.nom, u.prenom,
                    COUNT(CASE WHEN m.read_status = 0 AND m.sender_type = 'participant' THEN 1 END) as unread_count
             FROM chat_conversations c
-            JOIN users u ON c.participant_id = u.id
+            JOIN cp2i_users u ON c.participant_id = u.id
             LEFT JOIN chat_messages m ON c.id = m.conversation_id
             GROUP BY c.id
             ORDER BY c.updated_at DESC
@@ -59,7 +72,7 @@ function getConversations($user) {
             GROUP BY c.id
             ORDER BY c.updated_at DESC
         ");
-        $stmt->execute([$user['id']]);
+        $stmt->execute([$user['user_id']]);
     }
     
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
@@ -73,7 +86,7 @@ function getMessages($user, $conversationId) {
         SELECT * FROM chat_conversations 
         WHERE id = ? AND (participant_id = ? OR ? = 'admin')
     ");
-    $stmt->execute([$conversationId, $user['id'], $user['role']]);
+    $stmt->execute([$conversationId, $user['user_id'], $user['role']]);
     
     if (!$stmt->fetch()) {
         http_response_code(403);
@@ -84,7 +97,7 @@ function getMessages($user, $conversationId) {
     $stmt = $pdo->prepare("
         SELECT m.*, u.nom, u.prenom 
         FROM chat_messages m
-        JOIN users u ON m.sender_id = u.id
+        JOIN cp2i_users u ON m.sender_id = u.id
         WHERE m.conversation_id = ?
         ORDER BY m.timestamp ASC
     ");
@@ -96,6 +109,8 @@ function getMessages($user, $conversationId) {
 function createConversation($user, $data) {
     $pdo = getDB();
     
+    $userId = $user['user_id'];
+    
     try {
         $pdo->beginTransaction();
         
@@ -104,7 +119,7 @@ function createConversation($user, $data) {
             INSERT INTO chat_conversations (participant_id, subject, status, priority, created_at, updated_at)
             VALUES (?, ?, 'open', 'medium', NOW(), NOW())
         ");
-        $stmt->execute([$user['id'], $data['subject']]);
+        $stmt->execute([$userId, $data['subject']]);
         $conversationId = $pdo->lastInsertId();
         
         // Ajouter le message initial
@@ -112,14 +127,14 @@ function createConversation($user, $data) {
             INSERT INTO chat_messages (conversation_id, sender_id, sender_type, message, timestamp, read_status)
             VALUES (?, ?, 'participant', ?, NOW(), 0)
         ");
-        $stmt->execute([$conversationId, $user['id'], $data['message']]);
+        $stmt->execute([$conversationId, $userId, $data['message']]);
         
         $pdo->commit();
         echo json_encode(['success' => true, 'conversation_id' => $conversationId]);
         
     } catch (PDOException $e) {
         $pdo->rollBack();
-        echo json_encode(['error' => 'Erreur création conversation']);
+        echo json_encode(['error' => 'Erreur création conversation: ' . $e->getMessage()]);
     }
 }
 
@@ -132,7 +147,7 @@ function sendMessage($user, $data) {
             SELECT * FROM chat_conversations 
             WHERE id = ? AND (participant_id = ? OR ? = 'admin')
         ");
-        $stmt->execute([$data['conversation_id'], $user['id'], $user['role']]);
+        $stmt->execute([$data['conversation_id'], $user['user_id'], $user['role']]);
         
         if (!$stmt->fetch()) {
             http_response_code(403);
@@ -146,7 +161,7 @@ function sendMessage($user, $data) {
             INSERT INTO chat_messages (conversation_id, sender_id, sender_type, message, timestamp, read_status)
             VALUES (?, ?, ?, ?, NOW(), 0)
         ");
-        $stmt->execute([$data['conversation_id'], $user['id'], $senderType, $data['message']]);
+        $stmt->execute([$data['conversation_id'], $user['user_id'], $senderType, $data['message']]);
         
         // Mettre à jour la conversation
         $stmt = $pdo->prepare("UPDATE chat_conversations SET updated_at = NOW() WHERE id = ?");
@@ -268,7 +283,7 @@ function getUnreadCount($user) {
             JOIN chat_conversations c ON m.conversation_id = c.id
             WHERE m.read_status = 0 AND m.sender_type = 'admin' AND c.participant_id = ?
         ");
-        $stmt->execute([$user['id']]);
+        $stmt->execute([$user['user_id']]);
     }
     
     echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));

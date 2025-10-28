@@ -64,7 +64,7 @@ function verifyToken() {
         $token = $headers['authorization'];
     }
     
-    if (!$token || !str_starts_with($token, 'Bearer ')) {
+    if (!$token || strpos($token, 'Bearer ') !== 0) {
         http_response_code(401);
         echo json_encode(['error' => 'Token manquant', 'headers' => array_keys($headers)]);
         exit;

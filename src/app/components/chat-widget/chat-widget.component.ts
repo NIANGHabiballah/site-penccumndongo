@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="chat-widget" [class.open]="isOpen">
+    <div class="chat-widget" [class.open]="isOpen" *ngIf="isLoggedIn">
       <button class="chat-toggle" (click)="toggleChat()" *ngIf="!isOpen">
         💬
         <span class="notification-badge" *ngIf="unreadCount > 0">{{unreadCount}}</span>
@@ -51,10 +51,7 @@ import { Subscription } from 'rxjs';
             </button>
           </div>
 
-          <div class="login-prompt" *ngIf="!isLoggedIn">
-            <p>Connectez-vous pour utiliser le chat support</p>
-            <button class="login-btn" (click)="redirectToLogin()">Se connecter</button>
-          </div>
+
         </div>
       </div>
     </div>
@@ -239,8 +236,9 @@ export class ChatWidgetComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   constructor(private chatService: ChatSupportService) {
-    this.user = JSON.parse(localStorage.getItem('user') || 'null');
-    this.isLoggedIn = !!this.user;
+    const token = localStorage.getItem('cp2i_token');
+    this.user = JSON.parse(localStorage.getItem('cp2i_user') || 'null');
+    this.isLoggedIn = !!(token && this.user?.id);
   }
 
   ngOnInit() {
@@ -288,9 +286,12 @@ export class ChatWidgetComponent implements OnInit, OnDestroy {
   sendMessage() {
     if (!this.newMessage.trim() || !this.isLoggedIn) return;
 
+    console.log('Envoi message:', this.newMessage, 'ConversationId:', this.currentConversationId);
+
     if (!this.currentConversationId) {
       this.chatService.createConversation('Support général', this.newMessage).subscribe({
         next: (response) => {
+          console.log('Conversation créée:', response);
           this.currentConversationId = response.conversation_id;
           this.newMessage = '';
           this.loadMessages();
@@ -299,7 +300,8 @@ export class ChatWidgetComponent implements OnInit, OnDestroy {
       });
     } else {
       this.chatService.sendMessage(this.currentConversationId, this.newMessage).subscribe({
-        next: () => {
+        next: (response) => {
+          console.log('Message envoyé:', response);
           this.newMessage = '';
           this.loadMessages();
         },
