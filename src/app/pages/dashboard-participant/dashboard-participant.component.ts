@@ -4,11 +4,12 @@ import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Cp2iApiService, User } from '../../services/cp2i-api.service';
+import { ChatSupportComponent } from '../chat-support/chat-support.component';
 
 @Component({
   selector: 'app-dashboard-participant',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ChatSupportComponent],
   templateUrl: './dashboard-participant.component.html',
   styleUrls: ['./dashboard-participant.component.css', './participant-sections.css', './certificats-styles.css']
 })

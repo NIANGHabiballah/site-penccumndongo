@@ -105,6 +105,31 @@ export class ApiService {
     return this.http.get(`${this.baseUrl}/messagerie.php?action=templates`, { headers: this.getHeaders() });
   }
 
+  // Chat Support
+  getChatConversations(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/chat-support.php?action=conversations`, { headers: this.getHeaders() });
+  }
+
+  createChatConversation(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/chat-support.php?action=create`, data, { headers: this.getHeaders() });
+  }
+
+  getChatMessages(conversationId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/chat-support.php?action=messages&conversation_id=${conversationId}`, { headers: this.getHeaders() });
+  }
+
+  sendChatMessage(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/chat-support.php?action=send`, data, { headers: this.getHeaders() });
+  }
+
+  markChatAsRead(conversationId: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/chat-support.php?action=mark_read`, { conversation_id: conversationId }, { headers: this.getHeaders() });
+  }
+
+  getChatUnreadCount(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/chat-support.php?action=unread_count`, { headers: this.getHeaders() });
+  }
+
   // Règlements
   getReglementsCourants(): Observable<any> {
     return this.http.get(`${this.baseUrl}/reglements.php?action=current`);

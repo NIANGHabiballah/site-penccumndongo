@@ -2,6 +2,9 @@
 <router-outlet></router-outlet>
 <app-footer *ngIf="!isDashboardRoute"></app-footer>
 
+<!-- Widget de chat support -->
+<app-chat-widget></app-chat-widget>
+
 <!-- Boutons flottants globaux -->
 <div *ngIf="!isDashboardRoute">
   <a href="https://wa.me/221776290639" target="_blank" class="whatsapp-btn" aria-label="WhatsApp">

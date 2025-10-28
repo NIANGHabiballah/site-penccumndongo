@@ -1,0 +1,141 @@
+<div class="chat-support-container">
+  <!-- Header -->
+  <div class="chat-header">
+    <h2>💬 Support Chat</h2>
+    <div class="header-actions">
+      <span class="unread-badge" *ngIf="unreadCount > 0">{{unreadCount}}</span>
+      <button class="btn-new-chat" (click)="showNewChatForm = true" *ngIf="!isAdmin">
+        ➕ Nouveau Chat
+      </button>
+    </div>
+  </div>
+
+  <!-- Formulaire nouvelle conversation -->
+  <div class="new-chat-form" *ngIf="showNewChatForm">
+    <h3>Nouvelle demande de support</h3>
+    <input type="text" [(ngModel)]="newSubject" placeholder="Sujet de votre demande" class="form-input">
+    <textarea [(ngModel)]="newInitialMessage" placeholder="Décrivez votre problème..." rows="3" class="form-textarea"></textarea>
+    <div class="form-actions">
+      <button class="btn-primary" (click)="createNewConversation()">Envoyer</button>
+      <button class="btn-secondary" (click)="showNewChatForm = false">Annuler</button>
+    </div>
+  </div>
+
+  <div class="chat-layout">
+    <!-- Liste des conversations -->
+    <div class="conversations-panel">
+      <div class="conversations-header">
+        <h3>Conversations</h3>
+      </div>
+      
+      <div class="conversations-list">
+        <div 
+          class="conversation-item" 
+          *ngFor="let conv of conversations"
+          [class.active]="selectedConversation?.id === conv.id"
+          [class.unread]="conv.unread_count > 0"
+          (click)="selectConversation(conv)">
+          
+          <div class="conversation-info">
+            <div class="conversation-header">
+              <span class="subject">{{conv.subject}}</span>
+              <span class="status-badge" [style.background-color]="getStatusColor(conv.status)">
+                {{conv.status}}
+              </span>
+            </div>
+            
+            <div class="conversation-meta">
+              <span class="priority" [style.color]="getPriorityColor(conv.priority)">
+                {{conv.priority === 'high' ? '🔴' : conv.priority === 'medium' ? '🟡' : '🟢'}}
+              </span>
+              <span class="date">{{formatDate(conv.updated_at)}}</span>
+              <span class="unread-count" *ngIf="conv.unread_count > 0">{{conv.unread_count}}</span>
+            </div>
+          </div>
+
+          <!-- Actions admin -->
+          <div class="conversation-actions" *ngIf="isAdmin">
+            <button class="btn-assign" (click)="assignToMe(conv.id!); $event.stopPropagation()" 
+                    *ngIf="!conv.admin_id" title="M'assigner">
+              👤
+            </button>
+            <select (change)="onPriorityChange(conv.id!, $event)" 
+                    [value]="conv.priority" class="priority-select">
+              <option value="low">Faible</option>
+              <option value="medium">Moyenne</option>
+              <option value="high">Haute</option>
+            </select>
+            <button class="btn-close" (click)="closeConversation(conv.id!); $event.stopPropagation()" 
+                    *ngIf="conv.status !== 'closed'" title="Fermer">
+              ✖️
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone de chat -->
+    <div class="chat-panel" *ngIf="selectedConversation">
+      <div class="chat-info">
+        <h3>{{selectedConversation.subject}}</h3>
+        <div class="chat-meta">
+          <span class="status" [style.background-color]="getStatusColor(selectedConversation.status)">
+            {{selectedConversation.status}}
+          </span>
+          <span class="priority" [style.color]="getPriorityColor(selectedConversation.priority)">
+            Priorité: {{selectedConversation.priority}}
+          </span>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="messages-container" #messagesContainer>
+        <div class="message" 
+             *ngFor="let message of messages"
+             [class.own-message]="message.sender_id === user.id"
+             [class.admin-message]="message.sender_type === 'admin'">
+          
+          <div class="message-content">
+            <div class="message-header">
+              <span class="sender">
+                {{message.sender_type === 'admin' ? '👨‍💼 Support' : '👤 Vous'}}
+              </span>
+              <span class="timestamp">{{formatTime(message.timestamp)}}</span>
+            </div>
+            <div class="message-text">{{message.message}}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Zone de saisie -->
+      <div class="message-input-container" *ngIf="selectedConversation.status !== 'closed'">
+        <div class="input-wrapper">
+          <textarea 
+            [(ngModel)]="newMessage" 
+            placeholder="Tapez votre message..."
+            class="message-input"
+            rows="2"
+            (keydown.enter)="onEnterKey($event)"></textarea>
+          <button class="send-button" (click)="sendMessage()" [disabled]="!newMessage.trim()">
+            📤
+          </button>
+        </div>
+      </div>
+
+      <div class="conversation-closed" *ngIf="selectedConversation.status === 'closed'">
+        <p>Cette conversation est fermée.</p>
+      </div>
+    </div>
+
+    <!-- Message si aucune conversation sélectionnée -->
+    <div class="no-conversation" *ngIf="!selectedConversation">
+      <div class="empty-state">
+        <h3>Aucune conversation sélectionnée</h3>
+        <p>Sélectionnez une conversation dans la liste ou créez-en une nouvelle.</p>
+        <button class="btn-primary" (click)="toggleNewChatForm()" *ngIf="!isAdmin">
+          ➕ Nouvelle conversation
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

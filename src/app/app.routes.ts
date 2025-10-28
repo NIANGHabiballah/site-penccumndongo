@@ -37,6 +37,8 @@ import { ReglementsComponent } from './pages/reglements/reglements.component';
 import { ConditionsGeneralesComponent } from './pages/conditions-generales/conditions-generales.component';
 import { SoumissionTexteComponent } from './pages/soumission-texte/soumission-texte.component';
 import { ChangePasswordComponent } from './pages/change-password/change-password.component';
+import { ChatSupportComponent } from './pages/chat-support/chat-support.component';
+import { AdminChatComponent } from './pages/admin-chat/admin-chat.component';
 
 export const routes: Routes = [
   { path: '', component: AccueilComponent },
@@ -91,6 +93,10 @@ export const routes: Routes = [
   
   // Route de soumission de texte
   { path: 'soumission-texte', component: SoumissionTexteComponent, canActivate: [AuthGuard] },
+  
+  // Routes du chat support
+  { path: 'chat-support', component: ChatSupportComponent, canActivate: [AuthGuard] },
+  { path: 'admin/chat', component: AdminChatComponent, canActivate: [SecurityGuard] },
   
   // Routes de récupération de mot de passe
   { path: 'forgot-password', component: ChangePasswordComponent },

@@ -43,6 +43,9 @@
       <div class="nav-item" [class.active]="currentView === 'messages'" (click)="setCurrentView('messages')">
         <i class="fas fa-envelope"></i> Messages
       </div>
+      <div class="nav-item" [class.active]="currentView === 'chat-support'" (click)="setCurrentView('chat-support')">
+        <i class="fas fa-comments"></i> Chat Support
+      </div>
       <div class="nav-item" [class.active]="currentView === 'historique'" (click)="setCurrentView('historique')">
         <i class="fas fa-history"></i> Historique
       </div>
@@ -1678,6 +1681,11 @@
             <i class="fas fa-save"></i> Sauvegarder les paramètres
           </button>
         </div>
+      </div>
+
+      <!-- Chat Support -->
+      <div *ngSwitchCase="'chat-support'" class="chat-support-section">
+        <app-admin-chat></app-admin-chat>
       </div>
 
       <!-- Autres vues -->

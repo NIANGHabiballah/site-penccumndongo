@@ -1,76 +1,3 @@
--- Base de données CP2i
-CREATE DATABASE cp2i_db;
-USE cp2i_db;
-
--- Table des utilisateurs
-CREATE TABLE users (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    nom VARCHAR(100) NOT NULL,
-    prenom VARCHAR(100) NOT NULL,
-    telephone VARCHAR(20),
-    role ENUM('participant', 'correcteur', 'admin') NOT NULL,
-    statut ENUM('actif', 'inactif', 'suspendu') DEFAULT 'actif',
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    derniere_connexion TIMESTAMP NULL
-);
-
--- Table des textes soumis
-CREATE TABLE textes (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    participant_id INT NOT NULL,
-    titre VARCHAR(200) NOT NULL,
-    contenu TEXT NOT NULL,
-    theme VARCHAR(100),
-    date_soumission TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    statut ENUM('soumis', 'en_correction', 'corrige', 'valide') DEFAULT 'soumis',
-    note_finale DECIMAL(4,2) NULL,
-    FOREIGN KEY (participant_id) REFERENCES users(id)
-);
-
--- Table des corrections
-CREATE TABLE corrections (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    texte_id INT NOT NULL,
-    correcteur_id INT NOT NULL,
-    note DECIMAL(4,2) NOT NULL,
-    commentaires TEXT,
-    criteres JSON,
-    date_correction TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (texte_id) REFERENCES textes(id),
-    FOREIGN KEY (correcteur_id) REFERENCES users(id)
-);
-
--- Table des messages/chat
-CREATE TABLE messages (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    expediteur_id INT NOT NULL,
-    destinataire_id INT NULL,
-    type ENUM('support', 'notification', 'prive') NOT NULL,
-    sujet VARCHAR(200),
-    contenu TEXT NOT NULL,
-    lu BOOLEAN DEFAULT FALSE,
-    date_envoi TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (expediteur_id) REFERENCES users(id),
-    FOREIGN KEY (destinataire_id) REFERENCES users(id)
-);
-
--- Table des sessions
-CREATE TABLE sessions (
-    id VARCHAR(128) PRIMARY KEY,
-    user_id INT NOT NULL,
-    data TEXT,
-    expires TIMESTAMP NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
-
--- Index pour optimisation
-CREATE INDEX idx_textes_participant ON textes(participant_id);
-CREATE INDEX idx_corrections_texte ON corrections(texte_id);
-CREATE INDEX idx_messages_destinataire ON messages(destinataire_id);
-CREATE INDEX idx_sessions_expires ON sessions(expires);
-
 -- Tables pour le système de chat support
 
 -- Table des conversations de support
@@ -123,10 +50,22 @@ CREATE TABLE IF NOT EXISTS chat_quick_replies (
     INDEX idx_usage (usage_count)
 );
 
--- Données initiales
-INSERT INTO users (email, password, nom, prenom, role) VALUES
-('admin@cp2i.com', '$2b$10$hash', 'Admin', 'Système', 'admin'),
-('correcteur@cp2i.com', '$2b$10$hash', 'Correcteur', 'Principal', 'correcteur');
+-- Table pour les notifications de chat
+CREATE TABLE IF NOT EXISTS chat_notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    conversation_id INT NOT NULL,
+    message_id INT NOT NULL,
+    type ENUM('new_message', 'conversation_assigned', 'conversation_closed') NOT NULL,
+    read_status BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (conversation_id) REFERENCES chat_conversations(id) ON DELETE CASCADE,
+    FOREIGN KEY (message_id) REFERENCES chat_messages(id) ON DELETE CASCADE,
+    INDEX idx_user (user_id),
+    INDEX idx_read_status (read_status),
+    INDEX idx_created (created_at)
+);
 
 -- Insérer quelques réponses rapides par défaut
 INSERT INTO chat_quick_replies (title, message, category, created_by) VALUES
@@ -136,3 +75,33 @@ INSERT INTO chat_quick_replies (title, message, category, created_by) VALUES
 ('Résultats', 'Les résultats sont généralement publiés 2 semaines après la clôture des soumissions. Vous recevrez une notification par email.', 'resultats', 1),
 ('Problème technique', 'Je comprends votre problème technique. Pouvez-vous me donner plus de détails sur l''erreur que vous rencontrez ?', 'technique', 1),
 ('Fermeture', 'Votre demande a été traitée. N''hésitez pas à nous recontacter si vous avez d''autres questions. Bonne journée !', 'general', 1);
+
+-- Vues pour faciliter les requêtes
+
+-- Vue des conversations avec informations utilisateur
+CREATE OR REPLACE VIEW chat_conversations_view AS
+SELECT 
+    c.*,
+    p.nom as participant_nom,
+    p.prenom as participant_prenom,
+    p.email as participant_email,
+    a.nom as admin_nom,
+    a.prenom as admin_prenom,
+    (SELECT COUNT(*) FROM chat_messages m WHERE m.conversation_id = c.id AND m.read_status = 0 AND m.sender_type = 'participant') as unread_participant_messages,
+    (SELECT COUNT(*) FROM chat_messages m WHERE m.conversation_id = c.id AND m.read_status = 0 AND m.sender_type = 'admin') as unread_admin_messages,
+    (SELECT COUNT(*) FROM chat_messages m WHERE m.conversation_id = c.id) as total_messages
+FROM chat_conversations c
+JOIN users p ON c.participant_id = p.id
+LEFT JOIN users a ON c.admin_id = a.id;
+
+-- Vue des messages avec informations utilisateur
+CREATE OR REPLACE VIEW chat_messages_view AS
+SELECT 
+    m.*,
+    u.nom as sender_nom,
+    u.prenom as sender_prenom,
+    c.subject as conversation_subject,
+    c.status as conversation_status
+FROM chat_messages m
+JOIN users u ON m.sender_id = u.id
+JOIN chat_conversations c ON m.conversation_id = c.id;

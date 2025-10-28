@@ -1,0 +1,308 @@
+<?php
+require_once 'config.php';
+setCorsHeaders();
+
+$user = verifyToken();
+$method = $_SERVER['REQUEST_METHOD'];
+$data = json_decode(file_get_contents("php://input"), true);
+$action = $_GET['action'] ?? '';
+
+switch ($method) {
+    case 'GET':
+        if ($action === 'conversations') {
+            getConversations($user);
+        } elseif ($action === 'messages') {
+            getMessages($user, $_GET['conversation_id']);
+        } elseif ($action === 'unread_count') {
+            getUnreadCount($user);
+        } elseif ($action === 'stats') {
+            getSupportStats($user);
+        }
+        break;
+    case 'POST':
+        if ($action === 'create') {
+            createConversation($user, $data);
+        } elseif ($action === 'send') {
+            sendMessage($user, $data);
+        } elseif ($action === 'mark_read') {
+            markAsRead($user, $data);
+        } elseif ($action === 'assign') {
+            assignConversation($user, $data);
+        } elseif ($action === 'close') {
+            closeConversation($user, $data);
+        } elseif ($action === 'priority') {
+            setPriority($user, $data);
+        }
+        break;
+}
+
+function getConversations($user) {
+    $pdo = getDB();
+    
+    if ($user['role'] === 'admin') {
+        $stmt = $pdo->query("
+            SELECT c.*, u.nom, u.prenom,
+                   COUNT(CASE WHEN m.read_status = 0 AND m.sender_type = 'participant' THEN 1 END) as unread_count
+            FROM chat_conversations c
+            JOIN users u ON c.participant_id = u.id
+            LEFT JOIN chat_messages m ON c.id = m.conversation_id
+            GROUP BY c.id
+            ORDER BY c.updated_at DESC
+        ");
+    } else {
+        $stmt = $pdo->prepare("
+            SELECT c.*,
+                   COUNT(CASE WHEN m.read_status = 0 AND m.sender_type = 'admin' THEN 1 END) as unread_count
+            FROM chat_conversations c
+            LEFT JOIN chat_messages m ON c.id = m.conversation_id
+            WHERE c.participant_id = ?
+            GROUP BY c.id
+            ORDER BY c.updated_at DESC
+        ");
+        $stmt->execute([$user['id']]);
+    }
+    
+    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+}
+
+function getMessages($user, $conversationId) {
+    $pdo = getDB();
+    
+    // Vérifier l'accès à la conversation
+    $stmt = $pdo->prepare("
+        SELECT * FROM chat_conversations 
+        WHERE id = ? AND (participant_id = ? OR ? = 'admin')
+    ");
+    $stmt->execute([$conversationId, $user['id'], $user['role']]);
+    
+    if (!$stmt->fetch()) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Accès refusé']);
+        return;
+    }
+    
+    $stmt = $pdo->prepare("
+        SELECT m.*, u.nom, u.prenom 
+        FROM chat_messages m
+        JOIN users u ON m.sender_id = u.id
+        WHERE m.conversation_id = ?
+        ORDER BY m.timestamp ASC
+    ");
+    $stmt->execute([$conversationId]);
+    
+    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+}
+
+function createConversation($user, $data) {
+    $pdo = getDB();
+    
+    try {
+        $pdo->beginTransaction();
+        
+        // Créer la conversation
+        $stmt = $pdo->prepare("
+            INSERT INTO chat_conversations (participant_id, subject, status, priority, created_at, updated_at)
+            VALUES (?, ?, 'open', 'medium', NOW(), NOW())
+        ");
+        $stmt->execute([$user['id'], $data['subject']]);
+        $conversationId = $pdo->lastInsertId();
+        
+        // Ajouter le message initial
+        $stmt = $pdo->prepare("
+            INSERT INTO chat_messages (conversation_id, sender_id, sender_type, message, timestamp, read_status)
+            VALUES (?, ?, 'participant', ?, NOW(), 0)
+        ");
+        $stmt->execute([$conversationId, $user['id'], $data['message']]);
+        
+        $pdo->commit();
+        echo json_encode(['success' => true, 'conversation_id' => $conversationId]);
+        
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        echo json_encode(['error' => 'Erreur création conversation']);
+    }
+}
+
+function sendMessage($user, $data) {
+    $pdo = getDB();
+    
+    try {
+        // Vérifier l'accès à la conversation
+        $stmt = $pdo->prepare("
+            SELECT * FROM chat_conversations 
+            WHERE id = ? AND (participant_id = ? OR ? = 'admin')
+        ");
+        $stmt->execute([$data['conversation_id'], $user['id'], $user['role']]);
+        
+        if (!$stmt->fetch()) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Accès refusé']);
+            return;
+        }
+        
+        $senderType = $user['role'] === 'admin' ? 'admin' : 'participant';
+        
+        $stmt = $pdo->prepare("
+            INSERT INTO chat_messages (conversation_id, sender_id, sender_type, message, timestamp, read_status)
+            VALUES (?, ?, ?, ?, NOW(), 0)
+        ");
+        $stmt->execute([$data['conversation_id'], $user['id'], $senderType, $data['message']]);
+        
+        // Mettre à jour la conversation
+        $stmt = $pdo->prepare("UPDATE chat_conversations SET updated_at = NOW() WHERE id = ?");
+        $stmt->execute([$data['conversation_id']]);
+        
+        echo json_encode(['success' => true]);
+        
+    } catch (PDOException $e) {
+        echo json_encode(['error' => 'Erreur envoi message']);
+    }
+}
+
+function markAsRead($user, $data) {
+    $pdo = getDB();
+    
+    try {
+        $senderType = $user['role'] === 'admin' ? 'participant' : 'admin';
+        
+        $stmt = $pdo->prepare("
+            UPDATE chat_messages 
+            SET read_status = 1 
+            WHERE conversation_id = ? AND sender_type = ?
+        ");
+        $stmt->execute([$data['conversation_id'], $senderType]);
+        
+        echo json_encode(['success' => true]);
+        
+    } catch (PDOException $e) {
+        echo json_encode(['error' => 'Erreur marquage lu']);
+    }
+}
+
+function assignConversation($user, $data) {
+    if ($user['role'] !== 'admin') {
+        http_response_code(403);
+        echo json_encode(['error' => 'Accès refusé']);
+        return;
+    }
+    
+    $pdo = getDB();
+    
+    try {
+        $stmt = $pdo->prepare("
+            UPDATE chat_conversations 
+            SET admin_id = ?, status = 'assigned', updated_at = NOW()
+            WHERE id = ?
+        ");
+        $stmt->execute([$data['admin_id'], $data['conversation_id']]);
+        
+        echo json_encode(['success' => true]);
+        
+    } catch (PDOException $e) {
+        echo json_encode(['error' => 'Erreur assignation']);
+    }
+}
+
+function closeConversation($user, $data) {
+    if ($user['role'] !== 'admin') {
+        http_response_code(403);
+        echo json_encode(['error' => 'Accès refusé']);
+        return;
+    }
+    
+    $pdo = getDB();
+    
+    try {
+        $stmt = $pdo->prepare("
+            UPDATE chat_conversations 
+            SET status = 'closed', updated_at = NOW()
+            WHERE id = ?
+        ");
+        $stmt->execute([$data['conversation_id']]);
+        
+        echo json_encode(['success' => true]);
+        
+    } catch (PDOException $e) {
+        echo json_encode(['error' => 'Erreur fermeture']);
+    }
+}
+
+function setPriority($user, $data) {
+    if ($user['role'] !== 'admin') {
+        http_response_code(403);
+        echo json_encode(['error' => 'Accès refusé']);
+        return;
+    }
+    
+    $pdo = getDB();
+    
+    try {
+        $stmt = $pdo->prepare("
+            UPDATE chat_conversations 
+            SET priority = ?, updated_at = NOW()
+            WHERE id = ?
+        ");
+        $stmt->execute([$data['priority'], $data['conversation_id']]);
+        
+        echo json_encode(['success' => true]);
+        
+    } catch (PDOException $e) {
+        echo json_encode(['error' => 'Erreur priorité']);
+    }
+}
+
+function getUnreadCount($user) {
+    $pdo = getDB();
+    
+    if ($user['role'] === 'admin') {
+        $stmt = $pdo->query("
+            SELECT COUNT(*) as count 
+            FROM chat_messages m
+            JOIN chat_conversations c ON m.conversation_id = c.id
+            WHERE m.read_status = 0 AND m.sender_type = 'participant'
+        ");
+    } else {
+        $stmt = $pdo->prepare("
+            SELECT COUNT(*) as count 
+            FROM chat_messages m
+            JOIN chat_conversations c ON m.conversation_id = c.id
+            WHERE m.read_status = 0 AND m.sender_type = 'admin' AND c.participant_id = ?
+        ");
+        $stmt->execute([$user['id']]);
+    }
+    
+    echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
+}
+
+function getSupportStats($user) {
+    if ($user['role'] !== 'admin') {
+        http_response_code(403);
+        echo json_encode(['error' => 'Accès refusé']);
+        return;
+    }
+    
+    $pdo = getDB();
+    
+    $stats = [];
+    
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM chat_conversations");
+    $stats['total_conversations'] = $stmt->fetch()['count'];
+    
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM chat_conversations WHERE status = 'open'");
+    $stats['open_conversations'] = $stmt->fetch()['count'];
+    
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM chat_conversations WHERE status = 'assigned'");
+    $stats['assigned_conversations'] = $stmt->fetch()['count'];
+    
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM chat_conversations WHERE status = 'closed'");
+    $stats['closed_conversations'] = $stmt->fetch()['count'];
+    
+    $stmt = $pdo->query("
+        SELECT AVG(TIMESTAMPDIFF(HOUR, created_at, updated_at)) as avg_response_time
+        FROM chat_conversations WHERE status = 'closed'
+    ");
+    $stats['avg_response_time'] = round($stmt->fetch()['avg_response_time'] ?? 0, 1);
+    
+    echo json_encode($stats);
+}
+?>

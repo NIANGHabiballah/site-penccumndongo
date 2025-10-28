@@ -5,11 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Cp2iApiService, User } from '../../services/cp2i-api.service';
+import { AdminChatComponent } from '../admin-chat/admin-chat.component';
 
 @Component({
   selector: 'app-dashboard-admin',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, AdminChatComponent],
   templateUrl: './dashboard-admin.component.html',
   styleUrls: ['./dashboard-admin.component.css']
 })
