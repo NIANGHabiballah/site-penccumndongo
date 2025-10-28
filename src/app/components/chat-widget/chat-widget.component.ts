@@ -11,14 +11,14 @@ import { Subscription } from 'rxjs';
   template: `
     <div class="chat-widget" [class.open]="isOpen" *ngIf="isLoggedIn">
       <button class="chat-toggle" (click)="toggleChat()" *ngIf="!isOpen">
-        💬
+        <i class="fas fa-comments"></i>
         <span class="notification-badge" *ngIf="unreadCount > 0">{{unreadCount}}</span>
       </button>
 
       <div class="chat-window" *ngIf="isOpen">
         <div class="chat-header">
-          <h4>💬 Support</h4>
-          <button class="close-btn" (click)="toggleChat()">✖️</button>
+          <h4><i class="fas fa-life-ring"></i> Support</h4>
+          <button class="close-btn" (click)="toggleChat()"><i class="fas fa-times"></i></button>
         </div>
 
         <div class="chat-content">
@@ -47,7 +47,7 @@ import { Subscription } from 'rxjs';
               (keydown.enter)="sendMessage()"
               [disabled]="!isLoggedIn">
             <button (click)="sendMessage()" [disabled]="!newMessage.trim() || !isLoggedIn">
-              📤
+              <i class="fas fa-paper-plane"></i>
             </button>
           </div>
 
@@ -120,6 +120,15 @@ import { Subscription } from 'rxjs';
       color: white;
       cursor: pointer;
       font-size: 16px;
+    }
+
+    .chat-header h4 {
+      color: white;
+      margin: 0;
+    }
+
+    .chat-header h4 i {
+      color: white;
     }
 
     .chat-content {

@@ -40,6 +40,14 @@ export class AdminChatComponent implements OnInit {
   ngOnInit() {
     this.loadConversations();
     this.loadStats();
+    
+    // Polling temps réel toutes les 3 secondes
+    setInterval(() => {
+      this.loadConversations();
+      if (this.selectedConversation) {
+        this.loadMessages(this.selectedConversation.id);
+      }
+    }, 3000);
   }
 
   switchTab(tab: string) {
@@ -52,11 +60,18 @@ export class AdminChatComponent implements OnInit {
   }
 
   loadConversations() {
+    console.log('Token admin:', localStorage.getItem('cp2i_token'));
+    console.log('User admin:', localStorage.getItem('user'));
+    
     this.chatService.getConversations().subscribe({
       next: (conversations) => {
         this.conversations = conversations;
+        console.log('Conversations chargées:', conversations);
       },
-      error: (err) => console.error('Erreur conversations:', err)
+      error: (err) => {
+        console.error('Erreur conversations:', err);
+        console.log('Status:', err.status);
+      }
     });
   }
 
@@ -94,7 +109,7 @@ export class AdminChatComponent implements OnInit {
 
   assignToMe(conversationId: number) {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    this.chatService.assignConversation(conversationId, user.id).subscribe({
+    this.chatService.assignConversation(conversationId, user.user_id || user.id).subscribe({
       next: () => this.loadConversations(),
       error: (err) => console.error('Erreur assignation:', err)
     });
@@ -157,8 +172,12 @@ export class AdminChatComponent implements OnInit {
     this.chatService.getSupportStats().subscribe({
       next: (stats) => {
         this.stats = stats;
+        console.log('Stats chargées:', stats);
       },
-      error: (err) => console.error('Erreur stats:', err)
+      error: (err) => {
+        console.error('Erreur stats:', err);
+        console.log('Status stats:', err.status);
+      }
     });
   }
 

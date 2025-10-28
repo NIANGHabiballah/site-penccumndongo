@@ -1,17 +1,17 @@
 <div class="admin-chat-container">
   <div class="header">
-    <h1>🛠️ Administration Chat Support</h1>
+    <h2><i class="fas fa-cogs"></i> Administration Chat Support</h2>
   </div>
 
   <div class="tab-navigation">
     <button class="tab-btn" [class.active]="activeTab === 'conversations'" (click)="switchTab('conversations')">
-      💬 Conversations
+      <i class="fas fa-comments"></i> Conversations
     </button>
     <button class="tab-btn" [class.active]="activeTab === 'quick-replies'" (click)="switchTab('quick-replies')">
-      ⚡ Réponses Rapides
+      <i class="fas fa-bolt"></i> Réponses Rapides
     </button>
     <button class="tab-btn" [class.active]="activeTab === 'stats'" (click)="switchTab('stats')">
-      📊 Statistiques
+      <i class="fas fa-chart-bar"></i> Statistiques
     </button>
   </div>
 
@@ -42,7 +42,7 @@
               <div class="participant-info">
                 <span class="participant">{{conv.participant_nom}} {{conv.participant_prenom}}</span>
                 <span class="priority" [style.color]="getPriorityColor(conv.priority)">
-                  {{conv.priority === 'high' ? '🔴' : conv.priority === 'medium' ? '🟡' : '🟢'}}
+                  <i class="fas fa-circle"></i>
                 </span>
               </div>
               
@@ -55,7 +55,7 @@
             <div class="conversation-actions">
               <button class="btn-assign" (click)="onAssignToMe(conv.id, $event)" 
                       *ngIf="!conv.admin_id" title="M'assigner">
-                👤
+                <i class="fas fa-user"></i>
               </button>
               <select (change)="onPriorityChange(conv.id, $event)" 
                       [value]="conv.priority" class="priority-select">
@@ -65,7 +65,7 @@
               </select>
               <button class="btn-close" (click)="onCloseConversation(conv.id, $event)" 
                       *ngIf="conv.status !== 'closed'" title="Fermer">
-                ✖️
+                <i class="fas fa-times"></i>
               </button>
             </div>
           </div>
@@ -97,7 +97,8 @@
             <div class="message-content">
               <div class="message-header">
                 <span class="sender">
-                  {{message.sender_type === 'admin' ? '👨💼 ' + message.sender_nom : '👤 ' + message.sender_nom}}
+                  <i class="fas" [class.fa-life-ring]="message.sender_type === 'admin'" [class.fa-user]="message.sender_type === 'participant'"></i>
+                  {{message.sender_nom}}
                 </span>
                 <span class="timestamp">{{formatTime(message.timestamp)}}</span>
               </div>
@@ -123,7 +124,7 @@
                     rows="3"
                     class="message-input"></textarea>
           <button class="send-btn" (click)="sendMessage()" [disabled]="!newMessage.trim()">
-            📤 Envoyer
+            <i class="fas fa-paper-plane"></i> Envoyer
           </button>
         </div>
 
@@ -147,7 +148,7 @@
       <div class="section-header">
         <h3>Gestion des Réponses Rapides</h3>
         <button class="btn-primary" (click)="toggleAddForm()">
-          ➕ Ajouter une réponse
+          <i class="fas fa-plus"></i> Ajouter une réponse
         </button>
       </div>
 
@@ -176,7 +177,7 @@
           <div class="card-header">
             <h4>{{reply.title}}</h4>
             <span class="category">{{reply.category}}</span>
-            <button class="btn-delete" (click)="deleteQuickReply(reply.id)">🗑️</button>
+            <button class="btn-delete" (click)="deleteQuickReply(reply.id)"><i class="fas fa-trash"></i></button>
           </div>
           <div class="card-content">
             <p>{{reply.message}}</p>
@@ -191,7 +192,7 @@
     <div class="stats-container">
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-icon">💬</div>
+          <div class="stat-icon"><i class="fas fa-comments"></i></div>
           <div class="stat-content">
             <h3>{{stats.total_conversations}}</h3>
             <p>Total Conversations</p>
@@ -199,7 +200,7 @@
         </div>
         
         <div class="stat-card open">
-          <div class="stat-icon">🔓</div>
+          <div class="stat-icon"><i class="fas fa-unlock"></i></div>
           <div class="stat-content">
             <h3>{{stats.open_conversations}}</h3>
             <p>Conversations Ouvertes</p>
@@ -207,7 +208,7 @@
         </div>
         
         <div class="stat-card assigned">
-          <div class="stat-icon">👤</div>
+          <div class="stat-icon"><i class="fas fa-user"></i></div>
           <div class="stat-content">
             <h3>{{stats.assigned_conversations}}</h3>
             <p>Conversations Assignées</p>
@@ -215,7 +216,7 @@
         </div>
         
         <div class="stat-card closed">
-          <div class="stat-icon">✅</div>
+          <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
           <div class="stat-content">
             <h3>{{stats.closed_conversations}}</h3>
             <p>Conversations Fermées</p>
@@ -223,7 +224,7 @@
         </div>
         
         <div class="stat-card time">
-          <div class="stat-icon">⏱️</div>
+          <div class="stat-icon"><i class="fas fa-clock"></i></div>
           <div class="stat-content">
             <h3>{{stats.avg_response_time}}h</h3>
             <p>Temps de Réponse Moyen</p>
