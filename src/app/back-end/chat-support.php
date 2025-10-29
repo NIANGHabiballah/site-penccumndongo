@@ -30,6 +30,8 @@ switch ($method) {
             getUnreadCount($user);
         } elseif ($action === 'stats') {
             getSupportStats($user);
+        } elseif ($action === 'admins') {
+            getAvailableAdmins($user);
         }
         break;
     case 'POST':
@@ -54,10 +56,14 @@ function getConversations($user) {
     
     if ($user['role'] === 'admin') {
         $stmt = $pdo->query("
-            SELECT c.*, u.nom, u.prenom,
+            SELECT c.*, u.nom, u.prenom, u.email,
+                   CONCAT(u.prenom, ' ', u.nom) as user_name,
+                   u.email as user_email,
+                   CONCAT(a.prenom, ' ', a.nom) as admin_name,
                    COUNT(CASE WHEN m.read_status = 0 AND m.sender_type = 'participant' THEN 1 END) as unread_count
             FROM chat_conversations c
             JOIN cp2i_users u ON c.participant_id = u.id
+            LEFT JOIN cp2i_users a ON c.admin_id = a.id
             LEFT JOIN chat_messages m ON c.id = m.conversation_id
             GROUP BY c.id
             ORDER BY c.updated_at DESC
@@ -204,12 +210,13 @@ function assignConversation($user, $data) {
     $pdo = getDB();
     
     try {
+        $adminId = $data['admin_id'] ?? $user['user_id'];
         $stmt = $pdo->prepare("
             UPDATE chat_conversations 
             SET admin_id = ?, status = 'assigned', updated_at = NOW()
             WHERE id = ?
         ");
-        $stmt->execute([$data['admin_id'], $data['conversation_id']]);
+        $stmt->execute([$adminId, $data['conversation_id']]);
         
         echo json_encode(['success' => true]);
         
@@ -319,5 +326,24 @@ function getSupportStats($user) {
     $stats['avg_response_time'] = round($stmt->fetch()['avg_response_time'] ?? 0, 1);
     
     echo json_encode($stats);
+}
+
+function getAvailableAdmins($user) {
+    if ($user['role'] !== 'admin') {
+        http_response_code(403);
+        echo json_encode(['error' => 'Accès refusé']);
+        return;
+    }
+    
+    $pdo = getDB();
+    
+    $stmt = $pdo->query("
+        SELECT id, nom, prenom, email 
+        FROM cp2i_users 
+        WHERE role = 'admin' 
+        ORDER BY prenom, nom
+    ");
+    
+    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 ?>

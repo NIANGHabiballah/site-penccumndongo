@@ -43,6 +43,14 @@
                 {{conv.status}}
               </span>
             </div>
+            <div class="user-info" *ngIf="isAdmin">
+              <i class="fas fa-user"></i>
+              <span class="user-name">Demande de: {{conv['user_name'] || 'Utilisateur inconnu'}}</span>
+            </div>
+            <div class="assignment-info" *ngIf="isAdmin && conv.status === 'assigned'">
+              <i class="fas fa-user-check"></i>
+              <span class="assigned-to">Assigné à: {{conv['admin_name'] || 'Admin inconnu'}}</span>
+            </div>
             
             <div class="conversation-meta">
               <span class="priority" [style.color]="getPriorityColor(conv.priority)">
@@ -78,6 +86,15 @@
     <div class="chat-panel" *ngIf="selectedConversation">
       <div class="chat-info">
         <h3>{{selectedConversation.subject}}</h3>
+        <div class="user-details" *ngIf="isAdmin">
+          <div class="user-avatar">
+            <i class="fas fa-user-circle"></i>
+          </div>
+          <div class="user-info-detail">
+            <strong>{{selectedConversation['user_name'] || 'Utilisateur inconnu'}}</strong>
+            <span class="user-email">{{selectedConversation['user_email']}}</span>
+          </div>
+        </div>
         <div class="chat-meta">
           <span class="status" [style.background-color]="getStatusColor(selectedConversation.status)">
             {{selectedConversation.status}}

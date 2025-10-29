@@ -29,8 +29,9 @@ export class ChatSupportComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   constructor(private chatService: ChatSupportService) {
-    this.user = JSON.parse(localStorage.getItem('user') || '{}');
-    this.isAdmin = this.user.role === 'admin';
+    const userData = localStorage.getItem('cp2i_user');
+    this.user = userData ? JSON.parse(userData) : null;
+    this.isAdmin = this.user && this.user.role === 'admin';
   }
 
   ngOnInit() {

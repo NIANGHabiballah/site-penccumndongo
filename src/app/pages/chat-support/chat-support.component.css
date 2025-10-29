@@ -143,6 +143,57 @@
   flex: 1;
 }
 
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.user-name {
+  font-weight: 500;
+}
+
+.assignment-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  color: #28a745;
+}
+
+.assigned-to {
+  font-weight: 500;
+}
+
+.user-details {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.5rem 0;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.user-avatar {
+  font-size: 2rem;
+  color: #6c757d;
+}
+
+.user-info-detail {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-email {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
 .conversation-header {
   display: flex;
   justify-content: space-between;

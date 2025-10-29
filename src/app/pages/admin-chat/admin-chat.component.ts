@@ -18,6 +18,8 @@ export class AdminChatComponent implements OnInit {
   selectedConversation: any = null;
   messages: any[] = [];
   newMessage = '';
+  availableAdmins: any[] = [];
+  showAssignMenu: number | null = null;
   
   quickReplies: any[] = [
     { id: 1, title: 'Salutation', message: 'Bonjour ! Comment puis-je vous aider ?', category: 'general' },
@@ -38,6 +40,7 @@ export class AdminChatComponent implements OnInit {
   constructor(private chatService: ChatSupportService) {}
 
   ngOnInit() {
+    this.loadAvailableAdmins();
     this.loadConversations();
     this.loadStats();
     
@@ -60,13 +63,10 @@ export class AdminChatComponent implements OnInit {
   }
 
   loadConversations() {
-    console.log('Token admin:', localStorage.getItem('cp2i_token'));
-    console.log('User admin:', localStorage.getItem('user'));
     
     this.chatService.getConversations().subscribe({
       next: (conversations) => {
         this.conversations = conversations;
-        console.log('Conversations chargées:', conversations);
       },
       error: (err) => {
         console.error('Erreur conversations:', err);
@@ -107,12 +107,36 @@ export class AdminChatComponent implements OnInit {
     this.newMessage = reply.message;
   }
 
-  assignToMe(conversationId: number) {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    this.chatService.assignConversation(conversationId, user.user_id || user.id).subscribe({
-      next: () => this.loadConversations(),
-      error: (err) => console.error('Erreur assignation:', err)
+  loadAvailableAdmins() {
+    this.chatService.getAvailableAdmins().subscribe({
+      next: (admins) => {
+        this.availableAdmins = admins;
+      },
+      error: (err) => {
+        console.error('Erreur chargement admins:', err);
+        // Fallback en cas d'erreur
+        this.availableAdmins = [
+          { id: 13, prenom: 'Penccum', nom: 'NDONGO' },
+          { id: 16, prenom: 'CP2i', nom: 'Admin' },
+          { id: 17, prenom: 'Admin', nom: 'Test' }
+        ];
+      }
     });
+  }
+
+  onAdminSelect(conversationId: number, event: Event) {
+    const target = event.target as HTMLSelectElement;
+    const adminId = parseInt(target.value);
+    
+    if (adminId) {
+      this.chatService.assignConversation(conversationId, adminId).subscribe({
+        next: () => {
+          this.loadConversations();
+          target.value = ''; // Reset select
+        },
+        error: (err) => console.error('Erreur assignation:', err)
+      });
+    }
   }
 
   closeConversation(conversationId: number) {
@@ -172,7 +196,6 @@ export class AdminChatComponent implements OnInit {
     this.chatService.getSupportStats().subscribe({
       next: (stats) => {
         this.stats = stats;
-        console.log('Stats chargées:', stats);
       },
       error: (err) => {
         console.error('Erreur stats:', err);
@@ -216,10 +239,7 @@ export class AdminChatComponent implements OnInit {
     this.setPriority(conversationId, target.value);
   }
 
-  onAssignToMe(conversationId: number, event: Event) {
-    event.stopPropagation();
-    this.assignToMe(conversationId);
-  }
+
 
   onCloseConversation(conversationId: number, event: Event) {
     event.stopPropagation();

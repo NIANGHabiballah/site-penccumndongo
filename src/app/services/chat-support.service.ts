@@ -24,6 +24,9 @@ export interface ChatConversation {
   created_at: string;
   updated_at: string;
   unread_count: number;
+  user_name?: string;
+  user_email?: string;
+  admin_name?: string;
 }
 
 @Injectable({
@@ -135,11 +138,14 @@ export class ChatSupportService {
 
   // Vérifier les nouveaux messages
   private checkNewMessages(): void {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (user.id) {
-      this.getUnreadCount().subscribe(count => {
-        this.unreadCountSubject.next(count);
-      });
+    const userData = localStorage.getItem('cp2i_user');
+    if (userData) {
+      const user = JSON.parse(userData);
+      if (user.id) {
+        this.getUnreadCount().subscribe(count => {
+          this.unreadCountSubject.next(count);
+        });
+      }
     }
   }
 
@@ -151,6 +157,17 @@ export class ChatSupportService {
       'Content-Type': 'application/json'
     };
     return this.http.get(`${this.baseUrl}/chat-support.php?action=stats`, 
+      { headers });
+  }
+
+  // Obtenir la liste des admins disponibles
+  getAvailableAdmins(): Observable<any[]> {
+    const token = localStorage.getItem('cp2i_token');
+    const headers = { 
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+    return this.http.get<any[]>(`${this.baseUrl}/chat-support.php?action=admins`, 
       { headers });
   }
 }

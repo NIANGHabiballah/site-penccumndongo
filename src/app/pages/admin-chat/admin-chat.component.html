@@ -40,7 +40,8 @@
               </div>
               
               <div class="participant-info">
-                <span class="participant">{{conv.participant_nom}} {{conv.participant_prenom}}</span>
+                <span class="participant">Demande de: {{conv.user_name || conv.user_email}}</span>
+                <span class="admin-assigned" *ngIf="conv.admin_name">Assigné à: {{conv.admin_name}}</span>
                 <span class="priority" [style.color]="getPriorityColor(conv.priority)">
                   <i class="fas fa-circle"></i>
                 </span>
@@ -53,10 +54,16 @@
             </div>
 
             <div class="conversation-actions">
-              <button class="btn-assign" (click)="onAssignToMe(conv.id, $event)" 
-                      *ngIf="!conv.admin_id" title="M'assigner">
-                <i class="fas fa-user"></i>
-              </button>
+              <div class="assign-dropdown" *ngIf="!conv.admin_id">
+                <select class="admin-select" 
+                        (change)="onAdminSelect(conv.id, $event)"
+                        (click)="$event.stopPropagation()">
+                  <option value="">Assigner à...</option>
+                  <option *ngFor="let admin of availableAdmins" [value]="admin.id">
+                    {{admin.prenom}} {{admin.nom}}
+                  </option>
+                </select>
+              </div>
               <select (change)="onPriorityChange(conv.id, $event)" 
                       [value]="conv.priority" class="priority-select">
                 <option value="low">Faible</option>
@@ -76,7 +83,8 @@
         <div class="chat-header">
           <div class="conversation-details">
             <h3>{{selectedConversation.subject}}</h3>
-            <p>{{selectedConversation.participant_nom}} {{selectedConversation.participant_prenom}}</p>
+            <p>Demande de: {{selectedConversation.user_name || selectedConversation.user_email}}</p>
+            <p *ngIf="selectedConversation.admin_name">Assigné à: {{selectedConversation.admin_name}}</p>
             <div class="status-info">
               <span class="status" [style.background-color]="getStatusColor(selectedConversation.status)">
                 {{selectedConversation.status}}
