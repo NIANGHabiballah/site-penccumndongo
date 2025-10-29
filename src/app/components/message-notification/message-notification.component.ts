@@ -21,6 +21,7 @@ import { Subscription } from 'rxjs';
       color: #2196f3;
       cursor: pointer;
       transition: color 0.2s;
+      margin-left: 0.5rem !important;
     }
     
     .message-notification:hover {

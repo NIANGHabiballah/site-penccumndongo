@@ -23,7 +23,7 @@ import { Subscription } from 'rxjs';
 
         <div class="chat-content">
           <div class="messages" #messagesContainer>
-            <div class="message bot-message" *ngIf="messages.length === 0">
+            <div class="message bot-message">
               <div class="message-content">
                 Bonjour ! Comment puis-je vous aider ?
               </div>
@@ -138,10 +138,12 @@ import { Subscription } from 'rxjs';
     }
 
     .messages {
-      flex: 1;
-      padding: 1rem;
-      overflow-y: auto;
-      background: #f5f5f5;
+      flex: 1 !important;
+      padding: 1rem !important;
+      overflow-y: auto !important;
+      background: #f5f5f5 !important;
+      max-height: 350px !important;
+      min-height: 200px !important;
     }
 
     .message {
@@ -181,10 +183,14 @@ import { Subscription } from 'rxjs';
     }
 
     .chat-input {
-      padding: 1rem;
-      display: flex;
-      gap: 0.5rem;
-      border-top: 1px solid #e0e0e0;
+      padding: 1rem !important;
+      display: flex !important;
+      gap: 0.5rem !important;
+      border-top: 1px solid #e0e0e0 !important;
+      background: white !important;
+      position: sticky !important;
+      bottom: 0 !important;
+      z-index: 10 !important;
     }
 
     .chat-input input {

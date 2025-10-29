@@ -2870,3 +2870,92 @@ body {
     padding: 1rem;
   }
 }
+/* Messages section responsive */
+.messages-section h2 {
+  font-size: 1.5rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.messages-section h2 i {
+  font-size: 1.2rem !important;
+  margin-right: 0.5rem !important;
+}
+
+.messages-filters {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #dee2e6;
+  background: white;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.filter-btn:hover {
+  background: #f8f9fa;
+}
+
+.filter-btn.active {
+  background: #0380C2;
+  color: white;
+  border-color: #0380C2;
+}
+
+@media (max-width: 768px) {
+  .messages-section h2 {
+    font-size: 1.3rem !important;
+  }
+  
+  .messages-section h2 i {
+    font-size: 1rem !important;
+  }
+  
+  .messages-filters {
+    gap: 0.25rem;
+  }
+  
+  .filter-btn {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  
+  .filter-btn .btn-text {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .messages-section h2 {
+    font-size: 1.2rem !important;
+  }
+  
+  .filter-btn {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+/* Espacement pour l'icône de notification des messages */
+.nav-item .notification-badge {
+  margin-left: 0.5rem !important;
+  position: relative !important;
+}
+
+.nav-item span.notification-badge {
+  margin-left: 0.5rem !important;
+  position: relative !important;
+}
+
+.notification-badge {
+  margin-left: 0.5rem !important;
+  position: relative !important;
+}

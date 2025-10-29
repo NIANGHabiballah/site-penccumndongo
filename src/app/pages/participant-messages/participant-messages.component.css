@@ -27,6 +27,11 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-size: 1.5rem !important;
+}
+
+.header-title h2 i {
+  font-size: 1.2rem !important;
 }
 
 .unread-badge {
@@ -45,16 +50,27 @@
 }
 
 .btn-refresh, .btn-mark-all {
-  background: #2196f3;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: background-color 0.2s;
+  background: #2196f3 !important;
+  color: white !important;
+  border: none !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 20px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  transition: background-color 0.2s !important;
+  font-size: 0.9rem !important;
+}
+
+.unread-badge {
+  background: #f44336 !important;
+  color: white !important;
+  padding: 0.25rem 0.75rem !important;
+  border-radius: 15px !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
 }
 
 .btn-refresh:hover, .btn-mark-all:hover {
@@ -376,9 +392,74 @@
     flex-direction: column;
     gap: 1rem;
     align-items: stretch;
+    padding: 0.75rem 1rem;
   }
   
   .filter-tabs {
     justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  
+  .filter-tab {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+  
+  .header-title h2 {
+    font-size: 1.3rem !important;
+  }
+  
+  .header-title h2 i {
+    font-size: 1rem !important;
+  }
+  
+  .messages-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .header-actions {
+    gap: 0.5rem;
+    margin-left: 1rem !important;
+  }
+  
+  .btn-refresh, .btn-mark-all {
+    padding: 0.4rem 0.8rem !important;
+    font-size: 0.8rem !important;
+  }
+  
+  .unread-badge {
+    padding: 0.2rem 0.6rem !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-title h2 {
+    font-size: 1.2rem !important;
+  }
+  
+  .filter-tab {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+  }
+  
+  .filter-tab span {
+    display: none;
+  }
+  
+  .btn-refresh, .btn-mark-all {
+    padding: 0.3rem 0.6rem !important;
+    font-size: 0.75rem !important;
+  }
+  
+  .unread-badge {
+    padding: 0.15rem 0.5rem !important;
+    font-size: 0.7rem !important;
+  }
+  
+  .header-actions {
+    flex-direction: column !important;
+    gap: 0.25rem !important;
   }
 }

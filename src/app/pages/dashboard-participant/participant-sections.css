@@ -222,6 +222,32 @@
   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
 
+.messages-section h2 {
+  font-size: 1.5rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.messages-section h2 i {
+  font-size: 1.2rem !important;
+  margin-right: 0.5rem !important;
+}
+
+@media (max-width: 768px) {
+  .messages-section h2 {
+    font-size: 1.3rem !important;
+  }
+  
+  .messages-section h2 i {
+    font-size: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .messages-section h2 {
+    font-size: 1.2rem !important;
+  }
+}
+
 .messages-list {
   display: flex;
   flex-direction: column;
