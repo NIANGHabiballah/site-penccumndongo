@@ -156,8 +156,10 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
     
 
     
-    // Charger l'historique
-    this.loadHistorique();
+    // Charger l'historique après les textes et évaluations
+    setTimeout(() => {
+      this.loadHistorique();
+    }, 2000);
     
     // Calculer les jours restants
     this.calculateDeadline();
@@ -176,21 +178,87 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
 
   
   loadHistorique() {
-    // Désactiver temporairement l'historique pour éviter l'erreur 403
-    this.historique = [];
+    // Toujours utiliser l'historique généré localement pour éviter les problèmes de format
+    this.generateBasicHistory();
     
-    // Optionnel : essayer de charger l'historique mais ignorer les erreurs
+    // Optionnel : essayer de charger depuis l'API mais ne pas l'écraser
     /*
     this.cp2iApi.getParticipantHistory().subscribe({
       next: (data) => {
-        this.historique = data.history || [];
+        // Fusionner avec l'historique généré si nécessaire
+        if (data.history && data.history.length > 0) {
+          const apiHistory = data.history.map(item => ({
+            ...item,
+            type: item.type || 'login' // Assurer qu'il y a un type
+          }));
+          this.historique = [...this.historique, ...apiHistory];
+        }
       },
       error: (error) => {
-        // Ignorer silencieusement les erreurs d'historique
-        this.historique = [];
+        console.warn('Historique API indisponible:', error.status);
       }
     });
     */
+  }
+  
+  generateBasicHistory() {
+    this.historique = [];
+    
+    // Ajouter les soumissions de textes
+    this.mesSoumissions.forEach(texte => {
+      this.historique.push({
+        id: `submission-${texte.id}`,
+        type: 'submission',
+        created_at: texte.date_soumission || texte.created_at,
+        details: { titre: texte.titre }
+      });
+      
+      // Ajouter les évaluations si disponibles
+      if (texte.note && texte.statut !== 'en_attente') {
+        this.historique.push({
+          id: `evaluation-${texte.id}`,
+          type: 'evaluation', 
+          created_at: texte.date_evaluation || texte.updated_at,
+          details: { note: texte.note, titre: texte.titre }
+        });
+      }
+    });
+    
+    // Ajouter un élément d'inscription
+    this.historique.push({
+      id: 'inscription',
+      type: 'login',
+      created_at: '2025-10-18T12:55:00.000Z',
+      details: { action: 'Inscription au concours CP2i 2025' }
+    });
+    
+    // Charger les messages pour l'historique (asynchrone)
+    this.loadMessagesForHistory();
+  }
+  
+  loadMessagesForHistory() {
+    // Utiliser le service de messages participant pour récupérer les messages
+    this.participantMessagesService.getMessages().subscribe({
+      next: (messages) => {
+        // Ajouter les messages à l'historique existant
+        const messageHistory = messages.map(message => ({
+          id: `message-${message.id}`,
+          type: 'message',
+          created_at: message.created_at,
+          details: { 
+            subject: message.subject || 'Message reçu',
+            sender: `${message.sender_prenom} ${message.sender_nom}` || 'Administration'
+          }
+        }));
+        
+        // Fusionner avec l'historique existant et retrier
+        this.historique = [...this.historique, ...messageHistory];
+        this.historique.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      },
+      error: (error) => {
+        // Ignorer silencieusement les erreurs de messages
+      }
+    });
   }
   
   loadCertificats() {
@@ -348,11 +416,10 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
       };
     }
     
-    console.log('Classement calculé avec', totalParticipants, 'notes réelles:', notesDesAutres);
+
   }
   
   loadEvaluationsDetaillees() {
-    console.log('Chargement des évaluations détaillées...', this.mesSoumissions);
     
     let evaluationsChargees = 0;
     const totalTextes = this.mesSoumissions.filter(t => t.id && t.note).length;
@@ -365,15 +432,10 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
     // Charger les vraies évaluations depuis l'API
     this.mesSoumissions.forEach(texte => {
       if (texte.id && texte.note) {
-        console.log(`Appel API pour texte ${texte.id}...`);
         this.cp2iApi.getTextCorrections(texte.id).subscribe({
           next: (data) => {
-            console.log(`Réponse API pour texte ${texte.id}:`, data);
             if (data && data.success && data.corrections && data.corrections.length > 0) {
               texte.corrections = data.corrections;
-              console.log(`Corrections assignées pour texte ${texte.id}:`, texte.corrections);
-            } else {
-              console.warn(`Pas de corrections pour texte ${texte.id}`);
             }
             
             evaluationsChargees++;
@@ -383,15 +445,12 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
             }
           },
           error: (error) => {
-            console.error(`Erreur API pour texte ${texte.id}:`, error);
             evaluationsChargees++;
             if (evaluationsChargees === totalTextes) {
               this.calculateRealStats();
             }
           }
         });
-      } else {
-        console.log(`Texte ${texte.id} ignoré - ID: ${texte.id}, Note: ${texte.note}`);
       }
     });
   }
@@ -818,7 +877,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
       note_moyenne: this.calculateAverageNote()
     };
     
-    console.log('Stats calculées:', this.stats);
+
     
     // Calculer le classement après les stats
     this.loadClassement();
@@ -881,7 +940,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
     this.cp2iApi.getUserTexts().subscribe({
       next: (data) => {
         this.mesSoumissions = data.textes || [];
-        console.log('Textes chargés (fallback):', this.mesSoumissions);
+    
         
         // Filtrer pour ne garder que le texte du participant connecté
         this.mesSoumissions = this.mesSoumissions.slice(0, 1);
