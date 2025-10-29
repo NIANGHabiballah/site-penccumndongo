@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API CP2i</title>
+</head>
+<body>
+    <h1>Test des endpoints API</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testEndpoints() {
+            const results = document.getElementById('results');
+            const endpoints = [
+                'https://penccumndongo.com/cp2i-participant-messages.php?action=unread_count',
+                'https://penccumndongo.com/cp2i-participant.php?action=evaluations',
+                'https://penccumndongo.com/cp2i-textes.php'
+            ];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(endpoint);
+                    const text = await response.text();
+                    results.innerHTML += `<h3>${endpoint}</h3>`;
+                    results.innerHTML += `<p>Status: ${response.status}</p>`;
+                    results.innerHTML += `<pre>${text.substring(0, 500)}...</pre><hr>`;
+                } catch (error) {
+                    results.innerHTML += `<h3>${endpoint}</h3>`;
+                    results.innerHTML += `<p>Erreur: ${error.message}</p><hr>`;
+                }
+            }
+        }
+        
+        testEndpoints();
+    </script>
+</body>
+</html>

@@ -6,12 +6,15 @@ import { Subscription } from 'rxjs';
 import { Cp2iApiService, User } from '../../services/cp2i-api.service';
 import { ChatSupportComponent } from '../chat-support/chat-support.component';
 import { ChatWidgetComponent } from '../../components/chat-widget/chat-widget.component';
+import { ParticipantMessagesService } from '../../services/participant-messages.service';
+import { MessageNotificationComponent } from '../../components/message-notification/message-notification.component';
+import { ParticipantMessagesComponent } from '../participant-messages/participant-messages.component';
 
 
 @Component({
   selector: 'app-dashboard-participant',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ChatSupportComponent, ChatWidgetComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ChatSupportComponent, ChatWidgetComponent, MessageNotificationComponent, ParticipantMessagesComponent],
   templateUrl: './dashboard-participant.component.html',
   styleUrls: ['./dashboard-participant.component.css', './participant-sections.css', './certificats-styles.css']
 })
@@ -26,7 +29,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   currentGuideSection = 'steps';
   currentHistoryFilter = 'all';
   openFaq: number | null = null;
-  messages: any[] = [];
+
   historique: any[] = [];
   certificats: any[] = [];
   classement: any = {};
@@ -72,7 +75,8 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
 
   constructor(
     private cp2iApi: Cp2iApiService,
-    private router: Router
+    private router: Router,
+    private participantMessagesService: ParticipantMessagesService
   ) {}
 
   ngOnInit() {
@@ -84,6 +88,9 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
     
     this.currentUser = this.cp2iApi.getCurrentUser();
     this.loadData();
+    
+    // Initialiser le service de messages
+    this.participantMessagesService.initialize();
     
     // Forcer le recalcul du layout mobile
     this.handleMobileLayout();
@@ -147,8 +154,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
     
     // Pas d'appel serveur en développement
     
-    // Charger les messages
-    this.loadMessages();
+
     
     // Charger l'historique
     this.loadHistorique();
@@ -167,26 +173,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
     this.loadEvaluationsDetaillees();
   }
   
-  loadMessages() {
-    this.cp2iApi.getMessages().subscribe({
-      next: (data) => {
-        this.messages = data.messages || [];
-      },
-      error: (error) => {
-        console.error('Erreur chargement messages:', error);
-        // Fallback vers messages temporaires
-        this.messages = [
-          {
-            id: 3,
-            subject: 'Salutations',
-            content: 'Bonjour a tous, Bien des choses a vous. le concours va bientot demarrer !',
-            created_at: '2025-10-18T20:51:32.000Z',
-            read_at: null
-          }
-        ];
-      }
-    });
-  }
+
   
   loadHistorique() {
     // Désactiver temporairement l'historique pour éviter l'erreur 403
@@ -414,17 +401,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
     return contenu.split('\n').filter(line => line.trim().length > 0).length;
   }
   
-  markAsRead(message: any) {
-    if (!message.read_at) {
-      this.cp2iApi.markMessageAsRead(message.id).subscribe({
-        next: () => {
-          message.read_at = new Date().toISOString();
-          console.log('Message marqué comme lu:', message.id);
-        },
-        error: (error) => console.error('Erreur marquage lu:', error)
-      });
-    }
-  }
+
   
   async downloadCertificatPDF(cert: any) {
     const element = document.getElementById('cert-' + cert.id);
@@ -825,7 +802,10 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   }
   
   getUnreadMessagesCount(): number {
-    return this.messages.filter(m => !m.read_at).length;
+    // Utiliser le nouveau service de messages
+    let count = 0;
+    this.participantMessagesService.unreadCount$.subscribe(c => count = c).unsubscribe();
+    return count;
   }
   
   calculateRealStats() {

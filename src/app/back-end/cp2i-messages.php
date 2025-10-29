@@ -21,11 +21,9 @@ if ($method === 'POST') {
 
 function getMessages($user) {
     try {
-        // Connexion directe à la base
-        $pdo = new PDO('mysql:host=localhost;dbname=cp2i_db', 'username', 'password');
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo = getDB();
         
-        $stmt = $pdo->prepare("SELECT id, subject, content, created_at FROM textes_complets WHERE send_to_all = 1 ORDER BY created_at DESC");
+        $stmt = $pdo->prepare("SELECT id, subject, content, created_at FROM cp2i_messages ORDER BY created_at DESC");
         $stmt->execute();
         $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
         

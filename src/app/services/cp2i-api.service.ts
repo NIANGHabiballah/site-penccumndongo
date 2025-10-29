@@ -34,7 +34,7 @@ export interface Texte {
   providedIn: 'root'
 })
 export class Cp2iApiService {
-  private baseUrl = 'https://penccumndongo.com';
+  private baseUrl = environment.apiUrl;
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 

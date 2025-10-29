@@ -7,6 +7,7 @@ import { SecurityService } from './services/security.service';
 import { SecurityGuard } from './guards/security.guard';
 import { SecurityInterceptor } from './interceptors/security.interceptor';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { ErrorInterceptor } from './interceptors/error.interceptor';
 import { RECAPTCHA_SETTINGS, RecaptchaSettings } from 'ng-recaptcha';
 
 export const appConfig: ApplicationConfig = {
@@ -24,6 +25,11 @@ export const appConfig: ApplicationConfig = {
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorInterceptor,
       multi: true
     },
     {

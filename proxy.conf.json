@@ -1,1 +1,11 @@
-{}
+{
+  "/api/*": {
+    "target": "https://penccumndongo.com",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/api": ""
+    }
+  }
+}

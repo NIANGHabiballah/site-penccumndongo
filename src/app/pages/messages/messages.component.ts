@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-messages',
@@ -13,7 +14,7 @@ import { ApiService } from '../../services/api.service';
 export class MessagesComponent implements OnInit {
   activeTab = 'envoyer';
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService, private http: HttpClient) {}
   
   messageForm = {
     destinataire: 'tous',
@@ -68,23 +69,29 @@ export class MessagesComponent implements OnInit {
   }
 
   envoyerMessage() {
-    if (this.messageForm.destinataire === 'tous' || this.messageForm.destinataire === 'participants' || this.messageForm.destinataire === 'correcteurs') {
-      this.apiService.envoyerMessageGroupe(this.messageForm).subscribe({
-        next: (response) => {
-          alert(response.message);
-          this.resetForm();
-        },
-        error: (err) => alert('Erreur envoi message')
-      });
-    } else {
-      this.apiService.envoyerMessagePrive(this.messageForm).subscribe({
-        next: () => {
-          alert('Message envoyé');
-          this.resetForm();
-        },
-        error: (err) => alert('Erreur envoi message')
-      });
-    }
+    const messageData = {
+      subject: this.messageForm.sujet,
+      content: this.messageForm.contenu,
+      send_to_all: this.messageForm.destinataire === 'tous' || this.messageForm.destinataire === 'participants',
+      recipients: this.messageForm.destinataire === 'individuel' ? [] : undefined
+    };
+
+    // Utiliser le bon endpoint
+    const token = localStorage.getItem('cp2i_token');
+    const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+    
+    this.http.post('https://penccumndongo.com/src/app/back-end/cp2i-messages.php', messageData, {
+      headers
+    }).subscribe({
+      next: (response: any) => {
+        alert(response.message || 'Message envoyé avec succès');
+        this.resetForm();
+      },
+      error: (err) => {
+        console.error('Erreur envoi:', err);
+        alert('Erreur lors de l\'envoi du message');
+      }
+    });
   }
 
   resetForm() {

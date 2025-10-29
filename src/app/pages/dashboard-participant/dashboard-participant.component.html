@@ -41,7 +41,7 @@
       <div class="nav-item" [class.active]="currentView === 'messages'" (click)="setCurrentView('messages'); $event.preventDefault(); $event.stopPropagation()">
         <i class="fas fa-envelope"></i>
         <span>Messages</span>
-        <span class="notification-badge" *ngIf="getUnreadMessagesCount() > 0">{{getUnreadMessagesCount()}}</span>
+        <app-message-notification></app-message-notification>
       </div>
       <div class="nav-item" [class.active]="currentView === 'support'" (click)="setCurrentView('support'); $event.preventDefault(); $event.stopPropagation()">
         <i class="fas fa-comments"></i>
@@ -83,7 +83,7 @@
       <div class="header-actions">
         <button class="btn btn-outline btn-compact" (click)="setCurrentView('messages')">
           <i class="fas fa-bell"></i>
-          <span class="notification-badge" *ngIf="getUnreadMessagesCount() > 0">{{getUnreadMessagesCount()}}</span>
+          <app-message-notification></app-message-notification>
         </button>
         <button class="btn btn-small" [class.btn-primary]="stats.total_textes === 0" [class.btn-disabled]="stats.total_textes > 0" (click)="nouvellesoumission()" [disabled]="stats.total_textes > 0">
           <i class="fas fa-plus"></i>
@@ -577,38 +577,7 @@
       
       <!-- Messages -->
       <div *ngSwitchCase="'messages'" class="messages-section">
-        <h2>Messages</h2>
-        <div class="messages-list" *ngIf="messages.length > 0; else noMessages">
-          <div class="message-card" *ngFor="let message of messages" 
-               [class.unread]="!message.read_at" 
-               [class.read]="message.read_at"
-               (click)="markAsRead(message)">
-            <div class="message-header">
-              <div class="message-title">
-                <i class="fas fa-envelope" *ngIf="!message.read_at"></i>
-                <i class="fas fa-envelope-open" *ngIf="message.read_at"></i>
-                <h4>{{message.subject}}</h4>
-              </div>
-              <span class="message-date">{{message.created_at | date:'dd/MM/yyyy'}}</span>
-            </div>
-            <div class="message-content">
-              <p>{{message.content}}</p>
-            </div>
-            <div class="message-footer">
-              <small>De: Administration CP2i</small>
-              <span class="read-status" *ngIf="message.read_at">
-                <i class="fas fa-check"></i> Lu le {{message.read_at | date:'dd/MM/yyyy'}}
-              </span>
-            </div>
-          </div>
-        </div>
-        <ng-template #noMessages>
-          <div class="no-messages">
-            <i class="fas fa-envelope"></i>
-            <h3>Aucun message</h3>
-            <p>Vous n'avez pas de nouveaux messages.</p>
-          </div>
-        </ng-template>
+        <app-participant-messages></app-participant-messages>
       </div>
       
       <!-- Guide d'Utilisation -->

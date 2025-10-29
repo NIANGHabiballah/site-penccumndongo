@@ -1,0 +1,144 @@
+<div class="messages-container">
+  <!-- Header -->
+  <div class="messages-header">
+    <div class="header-title">
+      <h2><i class="fas fa-inbox"></i> Mes Messages</h2>
+      <span class="unread-badge" *ngIf="unreadCount > 0">{{unreadCount}} non lu{{unreadCount > 1 ? 's' : ''}}</span>
+    </div>
+    
+    <div class="header-actions">
+      <button class="btn-refresh" (click)="refreshMessages()" [disabled]="loading">
+        <i class="fas fa-sync-alt" [class.fa-spin]="loading"></i>
+      </button>
+      <button class="btn-mark-all" (click)="markAllAsRead()" *ngIf="unreadCount > 0">
+        <i class="fas fa-check-double"></i> Tout marquer comme lu
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtres et recherche -->
+  <div class="messages-filters">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" 
+             [(ngModel)]="searchTerm" 
+             placeholder="Rechercher dans les messages..."
+             class="search-input">
+    </div>
+    
+    <div class="filter-tabs">
+      <button class="filter-tab" 
+              [class.active]="filterType === 'all'"
+              (click)="filterType = 'all'">
+        <i class="fas fa-list"></i> Tous ({{messages.length}})
+      </button>
+      <button class="filter-tab" 
+              [class.active]="filterType === 'unread'"
+              (click)="filterType = 'unread'">
+        <i class="fas fa-envelope"></i> Non lus ({{getUnreadMessages().length}})
+      </button>
+      <button class="filter-tab" 
+              [class.active]="filterType === 'read'"
+              (click)="filterType = 'read'">
+        <i class="fas fa-envelope-open"></i> Lus ({{getReadMessages().length}})
+      </button>
+    </div>
+  </div>
+
+  <div class="messages-layout">
+    <!-- Liste des messages -->
+    <div class="messages-list">
+      <div class="loading-state" *ngIf="loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Chargement des messages...</p>
+      </div>
+
+      <div class="empty-state" *ngIf="!loading && getFilteredMessages().length === 0">
+        <i class="fas fa-inbox"></i>
+        <h3>Aucun message</h3>
+        <p *ngIf="filterType === 'all'">Vous n'avez reçu aucun message pour le moment.</p>
+        <p *ngIf="filterType === 'unread'">Tous vos messages ont été lus.</p>
+        <p *ngIf="filterType === 'read'">Aucun message lu trouvé.</p>
+      </div>
+
+      <div class="message-item" 
+           *ngFor="let message of getFilteredMessages()"
+           [class.unread]="!message.is_read"
+           [class.selected]="selectedMessage?.id === message.id"
+           (click)="selectMessage(message)">
+        
+        <div class="message-icon">
+          <i [class]="getMessageTypeIcon(message)"></i>
+        </div>
+        
+        <div class="message-content">
+          <div class="message-header">
+            <div class="message-sender">
+              <span class="sender-name">{{getSenderName(message)}}</span>
+              <span class="message-type" *ngIf="message.send_to_all">
+                <i class="fas fa-users"></i> Diffusion générale
+              </span>
+            </div>
+            <div class="message-date">{{formatDate(message.created_at)}}</div>
+          </div>
+          
+          <div class="message-subject">{{message.subject}}</div>
+          <div class="message-preview">{{formatContent(message.content)}}</div>
+        </div>
+        
+        <div class="message-status">
+          <div class="read-indicator" *ngIf="!message.is_read">
+            <i class="fas fa-circle"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Détail du message -->
+    <div class="message-detail" *ngIf="selectedMessage">
+      <div class="detail-header">
+        <div class="detail-title">
+          <h3>{{selectedMessage.subject}}</h3>
+          <button class="btn-close" (click)="closeMessage()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="detail-meta">
+          <div class="sender-info">
+            <i class="fas fa-user"></i>
+            <span>De: {{getSenderName(selectedMessage)}}</span>
+          </div>
+          <div class="date-info">
+            <i class="fas fa-clock"></i>
+            <span>{{formatDate(selectedMessage.created_at)}}</span>
+          </div>
+          <div class="type-info" *ngIf="selectedMessage.send_to_all">
+            <i class="fas fa-bullhorn"></i>
+            <span>Message diffusé à tous les participants</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="detail-content">
+        <div class="message-body" [innerHTML]="selectedMessage.content"></div>
+      </div>
+      
+      <div class="detail-footer" *ngIf="selectedMessage.read_at">
+        <div class="read-status">
+          <i class="fas fa-check-circle"></i>
+          <span>Lu le {{formatDate(selectedMessage.read_at)}}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- État vide quand aucun message sélectionné -->
+    <div class="no-selection" *ngIf="!selectedMessage && !loading && messages.length > 0">
+      <div class="empty-detail">
+        <i class="fas fa-envelope-open"></i>
+        <h3>Sélectionnez un message</h3>
+        <p>Cliquez sur un message dans la liste pour le lire.</p>
+      </div>
+    </div>
+  </div>
+</div>
