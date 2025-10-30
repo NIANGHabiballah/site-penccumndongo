@@ -357,33 +357,32 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   loadCertificats() {
     this.certificats = [];
     
-    // Toujours afficher au moins le certificat de participation pour les tests
-    this.certificats.push({
-      id: 1,
-      titre: 'Certificat de Participation',
-      description: 'Attestation officielle de participation au concours CP2i 2025',
-      type: 'participation',
-      date: new Date()
-    });
-    
-    // Certificat de mérite (si texte admis)
-    if (this.stats.textes_acceptes > 0) {
+    // Un seul certificat selon le niveau de performance
+    if (this.classement?.position && this.classement.position <= 10) {
+      // Certificat d'excellence pour le top 10
       this.certificats.push({
-        id: 2,
+        id: 1,
+        titre: 'Certificat d\'Excellence',
+        description: 'Attestation d\'excellence pour performance remarquable',
+        type: 'excellence',
+        date: new Date()
+      });
+    } else if (this.stats.textes_acceptes > 0) {
+      // Certificat de mérite si texte admis
+      this.certificats.push({
+        id: 1,
         titre: 'Certificat de Mérite',
         description: 'Attestation de mérite pour texte admis au concours',
         type: 'merite',
         date: new Date()
       });
-    }
-    
-    // Certificat d'excellence (si dans le top 10)
-    if (this.classement?.position && this.classement.position <= 10) {
+    } else {
+      // Certificat de participation par défaut
       this.certificats.push({
-        id: 3,
-        titre: 'Certificat d\'Excellence',
-        description: 'Attestation d\'excellence pour performance remarquable',
-        type: 'excellence',
+        id: 1,
+        titre: 'Certificat de Participation',
+        description: 'Attestation officielle de participation au concours CP2i 2025',
+        type: 'participation',
         date: new Date()
       });
     }
@@ -567,10 +566,12 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
       const { jsPDF } = await import('jspdf');
       
       const canvas = await html2canvas(element, {
-        scale: 3,
+        scale: 4,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        logging: false,
+        imageTimeout: 0
       });
       
       const imgData = canvas.toDataURL('image/png');
@@ -582,13 +583,8 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
       
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = (pdfHeight - imgHeight * ratio) / 2;
       
-      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       pdf.save(`Certificat_CP2i_${this.currentUser?.nom}_${this.currentUser?.prenom}.pdf`);
       
       this.showToast('Certificat PDF téléchargé avec succès', 'success');
@@ -625,9 +621,9 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
             @page { size: A4 landscape; margin: 0; }
             body { margin: 0; padding: 0; font-family: 'Georgia', serif; background: white; }
             .certificat-digital { width: 297mm; height: 210mm; margin: 0; background: white; position: relative; }
-            .cert-header { background: linear-gradient(135deg, #1e3c72, #2a5298, #FF7F1A); color: white; padding: 2rem; text-align: center; height: 120px; display: flex; flex-direction: column; justify-content: center; }
+            .cert-header { background: linear-gradient(135deg, #0380C2 0%, #001B36 100%); color: white; padding: 2rem; display: flex; justify-content: space-between; align-items: center; height: 120px; }
             .cert-organization { font-size: 1.8rem; margin: 0; font-weight: 900; color: #FFD700; letter-spacing: 1px; }
-            .cert-main-title { font-size: 2.2rem; margin: 0.5rem 0 0 0; font-weight: 900; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+            .cert-main-title { font-size: 2.2rem; margin: 0.5rem 0 0 0; font-weight: 900; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); color: #0380C2; }
             .cert-subtitle { font-size: 1.3rem; margin: 0.5rem 0; font-weight: 600; }
             .cert-edition { font-size: 1rem; margin: 0; opacity: 0.9; }
             .cert-body { padding: 3rem 2rem; text-align: center; background: linear-gradient(135deg, #ffffff, #f8f9fa); }
@@ -638,7 +634,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
             .cert-text { font-size: 1.2rem; line-height: 1.6; color: #2c3e50; margin: 1.5rem 0; font-weight: 500; }
             .cert-performance { margin: 1rem 0; padding: 1rem; background: #e8f5e8; border-radius: 8px; border-left: 4px solid #28a745; }
             .cert-ranking { margin: 0; font-size: 1.1rem; color: #2c3e50; font-weight: 700; }
-            .cert-footer { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 2rem; border-top: 2px solid #dee2e6; display: flex; justify-content: space-between; align-items: center; }
+            .cert-footer { background: #f8f9fa; padding: 1rem 2rem; border-top: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; }
             .cert-date { text-align: left; }
             .cert-date p { margin: 0.25rem 0; color: #495057; font-weight: 600; }
             .cert-location { font-style: italic; color: #6c757d; }
@@ -652,10 +648,13 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
         <body>
           <div class="certificat-digital">
             <div class="cert-header">
-              <div class="cert-organization">PENCCUM NDONGO</div>
-              <h2 class="cert-subtitle">Concours de Poésie Inédit & Innovant</h2>
-              <h3 class="cert-edition">Troisième Édition</h3>
-              <h1 class="cert-main-title">CERTIFICAT DE PARTICIPATION</h1>
+              <div style="width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;"><div style="width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; color: #0380C2; filter: brightness(0) invert(1);">PN</div></div>
+              <div style="text-align: center; flex: 1;">
+                <div class="cert-organization">PENCCUM NDONGO</div>
+                <h2 class="cert-subtitle">Concours de Poésie Inédit & Innovant</h2>
+                <h3 class="cert-edition">Troisième Édition</h3>
+              </div>
+              <div style="width: 60px; height: 60px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0380C2; font-size: 1.5rem;">🏆</div>
             </div>
             <div class="cert-body">
               <div class="cert-decoration-line"></div>
@@ -673,6 +672,9 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
               <div class="cert-date">
                 <p>Délivré le ${this.getCurrentDate()}</p>
                 <p class="cert-location">Dakar, Sénégal</p>
+              </div>
+              <div style="text-align: center; flex: 1;">
+                <p style="font-family: 'Courier New', monospace; font-size: 0.85rem; color: #495057; font-weight: 600; margin: 0;">Code : CP2i-${this.currentUser?.id}-${this.getCurrentYear()}</p>
               </div>
               <div class="cert-signature">
                 <p class="signature-name">Direction Penccum Ndongo</p>
