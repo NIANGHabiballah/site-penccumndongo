@@ -326,14 +326,12 @@
                 <span>Soumis le {{texte.created_at | date:'dd/MM/yyyy à HH:mm'}}</span>
               </div>
             </div>
-            <div class="submission-evaluation" *ngIf="texte.note || texte.commentaire">
-              <h4>Évaluation</h4>
-              <div class="evaluation-note" *ngIf="texte.note">
-                <strong>Note: {{texte.note}}/20</strong>
+            <div class="submission-evaluation" *ngIf="stats.note_moyenne">
+              <div class="evaluation-note">
+                <strong>Note moyenne: {{stats.note_moyenne | number:'1.1-1'}}/20</strong>
               </div>
-              <div class="evaluation-comment" *ngIf="texte.commentaire">
-                <p><strong>Commentaires du correcteur:</strong></p>
-                <p>{{texte.commentaire}}</p>
+              <div class="evaluation-comment">
+                <p><em>Voir détails dans Résultats & Notes</em></p>
               </div>
             </div>
             <div class="submission-actions">
@@ -748,75 +746,87 @@
         <div class="certificats-grid" *ngIf="certificats.length > 0; else noCertificats">
           <div class="certificat-card" *ngFor="let cert of certificats">
             <div class="certificat-preview">
-              <div class="certificat-digital" [id]="'cert-' + cert.id">
-                <!-- En-tête du certificat -->
-                <div class="cert-header">
-                  <div class="cert-logo">
-                    <img src="/logo-penccumndongo.png" alt="Penccum Ndongo" class="logo-img">
+              <div class="certificat-modern" [id]="'cert-' + cert.id">
+                <!-- Header moderne -->
+                <div class="cert-modern-header">
+                  <div class="cert-brand">
+                    <div class="brand-logo">
+                      <div class="logo-circle">
+                        <span class="logo-text">PN</span>
+                      </div>
+                    </div>
+                    <div class="brand-info">
+                      <h1>PENCCUM NDONGO</h1>
+                      <p>Concours de Poésie Inédit & Innovant</p>
+                      <p><strong>Troisième Édition</strong></p>
+                    </div>
                   </div>
-                  <div class="cert-title-section">
-                    <h1 class="cert-main-title">ATTESTATION DE PARTICIPATION</h1>
-                    <h2 class="cert-subtitle">Concours de Poésie Inédit & Innovant</h2>
-                    <h3 class="cert-edition">CP2i - Édition 2025</h3>
+                  <div class="cert-badge">
+                    <div class="badge-circle">
+                      <i class="fas fa-award"></i>
+                    </div>
                   </div>
                 </div>
                 
-                <!-- Corps du certificat -->
-                <div class="cert-body">
-                  <div class="cert-decoration-line"></div>
+                <!-- Contenu principal -->
+                <div class="cert-modern-body">
+                  <div class="cert-title">
+                    <h2>CERTIFICAT DE PARTICIPATION</h2>
+                    <div class="title-underline"></div>
+                  </div>
                   
-                  <div class="cert-content">
-                    <p class="cert-intro">Il est certifié par les présentes que</p>
-                    
-                    <div class="cert-participant">
-                      <span class="participant-name">{{currentUser?.prenom}} {{currentUser?.nom}}</span>
-                    </div>
-                    
-                    <p class="cert-text">
-                      a participé avec distinction au Concours de Poésie Inédit & Innovant CP2i Édition 2025,
-                      organisé par Penccum Ndongo, et a soumis une œuvre poétique 
-                      <span *ngIf="stats.textes_acceptes > 0" class="cert-status admis">admise au concours</span>
-                      <span *ngIf="stats.textes_acceptes === 0" class="cert-status participe">dans le cadre de ce concours</span>
-                      avec une note de <strong>{{stats.note_moyenne ? (stats.note_moyenne | number:'1.1-1') : 'N/A'}}/20</strong>.
+                  <div class="cert-participant-modern">
+                    <p class="participant-label">Décerné à</p>
+                    <h3 class="participant-name-modern">{{currentUser?.prenom}} {{currentUser?.nom}}</h3>
+                  </div>
+                  
+                  <div class="cert-achievement">
+                    <p class="achievement-text">
+                      Pour sa participation à la 3e édition du Concours de Poésie Inédit & Innovant (CP2i).
                     </p>
                     
-                    <div class="cert-performance" *ngIf="classement?.position">
-                      <p class="cert-ranking">
-                        Classement : <strong>{{classement.position}}{{getOrdinalSuffix(classement.position)}}</strong> 
-                        sur {{classement.total}} participants
-                      </p>
+                    <div class="performance-stats">
+                      <div class="stat-item" *ngIf="stats.note_moyenne">
+                        <span class="stat-value">{{stats.note_moyenne | number:'1.1-1'}}</span>
+                        <span class="stat-label">Note / 20</span>
+                      </div>
+                      <div class="stat-item" *ngIf="classement?.position">
+                        <span class="stat-value">{{classement.position}}{{getOrdinalSuffix(classement.position)}}</span>
+                        <span class="stat-label">Classement</span>
+                      </div>
+                      <div class="stat-item">
+                        <span class="stat-value">2025</span>
+                        <span class="stat-label">Édition</span>
+                      </div>
                     </div>
                   </div>
-                  
-                  <div class="cert-decoration-line"></div>
                 </div>
                 
-                <!-- Pied du certificat -->
-                <div class="cert-footer">
-                  <div class="cert-date">
-                    <p>Délivré le {{getCurrentDate()}}</p>
-                    <p class="cert-location">Dakar, Sénégal</p>
+                <!-- Footer moderne -->
+                <div class="cert-modern-footer">
+                  <div class="footer-left">
+                    <p class="cert-date-modern">{{getCurrentDate()}}</p>
+                    <p class="cert-location-modern">Dakar, Sénégal</p>
                   </div>
                   
-                  <div class="cert-signatures">
-                    <div class="signature-section">
-                      <div class="signature-image">
-                        <img src="/signature-penccum.png" alt="Signature" class="signature-img">
-                      </div>
-                      <div class="signature-info">
-                        <p class="signature-name">Direction Penccum Ndongo</p>
-                        <p class="signature-title">Organisateur CP2i</p>
-                      </div>
-                    </div>
-                    
-                    <div class="cert-seal">
-                      <div class="seal-container">
-                        <img src="/cachet-penccum.png" alt="Cachet officiel" class="seal-img">
+                  <div class="footer-center">
+                    <div class="cert-verification">
+                      <div class="cert-code-unique">
+                        <p class="code-label">Code de vérification unique :</p>
+                        <p class="code-value">{{generateUniqueCode()}}</p>
                       </div>
                     </div>
                   </div>
                   
-
+                  <div class="footer-right">
+                    <div class="signature-modern">
+                      <p class="signature-text">Direction Penccum Ndongo</p>
+                      <div class="signature-container">
+                        <img src="cachetpn.png" alt="Cachet Penccum Ndongo" class="cachet-img">
+                        <img src="signaturethn.png" alt="Signature" class="signature-img">
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -836,8 +846,11 @@
                 </button>
               </div>
               <div class="cert-verification-external">
-                <p class="verification-code">Code de vérification : CP2i-{{currentUser?.id}}-{{getCurrentYear()}}</p>
-                <p class="verification-url">Vérifiable sur : penccumndongo.com/verification</p>
+                <p class="verification-code">Code de vérification : {{generateUniqueCode()}}</p>
+                <button class="verification-btn" (click)="openVerificationUrl()">
+                  <i class="fas fa-external-link-alt"></i>
+                  Vérifiable sur : penccumndongo.com/verify
+                </button>
               </div>
             </div>
           </div>
@@ -1008,27 +1021,87 @@
       </button>
     </div>
     <div class="preview-body">
-      <div class="certificat-digital-preview" *ngIf="selectedCertificat">
-        <div class="cert-header">
-          <h1 class="cert-main-title">ATTESTATION DE PARTICIPATION</h1>
-          <h2 class="cert-subtitle">Concours de Poésie Inédit & Innovant</h2>
-          <h3 class="cert-edition">CP2i - Édition 2025</h3>
-        </div>
-        <div class="cert-body">
-          <div class="cert-decoration-line"></div>
-          <p class="cert-intro">Il est certifié par les présentes que</p>
-          <div class="cert-participant">
-            <span class="participant-name">{{currentUser?.prenom}} {{currentUser?.nom}}</span>
+      <div class="certificat-modern" *ngIf="selectedCertificat">
+        <!-- Header moderne -->
+        <div class="cert-modern-header">
+          <div class="cert-brand">
+            <div class="brand-logo">
+              <div class="logo-circle">
+                <span class="logo-text">PN</span>
+              </div>
+            </div>
+            <div class="brand-info">
+              <h1>PENCCUM NDONGO</h1>
+              <p>Concours de Poésie Inédit & Innovant</p>
+              <p><strong>Troisième Édition</strong></p>
+            </div>
           </div>
-          <p class="cert-text">
-            a participé avec distinction au Concours de Poésie Inédit & Innovant CP2i Édition 2025,
-            organisé par Penccum Ndongo.
-          </p>
-          <div class="cert-decoration-line"></div>
+          <div class="cert-badge">
+            <div class="badge-circle">
+              <i class="fas fa-award"></i>
+            </div>
+          </div>
         </div>
-        <div class="cert-footer">
-          <p>Délivré le {{getCurrentDate()}}</p>
-          <p>Direction Penccum Ndongo</p>
+        
+        <!-- Contenu principal -->
+        <div class="cert-modern-body">
+          <div class="cert-title">
+            <h2>CERTIFICAT DE PARTICIPATION</h2>
+            <div class="title-underline"></div>
+          </div>
+          
+          <div class="cert-participant-modern">
+            <p class="participant-label">Décerné à</p>
+            <h3 class="participant-name-modern">{{currentUser?.prenom}} {{currentUser?.nom}}</h3>
+          </div>
+          
+          <div class="cert-achievement">
+            <p class="achievement-text">
+              Pour sa participation à la 3e édition du Concours de Poésie Inédit & Innovant (CP2i).
+            </p>
+            
+            <div class="performance-stats">
+              <div class="stat-item" *ngIf="stats.note_moyenne">
+                <span class="stat-value">{{stats.note_moyenne | number:'1.1-1'}}</span>
+                <span class="stat-label">Note / 20</span>
+              </div>
+              <div class="stat-item" *ngIf="classement?.position">
+                <span class="stat-value">{{classement.position}}{{getOrdinalSuffix(classement.position)}}</span>
+                <span class="stat-label">Classement</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value">2025</span>
+                <span class="stat-label">Édition</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Footer moderne -->
+        <div class="cert-modern-footer">
+          <div class="footer-left">
+            <p class="cert-date-modern">{{getCurrentDate()}}</p>
+            <p class="cert-location-modern">Dakar, Sénégal</p>
+          </div>
+          
+          <div class="footer-center">
+            <div class="cert-verification">
+              <div class="cert-code-unique">
+                <p class="code-label">Code de vérification unique :</p>
+                <p class="code-value">{{generateUniqueCode()}}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="footer-right">
+            <div class="signature-modern">
+              <p class="signature-text">Direction Penccum Ndongo</p>
+              <div class="signature-container">
+                <img src="signaturethn.png" alt="Signature" class="signature-img">
+                <img src="cachetpn.png" alt="Cachet Penccum Ndongo" class="cachet-img">
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

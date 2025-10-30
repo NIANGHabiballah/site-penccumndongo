@@ -39,6 +39,7 @@ import { SoumissionTexteComponent } from './pages/soumission-texte/soumission-te
 import { ChangePasswordComponent } from './pages/change-password/change-password.component';
 import { ChatSupportComponent } from './pages/chat-support/chat-support.component';
 import { AdminChatComponent } from './pages/admin-chat/admin-chat.component';
+import { VerifyCertificateComponent } from './pages/verify-certificate/verify-certificate.component';
 
 export const routes: Routes = [
   { path: '', component: AccueilComponent },
@@ -97,6 +98,9 @@ export const routes: Routes = [
   // Routes du chat support
   { path: 'chat-support', component: ChatSupportComponent, canActivate: [AuthGuard] },
   { path: 'admin/chat', component: AdminChatComponent, canActivate: [SecurityGuard] },
+  
+  // Route de vérification de certificats
+  { path: 'verify', component: VerifyCertificateComponent },
   
   // Routes de récupération de mot de passe
   { path: 'forgot-password', component: ChangePasswordComponent },

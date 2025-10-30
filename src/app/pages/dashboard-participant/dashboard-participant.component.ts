@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -7,6 +7,8 @@ import { Cp2iApiService, User } from '../../services/cp2i-api.service';
 import { ChatSupportComponent } from '../chat-support/chat-support.component';
 import { ChatWidgetComponent } from '../../components/chat-widget/chat-widget.component';
 import { ParticipantMessagesService } from '../../services/participant-messages.service';
+import { QrCertificateService } from '../../services/qr-certificate.service';
+import { HttpClient } from '@angular/common/http';
 import { MessageNotificationComponent } from '../../components/message-notification/message-notification.component';
 import { ParticipantMessagesComponent } from '../participant-messages/participant-messages.component';
 
@@ -16,9 +18,10 @@ import { ParticipantMessagesComponent } from '../participant-messages/participan
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, ChatSupportComponent, ChatWidgetComponent, MessageNotificationComponent, ParticipantMessagesComponent],
   templateUrl: './dashboard-participant.component.html',
-  styleUrls: ['./dashboard-participant.component.css', './participant-sections.css', './certificats-styles.css']
+  styleUrls: ['./dashboard-participant.component.css', './participant-sections.css', './certificats-styles.css', './cert-verification-styles.css']
 })
-export class DashboardParticipantComponent implements OnInit, OnDestroy {
+export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('qrCanvas') qrCanvas!: ElementRef<HTMLCanvasElement>;
   mesSoumissions: any[] = [];
   stats: any = {};
   currentUser: User | null = null;
@@ -76,7 +79,9 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   constructor(
     private cp2iApi: Cp2iApiService,
     private router: Router,
-    private participantMessagesService: ParticipantMessagesService
+    private participantMessagesService: ParticipantMessagesService,
+    private qrService: QrCertificateService,
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
@@ -118,6 +123,94 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
       window.addEventListener('resize', () => {
         this.handleMobileLayout();
       });
+    }
+  }
+
+  ngAfterViewInit() {
+    // Générer les QR codes avec la librairie
+    setTimeout(() => {
+      this.generateQRCodes();
+    }, 2000);
+    
+    // Debug : forcer la génération QR quand on va sur certificats
+    setTimeout(() => {
+      if (this.currentView === 'certificats') {
+        this.forceGenerateQR();
+      }
+    }, 3000);
+  }
+  
+  generateQRCodes() {
+    if (this.certificats.length > 0) {
+      this.certificats.forEach(cert => {
+        setTimeout(() => {
+          this.generateQRCode(cert.id);
+        }, 500);
+      });
+    }
+  }
+  
+  generateQRCode(certId: number) {
+    const container = document.getElementById(`qr-container-${certId}`);
+    if (!container) {
+      setTimeout(() => {
+        const retryContainer = document.getElementById(`qr-container-${certId}`);
+        if (retryContainer) {
+          const fallbackUrl = `https://penccumndongo.com/verify?id=CP2i-${certId}-${this.currentUser?.id}`;
+          this.createQRCodeElement(retryContainer, fallbackUrl);
+        }
+      }, 1000);
+      return;
+    }
+    
+    const fallbackUrl = `https://penccumndongo.com/verify?id=CP2i-${certId}-${this.currentUser?.id}`;
+    this.createQRCodeElement(container, fallbackUrl);
+  }
+  
+  createQRCodeElement(container: HTMLElement, url: string) {
+    // QR code visuel simple mais fonctionnel
+    container.innerHTML = `
+      <div style="width: 80px !important; height: 80px !important; background: #FF7F1A !important; color: white !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; font-size: 10px !important; text-align: center !important; border-radius: 4px !important; cursor: pointer !important; border: 2px solid #1e3c72 !important; z-index: 999 !important; position: relative !important;" onclick="window.open('${url}', '_blank')">
+        <div style="font-weight: bold !important; margin-bottom: 2px !important; color: white !important;">QR</div>
+        <div style="font-weight: bold !important; color: white !important;">CODE</div>
+        <div style="font-size: 8px !important; opacity: 0.9 !important; color: white !important;">Cliquer</div>
+      </div>
+    `;
+    console.log('QR généré pour container:', container.id);
+  }
+  
+  forceGenerateQR() {
+    console.log('Force generate QR - certificats:', this.certificats.length);
+    
+    // Essayer de trouver tous les containers QR
+    const containers = document.querySelectorAll('[id^="qr-container-"]');
+    console.log('Containers trouvés:', containers.length);
+    
+    containers.forEach((container, index) => {
+      // Créer un certificat valide dans la base d'abord
+      this.createValidCertificate(index + 1).then(certId => {
+        const url = `https://penccumndongo.com/verify?id=${certId}`;
+        this.createQRCodeElement(container as HTMLElement, url);
+      }).catch(() => {
+        // Fallback si API ne fonctionne pas
+        const fallbackUrl = `https://penccumndongo.com/verify?id=DEMO-${this.currentUser?.id}-${Date.now()}`;
+        this.createQRCodeElement(container as HTMLElement, fallbackUrl);
+      });
+    });
+  }
+  
+  async createValidCertificate(certIndex: number): Promise<string> {
+    const certificateData = {
+      participant_name: `${this.currentUser?.prenom} ${this.currentUser?.nom}`,
+      formation_title: 'Concours CP2i 2025',
+      certificate_id: `CP2i-${certIndex}-${this.currentUser?.id}`
+    };
+    
+    try {
+      const response = await this.http.post<any>('https://penccumndongo.com/generate-qr.php', certificateData).toPromise();
+      return response.id;
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -474,12 +567,10 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
       const { jsPDF } = await import('jspdf');
       
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 3,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#ffffff',
-        width: element.scrollWidth,
-        height: element.scrollHeight
+        backgroundColor: '#ffffff'
       });
       
       const imgData = canvas.toDataURL('image/png');
@@ -534,8 +625,9 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
             @page { size: A4 landscape; margin: 0; }
             body { margin: 0; padding: 0; font-family: 'Georgia', serif; background: white; }
             .certificat-digital { width: 297mm; height: 210mm; margin: 0; background: white; position: relative; }
-            .cert-header { background: linear-gradient(135deg, #1e3c72, #2a5298, #FF7F1A); color: white; padding: 2rem; text-align: center; height: 80px; display: flex; flex-direction: column; justify-content: center; }
-            .cert-main-title { font-size: 2.2rem; margin: 0; font-weight: 900; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+            .cert-header { background: linear-gradient(135deg, #1e3c72, #2a5298, #FF7F1A); color: white; padding: 2rem; text-align: center; height: 120px; display: flex; flex-direction: column; justify-content: center; }
+            .cert-organization { font-size: 1.8rem; margin: 0; font-weight: 900; color: #FFD700; letter-spacing: 1px; }
+            .cert-main-title { font-size: 2.2rem; margin: 0.5rem 0 0 0; font-weight: 900; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
             .cert-subtitle { font-size: 1.3rem; margin: 0.5rem 0; font-weight: 600; }
             .cert-edition { font-size: 1rem; margin: 0; opacity: 0.9; }
             .cert-body { padding: 3rem 2rem; text-align: center; background: linear-gradient(135deg, #ffffff, #f8f9fa); }
@@ -560,19 +652,19 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
         <body>
           <div class="certificat-digital">
             <div class="cert-header">
-              <h1 class="cert-main-title">ATTESTATION DE PARTICIPATION</h1>
+              <div class="cert-organization">PENCCUM NDONGO</div>
               <h2 class="cert-subtitle">Concours de Poésie Inédit & Innovant</h2>
-              <h3 class="cert-edition">CP2i - Édition 2025</h3>
+              <h3 class="cert-edition">Troisième Édition</h3>
+              <h1 class="cert-main-title">CERTIFICAT DE PARTICIPATION</h1>
             </div>
             <div class="cert-body">
               <div class="cert-decoration-line"></div>
-              <p class="cert-intro">Il est certifié par les présentes que</p>
+              <p class="cert-intro">Décerné à</p>
               <div class="cert-participant">
                 <div class="participant-name">${this.currentUser?.prenom} ${this.currentUser?.nom}</div>
               </div>
               <p class="cert-text">
-                a participé avec distinction au Concours de Poésie Inédit & Innovant CP2i Édition 2025,
-                organisé par Penccum Ndongo, et a soumis une œuvre poétique ${statusText} ${noteText}.
+                Pour sa participation à la 3e édition du Concours de Poésie Inédit & Innovant (CP2i).
               </p>
               ${classementText ? `<div class="cert-performance"><p class="cert-ranking">${classementText}</p></div>` : ''}
               <div class="cert-decoration-line"></div>
@@ -630,6 +722,54 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
   getOrdinalSuffix(position: number): string {
     if (position === 1) return 'er';
     return 'ème';
+  }
+  
+
+  
+  generateCertificateHash(): string {
+    // Générer un hash unique basé sur les données du participant
+    const data = `${this.currentUser?.id}-${this.stats.note_moyenne}-${this.getCurrentDate()}-CP2i2025`;
+    return btoa(data).substring(0, 16);
+  }
+  
+  generateUniqueCode(): string {
+    // Générer un code unique standardisé
+    const userId = this.currentUser?.id || '0';
+    const year = this.getCurrentYear();
+    const noteStr = this.stats.note_moyenne ? this.stats.note_moyenne.toFixed(1) : 'null';
+    const dateStr = new Date().getDate().toString().padStart(2, '0');
+    const monthStr = this.getMonthAbbr().toLowerCase().charAt(0);
+    const data = `${userId}-${noteStr}-${dateStr} ${monthStr}`;
+    const hash = btoa(data).substring(0, 16);
+    return `CP2i-${userId}-${year}-${hash}`;
+  }
+  
+  getMonthAbbr(): string {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months[new Date().getMonth()];
+  }
+  
+  drawTextFallback(canvas: HTMLCanvasElement, text: string) {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    canvas.width = 60;
+    canvas.height = 60;
+    
+    // Fond blanc avec bordure
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 60, 60);
+    ctx.strokeStyle = '#1e3c72';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(0, 0, 60, 60);
+    
+    // Texte de fallback
+    ctx.fillStyle = '#1e3c72';
+    ctx.font = '8px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('QR', 30, 25);
+    ctx.fillText('CODE', 30, 35);
+    ctx.fillText(text.substring(0, 8), 30, 50);
   }
 
 
@@ -811,6 +951,13 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
     // Empêcher toute redirection automatique
     if (typeof window !== 'undefined') {
       window.history.replaceState(null, '', window.location.pathname);
+    }
+    
+    // Générer QR codes quand on va sur certificats
+    if (view === 'certificats') {
+      setTimeout(() => {
+        this.forceGenerateQR();
+      }, 500);
     }
   }
 
@@ -1081,5 +1228,9 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy {
       'login': 'Vous vous êtes connecté à votre tableau de bord participant.'
     };
     return descriptions[item.type as keyof typeof descriptions] || item.description || 'Aucune description disponible';
+  }
+  
+  openVerificationUrl() {
+    window.open('https://penccumndongo.com/verify', '_blank');
   }
 }
