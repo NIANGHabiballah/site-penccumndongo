@@ -29,19 +29,19 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 if ($user) {
     echo "   Utilisateur trouvé: {$user['email']}\n";
     
-    // Test de mise à jour
-    $newTelephone = '777123456';
-    $stmt = $db->prepare("UPDATE cp2i_users SET telephone = ? WHERE id = ?");
-    $result = $stmt->execute([$newTelephone, $testId]);
+    // Test de mise à jour (nom seulement)
+    $newNom = 'Test Modifié';
+    $stmt = $db->prepare("UPDATE cp2i_users SET nom = ? WHERE id = ?");
+    $result = $stmt->execute([$newNom, $testId]);
     
     if ($result) {
         echo "   ✓ Modification réussie\n";
         
         // Vérifier la modification
-        $stmt = $db->prepare("SELECT telephone FROM cp2i_users WHERE id = ?");
+        $stmt = $db->prepare("SELECT nom FROM cp2i_users WHERE id = ?");
         $stmt->execute([$testId]);
         $updated = $stmt->fetch(PDO::FETCH_ASSOC);
-        echo "   Nouveau téléphone: {$updated['telephone']}\n";
+        echo "   Nouveau nom: {$updated['nom']}\n";
     } else {
         echo "   ✗ Échec de la modification\n";
     }

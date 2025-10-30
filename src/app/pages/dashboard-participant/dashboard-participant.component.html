@@ -275,18 +275,15 @@
       
       <!-- Mon Profil -->
       <div *ngSwitchCase="'profil'" class="profile-section">
-        <h2>Mon Profil</h2>
+        <h2><i class="fas fa-user-circle"></i> Mon Profil</h2>
+        
         <div class="profile-card">
-          <div class="profile-header">
-            <div class="profile-avatar">
-              <i class="fas fa-user"></i>
-            </div>
-            <div class="profile-info">
-              <h3>{{currentUser?.prenom}} {{currentUser?.nom}}</h3>
-              <p>{{currentUser?.email}}</p>
-              <span class="role-badge">{{currentUser?.role | titlecase}}</span>
-            </div>
+          <div class="profile-info">
+            <h3>{{currentUser?.prenom}} {{currentUser?.nom}}</h3>
+            <p class="profile-email">{{currentUser?.email}}</p>
+            <span class="role-badge">{{currentUser?.role | titlecase}}</span>
           </div>
+          
           <div class="profile-stats">
             <div class="stat-item">
               <span class="stat-number">{{stats.total_textes || 0}}</span>

@@ -204,7 +204,7 @@ function getStats($user) {
 function getProfile($user) {
     $db = getDB();
     
-    $stmt = $db->prepare("SELECT id, email, nom, prenom, telephone, role, created_at FROM cp2i_users WHERE id = ?");
+    $stmt = $db->prepare("SELECT id, email, nom, prenom, role, created_at FROM cp2i_users WHERE id = ?");
     $stmt->execute([$user['user_id']]);
     $profile = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -244,7 +244,7 @@ function getUsers() {
     
     // Récupérer tous les utilisateurs avec leurs stats
     $stmt = $db->prepare("
-        SELECT u.id, u.email, u.nom, u.prenom, u.telephone, u.role, u.created_at,
+        SELECT u.id, u.email, u.nom, u.prenom, u.role, u.created_at,
                COUNT(t.id) as nb_textes,
                AVG(t.note) as note_moyenne
         FROM cp2i_users u

@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Cp2iApiService, User } from '../../services/cp2i-api.service';
+
 import { ChatSupportComponent } from '../chat-support/chat-support.component';
 import { ChatWidgetComponent } from '../../components/chat-widget/chat-widget.component';
 import { ParticipantMessagesService } from '../../services/participant-messages.service';
@@ -76,12 +77,16 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   
   private subscriptions: Subscription[] = [];
 
+
+
   constructor(
     private cp2iApi: Cp2iApiService,
+
     private router: Router,
     private participantMessagesService: ParticipantMessagesService,
     private qrService: QrCertificateService,
-    private http: HttpClient
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -93,6 +98,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     
     this.currentUser = this.cp2iApi.getCurrentUser();
     this.loadData();
+
     
     // Initialiser le service de messages
     this.participantMessagesService.initialize();
@@ -224,24 +230,6 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   }
 
   loadData() {
-    // Charger le profil utilisateur réel
-    this.cp2iApi.getProfile().subscribe({
-      next: (data) => {
-        if (data.profile) {
-          this.currentUser = {
-            id: data.profile.id,
-            email: data.profile.email,
-            nom: data.profile.nom,
-            prenom: data.profile.prenom,
-            role: data.profile.role
-          };
-        }
-      },
-      error: (error) => {
-        console.error('Erreur lors du chargement du profil:', error);
-      }
-    });
-    
     // Charger les données validées
     this.loadDataFallback();
     
@@ -1235,4 +1223,8 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   openVerificationUrl() {
     window.open('https://penccumndongo.com/verify', '_blank');
   }
+
+
+
+
 }

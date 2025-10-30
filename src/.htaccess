@@ -46,6 +46,27 @@ RewriteRule ^cgv/$ /cgv [L,R=301]
 #     Deny from all
 # </FilesMatch>
 
+# Sécurité pour les uploads de profil
+<Directory "uploads">
+    # Autoriser seulement les images
+    <FilesMatch "\.(jpg|jpeg|png|gif|webp)$">
+        Order Allow,Deny
+        Allow from all
+    </FilesMatch>
+    
+    # Bloquer l'exécution de scripts
+    <FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|sh|cgi)$">
+        Order Allow,Deny
+        Deny from all
+    </FilesMatch>
+    
+    # Désactiver l'indexation
+    Options -Indexes
+    
+    # Limiter la taille des fichiers (5MB)
+    LimitRequestBody 5242880
+</Directory>
+
 # Rate limiting (basic)
 <IfModule mod_evasive24.c>
     DOSHashTableSize    2048
