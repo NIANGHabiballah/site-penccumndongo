@@ -58,7 +58,7 @@ function getCorrecteurTexts($correcteurId) {
         
         // Solution définitive : requête simple et directe
         $stmt = $db->prepare("
-            SELECT DISTINCT t.id, t.titre, t.contenu, t.langue, t.created_at, t.note, 
+            SELECT DISTINCT t.id, t.titre, t.contenu, t.langue, t.theme, t.created_at, t.note, 
                    u.prenom, u.nom, 'en_attente' as statut
             FROM cp2i_textes t, cp2i_users u, cp2i_affectations a
             WHERE t.user_id = u.id 

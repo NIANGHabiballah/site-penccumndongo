@@ -1148,3 +1148,8 @@ body {
   font-size: 0.9rem;
   margin-top: 0.5rem;
 }
+
+/* Icônes dans les tip-cards */
+.tip-icon i {
+  color: #6f42c1 !important;
+}

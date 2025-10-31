@@ -109,6 +109,7 @@
             </div>
             <div class="texte-info">
               <p><strong>Identifiant:</strong> CP2i-{{texte.id | number:'3.0-0'}}</p>
+              <p><strong>Thème:</strong> {{texte.theme || 'Non spécifié'}}</p>
               <p><strong>Langue:</strong> {{texte.langue | titlecase}}</p>
               <p><strong>Soumis le:</strong> {{texte.created_at | date:'dd/MM/yyyy'}}</p>
               <p *ngIf="texte.note"><strong>Note:</strong> {{texte.note}}/20</p>
@@ -143,6 +144,7 @@
             
             <div class="text-meta">
               <span class="meta-tag"><i class="fas fa-id-card"></i> CP2i-{{currentTexte.id | number:'3.0-0'}}</span>
+              <span class="meta-tag"><i class="fas fa-tag"></i> {{currentTexte.theme || 'Non spécifié'}}</span>
               <span class="meta-tag"><i class="fas fa-globe"></i> {{currentTexte.langue | titlecase}}</span>
               <span class="meta-tag"><i class="fas fa-calendar"></i> {{currentTexte.created_at | date:'dd/MM/yyyy'}}</span>
             </div>
@@ -344,7 +346,7 @@
                   <p>Cliquez sur "Textes Assignés" dans le menu pour voir la liste de vos textes à corriger.</p>
                   <div class="step-visual">
                     <div class="mock-card">
-                      <div class="mock-header">📝 Poème de Victor Hugo</div>
+                      <div class="mock-header"><i class="fas fa-file-alt"></i> Poème de Victor Hugo</div>
                       <div class="mock-status status-pending">À corriger</div>
                       <div class="mock-info">Identifiant: CP2i-001 • Français • 15/10/2025</div>
                     </div>
@@ -359,8 +361,8 @@
                   <p>Cliquez sur une carte de texte pour l'ouvrir dans l'interface de correction.</p>
                   <div class="step-visual">
                     <div class="mock-interface">
-                      <div class="mock-text-panel">📄 Texte à corriger</div>
-                      <div class="mock-eval-panel">⭐ Grille d'évaluation</div>
+                      <div class="mock-text-panel"><i class="fas fa-scroll"></i> Texte à corriger</div>
+                      <div class="mock-eval-panel"><i class="fas fa-star"></i> Grille d'évaluation</div>
                     </div>
                   </div>
                 </div>
@@ -403,8 +405,8 @@
                   <p>• <strong>Brouillon</strong> : Sauvegarde temporaire<br>• <strong>Valider</strong> : Finalise l'évaluation</p>
                   <div class="step-visual">
                     <div class="mock-buttons">
-                      <button class="btn-outline">💾 Brouillon</button>
-                      <button class="btn-primary">✅ Valider</button>
+                      <button class="btn-outline"><i class="fas fa-save"></i> Brouillon</button>
+                      <button class="btn-primary"><i class="fas fa-check"></i> Valider</button>
                     </div>
                   </div>
                 </div>
@@ -416,22 +418,22 @@
             <h3><i class="fas fa-lightbulb"></i> Conseils pour l'évaluation</h3>
             <div class="tips-grid">
               <div class="tip-card">
-                <div class="tip-icon">📖</div>
+                <div class="tip-icon"><i class="fas fa-book-open"></i></div>
                 <h4>Lecture attentive</h4>
                 <p>Lisez le texte plusieurs fois avant d'évaluer pour bien comprendre le message.</p>
               </div>
               <div class="tip-card">
-                <div class="tip-icon">⚖️</div>
+                <div class="tip-icon"><i class="fas fa-balance-scale"></i></div>
                 <h4>Objectivité</h4>
                 <p>Soyez objectif et bienveillant dans vos commentaires et notations.</p>
               </div>
               <div class="tip-card">
-                <div class="tip-icon">💡</div>
+                <div class="tip-icon"><i class="fas fa-lightbulb"></i></div>
                 <h4>Exemples concrets</h4>
                 <p>Justifiez vos notes par des exemples précis tirés du texte.</p>
               </div>
               <div class="tip-card">
-                <div class="tip-icon">🎯</div>
+                <div class="tip-icon"><i class="fas fa-bullseye"></i></div>
                 <h4>Note de passage</h4>
                 <p>La note de passage est fixée à <strong>10/20</strong> pour l'admission.</p>
               </div>

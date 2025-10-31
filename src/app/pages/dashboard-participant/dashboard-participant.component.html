@@ -215,6 +215,10 @@
               </div>
               <div class="submission-details">
                 <div class="detail-item">
+                  <i class="fas fa-tag"></i>
+                  <span>{{texte.theme || 'Non spécifié'}}</span>
+                </div>
+                <div class="detail-item">
                   <i class="fas fa-language"></i>
                   <span>{{texte.langue | titlecase}}</span>
                 </div>
@@ -314,6 +318,10 @@
               <pre>{{texte.contenu}}</pre>
             </div>
             <div class="submission-meta">
+              <div class="meta-item">
+                <i class="fas fa-tag"></i>
+                <span>{{texte.theme || 'Non spécifié'}}</span>
+              </div>
               <div class="meta-item">
                 <i class="fas fa-language"></i>
                 <span>{{texte.langue | titlecase}}</span>
