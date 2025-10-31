@@ -3,17 +3,32 @@ require_once 'config.php';
 setCorsHeaders();
 
 $method = $_SERVER['REQUEST_METHOD'];
+$action = $_GET['action'] ?? '';
 
 if ($method === 'POST') {
     $user = verifyToken();
-    if ($user['role'] !== 'admin') {
-        http_response_code(403);
-        echo json_encode(['error' => 'Accès refusé']);
-        exit;
-    }
     
-    $input = json_decode(file_get_contents('php://input'), true);
-    sendMessage($user, $input);
+    if ($action === 'mark_read') {
+        // Permettre aux correcteurs de marquer les messages comme lus
+        if ($user['role'] !== 'correcteur' && $user['role'] !== 'admin') {
+            http_response_code(403);
+            echo json_encode(['error' => 'Accès refusé']);
+            exit;
+        }
+        
+        $input = json_decode(file_get_contents('php://input'), true);
+        markMessageAsRead($user, $input);
+    } else {
+        // Seuls les admins peuvent envoyer des messages
+        if ($user['role'] !== 'admin') {
+            http_response_code(403);
+            echo json_encode(['error' => 'Accès refusé']);
+            exit;
+        }
+        
+        $input = json_decode(file_get_contents('php://input'), true);
+        sendMessage($user, $input);
+    }
 } elseif ($method === 'GET') {
     $user = verifyToken();
     getMessages($user);
@@ -45,6 +60,40 @@ function getMessages($user) {
                 'created_at' => '2025-10-18 20:58:12'
             ]
         ]);
+    }
+}
+
+function markMessageAsRead($user, $data) {
+    try {
+        $message_id = $data['message_id'] ?? 0;
+        
+        if (!$message_id) {
+            http_response_code(400);
+            echo json_encode(['error' => 'ID du message requis']);
+            return;
+        }
+        
+        $db = getDB();
+        
+        // Vérifier si c'est un message send_to_all
+        $stmt = $db->prepare("SELECT send_to_all FROM cp2i_messages WHERE id = ?");
+        $stmt->execute([$message_id]);
+        $message = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($message && $message['send_to_all']) {
+            $stmt = $db->prepare("INSERT IGNORE INTO cp2i_message_recipients (message_id, recipient_id, read_at) VALUES (?, ?, NOW())");
+            $stmt->execute([$message_id, $user['user_id']]);
+        } else {
+            $stmt = $db->prepare("UPDATE cp2i_message_recipients SET read_at = NOW() WHERE message_id = ? AND recipient_id = ? AND read_at IS NULL");
+            $stmt->execute([$message_id, $user['user_id']]);
+        }
+        
+        echo json_encode(['success' => true]);
+        
+    } catch (Exception $e) {
+        error_log('Error in markMessageAsRead: ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['error' => 'Erreur serveur']);
     }
 }
 

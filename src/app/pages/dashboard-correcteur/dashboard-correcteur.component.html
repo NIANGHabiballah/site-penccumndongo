@@ -246,28 +246,134 @@
       </div>
 
       <!-- Messages -->
-      <div *ngSwitchCase="'messages'" class="messages">
-        <h2>Messages de l'administration</h2>
-        <div class="messages-list" *ngIf="messages.length > 0; else noMessages">
-          <div class="message-item compact" *ngFor="let message of messages" [class.unread]="!message.read_at" (click)="readMessage(message)">
-            <div class="message-compact">
-              <div class="message-title">
-                <span *ngIf="!message.read_at" class="unread-dot"></span>
-                {{message.subject}}
+      <div *ngSwitchCase="'messages'" class="messages-section">
+        <div class="messages-header">
+          <h2><i class="fas fa-envelope"></i> Messages de l'Administration</h2>
+          <p class="messages-subtitle">Communications officielles du concours CP2i</p>
+        </div>
+        
+        <div class="messages-stats" *ngIf="messages.length > 0">
+          <div class="stat-item">
+            <span class="stat-number">{{messages.length}}</span>
+            <span class="stat-label">Total messages</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">{{getUnreadMessagesCount()}}</span>
+            <span class="stat-label">Non lus</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">{{messages.length - getUnreadMessagesCount()}}</span>
+            <span class="stat-label">Lus</span>
+          </div>
+        </div>
+        
+        <div class="messages-filters" *ngIf="messages.length > 0">
+          <button class="filter-btn" [class.active]="currentMessageFilter === 'all'" (click)="currentMessageFilter = 'all'">
+            <i class="fas fa-list"></i> Tous ({{messages.length}})
+          </button>
+          <button class="filter-btn" [class.active]="currentMessageFilter === 'unread'" (click)="currentMessageFilter = 'unread'">
+            <i class="fas fa-envelope"></i> Non lus ({{getUnreadMessagesCount()}})
+          </button>
+          <button class="filter-btn" [class.active]="currentMessageFilter === 'read'" (click)="currentMessageFilter = 'read'">
+            <i class="fas fa-envelope-open"></i> Lus ({{messages.length - getUnreadMessagesCount()}})
+          </button>
+        </div>
+        
+        <div class="messages-list" *ngIf="getFilteredMessages().length > 0; else noFilteredMessages">
+          <div class="message-card" *ngFor="let message of getFilteredMessages()" [class.unread]="!message.read_at" (click)="toggleMessageExpansion(message)">
+            <div class="message-header">
+              <div class="message-info">
+                <div class="message-title">
+                  <span *ngIf="!message.read_at" class="unread-indicator"></span>
+                  <h4>{{message.subject}}</h4>
+                </div>
+                <div class="message-meta">
+                  <span class="message-sender">
+                    <i class="fas fa-user-shield"></i>
+                    {{message.sender_prenom}} {{message.sender_nom}}
+                  </span>
+                  <span class="message-date">
+                    <i class="fas fa-calendar"></i>
+                    {{message.created_at | date:'dd/MM/yyyy à HH:mm'}}
+                  </span>
+                </div>
               </div>
-              <div class="message-date">{{message.created_at | date:'dd/MM/yyyy'}}</div>
-              <div class="message-preview">{{message.content | slice:0:60}}{{message.content?.length > 60 ? '...' : ''}}</div>
-              <div class="message-sender">De: {{message.sender_prenom}} {{message.sender_nom}}</div>
+              <div class="message-actions">
+                <button class="action-btn" [class.active]="message.expanded" title="{{message.expanded ? 'Réduire' : 'Développer'}}">
+                  <i class="fas" [class.fa-chevron-down]="!message.expanded" [class.fa-chevron-up]="message.expanded"></i>
+                </button>
+                <button class="action-btn" *ngIf="!message.read_at" (click)="markAsRead(message, $event)" title="Marquer comme lu">
+                  <i class="fas fa-check"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="message-preview" *ngIf="!message.expanded">
+              <p>{{message.content | slice:0:120}}{{message.content?.length > 120 ? '...' : ''}}</p>
+            </div>
+            
+            <div class="message-content" *ngIf="message.expanded">
+              <div class="message-body">
+                <p>{{message.content}}</p>
+              </div>
+              
+              <div class="message-footer">
+                <div class="message-status">
+                  <span *ngIf="message.read_at" class="read-status">
+                    <i class="fas fa-check-double"></i>
+                    Lu le {{message.read_at | date:'dd/MM/yyyy à HH:mm'}}
+                  </span>
+                  <span *ngIf="!message.read_at" class="unread-status">
+                    <i class="fas fa-envelope"></i>
+                    Non lu
+                  </span>
+                </div>
+                
+                <div class="message-actions-expanded">
+                  <button class="btn btn-outline btn-small" *ngIf="!message.read_at" (click)="markAsRead(message, $event)">
+                    <i class="fas fa-check"></i> Marquer comme lu
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <ng-template #noMessages>
-          <div class="no-messages">
-            <i class="fas fa-envelope"></i>
-            <h3>Aucun message</h3>
-            <p>Vous n'avez pas de nouveaux messages.</p>
+        
+        <ng-template #noFilteredMessages>
+          <div class="no-messages-filtered">
+            <div class="no-messages-icon">
+              <i class="fas" [class.fa-envelope]="currentMessageFilter === 'unread'" [class.fa-envelope-open]="currentMessageFilter === 'read'" [class.fa-inbox]="currentMessageFilter === 'all'"></i>
+            </div>
+            <h3 *ngIf="currentMessageFilter === 'all'">Aucun message</h3>
+            <h3 *ngIf="currentMessageFilter === 'unread'">Aucun message non lu</h3>
+            <h3 *ngIf="currentMessageFilter === 'read'">Aucun message lu</h3>
+            <p *ngIf="currentMessageFilter === 'all'">Vous n'avez pas encore reçu de messages de l'administration.</p>
+            <p *ngIf="currentMessageFilter === 'unread'">Tous vos messages ont été lus.</p>
+            <p *ngIf="currentMessageFilter === 'read'">Vous n'avez pas encore lu de messages.</p>
           </div>
         </ng-template>
+        
+        <div class="no-messages" *ngIf="messages.length === 0">
+          <div class="no-messages-icon">
+            <i class="fas fa-inbox"></i>
+          </div>
+          <h3>Boîte de réception vide</h3>
+          <p>Vous n'avez pas encore reçu de messages de l'administration.</p>
+          <div class="messages-info">
+            <div class="info-item">
+              <i class="fas fa-info-circle"></i>
+              <span>Les annonces importantes apparaîtront ici</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-bell"></i>
+              <span>Vous serez notifié des nouveaux messages</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-envelope"></i>
+              <span>Consultez régulièrement cette section</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Guide de correction -->

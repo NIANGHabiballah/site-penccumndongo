@@ -42,6 +42,9 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
   notificationMessage = '';
   notificationType: 'success' | 'error' = 'success';
   
+  // Messages
+  currentMessageFilter = 'all';
+  
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -416,5 +419,41 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
     window.URL.revokeObjectURL(url);
     
     this.showToast('Téléchargement lancé', 'success');
+  }
+
+  // Méthodes pour la gestion des messages
+  getFilteredMessages(): any[] {
+    if (this.currentMessageFilter === 'unread') {
+      return this.messages.filter(m => !m.read_at);
+    } else if (this.currentMessageFilter === 'read') {
+      return this.messages.filter(m => m.read_at);
+    }
+    return this.messages;
+  }
+
+  toggleMessageExpansion(message: any) {
+    message.expanded = !message.expanded;
+    if (message.expanded && !message.read_at) {
+      this.markAsRead(message);
+    }
+  }
+
+  markAsRead(message: any, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    
+    if (!message.read_at) {
+      this.cp2iApi.markMessageAsRead(message.id).subscribe({
+        next: () => {
+          message.read_at = new Date().toISOString();
+          this.showToast('Message marqué comme lu', 'success');
+        },
+        error: (error) => {
+          console.error('Erreur marquage lu:', error);
+          this.showToast('Erreur lors du marquage', 'error');
+        }
+      });
+    }
   }
 }
