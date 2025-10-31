@@ -1384,34 +1384,94 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 }
 
 /* Gestion des textes */
+.texts-table-container {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .texts-table {
-  display: grid;
-  grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr 1fr;
-  gap: 1rem;
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
 }
 
-.text-row {
-  display: contents;
-}
-
-.text-row.header {
+.texts-table th {
+  background: #f8f9fa;
+  padding: 1rem;
+  text-align: left;
   font-weight: 600;
-  color: #333;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 0.5rem;
+  color: #2c3e50;
+  border-bottom: 2px solid #e9ecef;
 }
 
-.text-row > div {
-  padding: 0.75rem 0;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  align-items: center;
+.texts-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.texts-table tr:hover {
+  background: #f8f9fa;
 }
 
 .text-title {
   font-weight: 500;
   color: #333;
 }
+
+.texts-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .texts-table-container {
+    overflow: visible;
+    box-shadow: none;
+    background: transparent;
+  }
+  
+  .texts-table {
+    display: none;
+  }
+  
+  .texts-mobile {
+    display: block;
+  }
+  
+  .text-row {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #eee;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background: white;
+  }
+  
+  .text-row > div {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .text-row > div:last-child {
+    border-bottom: none;
+  }
+  
+  .text-row > div:before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #666;
+    min-width: 100px;
+  }
+}
+
+
 
 /* Affectations */
 .assignment-form {
@@ -1486,40 +1546,6 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 @media (max-width: 768px) {
   .users-grid {
     grid-template-columns: 1fr;
-  }
-  
-  .texts-table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-  
-  .text-row {
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #eee;
-    margin-bottom: 1rem;
-    padding: 1rem;
-    border-radius: 8px;
-    background: white;
-  }
-  
-  .text-row.header {
-    display: none;
-  }
-  
-  .text-row > div {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #f0f0f0;
-  }
-  
-  .text-row > div:before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: #666;
-    min-width: 100px;
   }
   
   .assignment-form {

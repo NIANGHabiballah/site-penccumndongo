@@ -362,24 +362,43 @@
             <h3>Textes soumis ({{textes.length}})</h3>
           </div>
           <div class="panel-content">
-            <div class="texts-table">
-              <div class="text-row header">
-                <div>Titre</div>
-                <div>Auteur</div>
-                <div>Thème</div>
-                <div>Langue</div>
-                <div>Statut</div>
-                <div>Note</div>
-                <div>Date</div>
-              </div>
-              <div class="text-row" *ngFor="let texte of textes">
-                <div class="text-title" data-label="Titre:">{{texte.titre}}</div>
-                <div data-label="Auteur:">{{texte.prenom}} {{texte.nom}}</div>
-                <div data-label="Thème:">{{getThemeLabel(texte.theme)}}</div>
-                <div data-label="Langue:">{{texte.langue | titlecase}}</div>
-                <div data-label="Statut:"><span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span></div>
-                <div data-label="Note:">{{getParticipantAverageNote(texte.prenom, texte.nom) ? (getParticipantAverageNote(texte.prenom, texte.nom) | number:'1.1-1') + '/20' : '-'}}</div>
-                <div data-label="Date:">{{texte.created_at | date:'dd/MM/yyyy'}}</div>
+            <div class="texts-table-container">
+              <table class="texts-table">
+                <thead>
+                  <tr>
+                    <th>Titre</th>
+                    <th>Auteur</th>
+                    <th>Thème</th>
+                    <th>Langue</th>
+                    <th>Statut</th>
+                    <th>Note</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let texte of textes">
+                    <td class="text-title">{{texte.titre}}</td>
+                    <td>{{texte.prenom}} {{texte.nom}}</td>
+                    <td>{{getThemeLabel(texte.theme)}}</td>
+                    <td>{{texte.langue | titlecase}}</td>
+                    <td><span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span></td>
+                    <td>{{getParticipantAverageNote(texte.prenom, texte.nom) ? (getParticipantAverageNote(texte.prenom, texte.nom) | number:'1.1-1') + '/20' : '-'}}</td>
+                    <td>{{texte.created_at | date:'dd/MM/yyyy'}}</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              <!-- Mobile view -->
+              <div class="texts-mobile">
+                <div class="text-row" *ngFor="let texte of textes">
+                  <div data-label="Titre:">{{texte.titre}}</div>
+                  <div data-label="Auteur:">{{texte.prenom}} {{texte.nom}}</div>
+                  <div data-label="Thème:">{{getThemeLabel(texte.theme)}}</div>
+                  <div data-label="Langue:">{{texte.langue | titlecase}}</div>
+                  <div data-label="Statut:"><span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span></div>
+                  <div data-label="Note:">{{getParticipantAverageNote(texte.prenom, texte.nom) ? (getParticipantAverageNote(texte.prenom, texte.nom) | number:'1.1-1') + '/20' : '-'}}</div>
+                  <div data-label="Date:">{{texte.created_at | date:'dd/MM/yyyy'}}</div>
+                </div>
               </div>
             </div>
           </div>
