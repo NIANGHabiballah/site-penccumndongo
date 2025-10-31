@@ -2912,17 +2912,17 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 }
 
 .message-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 1rem !important;
+  margin-bottom: 2rem !important;
   justify-content: center !important;
   align-items: center !important;
 }
 
 @media (max-width: 1024px) {
   .message-stats {
-    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-columns: repeat(2, 1fr) !important;
     max-width: 100% !important;
   }
 }
@@ -3020,6 +3020,39 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
   font-weight: 500;
 }
 
+.message-filters {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  flex-wrap: wrap;
+}
+
+.message-filters .filter-btn {
+  padding: 0.5rem 1rem;
+  border: 2px solid #e9ecef;
+  background: white;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #6c757d;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.message-filters .filter-btn.active,
+.message-filters .filter-btn:hover {
+  background: #0380C2;
+  border-color: #0380C2;
+  color: white;
+}
+
 .messages-list {
   display: flex;
   flex-direction: column;
@@ -3102,6 +3135,22 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
   border-radius: 15px;
   font-size: 0.8rem;
   font-weight: 600;
+}
+
+.message-type-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.recipients-info {
+  color: #666;
+  font-size: 11px;
+}
+
+.recipients-info i {
+  margin-right: 4px;
+  color: #999;
 }
 
 .no-messages {

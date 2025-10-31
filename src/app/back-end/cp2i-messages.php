@@ -38,28 +38,46 @@ function getMessages($user) {
     try {
         $pdo = getDB();
         
-        $stmt = $pdo->prepare("SELECT id, subject, content, created_at FROM cp2i_messages ORDER BY created_at DESC");
-        $stmt->execute();
-        $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        echo json_encode($messages);
+        if ($user['role'] === 'admin') {
+            // Pour les admins, retourner leurs messages envoyés avec statistiques
+            $stmt = $pdo->prepare("
+                SELECT m.id, m.subject, m.content, m.created_at, m.send_to_all,
+                       COUNT(mr.id) as total_recipients,
+                       COUNT(mr.read_at) as read_count,
+                       CASE 
+                           WHEN m.send_to_all = 1 THEN 'Tous les utilisateurs'
+                           ELSE GROUP_CONCAT(CONCAT(u.prenom, ' ', u.nom) SEPARATOR ', ')
+                       END as recipients_names
+                FROM cp2i_messages m
+                LEFT JOIN cp2i_message_recipients mr ON m.id = mr.message_id
+                LEFT JOIN cp2i_users u ON mr.recipient_id = u.id
+                WHERE m.sender_id = ?
+                GROUP BY m.id
+                ORDER BY m.created_at DESC
+            ");
+            $stmt->execute([$user['user_id']]);
+            $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo json_encode(['success' => true, 'messages' => $messages]);
+        } else {
+            // Pour les autres utilisateurs, retourner les messages reçus
+            $stmt = $pdo->prepare("
+                SELECT m.*, u.prenom as sender_prenom, u.nom as sender_nom, mr.read_at
+                FROM cp2i_messages m
+                LEFT JOIN cp2i_users u ON m.sender_id = u.id
+                LEFT JOIN cp2i_message_recipients mr ON m.id = mr.message_id AND mr.recipient_id = ?
+                WHERE m.send_to_all = 1 OR mr.recipient_id = ?
+                ORDER BY m.created_at DESC
+            ");
+            $stmt->execute([$user['user_id'], $user['user_id']]);
+            $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo json_encode(['success' => true, 'messages' => $messages]);
+        }
         
     } catch (Exception $e) {
-        // Retourner des messages de test en cas d'erreur
-        echo json_encode([
-            [
-                'id' => 1,
-                'subject' => 'Salutations',
-                'content' => 'Bonjour a tous, Bien des choses a vous. le concours va bientot demarrer !',
-                'created_at' => '2025-10-18 20:51:32'
-            ],
-            [
-                'id' => 2,
-                'subject' => 'Test',
-                'content' => 'Test de duplication',
-                'created_at' => '2025-10-18 20:58:12'
-            ]
-        ]);
+        error_log('Error in getMessages: ' . $e->getMessage());
+        echo json_encode(['success' => true, 'messages' => []]);
     }
 }
 

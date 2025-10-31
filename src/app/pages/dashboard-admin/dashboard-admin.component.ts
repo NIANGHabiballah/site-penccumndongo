@@ -73,6 +73,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   recipients: any[] = [];
   filteredRecipients: any[] = [];
   recipientFilter = 'all';
+  currentMessageFilter = 'all';
   showMessageModal = false;
   messageForm = {
     subject: '',
@@ -911,6 +912,29 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   getTotalReads(): number {
     return this.messages.reduce((total, msg) => total + parseInt(msg.read_count || 0), 0);
+  }
+  
+  getUnreadMessagesCount(): number {
+    const totalRecipients = this.getTotalRecipients();
+    const totalReads = this.getTotalReads();
+    return Math.max(0, totalRecipients - totalReads);
+  }
+  
+  getFilteredMessages(): any[] {
+    if (this.currentMessageFilter === 'collective') {
+      return this.messages.filter(msg => msg.send_to_all === 1 || msg.send_to_all === '1');
+    } else if (this.currentMessageFilter === 'individual') {
+      return this.messages.filter(msg => msg.send_to_all === 0 || msg.send_to_all === '0');
+    }
+    return this.messages;
+  }
+  
+  getCollectiveMessagesCount(): number {
+    return this.messages.filter(msg => msg.send_to_all === 1 || msg.send_to_all === '1').length;
+  }
+  
+  getIndividualMessagesCount(): number {
+    return this.messages.filter(msg => msg.send_to_all === 0 || msg.send_to_all === '0').length;
   }
   
   // Méthodes de gestion des paramètres

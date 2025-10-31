@@ -1305,11 +1305,31 @@
               <p>Messages lus</p>
             </div>
           </div>
+          <div class="message-stat-card">
+            <div class="stat-icon"><i class="fas fa-eye-slash"></i></div>
+            <div class="stat-content">
+              <h3>{{getUnreadMessagesCount()}}</h3>
+              <p>Messages non lus</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filtres des messages -->
+        <div class="message-filters">
+          <button class="filter-btn" [class.active]="currentMessageFilter === 'all'" (click)="currentMessageFilter = 'all'">
+            <i class="fas fa-list"></i> Tous ({{messages.length}})
+          </button>
+          <button class="filter-btn" [class.active]="currentMessageFilter === 'collective'" (click)="currentMessageFilter = 'collective'">
+            <i class="fas fa-users"></i> Collectifs ({{getCollectiveMessagesCount()}})
+          </button>
+          <button class="filter-btn" [class.active]="currentMessageFilter === 'individual'" (click)="currentMessageFilter = 'individual'">
+            <i class="fas fa-user"></i> Individuels ({{getIndividualMessagesCount()}})
+          </button>
         </div>
 
         <!-- Liste des messages -->
         <div class="messages-list">
-          <div class="message-card" *ngFor="let message of messages">
+          <div class="message-card" *ngFor="let message of getFilteredMessages()">
             <div class="message-card-header">
               <div class="message-info">
                 <h4>{{message.subject}}</h4>
@@ -1326,8 +1346,13 @@
             </div>
             
             <div class="message-actions">
-              <span class="message-type" *ngIf="message.send_to_all">Message collectif</span>
-              <span class="message-type" *ngIf="!message.send_to_all">Message individuel</span>
+              <div class="message-type-info">
+                <span class="message-type" *ngIf="message.send_to_all">Message collectif</span>
+                <span class="message-type" *ngIf="!message.send_to_all">Message individuel</span>
+                <div class="recipients-info" *ngIf="!message.send_to_all && message.recipients_names">
+                  <small><i class="fas fa-user"></i> {{message.recipients_names}}</small>
+                </div>
+              </div>
               <div class="action-buttons">
                 <button class="btn-icon" title="Voir détails" (click)="viewMessage(message)">
                   <i class="fas fa-eye"></i>
@@ -1339,7 +1364,7 @@
             </div>
           </div>
           
-          <div class="no-messages" *ngIf="messages.length === 0">
+          <div class="no-messages" *ngIf="getFilteredMessages().length === 0">
             <i class="fas fa-envelope-open"></i>
             <h3>Aucun message envoyé</h3>
             <p>Commencez par envoyer votre premier message aux utilisateurs</p>
