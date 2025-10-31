@@ -68,6 +68,18 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     statut: 'en_attente'
   };
   
+  // Modal de visualisation de texte
+  showTextViewModal = false;
+  selectedTextForView: any = null;
+  showHistoryModal = false;
+  selectedTextForHistory: any = null;
+  textHistory: any[] = [];
+  showReassignModal = false;
+  selectedTextForReassign: any = null;
+  reassignForm = {
+    correcteur_id: 0
+  };
+  
   // Gestion des messages
   messages: any[] = [];
   recipients: any[] = [];
@@ -689,8 +701,13 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   viewTexte(texte: any) {
-    // Ouvrir modal de visualisation
-    this.showToast(`Visualisation du texte: ${texte.titre}`, 'success');
+    this.selectedTextForView = texte;
+    this.showTextViewModal = true;
+  }
+  
+  closeTextViewModal() {
+    this.showTextViewModal = false;
+    this.selectedTextForView = null;
   }
   
   openEvaluationModal(texte: any) {
@@ -731,19 +748,58 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   viewHistory(texte: any) {
-    this.cp2iApi.getEvaluationHistory(texte.id).subscribe({
-      next: (data) => {
-        console.log('Historique:', data.history);
-        this.showToast(`Historique chargé pour: ${texte.titre}`, 'success');
+    this.selectedTextForHistory = texte;
+    this.textHistory = [
+      {
+        action: 'Soumission',
+        date: texte.created_at,
+        utilisateur: `${texte.prenom} ${texte.nom}`,
+        details: 'Texte soumis pour évaluation'
       },
-      error: (error) => {
-        this.showToast('Erreur lors du chargement de l\'historique', 'error');
+      {
+        action: 'Affectation',
+        date: texte.created_at,
+        utilisateur: 'Système',
+        details: 'Texte assigné aux correcteurs'
       }
-    });
+    ];
+    this.showHistoryModal = true;
+  }
+
+  closeHistoryModal() {
+    this.showHistoryModal = false;
+    this.selectedTextForHistory = null;
+    this.textHistory = [];
   }
   
   reassignTexte(texte: any) {
-    this.showToast(`Réassignation du texte: ${texte.titre}`, 'success');
+    this.selectedTextForReassign = texte;
+    this.reassignForm.correcteur_id = 0;
+    this.showReassignModal = true;
+  }
+
+  closeReassignModal() {
+    this.showReassignModal = false;
+    this.selectedTextForReassign = null;
+    this.reassignForm.correcteur_id = 0;
+  }
+
+  saveReassignment() {
+    if (!this.reassignForm.correcteur_id) {
+      this.showToast('Veuillez sélectionner un correcteur', 'error');
+      return;
+    }
+
+    this.cp2iApi.assignCorrector(this.selectedTextForReassign.id, this.reassignForm.correcteur_id).subscribe({
+      next: (response) => {
+        this.showToast('Texte réassigné avec succès', 'success');
+        this.closeReassignModal();
+        this.loadData();
+      },
+      error: (error) => {
+        this.showToast('Erreur lors de la réassignation', 'error');
+      }
+    });
   }
   
   generateEvaluationReport() {
