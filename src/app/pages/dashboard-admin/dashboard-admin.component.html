@@ -863,7 +863,7 @@
                 <tr *ngFor="let item of history">
                   <td>{{item.prenom}} {{item.nom}}</td>
                   <td><span class="action-badge">{{item.action}}</span></td>
-                  <td>{{item.description}}</td>
+                  <td>{{item.description || 'Aucune description'}}</td>
                   <td>{{item.created_at | date:'dd/MM/yyyy HH:mm'}}</td>
                 </tr>
               </tbody>
@@ -1059,12 +1059,10 @@
             </div>
             <div class="line-chart">
               <div class="chart-bars">
-                <div class="bar" style="height: 60%"><span>Jan</span></div>
-                <div class="bar" style="height: 80%"><span>Fév</span></div>
-                <div class="bar" style="height: 45%"><span>Mar</span></div>
-                <div class="bar" style="height: 90%"><span>Avr</span></div>
-                <div class="bar" style="height: 75%"><span>Mai</span></div>
-                <div class="bar" style="height: 95%"><span>Jun</span></div>
+                <div class="bar" *ngFor="let month of getMonthlySubmissions()" [style.height.%]="month.height">
+                  <span>{{month.name}}</span>
+                  <div class="bar-count">{{month.count}}</div>
+                </div>
               </div>
             </div>
           </div>
@@ -1074,9 +1072,9 @@
               <h4><i class="fas fa-globe"></i> Répartition par langue</h4>
             </div>
             <div class="pie-chart">
-              <div class="pie-segment french" data-percentage="65">Français 65%</div>
-              <div class="pie-segment wolof" data-percentage="25">Wolof 25%</div>
-              <div class="pie-segment other" data-percentage="10">Autres 10%</div>
+              <div class="pie-segment french">Français {{getLanguageStats().francais}}%</div>
+              <div class="pie-segment wolof">Wolof {{getLanguageStats().wolof}}%</div>
+              <div class="pie-segment other" *ngIf="getLanguageStats().autres > 0">Autres {{getLanguageStats().autres}}%</div>
             </div>
           </div>
 
@@ -1086,12 +1084,8 @@
             </div>
             <div class="donut-chart">
               <div class="donut-center">
-                <span class="donut-percentage">78%</span>
+                <span class="donut-percentage">{{getAcceptanceRate()}}%</span>
                 <span class="donut-label">Acceptés</span>
-              </div>
-              <div class="donut-segments">
-                <div class="segment accepted" style="--percentage: 78"></div>
-                <div class="segment rejected" style="--percentage: 22"></div>
               </div>
             </div>
           </div>
@@ -1102,40 +1096,10 @@
             </div>
             <div class="weekly-activity">
               <div class="day-stats">
-                <div class="day-item">
-                  <span class="day-name">Lun</span>
-                  <div class="day-bar" style="height: 60%"></div>
-                  <span class="day-count">12</span>
-                </div>
-                <div class="day-item">
-                  <span class="day-name">Mar</span>
-                  <div class="day-bar" style="height: 80%"></div>
-                  <span class="day-count">16</span>
-                </div>
-                <div class="day-item">
-                  <span class="day-name">Mer</span>
-                  <div class="day-bar" style="height: 45%"></div>
-                  <span class="day-count">9</span>
-                </div>
-                <div class="day-item">
-                  <span class="day-name">Jeu</span>
-                  <div class="day-bar" style="height: 90%"></div>
-                  <span class="day-count">18</span>
-                </div>
-                <div class="day-item">
-                  <span class="day-name">Ven</span>
-                  <div class="day-bar" style="height: 70%"></div>
-                  <span class="day-count">14</span>
-                </div>
-                <div class="day-item">
-                  <span class="day-name">Sam</span>
-                  <div class="day-bar" style="height: 35%"></div>
-                  <span class="day-count">7</span>
-                </div>
-                <div class="day-item">
-                  <span class="day-name">Dim</span>
-                  <div class="day-bar" style="height: 25%"></div>
-                  <span class="day-count">5</span>
+                <div class="day-item" *ngFor="let day of getDailySubmissions()">
+                  <span class="day-name">{{day.name}}</span>
+                  <div class="day-bar" [style.height.%]="day.height"></div>
+                  <span class="day-count">{{day.count}}</span>
                 </div>
               </div>
             </div>
@@ -1274,7 +1238,7 @@
             </div>
             <div class="panel-content">
               <div class="top-participants">
-                <div class="participant-row" *ngFor="let participant of participants.slice(0,5); let i = index">
+                <div class="participant-row" *ngFor="let participant of getTopParticipants(); let i = index">
                   <div class="rank">{{i + 1}}</div>
                   <div class="participant-info">
                     <strong>{{participant.prenom}} {{participant.nom}}</strong>

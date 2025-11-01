@@ -2175,6 +2175,16 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
   font-weight: 500;
 }
 
+.bar-count {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
 /* Graphique circulaire */
 .pie-chart {
   display: flex;
@@ -4052,7 +4062,7 @@ input:checked + .slider:before {
 }
 
 .calendar-panel .panel-header {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #FF7F1A 100%);
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
   color: white;
   padding: 2rem;
   text-align: center;
@@ -4211,7 +4221,7 @@ input:checked + .slider:before {
 }
 
 .deadline-card {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #FF7F1A 100%);
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
   color: white;
   padding: 2.5rem;
   border-radius: 20px;
@@ -4330,7 +4340,7 @@ input:checked + .slider:before {
 }
 
 .deadline-card-full {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #FF7F1A 100%);
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
   color: white;
   padding: 2rem;
   border-radius: 16px;

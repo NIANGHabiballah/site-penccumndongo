@@ -266,7 +266,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.allAccounts = data.accounts || [];
         this.filteredAccounts = [...this.allAccounts];
-        console.log('Comptes chargés:', this.allAccounts.length);
+
       },
       error: (error) => console.error('Erreur comptes:', error)
     });
@@ -275,6 +275,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.cp2iApi.getHistory().subscribe({
       next: (data) => {
         this.history = data.history || [];
+
       },
       error: (error) => {
         console.error('Erreur historique:', error);
@@ -299,6 +300,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.cp2iApi.assignCorrector(this.selectedTexte, this.selectedCorrector).subscribe({
       next: (response) => {
         this.showToast('Correcteur affecté avec succès!', 'success');
+        this.logAdminAction('affectation', `Affectation correcteur ID ${this.selectedCorrector} au texte ID ${this.selectedTexte}`);
         this.selectedTexte = 0;
         this.selectedCorrector = 0;
         this.loadData();
@@ -497,6 +499,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       password: this.userForm.password
     }).subscribe({
       next: (response) => {
+        this.logAdminAction('creation_utilisateur', `Création utilisateur: ${this.userForm.prenom} ${this.userForm.nom} (${this.userForm.role})`);
         this.loadData(); // Recharger toutes les données
         this.closeUserModal();
         this.showToast(`Utilisateur créé avec succès. Mot de passe: ${this.userForm.password}`, 'success');
@@ -512,6 +515,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.cp2iApi.updateUser(this.selectedUser.id, this.userForm).subscribe({
       next: (response) => {
         console.log('Update response:', response);
+        this.logAdminAction('modification_utilisateur', `Modification utilisateur: ${this.userForm.prenom} ${this.userForm.nom}`);
         this.loadData();
         this.closeUserModal();
         this.showToast('Utilisateur modifié avec succès', 'success');
@@ -531,6 +535,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   deleteUser() {
     this.cp2iApi.deleteUser(this.selectedUser.id).subscribe({
       next: (response) => {
+        this.logAdminAction('suppression_utilisateur', `Suppression utilisateur: ${this.selectedUser.prenom} ${this.selectedUser.nom}`);
         this.loadData();
         this.showDeleteModal = false;
         this.showToast('Utilisateur supprimé avec succès', 'success');
@@ -956,6 +961,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     };
     this.http.post(`https://penccumndongo.com/cp2i-messages.php`, messageData, { headers }).subscribe({
       next: (response: any) => {
+        const recipients = this.messageForm.sendToAll ? 'tous les utilisateurs' : `${this.getSelectedRecipientsCount()} utilisateurs`;
+        this.logAdminAction('envoi_message', `Message envoyé à ${recipients}: "${this.messageForm.subject}"`);
         this.showToast(response.message, 'success');
         this.closeMessageModal();
         this.loadMessages();
@@ -1187,7 +1194,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         note_moyenne: noteMoyenne
       };
       
-      console.log('📊 Note moyenne calculée:', noteMoyenne, 'depuis', notesValides.length, 'notes:', notesValides);
+
     }
   }
   
@@ -1264,8 +1271,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   generateAffectationStats() {
     if (this.textes.length === 0) return;
     
-    console.log('Affectations disponibles:', this.affectations);
-    console.log('Textes disponibles:', this.textes);
+
     
     const affectationsStats = this.textes.map(texte => {
       // Essayer d'abord par texte_id, puis par participant_id
@@ -1275,7 +1281,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         affectationsTexte = this.affectations.filter(a => a.participant_id === texte.user_id);
       }
       
-      console.log(`Texte ${texte.id} (${texte.titre}):`, affectationsTexte);
+
       
       const correcteursNoms = [...new Set(affectationsTexte.map(a => {
         const correcteur = this.correcteurs.find(c => c.id === a.corrector_id);
@@ -1293,5 +1299,111 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     });
     
     this.stats.textes_affectations = affectationsStats;
+  }
+  
+  // Statistiques réelles pour les graphiques
+  getLanguageStats() {
+    if (this.textes.length === 0) return { francais: 0, wolof: 0, autres: 0 };
+    
+    const francais = this.textes.filter(t => t.langue?.toLowerCase() === 'francais').length;
+    const wolof = this.textes.filter(t => t.langue?.toLowerCase() === 'wolof').length;
+    const autres = this.textes.length - francais - wolof;
+    
+    const total = this.textes.length;
+    return {
+      francais: Math.round((francais / total) * 100),
+      wolof: Math.round((wolof / total) * 100),
+      autres: Math.round((autres / total) * 100)
+    };
+  }
+  
+  getAcceptanceRate() {
+    if (this.textes.length === 0) return 0;
+    const acceptes = this.textes.filter(t => t.statut === 'accepte').length;
+    return Math.round((acceptes / this.textes.length) * 100);
+  }
+  
+  getMonthlySubmissions() {
+    const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+    const monthlyData = new Array(12).fill(0);
+    
+    this.textes.forEach(texte => {
+      if (texte.created_at) {
+        const month = new Date(texte.created_at).getMonth();
+        monthlyData[month]++;
+      }
+    });
+    
+    return months.map((month, index) => ({
+      name: month,
+      count: monthlyData[index],
+      height: monthlyData[index] > 0 ? Math.max(20, (monthlyData[index] / Math.max(...monthlyData)) * 100) : 20
+    }));
+  }
+  
+  getDailySubmissions() {
+    const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+    const dailyData = new Array(7).fill(0);
+    
+    this.textes.forEach(texte => {
+      if (texte.created_at) {
+        const day = new Date(texte.created_at).getDay();
+        const adjustedDay = day === 0 ? 6 : day - 1; // Ajuster pour commencer par lundi
+        dailyData[adjustedDay]++;
+      }
+    });
+    
+    const maxCount = Math.max(...dailyData, 1);
+    return days.map((day, index) => ({
+      name: day,
+      count: dailyData[index],
+      height: (dailyData[index] / maxCount) * 100
+    }));
+  }
+  
+  getTopParticipants() {
+    // Calculer la note moyenne pour chaque participant
+    const participantsAvecNotes = this.participants.map(participant => {
+      const noteMoyenne = this.getParticipantAverageNote(participant.prenom, participant.nom);
+      const nbTextes = this.textes.filter(t => t.prenom === participant.prenom && t.nom === participant.nom).length;
+      
+      return {
+        ...participant,
+        note_moyenne: noteMoyenne,
+        nb_textes: nbTextes
+      };
+    });
+    
+    // Trier par note moyenne décroissante, puis par nombre de textes
+    return participantsAvecNotes
+      .sort((a, b) => {
+        // D'abord par note moyenne (décroissant)
+        if (a.note_moyenne && b.note_moyenne) {
+          return b.note_moyenne - a.note_moyenne;
+        }
+        if (a.note_moyenne && !b.note_moyenne) return -1;
+        if (!a.note_moyenne && b.note_moyenne) return 1;
+        
+        // Ensuite par nombre de textes (décroissant)
+        return b.nb_textes - a.nb_textes;
+      })
+      .slice(0, 5);
+  }
+  
+  logAdminAction(action: string, description: string) {
+    // Enregistrer l'action dans l'historique local
+    const newAction = {
+      user_id: this.currentUser?.id,
+      prenom: this.currentUser?.prenom,
+      nom: this.currentUser?.nom,
+      action: action,
+      description: description,
+      created_at: new Date().toISOString()
+    };
+    
+    this.history.unshift(newAction);
+    
+    // Optionnel: envoyer à l'API pour persistance
+    // this.cp2iApi.logAction(action, description).subscribe();
   }
 }
