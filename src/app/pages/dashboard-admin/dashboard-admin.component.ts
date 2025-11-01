@@ -319,9 +319,18 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
 
   getAssignedCorrectorsNames(texteId: number): string {
-    // Chercher dans les données d'affectation par texte
-    const texteAffectation = this.stats.textes_affectations?.find((ta: any) => ta.texte_id === texteId);
-    return texteAffectation?.correcteurs_noms || 'Aucun';
+    // Chercher directement dans les affectations par texte_id
+    const affectationsTexte = this.affectations.filter(a => a.texte_id === texteId);
+    
+    if (affectationsTexte.length === 0) return 'Aucun';
+    
+    // Récupérer les noms des correcteurs uniques
+    const correcteursNoms = [...new Set(affectationsTexte.map(a => {
+      const correcteur = this.correcteurs.find(c => c.id === a.corrector_id);
+      return correcteur ? `${correcteur.prenom} ${correcteur.nom}` : null;
+    }).filter(nom => nom !== null))];
+    
+    return correcteursNoms.length > 0 ? correcteursNoms.join(', ') : 'Aucun';
   }
 
   logout() {
