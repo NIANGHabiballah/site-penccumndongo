@@ -227,6 +227,9 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         this.participants = this.users.filter(u => u.role === 'participant');
         this.correcteurs = this.users.filter(u => u.role === 'correcteur');
         this.affectations = data?.affectations || [];
+        
+        // Générer les stats d'affectation après avoir chargé les données
+        setTimeout(() => this.generateAffectationStats(), 100);
       },
       error: (error) => {
         console.error('Erreur utilisateurs:', error);
@@ -250,7 +253,10 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         this.loadDetailedEvaluations();
         
         this.calculateStatsFromTexts();
-        setTimeout(() => this.calculateStatsFromTexts(), 500);
+        setTimeout(() => {
+          this.calculateStatsFromTexts();
+          this.generateAffectationStats();
+        }, 500);
       },
       error: (error) => console.error('Erreur textes:', error)
     });
@@ -279,6 +285,9 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     // Charger les messages
     this.loadMessages();
     this.loadRecipients();
+    
+    // Charger les statistiques d'affectation
+    this.loadAffectationStats();
   }
 
   assignCorrector() {
@@ -319,8 +328,12 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
 
   getAssignedCorrectorsNames(texteId: number): string {
-    // Chercher directement dans les affectations par texte_id
-    const affectationsTexte = this.affectations.filter(a => a.texte_id === texteId);
+    // Chercher le texte pour obtenir l'user_id du participant
+    const texte = this.textes.find(t => t.id === texteId);
+    if (!texte) return 'Aucun';
+    
+    // Chercher dans les affectations par participant_id
+    const affectationsTexte = this.affectations.filter(a => a.participant_id === texte.user_id);
     
     if (affectationsTexte.length === 0) return 'Aucun';
     
@@ -1229,5 +1242,56 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       'emprise_ecrans': 'Sous l\'emprise des écrans'
     };
     return themes[theme as keyof typeof themes] || theme || 'Non spécifié';
+  }
+  
+  loadAffectationStats() {
+    this.cp2iApi.getDashboardStats().subscribe({
+      next: (data) => {
+        if (data.textes_affectations) {
+          this.stats.textes_affectations = data.textes_affectations;
+        } else {
+          // Générer les stats depuis les données locales
+          this.generateAffectationStats();
+        }
+      },
+      error: (error) => {
+        console.error('Erreur stats affectations:', error);
+        this.generateAffectationStats();
+      }
+    });
+  }
+  
+  generateAffectationStats() {
+    if (this.textes.length === 0) return;
+    
+    console.log('Affectations disponibles:', this.affectations);
+    console.log('Textes disponibles:', this.textes);
+    
+    const affectationsStats = this.textes.map(texte => {
+      // Essayer d'abord par texte_id, puis par participant_id
+      let affectationsTexte = this.affectations.filter(a => a.texte_id === texte.id);
+      
+      if (affectationsTexte.length === 0) {
+        affectationsTexte = this.affectations.filter(a => a.participant_id === texte.user_id);
+      }
+      
+      console.log(`Texte ${texte.id} (${texte.titre}):`, affectationsTexte);
+      
+      const correcteursNoms = [...new Set(affectationsTexte.map(a => {
+        const correcteur = this.correcteurs.find(c => c.id === a.corrector_id);
+        return correcteur ? `${correcteur.prenom} ${correcteur.nom}` : null;
+      }).filter(nom => nom !== null))].join(', ');
+      
+      return {
+        texte_id: texte.id,
+        titre: texte.titre,
+        auteur_prenom: texte.prenom,
+        auteur_nom: texte.nom,
+        correcteurs_noms: correcteursNoms || '',
+        nb_correcteurs: affectationsTexte.length
+      };
+    });
+    
+    this.stats.textes_affectations = affectationsStats;
   }
 }
