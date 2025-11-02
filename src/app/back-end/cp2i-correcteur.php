@@ -185,16 +185,18 @@ function markMessageAsRead($correcteurId) {
         
         $db = getDB();
         
-        // Créer l'entrée si c'est un message send_to_all
-        $stmt = $db->prepare("SELECT send_to_all FROM cp2i_messages WHERE id = ?");
-        $stmt->execute([$messageId]);
-        $message = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Vérifier si l'entrée existe déjà
+        $stmt = $db->prepare("SELECT id FROM cp2i_message_recipients WHERE message_id = ? AND recipient_id = ?");
+        $stmt->execute([$messageId, $correcteurId]);
+        $exists = $stmt->fetch();
         
-        if ($message && $message['send_to_all']) {
-            $stmt = $db->prepare("INSERT IGNORE INTO cp2i_message_recipients (message_id, recipient_id, read_at) VALUES (?, ?, NOW())");
+        if ($exists) {
+            // Mettre à jour l'entrée existante
+            $stmt = $db->prepare("UPDATE cp2i_message_recipients SET read_at = NOW() WHERE message_id = ? AND recipient_id = ?");
             $stmt->execute([$messageId, $correcteurId]);
         } else {
-            $stmt = $db->prepare("UPDATE cp2i_message_recipients SET read_at = NOW() WHERE message_id = ? AND recipient_id = ? AND read_at IS NULL");
+            // Créer une nouvelle entrée
+            $stmt = $db->prepare("INSERT INTO cp2i_message_recipients (message_id, recipient_id, read_at) VALUES (?, ?, NOW())");
             $stmt->execute([$messageId, $correcteurId]);
         }
         

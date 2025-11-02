@@ -320,7 +320,7 @@ export class Cp2iApiService {
   }
 
   markMessageAsRead(messageId: number): Observable<any> {
-    return this.http.post(`${this.baseUrl}/cp2i-messages.php?action=mark_read`, 
+    return this.http.post(`${this.baseUrl}/cp2i-correcteur.php?action=mark_read`, 
       { message_id: messageId }, 
       { headers: this.getHeaders() }
     );
