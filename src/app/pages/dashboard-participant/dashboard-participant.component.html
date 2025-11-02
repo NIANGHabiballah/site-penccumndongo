@@ -255,14 +255,7 @@
                   <i class="fas fa-edit"></i> 
                   {{canModifyText(texte).canModify ? 'Modifier' : 'Non modifiable'}}
                 </button>
-                <button class="btn btn-danger btn-small" 
-                        [disabled]="!canModifyText(texte).canModify"
-                        [class.btn-disabled]="!canModifyText(texte).canModify"
-                        (click)="supprimerTexte(texte)"
-                        [title]="!canModifyText(texte).canModify ? 'Texte non supprimable' : 'Supprimer ce texte'">
-                  <i class="fas fa-trash"></i> 
-                  Supprimer
-                </button>
+
                 <div class="modification-info" *ngIf="!canModifyText(texte).canModify">
                   <small class="text-muted">{{canModifyText(texte).reason}}</small>
                 </div>
@@ -355,14 +348,7 @@
                 <i class="fas fa-edit"></i> 
                 {{canModifyText(texte).canModify ? 'Modifier le texte' : 'Texte non modifiable'}}
               </button>
-              <button class="btn btn-danger btn-small" 
-                      [disabled]="!canModifyText(texte).canModify"
-                      [class.btn-disabled]="!canModifyText(texte).canModify"
-                      (click)="supprimerTexte(texte)"
-                      [title]="!canModifyText(texte).canModify ? 'Texte non supprimable' : 'Supprimer ce texte'">
-                <i class="fas fa-trash"></i> 
-                Supprimer
-              </button>
+
               <div class="modification-info" *ngIf="!canModifyText(texte).canModify">
                 <small class="text-muted">{{canModifyText(texte).reason}}</small>
               </div>

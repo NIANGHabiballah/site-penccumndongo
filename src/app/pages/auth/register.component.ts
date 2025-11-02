@@ -114,7 +114,7 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
             </div>
           </div>
           
-          <div class="input-group">
+          <div class="input-group" style="margin-top: 2rem;">
             <label class="field-label">Adresse complète (Ville, Région, Pays) *</label>
             <div class="input-wrapper" [class.error]="fieldErrors.ville">
               <i class="fas fa-map-marker-alt input-icon"></i>
