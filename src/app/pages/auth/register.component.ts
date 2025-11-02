@@ -38,7 +38,7 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
         
         <form (ngSubmit)="register()">
           <div class="input-group">
-            <label class="field-label">Nom complet *</label>
+            <label class="field-label">Prénom et nom de famille *</label>
             <div class="input-wrapper" [class.error]="fieldErrors.nomComplet">
               <i class="fas fa-user input-icon"></i>
               <input type="text" [(ngModel)]="user.nomComplet" name="nomComplet" placeholder="Prénom et nom de famille" required>
@@ -50,28 +50,41 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
             </div>
           </div>
           
+          <div class="input-group">
+            <label class="field-label">Adresse email *</label>
+            <div class="input-wrapper" [class.error]="fieldErrors.email">
+              <i class="fas fa-envelope input-icon"></i>
+              <input type="email" [(ngModel)]="user.email" name="email" placeholder="votre@email.com" required>
+            </div>
+            <div *ngIf="fieldErrors.email" class="field-error">
+              <i class="fas fa-exclamation-circle"></i>
+              <span>{{fieldErrors.email}}</span>
+            </div>
+          </div>
+          
           <div class="form-row">
             <div class="input-group">
-              <label class="field-label">Adresse email *</label>
-              <div class="input-wrapper" [class.error]="fieldErrors.email">
-                <i class="fas fa-envelope input-icon"></i>
-                <input type="email" [(ngModel)]="user.email" name="email" placeholder="votre@email.com" required>
-              </div>
-              <div *ngIf="fieldErrors.email" class="field-error">
-                <i class="fas fa-exclamation-circle"></i>
-                <span>{{fieldErrors.email}}</span>
-              </div>
-            </div>
-            <div class="input-group">
-              <label class="field-label">Numéro de téléphone *</label>
+              <label class="field-label">Téléphone principal *</label>
               <div class="input-wrapper" [class.error]="fieldErrors.telephone">
                 <i class="fas fa-phone input-icon"></i>
                 <input type="tel" [(ngModel)]="user.telephone" name="telephone" placeholder="+221 77 123 45 67" required title="Incluez l'indicatif de votre pays">
               </div>
-              <small class="field-help">Incluez l'indicatif de votre pays (ex: +221 77 123 45 67)</small>
+              <small class="field-help">Votre numéro principal avec indicatif pays (ex: +221 77 123 45 67)</small>
               <div *ngIf="fieldErrors.telephone" class="field-error">
                 <i class="fas fa-exclamation-circle"></i>
                 <span>{{fieldErrors.telephone}}</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="field-label">WhatsApp *</label>
+              <div class="input-wrapper" [class.error]="fieldErrors.whatsapp">
+                <i class="fab fa-whatsapp input-icon"></i>
+                <input type="tel" [(ngModel)]="user.whatsapp" name="whatsapp" placeholder="+221 77 123 45 67" required title="Votre numéro WhatsApp avec indicatif pays">
+              </div>
+              <small class="field-help">Votre numéro WhatsApp avec indicatif pays (ex: +221 77 123 45 67)</small>
+              <div *ngIf="fieldErrors.whatsapp" class="field-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{fieldErrors.whatsapp}}</span>
               </div>
             </div>
           </div>
@@ -89,7 +102,7 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
               </div>
             </div>
             <div class="input-group">
-              <label class="field-label">Confirmer le mot de passe *</label>
+              <label class="field-label">Confirmation *</label>
               <div class="input-wrapper" [class.error]="fieldErrors.confirmPassword">
                 <i class="fas fa-lock input-icon"></i>
                 <input type="password" [(ngModel)]="user.confirmPassword" name="confirmPassword" placeholder="Retapez votre mot de passe" required>
@@ -280,11 +293,16 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1rem;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    
+    .form-row .input-group {
+      margin-bottom: 0;
     }
     
     .input-group {
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
     
     .input-wrapper, .select-wrapper {
@@ -506,18 +524,21 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
       cursor: not-allowed;
     }
     
-    @media (max-width: 480px) {
-      .auth-card {
-        padding: 2rem;
-        margin: 1rem;
-      }
-      
+    @media (max-width: 768px) {
       .form-row {
         grid-template-columns: 1fr;
+        gap: 0.5rem;
       }
       
       .auth-wrapper {
         flex-direction: column;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .auth-card {
+        padding: 2rem;
+        margin: 1rem;
       }
       
       .welcome-card {
@@ -527,7 +548,7 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
   `]
 })
 export class RegisterComponent {
-  user = { nomComplet: '', email: '', telephone: '', password: '', confirmPassword: '', ville: '' };
+  user = { nomComplet: '', email: '', telephone: '', whatsapp: '', password: '', confirmPassword: '', ville: '' };
   acceptTerms = false;
   selectedRole: 'participant' = 'participant';
   errorMessage = '';
@@ -566,10 +587,18 @@ export class RegisterComponent {
     }
     
     if (!this.user.telephone) {
-      this.fieldErrors.telephone = 'Le numéro de téléphone est requis';
+      this.fieldErrors.telephone = 'Le numéro de téléphone principal est requis';
       hasErrors = true;
     } else if (!/^\+?[1-9]\d{1,14}$/.test(this.user.telephone.replace(/\s/g, ''))) {
       this.fieldErrors.telephone = 'Format de téléphone invalide (incluez l\'indicatif pays: +221...)';
+      hasErrors = true;
+    }
+    
+    if (!this.user.whatsapp) {
+      this.fieldErrors.whatsapp = 'Le numéro WhatsApp est requis';
+      hasErrors = true;
+    } else if (!/^\+?[1-9]\d{1,14}$/.test(this.user.whatsapp.replace(/\s/g, ''))) {
+      this.fieldErrors.whatsapp = 'Format WhatsApp invalide (incluez l\'indicatif pays: +221...)';
       hasErrors = true;
     }
     
@@ -616,6 +645,7 @@ export class RegisterComponent {
       nom: nom,
       prenom: prenom,
       telephone: this.user.telephone,
+      whatsapp: this.user.whatsapp,
       ville: this.user.ville,
       role: this.selectedRole
     };

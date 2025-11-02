@@ -16,7 +16,7 @@ function createUserWithPassword($db, $userData) {
     $hashedPassword = password_hash($userData['password'], PASSWORD_DEFAULT);
     $plainPasswordToStore = ($userData['role'] === 'admin' || $userData['role'] === 'correcteur') ? $userData['password'] : null;
     
-    $stmt = $db->prepare("INSERT INTO cp2i_users (email, password, nom, prenom, telephone, ville, role, email_verified, verification_token, plain_password, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, FALSE, ?, ?, NOW())");
+    $stmt = $db->prepare("INSERT INTO cp2i_users (email, password, nom, prenom, telephone, whatsapp, ville, role, email_verified, verification_token, plain_password, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, FALSE, ?, ?, NOW())");
     
     return $stmt->execute([
         $userData['email'], 
@@ -24,6 +24,7 @@ function createUserWithPassword($db, $userData) {
         $userData['nom'], 
         $userData['prenom'], 
         $userData['telephone'], 
+        $userData['whatsapp'], 
         $userData['ville'], 
         $userData['role'], 
         $userData['verification_token'],
@@ -56,6 +57,7 @@ function registerUser($data) {
     $nom = $data['nom'] ?? '';
     $prenom = $data['prenom'] ?? '';
     $telephone = $data['telephone'] ?? '';
+    $whatsapp = $data['whatsapp'] ?? '';
     $ville = $data['ville'] ?? '';
     $role = $data['role'] ?? 'participant';
     
@@ -92,7 +94,13 @@ function registerUser($data) {
     
     if (!$telephone) {
         http_response_code(400);
-        echo json_encode(['error' => 'Le numéro de téléphone est requis']);
+        echo json_encode(['error' => 'Le numéro de téléphone principal est requis']);
+        return;
+    }
+    
+    if (!$whatsapp) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Le numéro WhatsApp est requis']);
         return;
     }
     
@@ -121,6 +129,7 @@ function registerUser($data) {
         'nom' => $nom,
         'prenom' => $prenom,
         'telephone' => $telephone,
+        'whatsapp' => $whatsapp,
         'ville' => $ville,
         'role' => $role,
         'verification_token' => $verificationToken
