@@ -402,6 +402,7 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
           <div class="header">
             <div class="info">Titre: ${this.currentTexte.titre}</div>
             <div class="info">Identifiant: CP2i-${this.currentTexte.id.toString().padStart(3, '0')}</div>
+            <div class="info">Thème: ${this.getThemeLabel(this.currentTexte.theme)}</div>
             <div class="info">Langue: ${this.currentTexte.langue}</div>
             <div class="info">Date de soumission: ${new Date(this.currentTexte.created_at).toLocaleDateString('fr-FR')}</div>
           </div>
@@ -455,5 +456,16 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
         }
       });
     }
+  }
+
+  getThemeLabel(theme: string): string {
+    const themes = {
+      'patriotisme': 'Patriotisme',
+      'justice_dignite': 'Justice et dignité',
+      'beaute_africaine': 'Beauté Africaine',
+      'jeunesse_responsable': 'Jeunesse responsable',
+      'emprise_ecrans': 'Sous l\'emprise des écrans'
+    };
+    return themes[theme as keyof typeof themes] || theme || 'Non spécifié';
   }
 }
