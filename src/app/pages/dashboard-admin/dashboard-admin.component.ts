@@ -330,12 +330,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
 
   getAssignedCorrectorsNames(texteId: number): string {
-    // Chercher le texte pour obtenir l'user_id du participant
-    const texte = this.textes.find(t => t.id === texteId);
-    if (!texte) return 'Aucun';
-    
-    // Chercher dans les affectations par participant_id
-    const affectationsTexte = this.affectations.filter(a => a.participant_id === texte.user_id);
+    // Chercher directement dans les affectations par texte_id
+    const affectationsTexte = this.affectations.filter(a => a.texte_id === texteId);
     
     if (affectationsTexte.length === 0) return 'Aucun';
     
