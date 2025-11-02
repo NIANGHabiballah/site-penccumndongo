@@ -377,8 +377,30 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   }
   
   calculateDeadline() {
-    const prochaineEcheance = this.getProchaineEcheance();
-    this.joursRestants = prochaineEcheance.jours;
+    // Pour les participants, toujours afficher les jours restants pour soumettre (jusqu'au 23 novembre)
+    this.joursRestants = this.getJoursRestants(this.concoursSchedule.inscription_fin);
+  }
+  
+  isSubmissionPeriodActive(): boolean {
+    const today = new Date();
+    const submissionDeadline = new Date(this.concoursSchedule.inscription_fin);
+    return today <= submissionDeadline;
+  }
+  
+  getSubmissionStatus(): string {
+    if (this.isSubmissionPeriodActive()) {
+      return this.joursRestants > 0 ? 'Jusqu\'au 23 novembre' : 'Dernier jour';
+    } else {
+      return 'Soumissions clôturées';
+    }
+  }
+  
+  getSubmissionLabel(): string {
+    if (this.isSubmissionPeriodActive()) {
+      return this.joursRestants > 0 ? 'Jours pour soumettre' : 'Dernier jour';
+    } else {
+      return 'Période terminée';
+    }
   }
   
   getJoursRestants(dateStr: string): number {

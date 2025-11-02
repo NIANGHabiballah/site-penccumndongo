@@ -144,15 +144,22 @@
               </div>
               <div>
                 <h3>Délais</h3>
-                <p>Temps restant</p>
+                <p>Temps restant pour soumettre</p>
               </div>
             </div>
             <div class="card-content">
               <div>
-                <div class="number">{{joursRestants}}</div>
-                <div class="label">Jours restants</div>
+                <div class="number" *ngIf="isSubmissionPeriodActive(); else submissionClosed">{{joursRestants}}</div>
+                <ng-template #submissionClosed>
+                  <div class="number">-</div>
+                </ng-template>
+                <div class="label">{{getSubmissionLabel()}}</div>
               </div>
-              <span class="status-badge status-pending">Inscription ouverte</span>
+              <span class="status-badge" 
+                    [class.status-pending]="isSubmissionPeriodActive()"
+                    [class.status-completed]="!isSubmissionPeriodActive()">
+                {{getSubmissionStatus()}}
+              </span>
             </div>
           </div>
           

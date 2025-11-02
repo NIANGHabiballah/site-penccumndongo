@@ -39,15 +39,28 @@ function setCorsHeaders() {
 // Connexion PDO
 function getDB() {
     try {
-        return new PDO(
-            'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8',
+        $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8';
+        $pdo = new PDO(
+            $dsn,
             DB_USER,
             DB_PASS,
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
         );
+        return $pdo;
     } catch (PDOException $e) {
+        // Log l'erreur pour debug
+        error_log('Erreur DB: ' . $e->getMessage());
+        error_log('DSN: mysql:host=' . DB_HOST . ';dbname=' . DB_NAME);
+        error_log('User: ' . DB_USER);
+        
         http_response_code(500);
-        echo json_encode(['error' => 'Erreur de connexion']);
+        echo json_encode([
+            'error' => 'Erreur de connexion à la base de données',
+            'details' => $e->getMessage(),
+            'host' => DB_HOST,
+            'database' => DB_NAME,
+            'user' => DB_USER
+        ]);
         exit;
     }
 }
@@ -91,17 +104,24 @@ function verifyToken() {
     return $payload;
 }
 
-// Fonction pour enregistrer une action dans l'historique
+
+// Fonction pour enregistrer une action dans l'historique (robuste)
 function logAction($userId, $action, $description) {
     try {
         $db = getDB();
-        $stmt = $db->prepare("
-            INSERT INTO cp2i_history (user_id, action, description) 
-            VALUES (?, ?, ?)
-        ");
-        $stmt->execute([$userId, $action, $description]);
+        // Vérifier si la table existe avant d'insérer
+        $stmt = $db->prepare("SHOW TABLES LIKE 'cp2i_history'");
+        $stmt->execute();
+        if ($stmt->fetch()) {
+            $stmt = $db->prepare("
+                INSERT INTO cp2i_history (user_id, action, description, created_at) 
+                VALUES (?, ?, ?, NOW())
+            ");
+            $stmt->execute([$userId, $action, $description]);
+        }
     } catch (Exception $e) {
-        // Ignorer les erreurs d'historique pour ne pas casser l'app
+        // Ignorer silencieusement les erreurs d'historique
+        error_log("Erreur historique (ignorée): " . $e->getMessage());
     }
 }
 ?>

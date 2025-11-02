@@ -38,49 +38,80 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
         
         <form (ngSubmit)="register()">
           <div class="input-group">
-            <div class="input-wrapper">
+            <label class="field-label">Nom complet *</label>
+            <div class="input-wrapper" [class.error]="fieldErrors.nomComplet">
               <i class="fas fa-user input-icon"></i>
-              <input type="text" [(ngModel)]="user.nomComplet" name="nomComplet" placeholder="Nom complet" required>
+              <input type="text" [(ngModel)]="user.nomComplet" name="nomComplet" placeholder="Prénom et nom de famille" required>
+            </div>
+            <small class="field-help">⚠️ Ce nom apparaîtra sur votre attestation de participation</small>
+            <div *ngIf="fieldErrors.nomComplet" class="field-error">
+              <i class="fas fa-exclamation-circle"></i>
+              <span>{{fieldErrors.nomComplet}}</span>
             </div>
           </div>
           
           <div class="form-row">
             <div class="input-group">
-              <div class="input-wrapper">
+              <label class="field-label">Adresse email *</label>
+              <div class="input-wrapper" [class.error]="fieldErrors.email">
                 <i class="fas fa-envelope input-icon"></i>
-                <input type="email" [(ngModel)]="user.email" name="email" placeholder="Email" required>
+                <input type="email" [(ngModel)]="user.email" name="email" placeholder="votre@email.com" required>
+              </div>
+              <div *ngIf="fieldErrors.email" class="field-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{fieldErrors.email}}</span>
               </div>
             </div>
             <div class="input-group">
-              <div class="input-wrapper">
+              <label class="field-label">Numéro de téléphone *</label>
+              <div class="input-wrapper" [class.error]="fieldErrors.telephone">
                 <i class="fas fa-phone input-icon"></i>
-                <input type="tel" [(ngModel)]="user.telephone" name="telephone" placeholder="Téléphone (+221 77 123 45 67)" required title="Incluez l'indicatif de votre pays (ex: +221 pour le Sénégal)">
+                <input type="tel" [(ngModel)]="user.telephone" name="telephone" placeholder="+221 77 123 45 67" required title="Incluez l'indicatif de votre pays">
               </div>
               <small class="field-help">Incluez l'indicatif de votre pays (ex: +221 77 123 45 67)</small>
+              <div *ngIf="fieldErrors.telephone" class="field-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{fieldErrors.telephone}}</span>
+              </div>
             </div>
           </div>
           
           <div class="form-row">
             <div class="input-group">
-              <div class="input-wrapper">
+              <label class="field-label">Mot de passe *</label>
+              <div class="input-wrapper" [class.error]="fieldErrors.password">
                 <i class="fas fa-lock input-icon"></i>
-                <input type="password" [(ngModel)]="user.password" name="password" placeholder="Mot de passe" required>
+                <input type="password" [(ngModel)]="user.password" name="password" placeholder="Minimum 6 caractères" required>
+              </div>
+              <div *ngIf="fieldErrors.password" class="field-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{fieldErrors.password}}</span>
               </div>
             </div>
             <div class="input-group">
-              <div class="input-wrapper">
+              <label class="field-label">Confirmer le mot de passe *</label>
+              <div class="input-wrapper" [class.error]="fieldErrors.confirmPassword">
                 <i class="fas fa-lock input-icon"></i>
-                <input type="password" [(ngModel)]="user.confirmPassword" name="confirmPassword" placeholder="Confirmer" required>
+                <input type="password" [(ngModel)]="user.confirmPassword" name="confirmPassword" placeholder="Retapez votre mot de passe" required>
+              </div>
+              <div *ngIf="fieldErrors.confirmPassword" class="field-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{fieldErrors.confirmPassword}}</span>
               </div>
             </div>
           </div>
           
           <div class="input-group">
-            <div class="input-wrapper">
+            <label class="field-label">Adresse complète (Ville, Région, Pays) *</label>
+            <div class="input-wrapper" [class.error]="fieldErrors.ville">
               <i class="fas fa-map-marker-alt input-icon"></i>
               <input type="text" [(ngModel)]="user.ville" name="ville" placeholder="Ville, Région, Pays" required title="Indiquez votre ville, région/département et pays">
             </div>
             <small class="field-help">Exemple: Dakar, Région de Dakar, Sénégal</small>
+            <div *ngIf="fieldErrors.ville" class="field-error">
+              <i class="fas fa-exclamation-circle"></i>
+              <span>{{fieldErrors.ville}}</span>
+            </div>
           </div>
           
           <div class="checkbox-group">
@@ -88,7 +119,7 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
               <input type="checkbox" [(ngModel)]="acceptTerms" name="acceptTerms" required>
               <span class="checkmark"></span>
               <span class="checkbox-text">
-                J'accepte les <a (click)="voirConditions()" class="terms-link">conditions générales</a> et le <a (click)="voirReglements()" class="terms-link">règlement du concours</a> CP2i
+                J'accepte les <a (click)="voirConditions()" class="terms-link">conditions générales</a> et le <a (click)="voirReglements()" class="terms-link">règlement du concours</a> CP2i *
               </span>
             </label>
           </div>
@@ -395,12 +426,40 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
       color: #e67e22;
     }
     
+    .field-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+    }
+    
     .field-help {
       display: block;
       font-size: 0.8rem;
       color: #7f8c8d;
       margin-top: 0.3rem;
       font-style: italic;
+    }
+    
+    .field-error {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.8rem;
+      color: #e74c3c;
+      margin-top: 0.3rem;
+      font-weight: 500;
+    }
+    
+    .input-wrapper.error input,
+    .select-wrapper.error select {
+      border-color: #e74c3c;
+      box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+    }
+    
+    .input-wrapper.error .input-icon {
+      color: #e74c3c;
     }
     
     .error-alert {
@@ -474,6 +533,7 @@ export class RegisterComponent {
   errorMessage = '';
   successMessage = '';
   isLoading = false;
+  fieldErrors: any = {};
 
   constructor(
     private router: Router,
@@ -487,19 +547,59 @@ export class RegisterComponent {
   register() {
     this.errorMessage = '';
     this.successMessage = '';
+    this.fieldErrors = {};
     
-    if (!this.user.nomComplet || !this.user.email || !this.user.password || !this.user.telephone || !this.user.ville) {
-      this.errorMessage = 'Veuillez remplir tous les champs obligatoires';
-      return;
+    // Validation détaillée de chaque champ
+    let hasErrors = false;
+    
+    if (!this.user.nomComplet || this.user.nomComplet.trim().length < 2) {
+      this.fieldErrors.nomComplet = 'Le nom complet est requis (minimum 2 caractères)';
+      hasErrors = true;
     }
     
-    if (this.user.password !== this.user.confirmPassword) {
-      this.errorMessage = 'Les mots de passe ne correspondent pas';
-      return;
+    if (!this.user.email) {
+      this.fieldErrors.email = 'L\'adresse email est requise';
+      hasErrors = true;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.user.email)) {
+      this.fieldErrors.email = 'Format d\'email invalide (exemple: nom@domaine.com)';
+      hasErrors = true;
+    }
+    
+    if (!this.user.telephone) {
+      this.fieldErrors.telephone = 'Le numéro de téléphone est requis';
+      hasErrors = true;
+    } else if (!/^\+?[1-9]\d{1,14}$/.test(this.user.telephone.replace(/\s/g, ''))) {
+      this.fieldErrors.telephone = 'Format de téléphone invalide (incluez l\'indicatif pays: +221...)';
+      hasErrors = true;
+    }
+    
+    if (!this.user.password) {
+      this.fieldErrors.password = 'Le mot de passe est requis';
+      hasErrors = true;
+    } else if (this.user.password.length < 6) {
+      this.fieldErrors.password = 'Le mot de passe doit contenir au moins 6 caractères';
+      hasErrors = true;
+    }
+    
+    if (!this.user.confirmPassword) {
+      this.fieldErrors.confirmPassword = 'Veuillez confirmer votre mot de passe';
+      hasErrors = true;
+    } else if (this.user.password !== this.user.confirmPassword) {
+      this.fieldErrors.confirmPassword = 'Les mots de passe ne correspondent pas';
+      hasErrors = true;
+    }
+    
+    if (!this.user.ville || this.user.ville.trim().length < 3) {
+      this.fieldErrors.ville = 'La localisation est requise (ville, région, pays)';
+      hasErrors = true;
     }
     
     if (!this.acceptTerms) {
-      this.errorMessage = 'Veuillez accepter les conditions générales';
+      this.errorMessage = 'Veuillez accepter les conditions générales et le règlement du concours';
+      hasErrors = true;
+    }
+    
+    if (hasErrors) {
       return;
     }
 
@@ -534,8 +634,29 @@ export class RegisterComponent {
         }
       },
       error: (error) => {
-        this.errorMessage = error.error?.error || 'Erreur lors de l\'inscription';
         this.isLoading = false;
+        console.log('Registration error:', error);
+        
+        // Messages d'erreur spécifiques du serveur
+        if (error.error?.error && typeof error.error.error === 'string') {
+          const serverError = error.error.error.toLowerCase();
+          
+          if (serverError.includes('email') && serverError.includes('utilisé')) {
+            this.fieldErrors.email = 'Cette adresse email est déjà utilisée';
+          } else if (serverError.includes('email')) {
+            this.fieldErrors.email = 'Problème avec l\'adresse email';
+          } else if (serverError.includes('téléphone') || serverError.includes('telephone')) {
+            this.fieldErrors.telephone = 'Problème avec le numéro de téléphone';
+          } else {
+            this.errorMessage = error.error.error;
+          }
+        } else if (error.error?.error) {
+          this.errorMessage = String(error.error.error);
+        } else if (error.message) {
+          this.errorMessage = error.message;
+        } else {
+          this.errorMessage = 'Erreur lors de l\'inscription. Vérifiez votre connexion et réessayez.';
+        }
       }
     });
   }

@@ -59,9 +59,46 @@ function registerUser($data) {
     $ville = $data['ville'] ?? '';
     $role = $data['role'] ?? 'participant';
     
-    if (!$email || !$password || !$nom || !$prenom || !$telephone || !$ville) {
+    // Validation détaillée des champs
+    if (!$email) {
         http_response_code(400);
-        echo json_encode(['error' => 'Tous les champs sont obligatoires']);
+        echo json_encode(['error' => 'L\'adresse email est requise']);
+        return;
+    }
+    
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Format d\'email invalide']);
+        return;
+    }
+    
+    if (!$password || strlen($password) < 6) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Le mot de passe doit contenir au moins 6 caractères']);
+        return;
+    }
+    
+    if (!$nom || strlen(trim($nom)) < 1) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Le nom est requis']);
+        return;
+    }
+    
+    if (!$prenom || strlen(trim($prenom)) < 1) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Le prénom est requis']);
+        return;
+    }
+    
+    if (!$telephone) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Le numéro de téléphone est requis']);
+        return;
+    }
+    
+    if (!$ville || strlen(trim($ville)) < 3) {
+        http_response_code(400);
+        echo json_encode(['error' => 'La localisation complète est requise (ville, région, pays)']);
         return;
     }
     
@@ -70,7 +107,7 @@ function registerUser($data) {
     $stmt->execute([$email]);
     if ($stmt->fetch()) {
         http_response_code(409);
-        echo json_encode(['error' => 'Email déjà utilisé']);
+        echo json_encode(['error' => 'Cette adresse email est déjà utilisée. Utilisez une autre adresse ou connectez-vous.']);
         return;
     }
     
@@ -90,12 +127,9 @@ function registerUser($data) {
     ];
     
     if (createUserWithPassword($db, $userData)) {
-        // Enregistrer l'inscription dans l'historique
+        // Enregistrer l'inscription dans l'historique (si la table existe)
         $userId = $db->lastInsertId();
         logAction($userId, 'register', 'Inscription utilisateur');
-        
-        // Log pour confirmation
-        error_log("User created with consistent password: $email");
         
         // Envoyer email de vérification
         sendVerificationEmail($email, $nom, $prenom, $verificationToken);
@@ -139,7 +173,7 @@ function loginUser($data) {
         return;
     }
     
-    // Enregistrer la connexion dans l'historique
+    // Enregistrer la connexion dans l'historique (si la table existe)
     logAction($user['id'], 'login', 'Connexion utilisateur');
     
     $token = generateToken($user['id'], $user['email'], $user['role']);

@@ -66,6 +66,8 @@ export class Cp2iApiService {
   }
 
   register(userData: any): Observable<AuthResponse> {
+    console.log('Registering user with URL:', `${this.baseUrl}/cp2i-auth.php?action=register`);
+    console.log('User data:', userData);
     return this.http.post<AuthResponse>(`${this.baseUrl}/cp2i-auth.php?action=register`, userData);
   }
 
