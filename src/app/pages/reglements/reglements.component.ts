@@ -82,7 +82,7 @@ import { ApiService } from '../../services/api.service';
           <section class="reglement-section nouveautes" *ngIf="reglements.nouveautes_2025">
             <h2><i class="fas fa-star"></i> NOUVEAUTÉS {{reglements.annee}}</h2>
             <ul>
-              <li><strong>Nouveaux thèmes :</strong> {{reglements.nouveautes_2025.themes_supplementaires}}</li>
+              <li><strong>Nouveaux thèmes :</strong> {{reglements.nouveautes_2025.themes_officiels}}</li>
               <li><strong>Limite augmentée :</strong> {{reglements.nouveautes_2025.limite_vers_augmentee}}</li>
               <li><strong>Période prolongée :</strong> {{reglements.nouveautes_2025.periode_prolongee}}</li>
               <li><strong>Plateforme numérique :</strong> {{reglements.nouveautes_2025.plateforme_numerique}}</li>
@@ -542,7 +542,7 @@ export class ReglementsComponent implements OnInit {
       edition: '3ème',
       annee: '2025',
       organisation: {
-        description: 'La 3ème édition du Concours de Poésie Inédit et Innovant (CP2i) est organisée par Penccum Ndongo, une entreprise spécialisée dans la promotion des solutions numériques et l\'accompagnement des initiatives culturelles et créatives.',
+        description: 'La 3ème édition du Concours de Poésie Inédit et Innovant (CP2i) est organisée par Penccum Ndongo, une agence de marketing et de communication digitale qui propose des solutions numériques et l\'accompagnement des initiatives culturelles et créatives.',
         objectif: 'Cette année, le CP2i vise à offrir une plateforme d\'expression aux poètes, jeunes et confirmés, pour explorer et partager leur vision sur des thématiques d\'actualité.'
       },
       participation: {
@@ -568,7 +568,7 @@ export class ReglementsComponent implements OnInit {
       recompenses: {
         prix_par_langue: 'Des prix seront attribués aux lauréats des différentes langues',
         ceremonie: 'Les poèmes sélectionnés pourront faire l\'objet de publications ou d\'interprétations lors de la cérémonie de remise des prix',
-        details: 'Les détails sur les récompenses seront précisés lors de l\'annonce des finalistes'
+        details: 'Les récompenses seront remises le jour de la cérémonie'
       },
       conditions: {
         droits: 'En participant au concours, les auteurs acceptent de céder leurs droits de reproduction et de diffusion à Penccum Ndongo',
@@ -584,7 +584,7 @@ export class ReglementsComponent implements OnInit {
         suivi_temps_reel: 'Suivi en temps réel du statut de participation'
       },
       participation_info: {
-        lien_inscription: 'https://penccumndongo.com/cp2i',
+        lien_inscription: 'https://penccumndongo.com/auth/register',
         telephone: '+221 76 841 54 14'
       },
       partenaires: [
