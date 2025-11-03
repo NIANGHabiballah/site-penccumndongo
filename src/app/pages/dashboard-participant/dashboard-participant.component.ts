@@ -345,34 +345,40 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   loadCertificats() {
     this.certificats = [];
     
-    // Un seul certificat selon le niveau de performance
-    if (this.classement?.position && this.classement.position <= 10) {
-      // Certificat d'excellence pour le top 10
-      this.certificats.push({
-        id: 1,
-        titre: 'Certificat d\'Excellence',
-        description: 'Attestation d\'excellence pour performance remarquable',
-        type: 'excellence',
-        date: new Date()
-      });
-    } else if (this.stats.textes_acceptes > 0) {
-      // Certificat de mérite si texte admis
-      this.certificats.push({
-        id: 1,
-        titre: 'Certificat de Mérite',
-        description: 'Attestation de mérite pour texte admis au concours',
-        type: 'merite',
-        date: new Date()
-      });
-    } else {
-      // Certificat de participation par défaut
-      this.certificats.push({
-        id: 1,
-        titre: 'Certificat de Participation',
-        description: 'Attestation officielle de participation au concours CP2i 2025',
-        type: 'participation',
-        date: new Date()
-      });
+    // Vérifier si le participant a reçu ses trois notes de correction
+    const hasThreeCorrections = this.hasThreeCorrections();
+    
+    // N'afficher les certificats que si le participant a ses trois notes
+    if (hasThreeCorrections) {
+      // Un seul certificat selon le niveau de performance
+      if (this.classement?.position && this.classement.position <= 10) {
+        // Certificat d'excellence pour le top 10
+        this.certificats.push({
+          id: 1,
+          titre: 'Certificat d\'Excellence',
+          description: 'Attestation d\'excellence pour performance remarquable',
+          type: 'excellence',
+          date: new Date()
+        });
+      } else if (this.stats.textes_acceptes > 0) {
+        // Certificat de mérite si texte admis
+        this.certificats.push({
+          id: 1,
+          titre: 'Certificat de Mérite',
+          description: 'Attestation de mérite pour texte admis au concours',
+          type: 'merite',
+          date: new Date()
+        });
+      } else {
+        // Certificat de participation par défaut
+        this.certificats.push({
+          id: 1,
+          titre: 'Certificat de Participation',
+          description: 'Attestation officielle de participation au concours CP2i 2025',
+          type: 'participation',
+          date: new Date()
+        });
+      }
     }
   }
   
@@ -1118,6 +1124,12 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
 
   hasCorrections(): boolean {
     return this.mesSoumissions.some(texte => texte.corrections && texte.corrections.length > 0);
+  }
+  
+  hasThreeCorrections(): boolean {
+    // Pour le moment, retourner false pour tous les participants
+    // jusqu'à ce qu'ils aient effectivement 3 corrections complètes
+    return false;
   }
 
   canModifyText(texte: any): { canModify: boolean, reason: string } {
