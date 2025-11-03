@@ -1355,6 +1355,300 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     };
   }
   
+  // Nombre de textes par langue
+  getLanguageCount(langue: string): number {
+    if (this.textes.length === 0) return 0;
+    
+    switch(langue.toLowerCase()) {
+      case 'francais':
+        return this.textes.filter(t => t.langue?.toLowerCase() === 'francais' || t.langue?.toLowerCase() === 'français').length;
+      case 'wolof':
+        return this.textes.filter(t => t.langue?.toLowerCase() === 'wolof').length;
+      case 'anglais':
+        return this.textes.filter(t => t.langue?.toLowerCase() === 'anglais' || t.langue?.toLowerCase() === 'english').length;
+      case 'arabe':
+        return this.textes.filter(t => t.langue?.toLowerCase() === 'arabe' || t.langue?.toLowerCase() === 'arabic').length;
+      default:
+        return 0;
+    }
+  }
+  
+  // Classification par nationalité
+  classifyNationality(ville: string, telephone: string): string {
+    const villeLC = ville?.toLowerCase() || '';
+    const tel = telephone?.replace(/\s/g, '') || '';
+    
+    // Sénégal
+    if (villeLC.includes('sénégal') || villeLC.includes('senegal') || 
+        villeLC.includes('dakar') || villeLC.includes('saint-louis') || 
+        villeLC.includes('thiès') || villeLC.includes('thies') ||
+        villeLC.includes('rufisque') || villeLC.includes('guédiawaye') ||
+        villeLC.includes('guediawaye') || villeLC.includes('kolda') ||
+        villeLC.includes('mbour') || villeLC.includes('louga') ||
+        villeLC.includes('dahra') || villeLC.includes('ugb') ||
+        villeLC.includes('malika') || tel.startsWith('+221') ||
+        tel.startsWith('221') || /^7\d{8}$/.test(tel)) {
+      return 'senegal';
+    }
+    
+    // Côte d'Ivoire
+    if (villeLC.includes('côte') || villeLC.includes('daloa') || villeLC.includes('abidjan') ||
+        tel.startsWith('+225') || tel.startsWith('225')) {
+      return 'cote_ivoire';
+    }
+    
+    // Mali
+    if (villeLC.includes('mali') || villeLC.includes('bamako') ||
+        tel.startsWith('+223') || tel.startsWith('223')) {
+      return 'mali';
+    }
+    
+    // Niger
+    if (villeLC.includes('niger') || villeLC.includes('niamey') ||
+        tel.startsWith('+227') || tel.startsWith('227')) {
+      return 'niger';
+    }
+    
+    // Mauritanie
+    if (villeLC.includes('mauritanie') || villeLC.includes('nouakchott') ||
+        tel.startsWith('+222') || tel.startsWith('222')) {
+      return 'mauritanie';
+    }
+    
+    // Togo
+    if (villeLC.includes('togo') || villeLC.includes('lomé') || villeLC.includes('lome') ||
+        tel.startsWith('+228') || tel.startsWith('228')) {
+      return 'togo';
+    }
+    
+    // Congo (République du Congo)
+    if (villeLC.includes('congo') || villeLC.includes('brazzaville') ||
+        tel.startsWith('+242') || tel.startsWith('242')) {
+      return 'congo';
+    }
+    
+    // RDC (République Démocratique du Congo)
+    if (villeLC.includes('rdc') || villeLC.includes('kinshasa') ||
+        tel.startsWith('+243') || tel.startsWith('243')) {
+      return 'rdc';
+    }
+    
+    // Burkina Faso
+    if (villeLC.includes('burkina') || villeLC.includes('ouagadougou') ||
+        tel.startsWith('+226') || tel.startsWith('226')) {
+      return 'burkina';
+    }
+    
+    // Guinée
+    if (villeLC.includes('guinée') || villeLC.includes('guinee') || villeLC.includes('conakry') ||
+        tel.startsWith('+224') || tel.startsWith('224')) {
+      return 'guinee';
+    }
+    
+    // France
+    if (tel.startsWith('+33') || tel.startsWith('33')) {
+      return 'france';
+    }
+    
+    return 'autres';
+  }
+  
+  // Statistiques par nationalité
+  getNationalityStats() {
+    if (this.users.length === 0) return { senegal: 0, cote_ivoire: 0, mali: 0, niger: 0, mauritanie: 0, togo: 0, congo: 0, rdc: 0, burkina: 0, guinee: 0, france: 0, autres: 0 };
+    
+    const countries = ['senegal', 'cote_ivoire', 'mali', 'niger', 'mauritanie', 'togo', 'congo', 'rdc', 'burkina', 'guinee', 'france', 'autres'];
+    const stats: any = {};
+    
+    countries.forEach(country => {
+      const count = this.users.filter(u => this.classifyNationality(u.ville, u.telephone) === country).length;
+      stats[country] = Math.round((count / this.users.length) * 100);
+    });
+    
+    return stats;
+  }
+  
+  // Top pays (affiche tous même avec 0%)
+  getTopCountries() {
+    const stats = this.getNationalityStats();
+    const countries = [
+      { name: 'Sénégal', flag: '🇸🇳', key: 'senegal', percentage: stats.senegal },
+      { name: 'Côte d\'Ivoire', flag: '🇮🇨', key: 'cote_ivoire', percentage: stats.cote_ivoire },
+      { name: 'Mali', flag: '🇲🇱', key: 'mali', percentage: stats.mali },
+      { name: 'Niger', flag: '🇳🇪', key: 'niger', percentage: stats.niger },
+      { name: 'Mauritanie', flag: '🇲🇷', key: 'mauritanie', percentage: stats.mauritanie },
+      { name: 'France', flag: '🇫🇷', key: 'france', percentage: stats.france }
+    ];
+    
+    return countries.sort((a, b) => b.percentage - a.percentage);
+  }
+  
+  // Extraction et normalisation des villes
+  extractCity(ville: string): string {
+    if (!ville) return 'Non spécifiée';
+    
+    const villeLC = ville.toLowerCase().trim();
+    
+    // Extraction des villes principales du Sénégal
+    if (villeLC.includes('dakar')) return 'Dakar';
+    if (villeLC.includes('thiès') || villeLC.includes('thies')) return 'Thiès';
+    if (villeLC.includes('saint-louis')) return 'Saint-Louis';
+    if (villeLC.includes('kaolack')) return 'Kaolack';
+    if (villeLC.includes('ziguinchor')) return 'Ziguinchor';
+    if (villeLC.includes('rufisque')) return 'Rufisque';
+    if (villeLC.includes('guédiawaye') || villeLC.includes('guediawaye')) return 'Guédiawaye';
+    if (villeLC.includes('kolda')) return 'Kolda';
+    if (villeLC.includes('mbour')) return 'Mbour';
+    if (villeLC.includes('louga')) return 'Louga';
+    if (villeLC.includes('ugb')) return 'Saint-Louis'; // UGB = Université Gaston Berger à Saint-Louis
+    
+    // Villes internationales
+    if (villeLC.includes('daloa')) return 'Daloa';
+    if (villeLC.includes('abidjan')) return 'Abidjan';
+    
+    return 'Autres';
+  }
+  
+  // Statistiques des villes
+  getCityStats() {
+    if (this.users.length === 0) return [];
+    
+    const cityCount: { [key: string]: number } = {};
+    
+    this.users.forEach(user => {
+      const city = this.extractCity(user.ville);
+      cityCount[city] = (cityCount[city] || 0) + 1;
+    });
+    
+    const total = this.users.length;
+    const cities = Object.entries(cityCount)
+      .map(([city, count]) => ({
+        name: city,
+        count: count,
+        percentage: Math.round((count / total) * 100)
+      }))
+      .sort((a, b) => b.count - a.count);
+    
+    // Garder le top 5 + regrouper le reste dans "Autres"
+    const top5 = cities.slice(0, 5);
+    const others = cities.slice(5);
+    
+    if (others.length > 0) {
+      const othersCount = others.reduce((sum, city) => sum + city.count, 0);
+      const othersPercentage = Math.round((othersCount / total) * 100);
+      
+      if (othersPercentage > 0) {
+        top5.push({
+          name: 'Autres',
+          count: othersCount,
+          percentage: othersPercentage
+        });
+      }
+    }
+    
+    return top5;
+  }
+  
+  // Classification par région
+  extractRegion(ville: string): string {
+    if (!ville) return 'Non spécifiée';
+    
+    const villeLC = ville.toLowerCase().trim();
+    
+    // Région de Dakar
+    if (villeLC.includes('dakar') || villeLC.includes('rufisque') || 
+        villeLC.includes('guédiawaye') || villeLC.includes('guediawaye') ||
+        villeLC.includes('malika') || villeLC.includes('pikine')) {
+      return 'Dakar';
+    }
+    
+    // Région de Thiès
+    if (villeLC.includes('thiès') || villeLC.includes('thies') || 
+        villeLC.includes('mbour') || villeLC.includes('tivaouane')) {
+      return 'Thiès';
+    }
+    
+    // Région de Saint-Louis
+    if (villeLC.includes('saint-louis') || villeLC.includes('ugb') ||
+        villeLC.includes('ross-béthio') || villeLC.includes('dagana')) {
+      return 'Saint-Louis';
+    }
+    
+    // Région de Casamance (Ziguinchor + Sédhiou)
+    if (villeLC.includes('ziguinchor') || villeLC.includes('sédhiou') ||
+        villeLC.includes('sedhiou') || villeLC.includes('bignona') ||
+        villeLC.includes('oussouye')) {
+      return 'Casamance';
+    }
+    
+    // Région de Kaolack
+    if (villeLC.includes('kaolack') || villeLC.includes('kaffrine') ||
+        villeLC.includes('nioro') || villeLC.includes('guinguinéo')) {
+      return 'Kaolack';
+    }
+    
+    // Région de Louga
+    if (villeLC.includes('louga') || villeLC.includes('dahra') ||
+        villeLC.includes('linguère') || villeLC.includes('kebemer')) {
+      return 'Louga';
+    }
+    
+    // Région de Kolda
+    if (villeLC.includes('kolda') || villeLC.includes('vélingara') ||
+        villeLC.includes('médina yoro foulah')) {
+      return 'Kolda';
+    }
+    
+    // Région de Tambacounda
+    if (villeLC.includes('tambacounda') || villeLC.includes('kédougou') ||
+        villeLC.includes('bakel') || villeLC.includes('goudiry')) {
+      return 'Tambacounda';
+    }
+    
+    // Région de Fatick
+    if (villeLC.includes('fatick') || villeLC.includes('foundiougne') ||
+        villeLC.includes('gossas') || villeLC.includes('sokone')) {
+      return 'Fatick';
+    }
+    
+    // Région de Diourbel
+    if (villeLC.includes('diourbel') || villeLC.includes('touba') ||
+        villeLC.includes('mbacké') || villeLC.includes('bambey')) {
+      return 'Diourbel';
+    }
+    
+    // Région de Matam
+    if (villeLC.includes('matam') || villeLC.includes('kanel') ||
+        villeLC.includes('ranérou') || villeLC.includes('ourossogui')) {
+      return 'Matam';
+    }
+    
+    return 'Autres';
+  }
+  
+  // Statistiques des régions
+  getRegionStats() {
+    if (this.users.length === 0) return [];
+    
+    const regionCount: { [key: string]: number } = {};
+    
+    this.users.forEach(user => {
+      const region = this.extractRegion(user.ville);
+      regionCount[region] = (regionCount[region] || 0) + 1;
+    });
+    
+    const total = this.users.length;
+    const regions = Object.entries(regionCount)
+      .map(([region, count]) => ({
+        name: region,
+        count: count,
+        percentage: Math.round((count / total) * 100)
+      }))
+      .sort((a, b) => b.count - a.count);
+    
+    return regions.slice(0, 6);
+  }
+  
   getAcceptanceRate() {
     if (this.textes.length === 0) return 0;
     const acceptes = this.textes.filter(t => t.statut === 'accepte').length;

@@ -1121,10 +1121,22 @@
               <h4><i class="fas fa-globe"></i> Répartition par langue</h4>
             </div>
             <div class="pie-chart">
-              <div class="pie-segment french">Français {{getLanguageStats().francais}}%</div>
-              <div class="pie-segment wolof">Wolof {{getLanguageStats().wolof}}%</div>
-              <div class="pie-segment english">Anglais {{getLanguageStats().anglais}}%</div>
-              <div class="pie-segment arabic">Arabe {{getLanguageStats().arabe}}%</div>
+              <div class="pie-segment french">
+                <span>Français {{getLanguageStats().francais}}%</span>
+                <span class="text-count">({{getLanguageCount('francais')}} textes)</span>
+              </div>
+              <div class="pie-segment wolof">
+                <span>Wolof {{getLanguageStats().wolof}}%</span>
+                <span class="text-count">({{getLanguageCount('wolof')}} textes)</span>
+              </div>
+              <div class="pie-segment english">
+                <span>Anglais {{getLanguageStats().anglais}}%</span>
+                <span class="text-count">({{getLanguageCount('anglais')}} textes)</span>
+              </div>
+              <div class="pie-segment arabic">
+                <span>Arabe {{getLanguageStats().arabe}}%</span>
+                <span class="text-count">({{getLanguageCount('arabe')}} textes)</span>
+              </div>
             </div>
           </div>
 
@@ -1160,37 +1172,13 @@
               <h4><i class="fas fa-flag"></i> Répartition par nationalité</h4>
             </div>
             <div class="nationality-chart">
-              <div class="nationality-item">
-                <span class="nationality-flag">🇸🇳</span>
-                <span class="nationality-name">Sénégal</span>
+              <div class="nationality-item" *ngFor="let country of getTopCountries()">
+                <span class="nationality-flag">{{country.flag}}</span>
+                <span class="nationality-name">{{country.name}}</span>
                 <div class="nationality-bar">
-                  <div class="bar-fill" style="width: 85%"></div>
+                  <div class="bar-fill" [style.width.%]="country.percentage"></div>
                 </div>
-                <span class="nationality-count">85%</span>
-              </div>
-              <div class="nationality-item">
-                <span class="nationality-flag">🇫🇷</span>
-                <span class="nationality-name">France</span>
-                <div class="nationality-bar">
-                  <div class="bar-fill" style="width: 8%"></div>
-                </div>
-                <span class="nationality-count">8%</span>
-              </div>
-              <div class="nationality-item">
-                <span class="nationality-flag">🇲🇱</span>
-                <span class="nationality-name">Mali</span>
-                <div class="nationality-bar">
-                  <div class="bar-fill" style="width: 4%"></div>
-                </div>
-                <span class="nationality-count">4%</span>
-              </div>
-              <div class="nationality-item">
-                <span class="nationality-flag">🌍</span>
-                <span class="nationality-name">Autres</span>
-                <div class="nationality-bar">
-                  <div class="bar-fill" style="width: 3%"></div>
-                </div>
-                <span class="nationality-count">3%</span>
+                <span class="nationality-count">{{country.percentage}}%</span>
               </div>
             </div>
           </div>
@@ -1200,47 +1188,12 @@
               <h4><i class="fas fa-map-marker-alt"></i> Top villes</h4>
             </div>
             <div class="cities-chart">
-              <div class="city-item">
-                <span class="city-name">Dakar</span>
+              <div class="city-item" *ngFor="let city of getCityStats()">
+                <span class="city-name">{{city.name}}</span>
                 <div class="city-progress">
-                  <div class="progress-fill dakar" style="width: 45%"></div>
+                  <div class="progress-fill" [style.width.%]="city.percentage"></div>
                 </div>
-                <span class="city-count">45%</span>
-              </div>
-              <div class="city-item">
-                <span class="city-name">Thiès</span>
-                <div class="city-progress">
-                  <div class="progress-fill thies" style="width: 15%"></div>
-                </div>
-                <span class="city-count">15%</span>
-              </div>
-              <div class="city-item">
-                <span class="city-name">Saint-Louis</span>
-                <div class="city-progress">
-                  <div class="progress-fill saint-louis" style="width: 12%"></div>
-                </div>
-                <span class="city-count">12%</span>
-              </div>
-              <div class="city-item">
-                <span class="city-name">Kaolack</span>
-                <div class="city-progress">
-                  <div class="progress-fill kaolack" style="width: 10%"></div>
-                </div>
-                <span class="city-count">10%</span>
-              </div>
-              <div class="city-item">
-                <span class="city-name">Ziguinchor</span>
-                <div class="city-progress">
-                  <div class="progress-fill ziguinchor" style="width: 8%"></div>
-                </div>
-                <span class="city-count">8%</span>
-              </div>
-              <div class="city-item">
-                <span class="city-name">Autres</span>
-                <div class="city-progress">
-                  <div class="progress-fill autres" style="width: 10%"></div>
-                </div>
-                <span class="city-count">10%</span>
+                <span class="city-count">{{city.percentage}}%</span>
               </div>
             </div>
           </div>
@@ -1251,29 +1204,13 @@
             </div>
             <div class="regions-map">
               <div class="region-grid">
-                <div class="region-item high">
-                  <span class="region-name">Dakar</span>
-                  <span class="region-count">45%</span>
-                </div>
-                <div class="region-item medium">
-                  <span class="region-name">Thiès</span>
-                  <span class="region-count">18%</span>
-                </div>
-                <div class="region-item medium">
-                  <span class="region-name">Saint-Louis</span>
-                  <span class="region-count">15%</span>
-                </div>
-                <div class="region-item low">
-                  <span class="region-name">Casamance</span>
-                  <span class="region-count">12%</span>
-                </div>
-                <div class="region-item low">
-                  <span class="region-name">Kaolack</span>
-                  <span class="region-count">6%</span>
-                </div>
-                <div class="region-item very-low">
-                  <span class="region-name">Autres</span>
-                  <span class="region-count">4%</span>
+                <div class="region-item" *ngFor="let region of getRegionStats()" 
+                     [class.high]="region.percentage >= 30"
+                     [class.medium]="region.percentage >= 10 && region.percentage < 30"
+                     [class.low]="region.percentage >= 5 && region.percentage < 10"
+                     [class.very-low]="region.percentage < 5">
+                  <span class="region-name">{{region.name}}</span>
+                  <span class="region-count">{{region.percentage}}%</span>
                 </div>
               </div>
             </div>

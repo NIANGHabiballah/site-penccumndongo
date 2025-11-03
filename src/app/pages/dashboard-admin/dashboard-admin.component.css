@@ -2197,10 +2197,18 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .pie-segment {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
   padding: 0.75rem;
   border-radius: 8px;
   font-weight: 600;
+}
+
+.text-count {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-weight: 500;
+  color: white;
 }
 
 .pie-segment.french {
@@ -2391,12 +2399,9 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
   transition: width 0.3s;
 }
 
-.progress-fill.dakar { background: linear-gradient(135deg, #FF7F1A, #ff9a3d); }
-.progress-fill.thies { background: linear-gradient(135deg, #28a745, #34ce57); }
-.progress-fill.saint-louis { background: linear-gradient(135deg, #6f42c1, #8e5dd8); }
-.progress-fill.kaolack { background: linear-gradient(135deg, #dc3545, #e55a6a); }
-.progress-fill.ziguinchor { background: linear-gradient(135deg, #17a2b8, #3fc5d8); }
-.progress-fill.autres { background: linear-gradient(135deg, #6c757d, #8a9ba8); }
+.progress-fill {
+  background: linear-gradient(135deg, #0380C2, #4a90e2);
+}
 
 .city-count {
   min-width: 35px;
