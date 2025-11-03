@@ -86,7 +86,7 @@
     <div class="themes-preview-header">
       <h2 class="themes-title">
         <i class="fas fa-lightbulb"></i>
-        Thèmes de cette édition
+        Thèmes de cette 3e édition
       </h2>
       <p class="themes-subtitle">Découvrez les 5 thèmes qui inspireront vos créations poétiques</p>
     </div>
@@ -272,6 +272,28 @@
 </section>
 
 
+
+<!-- Partners Section -->
+<section class="partners-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="fas fa-handshake"></i>
+        Nos Partenaires Officiels
+      </h2>
+      <p class="section-subtitle">Ils nous accompagnent dans cette aventure culturelle</p>
+    </div>
+    <div class="partners-grid">
+      <div class="partner-item" *ngFor="let partner of partners">
+        <img [src]="partner.logo" [alt]="partner.name" class="partner-logo">
+        <span class="partner-name">{{partner.name}}</span>
+      </div>
+    </div>
+    <p class="partners-thanks">
+      Nous remercions chaleureusement nos partenaires pour leur soutien dans la réalisation du CP2i.
+    </p>
+  </div>
+</section>
 
 <!-- CTA Section -->
 <section class="cta-section">

@@ -430,6 +430,7 @@ import { ApiService } from '../../services/api.service';
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 1rem;
       min-height: 120px;
     }
@@ -440,8 +441,8 @@ import { ApiService } from '../../services/api.service';
     }
 
     .partenaire-logo {
-      max-width: 80px;
-      max-height: 60px;
+      max-width: 100px;
+      max-height: 80px;
       width: auto;
       height: auto;
       object-fit: contain;
@@ -588,15 +589,15 @@ export class ReglementsComponent implements OnInit {
         telephone: '+221 76 841 54 14'
       },
       partenaires: [
-        { nom: 'Partenaire 1', logo: 'P1.jpg' },
-        { nom: 'Partenaire 2', logo: 'P2.png' },
-        { nom: 'Partenaire 3', logo: 'P3.jpg' },
-        { nom: 'Partenaire 4', logo: 'P4.jpeg' },
-        { nom: 'Partenaire 5', logo: 'P5.png' },
-        { nom: 'Partenaire 6', logo: 'P6.jpg' },
-        { nom: 'Partenaire 7', logo: 'P7.jpg' },
-        { nom: 'Partenaire 8', logo: 'P8.jpg' },
-        { nom: 'Partenaire 9', logo: 'P9.jpg' }
+        { nom: 'Capture Vision', logo: 'Partenaires/Capture-Vision.png' },
+        { nom: 'Comm Niit', logo: 'Partenaires/COMM-NIIT.png' },
+        { nom: 'DCI', logo: 'Partenaires/DCI.png' },
+        { nom: 'Gandal Afrik', logo: 'Partenaires/GANDAL-AFRIK.png' },
+        { nom: 'Home School', logo: 'Partenaires/HomeSchool.png' },
+        { nom: 'Mourchid Services', logo: 'Partenaires/MourchidServices.png' },
+        { nom: 'Ndiaye Digital', logo: 'Partenaires/Ndiaye-Digital.png' },
+        { nom: 'Tele Niandane', logo: 'Partenaires/TeleNiandane.png' },
+        { nom: 'UGB Live', logo: 'Partenaires/UGB-LIVE.png' }
       ],
       contact: {
         email: 'penc.pencumndongo@gmail.com',

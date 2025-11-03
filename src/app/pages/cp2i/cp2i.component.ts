@@ -65,25 +65,38 @@ export class Cp2iComponent implements OnInit {
   // Thèmes du concours CP2i 3ème édition
   themes = [
     {
-      title: 'Patriotisme',
+      title: '1. Patriotisme',
       icon: 'fas fa-flag'
     },
     {
-      title: 'Justice et dignité',
+      title: '2. Justice et dignité',
       icon: 'fas fa-balance-scale'
     },
     {
-      title: 'Beauté Africaine',
+      title: '3. Beauté Africaine',
       icon: 'fas fa-crown'
     },
     {
-      title: 'Jeunesse responsable',
+      title: '4. Jeunesse responsable',
       icon: 'fas fa-users'
     },
     {
-      title: 'Sous l\'emprise des écrans',
+      title: '5. Sous l\'emprise des écrans',
       icon: 'fas fa-mobile-alt'
     }
+  ];
+
+  // Partenaires officiels
+  partners = [
+    { name: 'Capture Vision', logo: 'Partenaires/Capture-Vision.png' },
+    { name: 'Comm Niit', logo: 'Partenaires/COMM-NIIT.png' },
+    { name: 'DCI', logo: 'Partenaires/DCI.png' },
+    { name: 'Gandal Afrik', logo: 'Partenaires/GANDAL-AFRIK.png' },
+    { name: 'Home School', logo: 'Partenaires/HomeSchool.png' },
+    { name: 'Mourchid Services', logo: 'Partenaires/MourchidServices.png' },
+    { name: 'Ndiaye Digital', logo: 'Partenaires/Ndiaye-Digital.png' },
+    { name: 'Tele Niandane', logo: 'Partenaires/TeleNiandane.png' },
+    { name: 'UGB Live', logo: 'Partenaires/UGB-LIVE.png' }
   ];
 
   ngOnInit() {
