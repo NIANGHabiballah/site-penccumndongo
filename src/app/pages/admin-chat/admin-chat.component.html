@@ -33,23 +33,46 @@
             
             <div class="conversation-info">
               <div class="conversation-header">
-                <span class="subject">{{conv.subject}}</span>
-                <span class="status" [style.background-color]="getStatusColor(conv.status)">
-                  {{conv.status}}
-                </span>
+                <div class="subject-wrapper">
+                  <h4 class="subject-title">{{conv.subject}}</h4>
+                  <span class="status-badge" [ngClass]="'status-' + conv.status">
+                    <i class="fas" [ngClass]="{
+                      'fa-envelope-open': conv.status === 'open',
+                      'fa-user-check': conv.status === 'assigned', 
+                      'fa-check-circle': conv.status === 'closed'
+                    }"></i>
+                    {{conv.status === 'open' ? 'Ouvert' : conv.status === 'assigned' ? 'Assigné' : 'Fermé'}}
+                  </span>
+                </div>
+                <div class="priority-indicator">
+                  <span class="priority-badge" [ngClass]="'priority-' + conv.priority">
+                    <i class="fas fa-flag"></i> {{conv.priority === 'high' ? 'Haute' : conv.priority === 'medium' ? 'Moyenne' : 'Faible'}}
+                  </span>
+                </div>
               </div>
               
-              <div class="participant-info">
-                <span class="participant">Demande de: {{conv.user_name || conv.user_email}}</span>
-                <span class="admin-assigned" *ngIf="conv.admin_name">Assigné à: {{conv.admin_name}}</span>
-                <span class="priority" [style.color]="getPriorityColor(conv.priority)">
-                  <i class="fas fa-circle"></i>
-                </span>
+              <div class="participant-section">
+                <div class="participant-info">
+                  <i class="fas fa-user"></i>
+                  <span class="participant-name">{{conv.user_name || conv.user_email}}</span>
+                </div>
+                <div class="admin-info" *ngIf="conv.admin_name">
+                  <i class="fas fa-user-tie"></i>
+                  <span class="admin-name">{{conv.admin_name}}</span>
+                </div>
               </div>
               
-              <div class="conversation-meta">
-                <span class="date">{{formatDate(conv.updated_at)}}</span>
-                <span class="unread" *ngIf="conv.unread_count > 0">{{conv.unread_count}} non lus</span>
+              <div class="conversation-footer">
+                <div class="date-info">
+                  <i class="fas fa-clock"></i>
+                  <span class="date-text">{{formatDate(conv.updated_at)}}</span>
+                </div>
+                <div class="unread-info" *ngIf="conv.unread_count > 0">
+                  <span class="unread-badge">
+                    <i class="fas fa-envelope"></i>
+                    {{conv.unread_count}} non lu{{conv.unread_count > 1 ? 's' : ''}}
+                  </span>
+                </div>
               </div>
             </div>
 

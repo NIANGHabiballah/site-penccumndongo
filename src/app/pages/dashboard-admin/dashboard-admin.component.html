@@ -44,7 +44,9 @@
         <i class="fas fa-envelope"></i> Messages
       </div>
       <div class="nav-item" [class.active]="currentView === 'chat-support'" (click)="setCurrentView('chat-support')">
-        <i class="fas fa-comments"></i> Chat Support
+        <i class="fas fa-comments"></i> 
+        <span class="nav-text">Chat Support</span>
+        <span class="notification-badge" *ngIf="unreadChatMessages > 0">{{unreadChatMessages}}</span>
       </div>
       <div class="nav-item" [class.active]="currentView === 'historique'" (click)="setCurrentView('historique')">
         <i class="fas fa-history"></i> Historique
@@ -2152,6 +2154,28 @@
     <div class="modal-footer">
       <button class="btn btn-outline" (click)="closeReassignModal()">Annuler</button>
       <button class="btn btn-primary" (click)="saveReassignment()" [disabled]="!reassignForm.correcteur_id">Réassigner</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Confirmation Suppression Message -->
+<div class="modal-overlay" *ngIf="showDeleteMessageModal" (click)="closeDeleteMessageModal()">
+  <div class="modal-content small" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="fas fa-trash"></i> Confirmer la suppression</h3>
+      <button class="modal-close" (click)="closeDeleteMessageModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p>Êtes-vous sûr de vouloir supprimer ce message ?</p>
+      <div class="message-preview" *ngIf="selectedMessage">
+        <strong>Sujet :</strong> {{selectedMessage.subject}}<br>
+        <strong>Contenu :</strong> {{selectedMessage.content | slice:0:100}}{{selectedMessage.content?.length > 100 ? '...' : ''}}
+      </div>
+      <p class="warning-text">Cette action est irréversible.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" (click)="closeDeleteMessageModal()">Annuler</button>
+      <button class="btn btn-danger" (click)="confirmDeleteMessage()">Supprimer</button>
     </div>
   </div>
 </div>

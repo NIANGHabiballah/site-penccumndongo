@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Cp2iApiService, User } from '../../services/cp2i-api.service';
+import { ChatSupportService } from '../../services/chat-support.service';
 import { AdminChatComponent } from '../admin-chat/admin-chat.component';
 
 @Component({
@@ -147,7 +148,11 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   showUserModal = false;
   showDeleteModal = false;
   showUserDetailsModal = false;
+  showDeleteMessageModal = false;
   selectedUser: any = null;
+  selectedMessage: any = null;
+  unreadChatMessages = 0;
+  chatCheckInterval: any;
   userForm: any = {
     prenom: '',
     nom: '',
@@ -168,7 +173,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   constructor(
     private cp2iApi: Cp2iApiService,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private chatService: ChatSupportService
   ) {}
   
   private getHeaders() {
@@ -200,6 +206,9 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
+    if (this.chatCheckInterval) {
+      clearInterval(this.chatCheckInterval);
+    }
   }
 
   loadData() {
@@ -304,6 +313,40 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     
     // Charger les statistiques d'affectation
     this.loadAffectationStats();
+    
+    // Démarrer la vérification des messages de chat
+    this.startChatNotificationCheck();
+  }
+  
+  startChatNotificationCheck() {
+    this.checkUnreadChatMessages();
+    this.chatCheckInterval = setInterval(() => {
+      this.checkUnreadChatMessages();
+    }, 30000); // Vérifier toutes les 30 secondes
+  }
+  
+  checkUnreadChatMessages() {
+    if (!this.currentUser?.id) return;
+    
+    this.chatService.getConversations().subscribe({
+      next: (conversations) => {
+        const unreadConversations = conversations.filter(conv => 
+          conv.unread_count > 0
+        );
+        
+        const newCount = unreadConversations.length;
+        
+        // Ne notifier que si c'est une vraie augmentation (pas au démarrage)
+        if (newCount > this.unreadChatMessages && this.unreadChatMessages > 0 && this.currentView !== 'chat-support') {
+          this.showToast(`${newCount - this.unreadChatMessages} nouveau(x) message(s) de support`, 'success');
+        }
+        
+        this.unreadChatMessages = newCount;
+      },
+      error: (error) => {
+        this.unreadChatMessages = 0;
+      }
+    });
   }
 
   assignCorrector() {
@@ -382,6 +425,9 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
 
   setCurrentView(view: string) {
     this.currentView = view;
+    if (view === 'chat-support') {
+      this.unreadChatMessages = 0;
+    }
   }
 
   filterUsers(filter: string) {
@@ -1006,17 +1052,27 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   deleteMessage(message: any) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce message ?')) {
-      this.cp2iApi.deleteMessage(message.id).subscribe({
-        next: (response) => {
-          this.showToast('Message supprimé', 'success');
-          this.loadMessages();
-        },
-        error: (error) => {
-          this.showToast('Erreur lors de la suppression', 'error');
-        }
-      });
-    }
+    this.selectedMessage = message;
+    this.showDeleteMessageModal = true;
+  }
+  
+  confirmDeleteMessage() {
+    this.cp2iApi.deleteMessage(this.selectedMessage.id).subscribe({
+      next: (response) => {
+        this.showToast('Message supprimé', 'success');
+        this.loadMessages();
+        this.closeDeleteMessageModal();
+      },
+      error: (error) => {
+        this.showToast('Erreur lors de la suppression', 'error');
+        this.closeDeleteMessageModal();
+      }
+    });
+  }
+  
+  closeDeleteMessageModal() {
+    this.showDeleteMessageModal = false;
+    this.selectedMessage = null;
   }
   
   getTotalRecipients(): number {
