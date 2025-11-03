@@ -213,6 +213,28 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
   // --- Actualités ---
   articles: Article[] = [
     {
+      id: 10,
+      title: "Lancement Officiel CP2I 2025-2026",
+      excerpt: "Nous sommes ravis d'annoncer le lancement officiel de la troisième édition du Concours de Poésie Inédit & Innovant (CP2i) pour l'année 2025-2026. Une nouvelle aventure poétique commence ! #cp2i #penccumndongo #edition3",
+      image: "LancementOfficielCP2I2025-2026.jpg",
+      date: new Date('2025-01-15'),
+      author: "Penccum Ndongo",
+      category: "CP2I",
+      linkedinUrl: "https://www.linkedin.com/posts/penccum-ndongo_cp2i-penccumndongo-edition3-activity-7391021385529073665-DRHq?utm_source=share&utm_medium=member_desktop&rcm=ACoAADqQAssBElpPsDolAtxkZ86cX_61QT4D7ZA",
+      featured: true
+    },
+    {
+      id: 11,
+      title: "Appel aux Sponsors & Partenaires - CP2i Édition 3",
+      excerpt: "Rejoignez-nous en tant que sponsor ou partenaire pour la troisième édition du CP2i ! Ensemble, soutenons la créativité poétique africaine et contribuons au rayonnement culturel de notre continent. #cp2i #penccumndongo #edition3",
+      image: "AppelauxSponsorsPartenairesCP2iEdition3.jpg",
+      date: new Date('2025-01-10'),
+      author: "Penccum Ndongo",
+      category: "CP2I",
+      linkedinUrl: "https://www.linkedin.com/posts/penccum-ndongo_cp2i-penccumndongo-edition3-activity-7387216263854579712-OfjQ?utm_source=share&utm_medium=member_desktop&rcm=ACoAADqQAssBElpPsDolAtxkZ86cX_61QT4D7ZA",
+      featured: true
+    },
+    {
       id: 1,
       title: "Lundi d'inspiration - Thomas Edison",
       excerpt: "« La vision sans exécution n'est qu'hallucination. » - Thomas Edison. Une citation puissante pour nous rappeler l'importance de passer à l'action. #lundidinspiration #thomasedison #penccumndongo",

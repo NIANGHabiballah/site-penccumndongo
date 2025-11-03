@@ -841,23 +841,3 @@
   font-size: 1.1rem;
 }
   
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-  
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .performance-metrics {
-    grid-template-columns: 1fr;
-  }
-  
-  .quick-replies-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .quick-reply-card {
-    margin-bottom: 1rem;
-  }
-}
