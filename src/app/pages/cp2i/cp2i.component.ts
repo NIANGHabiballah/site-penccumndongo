@@ -20,11 +20,11 @@ export class Cp2iComponent implements OnInit {
   // Images du recueil
   bookImages: BookImage[] = [
     {
-      src: 'CouvertureRecueildePoème.jpeg',
+      src: 'cp2i/couverturereccueil.jpg',
       alt: 'Couverture du recueil de poèmes'
     },
     {
-      src: 'QuatrièmeCouvertureRecueildePoème.jpeg',
+      src: 'cp2i/auatriemecouverturerecueil.jpg',
       alt: 'Quatrième de couverture du recueil'
     },
     {
@@ -42,16 +42,14 @@ export class Cp2iComponent implements OnInit {
   ];
 
   // Images de la galerie
-  galleryImages: string[] = [
-    'cp2i/galerie/1.jpg',
-    'cp2i/galerie/2.jpg',
-    'cp2i/galerie/3.jpg',
-    'cp2i/galerie/4.jpg',
-    'cp2i/galerie/5.jpg',
-    'cp2i/galerie/6.jpg',
-    'cp2i/galerie/7.jpg',
-    'cp2i/galerie/8.jpg'
-  ];
+  galleryImages: string[] = [];
+
+  constructor() {
+    // Génération automatique des images de 0 à 48
+    for (let i = 0; i <= 48; i++) {
+      this.galleryImages.push(`cp2i/galerie/${i}.jpg`);
+    }
+  }
 
   // États des lightbox
   showThanksLightbox = false;
@@ -63,6 +61,30 @@ export class Cp2iComponent implements OnInit {
   galleryIndex = 0;
   selectedGalleryImage = '';
   countdown: any = {};
+
+  // Thèmes du concours CP2i 3ème édition
+  themes = [
+    {
+      title: 'Patriotisme',
+      icon: 'fas fa-flag'
+    },
+    {
+      title: 'Justice et dignité',
+      icon: 'fas fa-balance-scale'
+    },
+    {
+      title: 'Beauté Africaine',
+      icon: 'fas fa-crown'
+    },
+    {
+      title: 'Jeunesse responsable',
+      icon: 'fas fa-users'
+    },
+    {
+      title: 'Sous l\'emprise des écrans',
+      icon: 'fas fa-mobile-alt'
+    }
+  ];
 
   ngOnInit() {
     this.startCountdown();
@@ -134,6 +156,14 @@ export class Cp2iComponent implements OnInit {
     const galleryElement = document.getElementById('gallery-section');
     if (galleryElement) {
       galleryElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  // Navigation vers les thèmes détaillés
+  scrollToThemesDetail() {
+    const themesElement = document.getElementById('themes-detail');
+    if (themesElement) {
+      themesElement.scrollIntoView({ behavior: 'smooth' });
     }
   }
 

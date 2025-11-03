@@ -80,6 +80,28 @@
   </div>
 </section>
 
+<!-- Themes Section -->
+<section class="themes-preview-section">
+  <div class="container">
+    <div class="themes-preview-header">
+      <h2 class="themes-title">
+        <i class="fas fa-lightbulb"></i>
+        Thèmes de cette édition
+      </h2>
+      <p class="themes-subtitle">Découvrez les 5 thèmes qui inspireront vos créations poétiques</p>
+    </div>
+    <div class="themes-grid">
+      <div class="theme-card" *ngFor="let theme of themes">
+        <div class="theme-icon">
+          <i [class]="theme.icon"></i>
+        </div>
+        <h3>{{theme.title}}</h3>
+      </div>
+    </div>
+
+  </div>
+</section>
+
 <!-- About Section -->
 <section id="about" class="about-section">
   <div class="container">
@@ -248,6 +270,8 @@
     </div>
   </div>
 </section>
+
+
 
 <!-- CTA Section -->
 <section class="cta-section">
