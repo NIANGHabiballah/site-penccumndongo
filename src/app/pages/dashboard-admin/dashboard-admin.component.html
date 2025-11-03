@@ -1028,7 +1028,7 @@
                   </div>
                 </div>
               </div>
-              <div class="affectations-summary">
+              <div class="affectations-summary-spaced">
                 <p><strong>Total:</strong> {{stats.textes_affectations.length}} textes soumis</p>
                 <div class="color-legend">
                   <div class="legend-item">
@@ -1065,37 +1065,35 @@
         </div>
 
         <!-- Statistiques générales -->
-        <div class="kpi-grid">
-          <div class="kpi-card success">
-            <div class="kpi-icon"><i class="fas fa-file-alt"></i></div>
-            <div class="kpi-content">
-              <h3>{{textes.length}}</h3>
-              <p>Textes soumis</p>
-              <span class="kpi-trend up">Total</span>
+        <div class="stats-section-spacing">
+          <div class="kpi-grid-compact">
+            <div class="kpi-card-small success">
+              <div class="kpi-icon-small"><i class="fas fa-file-alt"></i></div>
+              <div class="kpi-content-small">
+                <h4>{{textes.length}}</h4>
+                <span>Textes soumis</span>
+              </div>
             </div>
-          </div>
-          <div class="kpi-card warning">
-            <div class="kpi-icon"><i class="fas fa-star"></i></div>
-            <div class="kpi-content">
-              <h3>{{stats.note_moyenne ? (stats.note_moyenne | number:'1.1-1') : 'N/A'}}</h3>
-              <p>Note moyenne</p>
-              <span class="kpi-trend neutral">Globale</span>
+            <div class="kpi-card-small warning">
+              <div class="kpi-icon-small"><i class="fas fa-star"></i></div>
+              <div class="kpi-content-small">
+                <h4>{{stats.note_moyenne ? (stats.note_moyenne | number:'1.1-1') : 'N/A'}}</h4>
+                <span>Note moyenne</span>
+              </div>
             </div>
-          </div>
-          <div class="kpi-card primary">
-            <div class="kpi-icon"><i class="fas fa-check"></i></div>
-            <div class="kpi-content">
-              <h3>{{stats.textes_acceptes || 0}}</h3>
-              <p>Textes acceptés</p>
-              <span class="kpi-trend up">Validés</span>
+            <div class="kpi-card-small primary">
+              <div class="kpi-icon-small"><i class="fas fa-check"></i></div>
+              <div class="kpi-content-small">
+                <h4>{{stats.textes_acceptes || 0}}</h4>
+                <span>Textes acceptés</span>
+              </div>
             </div>
-          </div>
-          <div class="kpi-card info">
-            <div class="kpi-icon"><i class="fas fa-clock"></i></div>
-            <div class="kpi-content">
-              <h3>{{stats.textes_en_attente || 0}}</h3>
-              <p>En attente</p>
-              <span class="kpi-trend neutral">À évaluer</span>
+            <div class="kpi-card-small info">
+              <div class="kpi-icon-small"><i class="fas fa-clock"></i></div>
+              <div class="kpi-content-small">
+                <h4>{{stats.textes_en_attente || 0}}</h4>
+                <span>En attente</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1277,6 +1275,185 @@
                     <div class="progress-fill" [style.width.%]="corrector.completion" [class.high]="corrector.completion >= 80" [class.medium]="corrector.completion >= 50 && corrector.completion < 80" [class.low]="corrector.completion < 50"></div>
                   </div>
                   <span class="completion-rate">{{corrector.completion}}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistiques de délais -->
+        <div class="delay-stats">
+          <div class="panel">
+            <div class="panel-header">
+              <h3><i class="fas fa-clock"></i> Analyse des délais</h3>
+            </div>
+            <div class="panel-content">
+              <div class="delay-grid">
+                <div class="delay-card">
+                  <div class="delay-icon"><i class="fas fa-hourglass-half"></i></div>
+                  <div class="delay-info">
+                    <h4>{{getAverageCorrectionTime()}} jours</h4>
+                    <p>Temps moyen de correction</p>
+                  </div>
+                </div>
+                <div class="delay-card">
+                  <div class="delay-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                  <div class="delay-info">
+                    <h4>{{getOverdueTexts()}}</h4>
+                    <p>Textes en retard</p>
+                  </div>
+                </div>
+                <div class="delay-card">
+                  <div class="delay-icon"><i class="fas fa-tachometer-alt"></i></div>
+                  <div class="delay-info">
+                    <h4>{{getFastestCorrector()}}</h4>
+                    <p>Correcteur le plus rapide</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistiques d'engagement -->
+        <div class="engagement-stats">
+          <div class="panel">
+            <div class="panel-header">
+              <h3><i class="fas fa-users"></i> Engagement des participants</h3>
+            </div>
+            <div class="panel-content">
+              <div class="engagement-metrics">
+                <div class="metric-row">
+                  <span class="metric-label">Participants multi-textes:</span>
+                  <span class="metric-value">{{getMultiTextParticipants()}} ({{getMultiTextPercentage()}}%)</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Taux d'abandon:</span>
+                  <span class="metric-value">{{getAbandonRate()}}%</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Moyenne textes/participant:</span>
+                  <span class="metric-value">{{getAverageTextsPerParticipant()}}</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">Ville la plus active:</span>
+                  <span class="metric-value">{{getMostActiveCityName()}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistiques de qualité avancées -->
+        <div class="quality-advanced-stats">
+          <div class="panel">
+            <div class="panel-header">
+              <h3><i class="fas fa-chart-line"></i> Analyse de qualité avancée</h3>
+            </div>
+            <div class="panel-content">
+              <div class="quality-metrics">
+                <div class="quality-metric">
+                  <div class="metric-header">
+                    <h4>Cohérence des notes</h4>
+                    <span class="metric-badge" [class]="getConsistencyClass()">{{getNotesConsistency()}}</span>
+                  </div>
+                  <p>Écart-type: {{getNotesStandardDeviation()}}</p>
+                </div>
+                <div class="quality-metric">
+                  <div class="metric-header">
+                    <h4>Performance par langue</h4>
+                  </div>
+                  <div class="language-performance" *ngFor="let lang of getLanguagePerformance()">
+                    <span class="lang-name">{{lang.langue}}:</span>
+                    <span class="lang-score">{{lang.moyenne}}/20</span>
+                    <span class="lang-count">({{lang.count}} textes)</span>
+                  </div>
+                </div>
+                <div class="quality-metric">
+                  <div class="metric-header">
+                    <h4>Évolution temporelle</h4>
+                  </div>
+                  <div class="trend-indicator">
+                    <span class="trend-label">Tendance qualité:</span>
+                    <span class="trend-value" [class]="getQualityTrendClass()">{{getQualityTrend()}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistiques géographiques avancées -->
+        <div class="geo-advanced-stats">
+          <div class="panel">
+            <div class="panel-header">
+              <h3><i class="fas fa-map-marked-alt"></i> Analyse géographique</h3>
+            </div>
+            <div class="panel-content">
+              <div class="geo-metrics">
+                <div class="geo-metric">
+                  <h4>Performance par ville</h4>
+                  <div class="city-performance" *ngFor="let city of getCityPerformance()">
+                    <div class="city-info">
+                      <span class="city-name">{{city.ville}}</span>
+                      <span class="city-participants">({{city.participants}} participants)</span>
+                    </div>
+                    <div class="city-score">{{city.moyenne}}/20</div>
+                  </div>
+                </div>
+                <div class="geo-metric">
+                  <h4>Rayonnement du concours</h4>
+                  <div class="rayonnement-stats">
+                    <div class="rayonnement-item">
+                      <span class="rayonnement-label">Villes représentées:</span>
+                      <span class="rayonnement-value">{{getUniqueCitiesCount()}}</span>
+                    </div>
+                    <div class="rayonnement-item">
+                      <span class="rayonnement-label">Régions couvertes:</span>
+                      <span class="rayonnement-value">{{getUniqueRegionsCount()}}</span>
+                    </div>
+                    <div class="rayonnement-item">
+                      <span class="rayonnement-label">Pays participants:</span>
+                      <span class="rayonnement-value">{{getUniqueCountriesCount()}}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistiques prédictives -->
+        <div class="predictive-stats">
+          <div class="panel">
+            <div class="panel-header">
+              <h3><i class="fas fa-crystal-ball"></i> Projections et tendances</h3>
+            </div>
+            <div class="panel-content">
+              <div class="predictions-grid">
+                <div class="prediction-card">
+                  <div class="prediction-icon"><i class="fas fa-chart-line"></i></div>
+                  <div class="prediction-content">
+                    <h4>{{getPredictedFinalParticipants()}}</h4>
+                    <p>Participants finaux estimés</p>
+                    <small>Basé sur la tendance actuelle</small>
+                  </div>
+                </div>
+                <div class="prediction-card">
+                  <div class="prediction-icon"><i class="fas fa-exclamation-circle"></i></div>
+                  <div class="prediction-content">
+                    <h4>{{getCorrectorsAtRisk()}}</h4>
+                    <p>Correcteurs à risque</p>
+                    <small>Retard potentiel détecté</small>
+                  </div>
+                </div>
+                <div class="prediction-card">
+                  <div class="prediction-icon"><i class="fas fa-calendar-check"></i></div>
+                  <div class="prediction-content">
+                    <h4>{{getPeakSubmissionDay()}}</h4>
+                    <p>Pic de soumissions prévu</p>
+                    <small>Jour de la semaine le plus actif</small>
+                  </div>
                 </div>
               </div>
             </div>

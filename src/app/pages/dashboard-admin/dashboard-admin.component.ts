@@ -1827,4 +1827,205 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       };
     }).filter(c => c.assignes > 0).sort((a, b) => b.completion - a.completion);
   }
+  
+  // Statistiques de délais
+  getAverageCorrectionTime(): string {
+    const textesCorrigés = this.textes.filter(t => t.statut === 'accepte' || t.statut === 'refuse');
+    if (textesCorrigés.length === 0) return '0';
+    
+    const totalDays = textesCorrigés.reduce((sum, texte) => {
+      const soumission = new Date(texte.created_at);
+      const correction = new Date(texte.updated_at || texte.created_at);
+      const diffDays = Math.ceil((correction.getTime() - soumission.getTime()) / (1000 * 60 * 60 * 24));
+      return sum + Math.max(0, diffDays);
+    }, 0);
+    
+    return Math.round(totalDays / textesCorrigés.length).toString();
+  }
+  
+  getOverdueTexts(): number {
+    const delaiMax = 7;
+    return this.textes.filter(t => {
+      if (t.statut !== 'en_attente') return false;
+      const soumission = new Date(t.created_at);
+      const maintenant = new Date();
+      const diffDays = Math.ceil((maintenant.getTime() - soumission.getTime()) / (1000 * 60 * 60 * 24));
+      return diffDays > delaiMax;
+    }).length;
+  }
+  
+  getFastestCorrector(): string {
+    const performance = this.getCorrectorPerformance();
+    if (performance.length === 0) return 'Aucun';
+    const fastest = performance.reduce((prev, current) => current.completion > prev.completion ? current : prev);
+    return fastest.nom.split(' ')[0];
+  }
+  
+  // Statistiques d'engagement
+  getMultiTextParticipants(): number {
+    const participantTextes = new Map<string, number>();
+    this.textes.forEach(texte => {
+      const key = `${texte.prenom}_${texte.nom}`;
+      participantTextes.set(key, (participantTextes.get(key) || 0) + 1);
+    });
+    return Array.from(participantTextes.values()).filter(count => count > 1).length;
+  }
+  
+  getMultiTextPercentage(): number {
+    const total = this.participants.length;
+    if (total === 0) return 0;
+    return Math.round((this.getMultiTextParticipants() / total) * 100);
+  }
+  
+  getAbandonRate(): number {
+    const inscrits = this.users.filter(u => u.role === 'participant').length;
+    const actifs = new Set(this.textes.map(t => `${t.prenom}_${t.nom}`)).size;
+    if (inscrits === 0) return 0;
+    return Math.round(((inscrits - actifs) / inscrits) * 100);
+  }
+  
+  getAverageTextsPerParticipant(): string {
+    const actifs = new Set(this.textes.map(t => `${t.prenom}_${t.nom}`)).size;
+    if (actifs === 0) return '0';
+    return (this.textes.length / actifs).toFixed(1);
+  }
+  
+  getMostActiveCityName(): string {
+    const cityStats = this.getCityStats();
+    if (cityStats.length === 0) return 'Aucune';
+    return cityStats[0].name;
+  }
+  
+  // Statistiques de qualité avancées
+  getNotesStandardDeviation(): string {
+    const notes = this.textes.filter(t => t.note && t.note > 0).map(t => parseFloat(t.note));
+    if (notes.length < 2) return '0';
+    const moyenne = notes.reduce((sum, note) => sum + note, 0) / notes.length;
+    const variance = notes.reduce((sum, note) => sum + Math.pow(note - moyenne, 2), 0) / notes.length;
+    return Math.sqrt(variance).toFixed(2);
+  }
+  
+  getNotesConsistency(): string {
+    const ecartType = parseFloat(this.getNotesStandardDeviation());
+    if (ecartType <= 2) return 'Excellente';
+    if (ecartType <= 3) return 'Bonne';
+    if (ecartType <= 4) return 'Moyenne';
+    return 'Faible';
+  }
+  
+  getConsistencyClass(): string {
+    const consistency = this.getNotesConsistency();
+    switch(consistency) {
+      case 'Excellente': return 'excellent';
+      case 'Bonne': return 'good';
+      case 'Moyenne': return 'average';
+      default: return 'poor';
+    }
+  }
+  
+  getLanguagePerformance() {
+    const langStats = new Map<string, {total: number, count: number}>();
+    this.textes.filter(t => t.note && t.note > 0).forEach(texte => {
+      const langue = texte.langue || 'Non spécifié';
+      const current = langStats.get(langue) || {total: 0, count: 0};
+      langStats.set(langue, {total: current.total + parseFloat(texte.note), count: current.count + 1});
+    });
+    return Array.from(langStats.entries()).map(([langue, stats]) => ({
+      langue, moyenne: (stats.total / stats.count).toFixed(1), count: stats.count
+    })).sort((a, b) => parseFloat(b.moyenne) - parseFloat(a.moyenne));
+  }
+  
+  getQualityTrend(): string {
+    const textesAvecNotes = this.textes.filter(t => t.note && t.note > 0)
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    if (textesAvecNotes.length < 4) return 'Données insuffisantes';
+    const moitie = Math.floor(textesAvecNotes.length / 2);
+    const premierePartie = textesAvecNotes.slice(0, moitie);
+    const deuxiemePartie = textesAvecNotes.slice(moitie);
+    const moyenneDebut = premierePartie.reduce((sum, t) => sum + parseFloat(t.note), 0) / premierePartie.length;
+    const moyenneFin = deuxiemePartie.reduce((sum, t) => sum + parseFloat(t.note), 0) / deuxiemePartie.length;
+    const diff = moyenneFin - moyenneDebut;
+    if (diff > 0.5) return 'En amélioration';
+    if (diff < -0.5) return 'En baisse';
+    return 'Stable';
+  }
+  
+  getQualityTrendClass(): string {
+    const trend = this.getQualityTrend();
+    if (trend === 'En amélioration') return 'trend-up';
+    if (trend === 'En baisse') return 'trend-down';
+    return 'trend-stable';
+  }
+  
+  // Statistiques géographiques avancées
+  getCityPerformance() {
+    const cityStats = new Map<string, {total: number, count: number, participants: number}>();
+    this.users.filter(u => u.role === 'participant').forEach(user => {
+      const ville = this.extractCity(user.ville);
+      const current = cityStats.get(ville) || {total: 0, count: 0, participants: 0};
+      cityStats.set(ville, {...current, participants: current.participants + 1});
+    });
+    this.textes.filter(t => t.note && t.note > 0).forEach(texte => {
+      const participant = this.users.find(u => u.prenom === texte.prenom && u.nom === texte.nom);
+      if (participant) {
+        const ville = this.extractCity(participant.ville);
+        const current = cityStats.get(ville) || {total: 0, count: 0, participants: 0};
+        cityStats.set(ville, {...current, total: current.total + parseFloat(texte.note), count: current.count + 1});
+      }
+    });
+    return Array.from(cityStats.entries())
+      .filter(([_, stats]) => stats.count > 0)
+      .map(([ville, stats]) => ({ville, moyenne: (stats.total / stats.count).toFixed(1), participants: stats.participants}))
+      .sort((a, b) => parseFloat(b.moyenne) - parseFloat(a.moyenne)).slice(0, 5);
+  }
+  
+  getUniqueCitiesCount(): number {
+    const cities = new Set(this.users.map(u => this.extractCity(u.ville)));
+    cities.delete('Non spécifiée'); cities.delete('Autres');
+    return cities.size;
+  }
+  
+  getUniqueRegionsCount(): number {
+    const regions = new Set(this.users.map(u => this.extractRegion(u.ville)));
+    regions.delete('Non spécifiée'); regions.delete('Autres');
+    return regions.size;
+  }
+  
+  getUniqueCountriesCount(): number {
+    const countries = new Set(this.users.map(u => this.classifyNationality(u.ville, u.telephone)));
+    countries.delete('autres');
+    return countries.size;
+  }
+  
+  // Statistiques prédictives
+  getPredictedFinalParticipants(): number {
+    const currentParticipants = this.participants.length;
+    const joursEcoules = this.getDaysFromStart();
+    const joursTotal = this.getTotalDays();
+    if (joursEcoules === 0 || joursTotal === 0) return currentParticipants;
+    const tauxCroissance = currentParticipants / joursEcoules;
+    return Math.round(tauxCroissance * joursTotal);
+  }
+  
+  getCorrectorsAtRisk(): number {
+    return this.getCorrectorPerformance().filter(c => c.completion < 50 && c.assignes > 2).length;
+  }
+  
+  getPeakSubmissionDay(): string {
+    const dayStats = this.getDailySubmissions();
+    const maxDay = dayStats.reduce((prev, current) => current.count > prev.count ? current : prev);
+    return maxDay.name;
+  }
+  
+  private getDaysFromStart(): number {
+    const startDate = new Date('2025-11-03');
+    const today = new Date();
+    return Math.max(1, Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+  }
+  
+  private getTotalDays(): number {
+    const startDate = new Date('2025-11-03');
+    const endDate = new Date('2025-11-23');
+    return Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  }
 }
