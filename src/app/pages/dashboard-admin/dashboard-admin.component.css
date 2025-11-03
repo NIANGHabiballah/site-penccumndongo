@@ -2213,8 +2213,13 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
   color: white;
 }
 
-.pie-segment.other {
-  background: linear-gradient(135deg, #6c757d, #8a9ba8);
+.pie-segment.english {
+  background: linear-gradient(135deg, #28a745, #34ce57);
+  color: white;
+}
+
+.pie-segment.arabic {
+  background: linear-gradient(135deg, #6f42c1, #8e5dd8);
   color: white;
 }
 

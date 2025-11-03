@@ -219,6 +219,19 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       error: (error) => console.error('Erreur profil:', error)
     });
     
+    // Charger les statistiques du dashboard (incluant les stats par langue)
+    this.http.get(`${this.cp2iApi['baseUrl']}/cp2i-dashboard.php?action=stats`, { headers: this.getHeaders() }).subscribe({
+      next: (data: any) => {
+        if (data.stats) {
+          this.stats = { ...this.stats, ...data.stats };
+        }
+        if (data.stats_langues) {
+          this.stats.stats_langues = data.stats_langues;
+        }
+      },
+      error: (error) => console.error('Erreur stats dashboard:', error)
+    });
+    
     this.calculateStatsFromTexts();
     
     // Charger tous les utilisateurs
@@ -1278,17 +1291,9 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   generateAffectationStats() {
     if (this.textes.length === 0) return;
     
-
-    
     const affectationsStats = this.textes.map(texte => {
-      // Essayer d'abord par texte_id, puis par participant_id
-      let affectationsTexte = this.affectations.filter(a => a.texte_id === texte.id);
-      
-      if (affectationsTexte.length === 0) {
-        affectationsTexte = this.affectations.filter(a => a.participant_id === texte.user_id);
-      }
-      
-
+      // Utiliser seulement texte_id pour les affectations
+      const affectationsTexte = this.affectations.filter(a => a.texte_id === texte.id);
       
       const correcteursNoms = [...new Set(affectationsTexte.map(a => {
         const correcteur = this.correcteurs.find(c => c.id === a.corrector_id);
@@ -1310,17 +1315,43 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   // Statistiques réelles pour les graphiques
   getLanguageStats() {
-    if (this.textes.length === 0) return { francais: 0, wolof: 0, autres: 0 };
+    // Utiliser les stats du backend si disponibles
+    if (this.stats.stats_langues && this.stats.stats_langues.length > 0) {
+      const total = this.stats.stats_langues.reduce((sum: number, stat: any) => sum + parseInt(stat.count), 0);
+      const result = { francais: 0, wolof: 0, anglais: 0, arabe: 0 };
+      
+      this.stats.stats_langues.forEach((stat: any) => {
+        const langue = stat.langue?.toLowerCase();
+        const percentage = total > 0 ? Math.round((parseInt(stat.count) / total) * 100) : 0;
+        
+        if (langue === 'francais' || langue === 'français' || langue === 'french') {
+          result.francais = percentage;
+        } else if (langue === 'wolof') {
+          result.wolof = percentage;
+        } else if (langue === 'anglais' || langue === 'english') {
+          result.anglais = percentage;
+        } else if (langue === 'arabe' || langue === 'arabic') {
+          result.arabe = percentage;
+        }
+      });
+      
+      return result;
+    }
     
-    const francais = this.textes.filter(t => t.langue?.toLowerCase() === 'francais').length;
+    // Fallback: calculer depuis les textes locaux
+    if (this.textes.length === 0) return { francais: 0, wolof: 0, anglais: 0, arabe: 0 };
+    
+    const francais = this.textes.filter(t => t.langue?.toLowerCase() === 'francais' || t.langue?.toLowerCase() === 'français').length;
     const wolof = this.textes.filter(t => t.langue?.toLowerCase() === 'wolof').length;
-    const autres = this.textes.length - francais - wolof;
+    const anglais = this.textes.filter(t => t.langue?.toLowerCase() === 'anglais' || t.langue?.toLowerCase() === 'english').length;
+    const arabe = this.textes.filter(t => t.langue?.toLowerCase() === 'arabe' || t.langue?.toLowerCase() === 'arabic').length;
     
     const total = this.textes.length;
     return {
       francais: Math.round((francais / total) * 100),
       wolof: Math.round((wolof / total) * 100),
-      autres: Math.round((autres / total) * 100)
+      anglais: Math.round((anglais / total) * 100),
+      arabe: Math.round((arabe / total) * 100)
     };
   }
   

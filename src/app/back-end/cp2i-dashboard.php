@@ -146,7 +146,7 @@ function getStats($user) {
                 t.created_at as date_soumission
             FROM cp2i_textes t
             JOIN cp2i_users u ON t.user_id = u.id
-            LEFT JOIN cp2i_affectations a ON u.id = a.participant_id
+            LEFT JOIN cp2i_affectations a ON t.id = a.texte_id
             LEFT JOIN cp2i_users c ON a.corrector_id = c.id AND c.role = 'correcteur'
             GROUP BY t.id, t.titre, t.statut, u.prenom, u.nom, u.email, t.created_at
             ORDER BY nb_correcteurs DESC, t.titre
