@@ -1764,4 +1764,67 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     if (!lastLogin) return 'Jamais connecté';
     return this.getTimeAgo(lastLogin);
   }
+  
+  // Nouvelles statistiques
+  getQualityDistribution() {
+    if (this.textes.length === 0) return [];
+    
+    const ranges = [
+      { min: 0, max: 5, label: '0-5/20', class: 'very-low' },
+      { min: 6, max: 10, label: '6-10/20', class: 'low' },
+      { min: 11, max: 15, label: '11-15/20', class: 'medium' },
+      { min: 16, max: 20, label: '16-20/20', class: 'high' }
+    ];
+    
+    const textesAvecNotes = this.textes.filter(t => t.note && t.note > 0);
+    if (textesAvecNotes.length === 0) return [];
+    
+    return ranges.map(range => {
+      const count = textesAvecNotes.filter(t => t.note >= range.min && t.note <= range.max).length;
+      const percentage = Math.round((count / textesAvecNotes.length) * 100);
+      return { ...range, count, percentage };
+    }).filter(r => r.count > 0);
+  }
+  
+  getThemeDistribution() {
+    if (this.textes.length === 0) return [];
+    
+    const themeCount: { [key: string]: number } = {};
+    this.textes.forEach(texte => {
+      const theme = texte.theme || 'non_specifie';
+      themeCount[theme] = (themeCount[theme] || 0) + 1;
+    });
+    
+    const total = this.textes.length;
+    return Object.entries(themeCount)
+      .map(([theme, count]) => ({
+        theme,
+        label: this.getThemeLabel(theme),
+        count,
+        percentage: Math.round((count / total) * 100)
+      }))
+      .sort((a, b) => b.count - a.count);
+  }
+  
+  getCorrectorPerformance() {
+    if (this.correcteurs.length === 0 || this.affectations.length === 0) return [];
+    
+    return this.correcteurs.map(correcteur => {
+      const assignes = this.affectations.filter(a => a.corrector_id === correcteur.id).length;
+      const corriges = this.textes.filter(t => {
+        const isAssigned = this.affectations.some(a => a.corrector_id === correcteur.id && a.texte_id === t.id);
+        return isAssigned && (t.statut === 'accepte' || t.statut === 'refuse');
+      }).length;
+      
+      const completion = assignes > 0 ? Math.round((corriges / assignes) * 100) : 0;
+      
+      return {
+        id: correcteur.id,
+        nom: `${correcteur.prenom} ${correcteur.nom}`,
+        assignes,
+        corriges,
+        completion
+      };
+    }).filter(c => c.assignes > 0).sort((a, b) => b.completion - a.completion);
+  }
 }

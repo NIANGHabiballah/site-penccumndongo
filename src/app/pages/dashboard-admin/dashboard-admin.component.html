@@ -1217,6 +1217,72 @@
           </div>
         </div>
 
+        <!-- Statistiques de qualité -->
+        <div class="quality-stats">
+          <div class="panel">
+            <div class="panel-header">
+              <h3><i class="fas fa-chart-bar"></i> Distribution des notes</h3>
+            </div>
+            <div class="panel-content">
+              <div class="quality-distribution">
+                <div class="quality-bar" *ngFor="let range of getQualityDistribution()">
+                  <span class="range-label">{{range.label}}</span>
+                  <div class="bar-container">
+                    <div class="bar-fill" [style.width.%]="range.percentage" [class]="'quality-' + range.class"></div>
+                  </div>
+                  <span class="range-count">{{range.count}} ({{range.percentage}}%)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistiques thématiques -->
+        <div class="theme-stats" *ngIf="getThemeDistribution().length > 0">
+          <div class="panel">
+            <div class="panel-header">
+              <h3><i class="fas fa-tags"></i> Répartition par thème</h3>
+            </div>
+            <div class="panel-content">
+              <div class="theme-distribution">
+                <div class="theme-item" *ngFor="let theme of getThemeDistribution()">
+                  <div class="theme-info">
+                    <strong>{{theme.label}}</strong>
+                    <span>{{theme.count}} textes</span>
+                  </div>
+                  <div class="theme-bar">
+                    <div class="bar-fill" [style.width.%]="theme.percentage"></div>
+                  </div>
+                  <span class="theme-percentage">{{theme.percentage}}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance des correcteurs -->
+        <div class="corrector-performance" *ngIf="getCorrectorPerformance().length > 0">
+          <div class="panel">
+            <div class="panel-header">
+              <h3><i class="fas fa-user-check"></i> Performance des correcteurs</h3>
+            </div>
+            <div class="panel-content">
+              <div class="corrector-stats">
+                <div class="corrector-item" *ngFor="let corrector of getCorrectorPerformance()">
+                  <div class="corrector-info">
+                    <strong>{{corrector.nom}}</strong>
+                    <span>{{corrector.assignes}} assignés / {{corrector.corriges}} corrigés</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="corrector.completion" [class.high]="corrector.completion >= 80" [class.medium]="corrector.completion >= 50 && corrector.completion < 80" [class.low]="corrector.completion < 50"></div>
+                  </div>
+                  <span class="completion-rate">{{corrector.completion}}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Tableau de performance -->
         <div class="performance-table">
           <div class="panel">
