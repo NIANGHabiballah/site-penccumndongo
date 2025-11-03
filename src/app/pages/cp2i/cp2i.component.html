@@ -325,6 +325,14 @@
       <i class="fas fa-times"></i>
     </button>
     <img [src]="selectedGalleryImage" alt="Image agrandie" class="lightbox-image">
+    <div class="lightbox-nav">
+      <button class="nav-btn prev" (click)="prevGalleryModal()" [disabled]="galleryImages.indexOf(selectedGalleryImage) === 0">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="nav-btn next" (click)="nextGalleryModal()" [disabled]="galleryImages.indexOf(selectedGalleryImage) === galleryImages.length - 1">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
   </div>
 </div>
 

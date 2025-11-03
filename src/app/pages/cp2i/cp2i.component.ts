@@ -145,6 +145,20 @@ export class Cp2iComponent implements OnInit {
     document.body.style.overflow = 'hidden';
   }
 
+  prevGalleryModal() {
+    const currentIndex = this.galleryImages.indexOf(this.selectedGalleryImage);
+    if (currentIndex > 0) {
+      this.selectedGalleryImage = this.galleryImages[currentIndex - 1];
+    }
+  }
+
+  nextGalleryModal() {
+    const currentIndex = this.galleryImages.indexOf(this.selectedGalleryImage);
+    if (currentIndex < this.galleryImages.length - 1) {
+      this.selectedGalleryImage = this.galleryImages[currentIndex + 1];
+    }
+  }
+
   closeGalleryModal() {
     this.showGalleryModal = false;
     this.selectedGalleryImage = '';
