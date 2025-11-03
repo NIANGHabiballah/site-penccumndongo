@@ -468,7 +468,6 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
 
   validateForm(): boolean {
     const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
-    const phoneRegex = /^\+?[0-9\s\-()]{8,15}$/;
     
     if (!this.userForm.prenom.trim()) {
       this.showToast('Le prénom est requis', 'error');
@@ -495,9 +494,18 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       return false;
     }
     
-    if (!phoneRegex.test(this.userForm.telephone)) {
+    const phoneClean = this.userForm.telephone.replace(/[\s\-()]/g, '');
+    if (phoneClean.length < 8 || phoneClean.length > 15 || !/^\+?[0-9]+$/.test(phoneClean)) {
       this.showToast('Veuillez entrer un numéro de téléphone valide', 'error');
       return false;
+    }
+    
+    if (this.userForm.whatsapp && this.userForm.whatsapp.trim()) {
+      const whatsappClean = this.userForm.whatsapp.replace(/[\s\-()]/g, '');
+      if (whatsappClean.length < 8 || whatsappClean.length > 15 || !/^\+?[0-9]+$/.test(whatsappClean)) {
+        this.showToast('Veuillez entrer un numéro WhatsApp valide', 'error');
+        return false;
+      }
     }
     
     if (!this.selectedUser && !this.userForm.password.trim()) {
@@ -1220,7 +1228,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   getNoteMoyenne(): string {
     if (this.stats.note_moyenne !== null && this.stats.note_moyenne !== undefined && this.stats.note_moyenne > 0) {
-      return this.stats.note_moyenne.toFixed(1) + '/20';
+      const moyenne = typeof this.stats.note_moyenne === 'string' ? parseFloat(this.stats.note_moyenne) : this.stats.note_moyenne;
+      return moyenne.toFixed(1) + '/20';
     }
     return 'N/A';
   }
