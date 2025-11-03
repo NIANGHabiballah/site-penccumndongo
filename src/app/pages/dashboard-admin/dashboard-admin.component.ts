@@ -154,6 +154,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     email: '',
     role: 'participant',
     telephone: '',
+    whatsapp: '',
+    ville: '',
     password: ''
   };
   
@@ -412,6 +414,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         email: user.email,
         role: user.role,
         telephone: fullUserData.telephone || user.telephone || '',
+        whatsapp: fullUserData.whatsapp || user.whatsapp || '',
+        ville: fullUserData.ville || user.ville || '',
         password: '' // Vide pour modification
       };
     } else {
@@ -422,6 +426,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         email: '',
         role: 'participant',
         telephone: '',
+        whatsapp: '',
+        ville: '',
         password: generatedPassword
       };
     }
@@ -566,13 +572,15 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
 
   generateCSV(): string {
-    const headers = ['Prénom', 'Nom', 'Email', 'Rôle', 'Téléphone', 'Textes', 'Note moyenne', 'Inscription'];
+    const headers = ['Prénom', 'Nom', 'Email', 'Rôle', 'Téléphone', 'WhatsApp', 'Ville', 'Textes', 'Note moyenne', 'Inscription'];
     const rows = this.filteredUsers.map(user => [
       user.prenom,
       user.nom,
       user.email,
       user.role,
       user.telephone || '',
+      user.whatsapp || '',
+      user.ville || '',
       user.nb_textes || 0,
       user.note_moyenne || '',
       new Date(user.created_at).toLocaleDateString()
@@ -646,12 +654,15 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
 
   generateAccountsCSV(): string {
-    const headers = ['Email', 'Mot de passe', 'Prénom', 'Nom', 'Rôle', 'Statut', 'Inscription'];
+    const headers = ['Email', 'Mot de passe', 'Prénom', 'Nom', 'Téléphone', 'WhatsApp', 'Ville', 'Rôle', 'Statut', 'Inscription'];
     const rows = this.filteredAccounts.map(account => [
       account.email,
       account.mot_de_passe_clair || 'Non disponible',
       account.prenom,
       account.nom,
+      account.telephone || '',
+      account.whatsapp || '',
+      account.ville || '',
       account.role,
       account.email_verified ? 'Vérifié' : 'En attente',
       new Date(account.created_at).toLocaleDateString()

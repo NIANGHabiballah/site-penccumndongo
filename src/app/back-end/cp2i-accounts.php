@@ -55,8 +55,8 @@ function getAllAccountsWithPasswords() {
     try {
         $db = getDB();
         
-        // Récupérer tous les comptes avec plain_password
-        $stmt = $db->prepare("SELECT id, email, nom, prenom, role, email_verified, created_at, plain_password FROM cp2i_users ORDER BY role, created_at DESC");
+        // Récupérer tous les comptes avec plain_password et informations complètes
+        $stmt = $db->prepare("SELECT id, email, nom, prenom, role, email_verified, created_at, plain_password, telephone, whatsapp, ville FROM cp2i_users ORDER BY role, created_at DESC");
         $stmt->execute();
         $accounts = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
@@ -102,11 +102,14 @@ function updateUserAccount() {
     $nom = $input['nom'] ?? '';
     $email = $input['email'] ?? '';
     $role = $input['role'] ?? 'participant';
+    $telephone = $input['telephone'] ?? '';
+    $whatsapp = $input['whatsapp'] ?? '';
+    $ville = $input['ville'] ?? '';
     $password = $input['password'] ?? null;
     
-    // Mise à jour simple sans mot de passe d'abord
-    $stmt = $db->prepare("UPDATE cp2i_users SET prenom = ?, nom = ?, email = ?, role = ? WHERE id = ?");
-    $stmt->execute([$prenom, $nom, $email, $role, $id]);
+    // Mise à jour avec tous les champs
+    $stmt = $db->prepare("UPDATE cp2i_users SET prenom = ?, nom = ?, email = ?, role = ?, telephone = ?, whatsapp = ?, ville = ? WHERE id = ?");
+    $stmt->execute([$prenom, $nom, $email, $role, $telephone, $whatsapp, $ville, $id]);
     
     // Mise à jour du mot de passe seulement si fourni
     if ($password && trim($password) !== '') {

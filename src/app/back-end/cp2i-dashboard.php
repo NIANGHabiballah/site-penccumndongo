@@ -242,9 +242,10 @@ if ($method === 'POST' && isset($_GET['action'])) {
 function getUsers() {
     $db = getDB();
     
-    // Récupérer tous les utilisateurs avec leurs stats
+    // Récupérer tous les utilisateurs avec leurs stats et informations complètes
     $stmt = $db->prepare("
         SELECT u.id, u.email, u.nom, u.prenom, u.role, u.created_at,
+               u.telephone, u.whatsapp, u.ville,
                COUNT(t.id) as nb_textes,
                AVG(t.note) as note_moyenne
         FROM cp2i_users u
