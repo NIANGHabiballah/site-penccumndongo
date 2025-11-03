@@ -700,7 +700,7 @@
               </div>
               <div class="info-item">
                 <span class="info-label">Dernière connexion:</span>
-                <span class="info-value">Il y a 2 heures</span>
+                <span class="info-value">{{getLastLoginText(selectedUser?.last_login)}}</span>
               </div>
             </div>
           </div>
@@ -727,7 +727,7 @@
             <div class="stat-card-small">
               <div class="stat-icon"><i class="fas fa-trophy"></i></div>
               <div class="stat-info">
-                <span class="stat-number">-</span>
+                <span class="stat-number">{{selectedUser?.classement || '-'}}</span>
                 <span class="stat-label">Classement</span>
               </div>
             </div>
@@ -737,24 +737,33 @@
 
 
         <!-- Historique récent -->
-        <div class="details-section full-width" *ngIf="selectedUser?.role === 'participant'">
+        <div class="details-section full-width">
           <h4><i class="fas fa-history"></i> Activité récente</h4>
-          <div class="activity-list">
-            <div class="activity-item">
-              <div class="activity-icon"><i class="fas fa-plus"></i></div>
+          <div class="activity-list" *ngIf="selectedUser?.activite_recente?.length > 0; else noActivity">
+            <div class="activity-item" *ngFor="let activity of selectedUser.activite_recente">
+              <div class="activity-icon"><i class="fas fa-file-alt"></i></div>
               <div class="activity-content">
-                <span class="activity-text">Soumission d'un nouveau texte</span>
-                <span class="activity-date">Il y a 2 jours</span>
+                <span class="activity-text">Soumission: "{{activity.details}}"</span>
+                <span class="activity-date">{{getTimeAgo(activity.created_at)}}</span>
               </div>
             </div>
             <div class="activity-item">
               <div class="activity-icon"><i class="fas fa-user"></i></div>
               <div class="activity-content">
                 <span class="activity-text">Inscription au concours</span>
-                <span class="activity-date">Il y a 1 semaine</span>
+                <span class="activity-date">{{getTimeAgo(selectedUser?.created_at)}}</span>
               </div>
             </div>
           </div>
+          <ng-template #noActivity>
+            <div class="activity-item">
+              <div class="activity-icon"><i class="fas fa-user"></i></div>
+              <div class="activity-content">
+                <span class="activity-text">Inscription au concours</span>
+                <span class="activity-date">{{getTimeAgo(selectedUser?.created_at)}}</span>
+              </div>
+            </div>
+          </ng-template>
         </div>
       </div>
     </div>

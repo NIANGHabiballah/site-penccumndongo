@@ -204,7 +204,7 @@ function getStats($user) {
 function getProfile($user) {
     $db = getDB();
     
-    $stmt = $db->prepare("SELECT id, email, nom, prenom, role, created_at FROM cp2i_users WHERE id = ?");
+    $stmt = $db->prepare("SELECT id, email, nom, prenom, role, created_at, telephone, whatsapp, ville, last_login FROM cp2i_users WHERE id = ?");
     $stmt->execute([$user['user_id']]);
     $profile = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -245,7 +245,7 @@ function getUsers() {
     // Récupérer tous les utilisateurs avec leurs stats et informations complètes
     $stmt = $db->prepare("
         SELECT u.id, u.email, u.nom, u.prenom, u.role, u.created_at,
-               u.telephone, u.whatsapp, u.ville,
+               u.telephone, u.whatsapp, u.ville, u.last_login,
                COUNT(t.id) as nb_textes,
                AVG(t.note) as note_moyenne
         FROM cp2i_users u
@@ -255,6 +255,28 @@ function getUsers() {
     ");
     $stmt->execute();
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Calculer le classement pour chaque participant
+    foreach ($users as &$user) {
+        if ($user['role'] === 'participant' && $user['note_moyenne'] && $user['note_moyenne'] > 0) {
+            // Compter combien de participants ont une note moyenne supérieure
+            $stmt = $db->prepare("
+                SELECT COUNT(*) as count
+                FROM (
+                    SELECT u2.id, AVG(t2.note) as avg_note
+                    FROM cp2i_users u2
+                    LEFT JOIN cp2i_textes t2 ON u2.id = t2.user_id
+                    WHERE u2.role = 'participant' AND t2.note IS NOT NULL AND t2.note > 0
+                    GROUP BY u2.id
+                    HAVING avg_note > ?
+                ) as rankings
+            ");
+            $stmt->execute([$user['note_moyenne']]);
+            $user['classement'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'] + 1;
+        } else {
+            $user['classement'] = null;
+        }
+    }
     
     // Récupérer les affectations existantes avec noms complets
     $stmt = $db->prepare("

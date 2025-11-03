@@ -56,9 +56,40 @@ function getAllAccountsWithPasswords() {
         $db = getDB();
         
         // Récupérer tous les comptes avec plain_password et informations complètes
-        $stmt = $db->prepare("SELECT id, email, nom, prenom, role, email_verified, created_at, plain_password, telephone, whatsapp, ville FROM cp2i_users ORDER BY role, created_at DESC");
+        $stmt = $db->prepare("
+            SELECT u.id, u.email, u.nom, u.prenom, u.role, u.email_verified, u.created_at, 
+                   u.plain_password, u.telephone, u.whatsapp, u.ville, u.last_login,
+                   COUNT(t.id) as nb_textes,
+                   AVG(t.note) as note_moyenne
+            FROM cp2i_users u
+            LEFT JOIN cp2i_textes t ON u.id = t.user_id
+            GROUP BY u.id
+            ORDER BY u.role, u.created_at DESC
+        ");
         $stmt->execute();
         $accounts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Calculer le classement pour chaque participant
+        foreach ($accounts as &$account) {
+            if ($account['role'] === 'participant' && $account['note_moyenne'] && $account['note_moyenne'] > 0) {
+                // Compter combien de participants ont une note moyenne supérieure
+                $stmt = $db->prepare("
+                    SELECT COUNT(*) as count
+                    FROM (
+                        SELECT u2.id, AVG(t2.note) as avg_note
+                        FROM cp2i_users u2
+                        LEFT JOIN cp2i_textes t2 ON u2.id = t2.user_id
+                        WHERE u2.role = 'participant' AND t2.note IS NOT NULL AND t2.note > 0
+                        GROUP BY u2.id
+                        HAVING avg_note > ?
+                    ) as rankings
+                ");
+                $stmt->execute([$account['note_moyenne']]);
+                $account['classement'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'] + 1;
+            } else {
+                $account['classement'] = null;
+            }
+        }
         
         error_log('Accounts found: ' . count($accounts));
         

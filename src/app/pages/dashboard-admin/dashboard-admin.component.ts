@@ -1413,4 +1413,30 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     // Optionnel: envoyer à l'API pour persistance
     // this.cp2iApi.logAction(action, description).subscribe();
   }
+  
+  getTimeAgo(dateString: string): string {
+    if (!dateString) return 'Jamais';
+    
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    
+    if (diffDays > 0) {
+      return diffDays === 1 ? 'Il y a 1 jour' : `Il y a ${diffDays} jours`;
+    } else if (diffHours > 0) {
+      return diffHours === 1 ? 'Il y a 1 heure' : `Il y a ${diffHours} heures`;
+    } else if (diffMinutes > 0) {
+      return diffMinutes === 1 ? 'Il y a 1 minute' : `Il y a ${diffMinutes} minutes`;
+    } else {
+      return 'Il y a quelques instants';
+    }
+  }
+  
+  getLastLoginText(lastLogin: string): string {
+    if (!lastLogin) return 'Jamais connecté';
+    return this.getTimeAgo(lastLogin);
+  }
 }

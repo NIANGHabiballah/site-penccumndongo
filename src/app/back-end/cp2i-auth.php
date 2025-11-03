@@ -182,6 +182,10 @@ function loginUser($data) {
         return;
     }
     
+    // Mettre à jour la dernière connexion
+    $stmt = $db->prepare("UPDATE cp2i_users SET last_login = NOW() WHERE id = ?");
+    $stmt->execute([$user['id']]);
+    
     // Enregistrer la connexion dans l'historique (si la table existe)
     logAction($user['id'], 'login', 'Connexion utilisateur');
     
