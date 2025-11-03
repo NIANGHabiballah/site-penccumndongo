@@ -468,7 +468,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
 
   validateForm(): boolean {
     const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
-    const phoneRegex = /^[0-9+\-\s()]{8,15}$/;
+    const phoneRegex = /^\+?[0-9\s\-()]{8,15}$/;
     
     if (!this.userForm.prenom.trim()) {
       this.showToast('Le prénom est requis', 'error');
