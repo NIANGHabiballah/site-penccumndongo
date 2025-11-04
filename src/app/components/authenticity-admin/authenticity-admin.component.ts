@@ -98,17 +98,57 @@ import { Cp2iApiService } from '../../services/cp2i-api.service';
             <div class="result-details">{{manualTestResult.details}}</div>
             
             <div class="result-breakdown">
-              <div class="breakdown-item">
-                <span class="breakdown-label">🤖 Détection IA:</span>
-                <span class="breakdown-score">{{manualTestResult.aiDetection.score}}/100</span>
+              <div class="breakdown-section">
+                <div class="breakdown-item">
+                  <span class="breakdown-label">🤖 Détection IA:</span>
+                  <span class="breakdown-score">{{manualTestResult.aiDetection.score}}/100</span>
+                </div>
+                <div class="breakdown-details" *ngIf="manualTestResult.aiDetection.indicators.length > 0">
+                  <div class="detail-item" *ngFor="let indicator of manualTestResult.aiDetection.indicators">
+                    <i class="fas fa-exclamation-triangle"></i> {{indicator}}
+                  </div>
+                </div>
+                <div class="breakdown-details" *ngIf="manualTestResult.aiDetection.indicators.length === 0">
+                  <div class="detail-item success">
+                    <i class="fas fa-check-circle"></i> Aucun indicateur IA détecté
+                  </div>
+                </div>
               </div>
-              <div class="breakdown-item">
-                <span class="breakdown-label">📄 Détection Plagiat:</span>
-                <span class="breakdown-score">{{manualTestResult.plagiarismCheck.score}}/100</span>
+              
+              <div class="breakdown-section">
+                <div class="breakdown-item">
+                  <span class="breakdown-label">📄 Détection Plagiat:</span>
+                  <span class="breakdown-score">{{manualTestResult.plagiarismCheck.score}}/100</span>
+                </div>
+                <div class="breakdown-details" *ngIf="manualTestResult.plagiarismCheck.matches.length > 0">
+                  <div class="detail-item" *ngFor="let match of manualTestResult.plagiarismCheck.matches">
+                    <i class="fas fa-search"></i> <strong>{{match.source}}</strong><br>
+                    <small>"{{match.phrase}}" ({{match.similarity}}% similarité)</small>
+                  </div>
+                </div>
+                <div class="breakdown-details" *ngIf="manualTestResult.plagiarismCheck.matches.length === 0">
+                  <div class="detail-item success">
+                    <i class="fas fa-check-circle"></i> Aucune correspondance trouvée sur le web
+                  </div>
+                </div>
               </div>
-              <div class="breakdown-item">
-                <span class="breakdown-label">🗄️ Base Interne:</span>
-                <span class="breakdown-score">{{manualTestResult.internalCheck.score}}/100</span>
+              
+              <div class="breakdown-section">
+                <div class="breakdown-item">
+                  <span class="breakdown-label">🗄️ Base Interne:</span>
+                  <span class="breakdown-score">{{manualTestResult.internalCheck.score}}/100</span>
+                </div>
+                <div class="breakdown-details" *ngIf="manualTestResult.internalCheck.similarTexts.length > 0">
+                  <div class="detail-item" *ngFor="let similar of manualTestResult.internalCheck.similarTexts">
+                    <i class="fas fa-file-alt"></i> <strong>{{similar.title}}</strong><br>
+                    <small>{{similar.similarity}}% de similarité - {{similar.edition}}</small>
+                  </div>
+                </div>
+                <div class="breakdown-details" *ngIf="manualTestResult.internalCheck.similarTexts.length === 0">
+                  <div class="detail-item success">
+                    <i class="fas fa-check-circle"></i> Aucune similarité avec les textes CP2i
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -236,8 +276,14 @@ import { Cp2iApiService } from '../../services/cp2i-api.service';
     .result-reject { border-color: #dc3545; background: #f8d7da; }
     .result-score { font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem; }
     .result-breakdown { margin-top: 1rem; }
-    .breakdown-item { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #eee; }
+    .breakdown-section { margin-bottom: 1.5rem; padding: 1rem; border: 1px solid #eee; border-radius: 6px; }
+    .breakdown-item { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 2px solid #ddd; font-weight: bold; }
     .breakdown-score { font-weight: bold; }
+    .breakdown-details { margin-top: 0.75rem; }
+    .detail-item { padding: 0.5rem; margin: 0.25rem 0; background: #f8f9fa; border-radius: 4px; border-left: 3px solid #dc3545; }
+    .detail-item.success { border-left-color: #28a745; background: #d4edda; }
+    .detail-item i { margin-right: 0.5rem; }
+    .detail-item small { color: #666; display: block; margin-top: 0.25rem; }
   `]
 })
 export class AuthenticityAdminComponent implements OnInit {
