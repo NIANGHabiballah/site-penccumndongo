@@ -30,7 +30,18 @@
         placeholder="Entrez le titre de votre poème">
     </div>
 
-
+    <div class="form-group">
+      <label for="langue">Langue *</label>
+      <select 
+        id="langue" 
+        name="langue"
+        [(ngModel)]="texte.langue"
+        (ngModelChange)="onLangueChange()"
+        required>
+        <option value="">Sélectionnez une langue</option>
+        <option *ngFor="let langue of langues" [value]="langue.code">{{langue.nom}}</option>
+      </select>
+    </div>
 
     <div class="form-group">
       <label for="theme">Thème *</label>
@@ -40,24 +51,7 @@
         [(ngModel)]="texte['theme']"
         required>
         <option value="">Sélectionnez un thème</option>
-        <option value="patriotisme">Patriotisme</option>
-        <option value="justice_dignite">Justice et dignité</option>
-        <option value="beaute_africaine">Beauté Africaine</option>
-        <option value="jeunesse_responsable">Jeunesse responsable</option>
-        <option value="emprise_ecrans">Sous l'emprise des écrans</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="langue">Langue</label>
-      <select 
-        id="langue" 
-        name="langue"
-        [(ngModel)]="texte.langue">
-        <option value="francais">Français</option>
-        <option value="wolof">Wolof</option>
-        <option value="anglais">Anglais</option>
-        <option value="arabe">Arabe</option>
+        <option *ngFor="let theme of getThemesForLanguage()" [value]="theme.code">{{theme.nom}}</option>
       </select>
     </div>
 

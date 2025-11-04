@@ -88,17 +88,32 @@
         <i class="fas fa-lightbulb"></i>
         Thèmes de cette 3e édition
       </h2>
-      <p class="themes-subtitle">Découvrez les 5 thèmes qui inspireront vos créations poétiques</p>
+      <p class="themes-subtitle">Choisissez 1 thème parmi ces 5 pour votre création poétique</p>
     </div>
-    <div class="themes-grid">
-      <div class="theme-card" *ngFor="let theme of themes">
+    
+    <!-- Language Tabs -->
+    <div class="language-tabs">
+      <button class="tab-btn" 
+              *ngFor="let lang of languages" 
+              [class.active]="selectedLanguage === lang.code"
+              (click)="selectLanguage(lang.code)">
+        <i [class]="lang.icon"></i>
+        <span>{{lang.name}}</span>
+      </button>
+    </div>
+    
+    <!-- Themes Grid -->
+    <div class="themes-multilingual-grid">
+      <div class="theme-multilingual-card" *ngFor="let theme of getThemesForSelectedLanguage()">
         <div class="theme-icon">
           <i [class]="theme.icon"></i>
         </div>
         <h3>{{theme.title}}</h3>
+        <div class="theme-badge">
+          <span>{{getLanguageName(selectedLanguage)}}</span>
+        </div>
       </div>
     </div>
-
   </div>
 </section>
 

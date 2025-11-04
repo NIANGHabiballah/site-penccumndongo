@@ -48,8 +48,48 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   texte = {
     titre: '',
     theme: '',
-    langue: '',
+    langue: 'francais',
     contenu: ''
+  };
+  
+  // Langues avec leurs noms natifs
+  langues = [
+    { code: 'francais', nom: 'Français' },
+    { code: 'wolof', nom: 'Wolof' },
+    { code: 'anglais', nom: 'English' },
+    { code: 'arabe', nom: 'العربية' }
+  ];
+
+  // Thèmes traduits par langue
+  themesParLangue = {
+    francais: [
+      { code: 'patriotisme', nom: 'Patriotisme' },
+      { code: 'justice_dignite', nom: 'Justice et dignité' },
+      { code: 'beaute_africaine', nom: 'Beauté Africaine' },
+      { code: 'jeunesse_responsable', nom: 'Jeunesse responsable' },
+      { code: 'emprise_ecrans', nom: 'Sous l\'emprise des écrans' }
+    ],
+    wolof: [
+      { code: 'patriotisme', nom: 'Bëgg sa réew' },
+      { code: 'justice_dignite', nom: 'Yoon ak ngor' },
+      { code: 'beaute_africaine', nom: 'Taaru jigeenu afrik' },
+      { code: 'jeunesse_responsable', nom: 'Xale yu am responsabilite' },
+      { code: 'emprise_ecrans', nom: 'Ci ndigalu ekraŋ yi' }
+    ],
+    anglais: [
+      { code: 'patriotisme', nom: 'Patriotism' },
+      { code: 'justice_dignite', nom: 'Justice and dignity' },
+      { code: 'beaute_africaine', nom: 'African Beauty' },
+      { code: 'jeunesse_responsable', nom: 'Responsible Youth' },
+      { code: 'emprise_ecrans', nom: 'Under the grip of screens' }
+    ],
+    arabe: [
+      { code: 'patriotisme', nom: 'الوطنية' },
+      { code: 'justice_dignite', nom: 'العدالة والكرامة' },
+      { code: 'beaute_africaine', nom: 'الجمال الأفريقي' },
+      { code: 'jeunesse_responsable', nom: 'الشباب المسؤول' },
+      { code: 'emprise_ecrans', nom: 'تحت سيطرة الشاشات' }
+    ]
   };
   isSubmitting = false;
   showNotification = false;
@@ -827,11 +867,21 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     this.texte = {
       titre: '',
       theme: '',
-      langue: '',
+      langue: 'francais',
       contenu: ''
     };
     this.isEditing = false;
     this.editingTexteId = null;
+  }
+  
+  // Obtenir les thèmes selon la langue sélectionnée
+  getThemesForLanguage() {
+    return this.themesParLangue[this.texte.langue as keyof typeof this.themesParLangue] || this.themesParLangue.francais;
+  }
+
+  // Réinitialiser le thème quand la langue change
+  onLangueChange() {
+    this.texte.theme = '';
   }
   
   getLineCount(): number {
