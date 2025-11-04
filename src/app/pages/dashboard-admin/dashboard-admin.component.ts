@@ -7,11 +7,12 @@ import { HttpClient } from '@angular/common/http';
 import { Cp2iApiService, User } from '../../services/cp2i-api.service';
 import { ChatSupportService } from '../../services/chat-support.service';
 import { AdminChatComponent } from '../admin-chat/admin-chat.component';
+import { AuthenticityAdminComponent } from '../../components/authenticity-admin/authenticity-admin.component';
 
 @Component({
   selector: 'app-dashboard-admin',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, AdminChatComponent],
+  imports: [CommonModule, RouterModule, FormsModule, AdminChatComponent, AuthenticityAdminComponent],
   templateUrl: './dashboard-admin.component.html',
   styleUrls: ['./dashboard-admin.component.css']
 })

@@ -54,6 +54,9 @@
       <div class="nav-item" [class.active]="currentView === 'parametres'" (click)="setCurrentView('parametres')">
         <i class="fas fa-cog"></i> Paramètres
       </div>
+      <div class="nav-item" [class.active]="currentView === 'authenticity'" (click)="setCurrentView('authenticity')">
+        <i class="fas fa-shield-alt"></i> Vérification Authenticité
+      </div>
       <div class="nav-item" (click)="logout()">
         <i class="fas fa-sign-out-alt"></i> Déconnexion
       </div>
@@ -1926,6 +1929,11 @@
       <!-- Chat Support -->
       <div *ngSwitchCase="'chat-support'" class="chat-support-section">
         <app-admin-chat></app-admin-chat>
+      </div>
+
+      <!-- Vérification Authenticité -->
+      <div *ngSwitchCase="'authenticity'" class="authenticity-section">
+        <app-authenticity-admin></app-authenticity-admin>
       </div>
 
       <!-- Autres vues -->

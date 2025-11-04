@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { Cp2iApiService, Texte } from '../../services/cp2i-api.service';
+import { TextAuthenticityService } from '../../services/text-authenticity.service';
 
 @Component({
   selector: 'app-soumission-texte',
@@ -22,6 +23,8 @@ export class SoumissionTexteComponent implements OnInit {
   isSubmitting = false;
   isEditing = false;
   editingTexteId: number | null = null;
+  isCheckingAuthenticity = false;
+  authenticityResult: any = null;
 
   // Langues avec leurs noms natifs
   langues = [
@@ -66,7 +69,8 @@ export class SoumissionTexteComponent implements OnInit {
   constructor(
     private cp2iApi: Cp2iApiService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private authenticityService: TextAuthenticityService
   ) {}
 
   ngOnInit() {
@@ -145,7 +149,7 @@ export class SoumissionTexteComponent implements OnInit {
   notificationMessage = '';
   notificationType: 'success' | 'error' = 'success';
 
-  onSubmit() {
+  async onSubmit() {
     if (!this.isFormValid()) {
       if (this.getLineCount() > 40) {
         this.showToast('Votre texte dépasse la limite de 40 vers. Veuillez le raccourcir.', 'error');
@@ -155,14 +159,66 @@ export class SoumissionTexteComponent implements OnInit {
       return;
     }
 
+    // 1. Vérification d'authenticité avant soumission
+    this.isCheckingAuthenticity = true;
+    this.showToast('Vérification de l\'authenticité du texte...', 'success');
+    
+    try {
+      const participantId = this.cp2iApi.getCurrentUser()?.id;
+      this.authenticityResult = await this.authenticityService.analyzeTextAuthenticity(
+        this.texte.contenu, 
+        participantId
+      );
+      
+      // Bloquer si REJECT
+      if (this.authenticityResult.recommendation === 'REJECT') {
+        this.isCheckingAuthenticity = false;
+        this.showToast(
+          `Texte rejeté: ${this.authenticityResult.details}. Score: ${this.authenticityResult.suspicionScore}/100`,
+          'error'
+        );
+        return;
+      }
+      
+      // Avertir si REVIEW
+      if (this.authenticityResult.recommendation === 'REVIEW') {
+        this.showToast(
+          `Attention: Texte suspect (Score: ${this.authenticityResult.suspicionScore}/100). Soumission en révision.`,
+          'error'
+        );
+      }
+      
+    } catch (error) {
+      console.error('Erreur vérification authenticité:', error);
+      this.showToast('Erreur lors de la vérification. Soumission annulée.', 'error');
+      this.isCheckingAuthenticity = false;
+      return;
+    }
+    
+    this.isCheckingAuthenticity = false;
     this.isSubmitting = true;
     
+    // 2. Soumission avec résultat d'authenticité
+    const texteWithAuthenticity = {
+      ...this.texte,
+      authenticityResult: this.authenticityResult
+    };
+    
     const apiCall = this.isEditing ? 
-      this.cp2iApi.updateText(this.texte) : 
-      this.cp2iApi.submitText(this.texte);
+      this.cp2iApi.updateText(texteWithAuthenticity) : 
+      this.cp2iApi.submitText(texteWithAuthenticity);
     
     apiCall.subscribe({
-      next: (response) => {
+      next: async (response) => {
+        // Sauvegarder le résultat d'authenticité
+        if (response.texte?.id && this.authenticityResult) {
+          await this.authenticityService.saveAnalysisResult(response.texte.id, {
+            ...this.authenticityResult,
+            textId: response.texte.id,
+            timestamp: new Date()
+          });
+        }
+        
         const message = this.isEditing ? 
           'Texte modifié avec succès !' : 
           'Texte soumis avec succès ! Vous recevrez une notification une fois évalué.';
@@ -215,5 +271,6 @@ export class SoumissionTexteComponent implements OnInit {
       langue: 'francais',
       theme: ''
     };
+    this.authenticityResult = null;
   }
 }

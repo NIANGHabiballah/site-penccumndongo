@@ -233,6 +233,75 @@
   line-height: 1.4;
 }
 
+/* Statut d'authenticité */
+.authenticity-status {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #6c757d;
+}
+
+.status-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.75rem;
+}
+
+.status-content {
+  padding: 0.75rem;
+  border-radius: 6px;
+  background: white;
+}
+
+.status-accept {
+  border-left-color: #28a745 !important;
+  background: #d4edda !important;
+}
+
+.status-accept .status-header {
+  color: #155724;
+}
+
+.status-review {
+  border-left-color: #ffc107 !important;
+  background: #fff3cd !important;
+}
+
+.status-review .status-header {
+  color: #856404;
+}
+
+.status-reject {
+  border-left-color: #dc3545 !important;
+  background: #f8d7da !important;
+}
+
+.status-reject .status-header {
+  color: #721c24;
+}
+
+.score {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.recommendation {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.details {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
 @media (max-width: 768px) {
   .soumission-container {
     padding: 2rem 1rem;
