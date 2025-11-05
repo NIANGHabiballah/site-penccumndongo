@@ -415,8 +415,8 @@
   padding: 1rem;
   overflow-y: auto;
   background: #fafafa;
-  min-height: 0;
-  max-height: calc(100vh - 400px);
+  min-height: 500px !important;
+  max-height: calc(100vh - 200px) !important;
 }
 
 .message {
@@ -495,7 +495,7 @@
 
 /* Réponses rapides */
 .quick-replies-bar {
-  padding: 1rem;
+  padding: 0.5rem;
   border-top: 1px solid #e9ecef;
   background: #f8f9fa;
 }
@@ -529,7 +529,7 @@
 
 /* Zone de saisie */
 .message-input-area {
-  padding: 1rem;
+  padding: 0.5rem;
   border-top: 1px solid #e9ecef;
   flex-shrink: 0;
   background: white;
@@ -539,7 +539,7 @@
   display: flex;
   gap: 0.5rem;
   align-items: flex-end;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   flex-wrap: wrap;
 }
 
