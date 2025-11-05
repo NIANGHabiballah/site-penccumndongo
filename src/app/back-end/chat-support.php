@@ -47,6 +47,10 @@ switch ($method) {
             closeConversation($user, $data);
         } elseif ($action === 'priority') {
             setPriority($user, $data);
+        } elseif ($action === 'send_with_images') {
+            sendMessageWithImages($user);
+        } elseif ($action === 'create_with_images') {
+            createConversationWithImages($user);
         }
         break;
 }
@@ -101,7 +105,7 @@ function getMessages($user, $conversationId) {
     }
     
     $stmt = $pdo->prepare("
-        SELECT m.*, u.nom, u.prenom 
+        SELECT m.*, u.nom, u.prenom, m.images
         FROM chat_messages m
         JOIN cp2i_users u ON m.sender_id = u.id
         WHERE m.conversation_id = ?
@@ -109,7 +113,12 @@ function getMessages($user, $conversationId) {
     ");
     $stmt->execute([$conversationId]);
     
-    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+    $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Debug: Log les messages pour voir le contenu
+    error_log('Messages récupérés pour conversation ' . $conversationId . ': ' . json_encode($messages));
+    
+    echo json_encode($messages);
 }
 
 function createConversation($user, $data) {
@@ -345,5 +354,135 @@ function getAvailableAdmins($user) {
     ");
     
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+}
+
+function sendMessageWithImages($user) {
+    $pdo = getDB();
+    
+    try {
+        $conversationId = $_POST['conversation_id'];
+        $message = $_POST['message'] ?? '';
+        
+        // Vérifier l'accès
+        $stmt = $pdo->prepare("
+            SELECT * FROM chat_conversations 
+            WHERE id = ? AND (participant_id = ? OR ? = 'admin')
+        ");
+        $stmt->execute([$conversationId, $user['user_id'], $user['role']]);
+        
+        if (!$stmt->fetch()) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Accès refusé']);
+            return;
+        }
+        
+        // Traiter les images
+        $imageUrls = [];
+        foreach ($_FILES as $key => $file) {
+            if (strpos($key, 'image_') === 0) {
+                $imageUrl = uploadImage($file, 'chat');
+                if ($imageUrl) {
+                    $imageUrls[] = $imageUrl;
+                }
+            }
+        }
+        
+        $senderType = $user['role'] === 'admin' ? 'admin' : 'participant';
+        
+        // Stocker le message et les images séparément
+        $stmt = $pdo->prepare("
+            INSERT INTO chat_messages (conversation_id, sender_id, sender_type, message, images, timestamp, read_status)
+            VALUES (?, ?, ?, ?, ?, NOW(), 0)
+        ");
+        $stmt->execute([$conversationId, $user['user_id'], $senderType, $message, json_encode($imageUrls)]);
+        
+        // Mettre à jour la conversation
+        $stmt = $pdo->prepare("UPDATE chat_conversations SET updated_at = NOW() WHERE id = ?");
+        $stmt->execute([$conversationId]);
+        
+        echo json_encode(['success' => true, 'images' => $imageUrls]);
+        
+    } catch (Exception $e) {
+        echo json_encode(['error' => 'Erreur envoi message avec images: ' . $e->getMessage()]);
+    }
+}
+
+function createConversationWithImages($user) {
+    $pdo = getDB();
+    
+    try {
+        $subject = $_POST['subject'] ?? 'Support';
+        $initialMessage = $_POST['initial_message'] ?? '';
+        $userId = $user['user_id'];
+        
+        $pdo->beginTransaction();
+        
+        // Créer la conversation
+        $stmt = $pdo->prepare("
+            INSERT INTO chat_conversations (participant_id, subject, status, priority, created_at, updated_at)
+            VALUES (?, ?, 'open', 'medium', NOW(), NOW())
+        ");
+        $stmt->execute([$userId, $subject]);
+        $conversationId = $pdo->lastInsertId();
+        
+        // Traiter les images
+        $imageUrls = [];
+        foreach ($_FILES as $key => $file) {
+            if (strpos($key, 'image_') === 0) {
+                $imageUrl = uploadImage($file, 'chat');
+                if ($imageUrl) {
+                    $imageUrls[] = $imageUrl;
+                }
+            }
+        }
+        
+        // Créer le message initial avec images séparées
+        $stmt = $pdo->prepare("
+            INSERT INTO chat_messages (conversation_id, sender_id, sender_type, message, images, timestamp, read_status)
+            VALUES (?, ?, 'participant', ?, ?, NOW(), 0)
+        ");
+        $stmt->execute([$conversationId, $userId, $initialMessage, json_encode($imageUrls)]);
+        
+        $pdo->commit();
+        echo json_encode(['success' => true, 'conversation_id' => $conversationId, 'images' => $imageUrls]);
+        
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        echo json_encode(['error' => 'Erreur création conversation avec images: ' . $e->getMessage()]);
+    }
+}
+
+function uploadImage($file, $type = 'chat') {
+    // Dossier uploads directement dans public_html
+    $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $type . '/';
+    
+    // Créer le dossier s'il n'existe pas
+    if (!file_exists($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+    
+    // Vérifications de sécurité
+    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    $maxSize = 5 * 1024 * 1024; // 5MB
+    
+    if (!in_array($file['type'], $allowedTypes)) {
+        return false;
+    }
+    
+    if ($file['size'] > $maxSize) {
+        return false;
+    }
+    
+    // Générer un nom unique
+    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $filename = uniqid() . '_' . time() . '.' . $extension;
+    $filepath = $uploadDir . $filename;
+    
+    // Déplacer le fichier
+    if (move_uploaded_file($file['tmp_name'], $filepath)) {
+        return 'uploads/' . $type . '/' . $filename;
+    }
+    
+    return false;
 }
 ?>

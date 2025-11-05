@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatSupportService } from '../../services/chat-support.service';
@@ -33,12 +33,29 @@ import { Subscription } from 'rxjs';
                  *ngFor="let message of messages"
                  [class.own-message]="message.sender_id === user?.id">
               <div class="message-content">
-                <div class="message-text">{{message.message}}</div>
+                <div class="message-text" *ngIf="message.message && message.message.trim()">{{message.message}}</div>
+                <div class="message-images" *ngIf="message.images && getImagesFromField(message.images).length > 0">
+                  <img *ngFor="let img of getImagesFromField(message.images)" 
+                       [src]="getImageUrl(img)" 
+                       class="message-image"
+                       (click)="openImage(img)"
+                       (error)="onImageError($event)">
+                </div>
                 <div class="message-time">{{formatTime(message.timestamp)}}</div>
               </div>
             </div>
           </div>
-
+          
+          <!-- Aperçu des images sélectionnées -->
+          <div class="attached-images" *ngIf="selectedImages.length > 0">
+            <div class="image-preview" *ngFor="let image of selectedImages; let i = index">
+              <img [src]="image.preview" [alt]="image.name">
+              <button class="remove-image" (click)="removeImage(i)">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          
           <div class="chat-input">
             <input 
               type="text" 
@@ -46,12 +63,20 @@ import { Subscription } from 'rxjs';
               placeholder="Tapez votre message..."
               (keydown.enter)="sendMessage()"
               [disabled]="!isLoggedIn">
-            <button (click)="sendMessage()" [disabled]="!newMessage.trim() || !isLoggedIn">
+            <button class="attach-btn" (click)="fileInput.click()" [disabled]="!isLoggedIn">
+              <i class="fas fa-paperclip"></i>
+            </button>
+            <button (click)="sendMessage()" [disabled]="(!newMessage.trim() && selectedImages.length === 0) || !isLoggedIn">
               <i class="fas fa-paper-plane"></i>
             </button>
           </div>
-
-
+          
+          <input #fileInput 
+                 type="file" 
+                 accept="image/*" 
+                 multiple
+                 (change)="onFileSelect($event)"
+                 style="display: none;">
         </div>
       </div>
     </div>
@@ -135,6 +160,7 @@ import { Subscription } from 'rxjs';
       flex: 1;
       display: flex;
       flex-direction: column;
+      overflow: visible !important;
     }
 
     .messages {
@@ -142,8 +168,8 @@ import { Subscription } from 'rxjs';
       padding: 1rem !important;
       overflow-y: auto !important;
       background: #f5f5f5 !important;
-      max-height: 350px !important;
-      min-height: 200px !important;
+      max-height: 250px !important;
+      min-height: 150px !important;
     }
 
     .message {
@@ -207,11 +233,86 @@ import { Subscription } from 'rxjs';
       padding: 0.5rem 1rem;
       border-radius: 20px;
       cursor: pointer;
+      min-width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
     .chat-input button:disabled {
       background: #ccc;
       cursor: not-allowed;
+    }
+    
+    .attach-btn {
+      background: #f8f9fa !important;
+      color: #666 !important;
+      border: 1px solid #ddd !important;
+    }
+    
+    .attached-images {
+      display: flex !important;
+      gap: 8px !important;
+      padding: 10px !important;
+      flex-wrap: wrap !important;
+      background: #f8f9fa !important;
+      border-top: 1px solid #e0e0e0 !important;
+      border-bottom: 1px solid #e0e0e0 !important;
+      height: 80px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      flex-shrink: 0 !important;
+      overflow-y: auto !important;
+    }
+    
+    .image-preview {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 2px solid #2196f3;
+    }
+    
+    .image-preview img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      display: block !important;
+    }
+    
+    .remove-image {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: rgba(255,0,0,0.8);
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .message-images {
+      margin-top: 8px;
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    
+    .message-image {
+      max-width: 120px;
+      max-height: 120px;
+      border-radius: 6px;
+      cursor: pointer;
+      object-fit: cover;
     }
 
     .login-prompt {
@@ -234,7 +335,56 @@ import { Subscription } from 'rxjs';
     @media (max-width: 768px) {
       .chat-window {
         width: 300px;
-        height: 400px;
+        height: 450px;
+      }
+      
+      .messages {
+        max-height: 200px !important;
+        min-height: 120px !important;
+      }
+      
+      .attached-images {
+        height: 70px !important;
+        padding: 8px !important;
+        display: flex !important;
+        background: #f8f9fa !important;
+        border-top: 1px solid #e0e0e0 !important;
+        border-bottom: 1px solid #e0e0e0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        flex-shrink: 0 !important;
+        overflow-y: auto !important;
+      }
+      
+      .chat-input {
+        padding: 0.5rem !important;
+        gap: 0.3rem !important;
+        flex-wrap: nowrap !important;
+      }
+      
+      .chat-input button {
+        min-width: 38px !important;
+        width: 38px !important;
+        height: 38px !important;
+        max-width: 38px !important;
+        padding: 0 !important;
+        font-size: 12px !important;
+        flex-shrink: 0 !important;
+        border-radius: 50% !important;
+      }
+      
+      .attach-btn {
+        min-width: 38px !important;
+        width: 38px !important;
+        height: 38px !important;
+        max-width: 38px !important;
+      }
+      
+      .chat-input input {
+        font-size: 14px;
+        padding: 0.5rem 0.8rem;
+        min-width: 0;
+        flex: 1;
       }
     }
   `]
@@ -247,10 +397,11 @@ export class ChatWidgetComponent implements OnInit, OnDestroy {
   user: any;
   isLoggedIn = false;
   currentConversationId: number | null = null;
+  selectedImages: {file: File, preview: string, name: string}[] = [];
   
   private subscriptions: Subscription[] = [];
 
-  constructor(private chatService: ChatSupportService) {
+  constructor(private chatService: ChatSupportService, private cdr: ChangeDetectorRef) {
     const token = localStorage.getItem('cp2i_token');
     this.user = JSON.parse(localStorage.getItem('cp2i_user') || 'null');
     this.isLoggedIn = !!(token && this.user?.id);
@@ -299,29 +450,68 @@ export class ChatWidgetComponent implements OnInit, OnDestroy {
   }
 
   sendMessage() {
-    if (!this.newMessage.trim() || !this.isLoggedIn) return;
-
-    console.log('Envoi message:', this.newMessage, 'ConversationId:', this.currentConversationId);
+    if ((!this.newMessage.trim() && this.selectedImages.length === 0) || !this.isLoggedIn) return;
 
     if (!this.currentConversationId) {
-      this.chatService.createConversation('Support général', this.newMessage).subscribe({
-        next: (response) => {
-          console.log('Conversation créée:', response);
-          this.currentConversationId = response.conversation_id;
-          this.newMessage = '';
-          this.loadMessages();
-        },
-        error: (err) => console.error('Erreur création:', err)
-      });
+      if (this.selectedImages.length > 0) {
+        const formData = new FormData();
+        formData.append('subject', 'Support général');
+        formData.append('initial_message', this.newMessage || '');
+        
+        this.selectedImages.forEach((image, index) => {
+          formData.append(`image_${index}`, image.file);
+        });
+        
+        this.chatService.createConversationWithImages(formData).subscribe({
+          next: (response) => {
+            this.currentConversationId = response?.conversation_id || response?.id;
+            this.newMessage = '';
+            this.selectedImages = [];
+            if (this.currentConversationId) {
+              this.loadMessages();
+            }
+          },
+          error: (err) => console.error('Erreur création:', err)
+        });
+      } else {
+        this.chatService.createConversation('Support général', this.newMessage).subscribe({
+          next: (response) => {
+            this.currentConversationId = response?.conversation_id || response?.id;
+            this.newMessage = '';
+            if (this.currentConversationId) {
+              this.loadMessages();
+            }
+          },
+          error: (err) => console.error('Erreur création:', err)
+        });
+      }
     } else {
-      this.chatService.sendMessage(this.currentConversationId, this.newMessage).subscribe({
-        next: (response) => {
-          console.log('Message envoyé:', response);
-          this.newMessage = '';
-          this.loadMessages();
-        },
-        error: (err) => console.error('Erreur envoi:', err)
-      });
+      if (this.selectedImages.length > 0) {
+        const formData = new FormData();
+        formData.append('conversation_id', this.currentConversationId.toString());
+        formData.append('message', this.newMessage || '');
+        
+        this.selectedImages.forEach((image, index) => {
+          formData.append(`image_${index}`, image.file);
+        });
+        
+        this.chatService.sendMessageWithImages(formData).subscribe({
+          next: (response) => {
+            this.newMessage = '';
+            this.selectedImages = [];
+            this.loadMessages();
+          },
+          error: (err) => console.error('Erreur envoi:', err)
+        });
+      } else {
+        this.chatService.sendMessage(this.currentConversationId, this.newMessage).subscribe({
+          next: (response) => {
+            this.newMessage = '';
+            this.loadMessages();
+          },
+          error: (err) => console.error('Erreur envoi:', err)
+        });
+      }
     }
   }
 
@@ -347,5 +537,93 @@ export class ChatWidgetComponent implements OnInit, OnDestroy {
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+  
+  onFileSelect(event: any) {
+    const files = Array.from(event.target.files) as File[];
+    this.processFiles(files);
+  }
+  
+  processFiles(files: File[]) {
+    console.log('Processing files:', files.length);
+    files.forEach(file => {
+      if (this.selectedImages.length >= 3) return;
+      
+      if (!file.type.startsWith('image/')) {
+        alert('Seules les images sont autorisées');
+        return;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) {
+        alert(`L'image ${file.name} est trop volumineuse (max 5MB)`);
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.selectedImages.push({
+          file,
+          preview: e.target?.result as string,
+          name: file.name
+        });
+        console.log('Image added, total:', this.selectedImages.length);
+        this.cdr.detectChanges(); // Force la détection des changements
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  
+  removeImage(index: number) {
+    this.selectedImages.splice(index, 1);
+  }
+  
+  getMessageText(message: string): string {
+    if (message.includes('[IMAGES]')) {
+      const text = message.split('[IMAGES]')[0].replace(/\\n/g, '\n').trim();
+      return text || '';
+    }
+    return message.replace(/\\n/g, '\n');
+  }
+  
+  getMessageImages(message: string): string[] {
+    if (message.includes('[IMAGES]')) {
+      try {
+        const imagesPart = message.split('[IMAGES]')[1];
+        return JSON.parse(imagesPart) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  }
+  
+  getImageUrl(imagePath: string): string {
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    return `https://penccumndongo.com/${imagePath}`;
+  }
+  
+  openImage(imagePath: string) {
+    window.open(this.getImageUrl(imagePath), '_blank');
+  }
+  
+  getImagesFromField(imagesField: string): string[] {
+    if (!imagesField) return [];
+    try {
+      const parsed = JSON.parse(imagesField);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+  
+  onImageError(event: any) {
+    event.target.style.display = 'none';
+    // Masquer le conteneur parent si c'est la seule image
+    const parent = event.target.closest('.message-images');
+    if (parent && parent.children.length === 1) {
+      parent.style.display = 'none';
+    }
   }
 }

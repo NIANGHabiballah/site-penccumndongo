@@ -520,80 +520,17 @@
   font-size: 1.2rem;
 }
 
-/* Responsive */
+/* Responsive - Version simplifiée */
 @media (max-width: 768px) {
-  .admin-chat-container {
-    padding: 0.5rem;
-  }
-  
-  .header h2 {
-    font-size: 1.2rem;
-  }
-  
-  .tab-navigation {
-    flex-wrap: wrap;
-    gap: 0.25rem;
-  }
-  
-  .tab-btn {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.85rem;
-  }
-  
-  .tab-content {
-    padding: 1rem;
-  }
-  
   .conversations-layout {
     grid-template-columns: 1fr;
-    height: auto;
   }
   
-  .section-header {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-  }
-  
-  .section-header h3 {
-    font-size: 1.1rem;
-    text-align: center;
-  }
-  
-  .btn-primary {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-    justify-content: center;
-  }
-  
-  .conversation-item {
-    padding: 1rem;
-  }
-  
-  .conversation-header {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  .priority-indicator {
-    margin-left: 0;
-  }
-  
-  .conversation-footer {
-    flex-direction: column;
-    gap: 0.5rem;
-    align-items: flex-start;
-  }
-  
-  .conversation-actions {
-    flex-direction: column;
-  }
-  
-  .message-input-area {
-    flex-direction: column;
-    align-items: stretch;
+  .conversations-panel.mobile-hidden {
+    display: none;
   }
 }
+
 /* Onglet Réponses Rapides */
 .quick-replies-container {
   max-width: 1200px;
@@ -840,4 +777,3 @@
   color: #2c3e50;
   font-size: 1.1rem;
 }
-  

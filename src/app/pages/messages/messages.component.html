@@ -67,6 +67,11 @@
             placeholder="Rédigez votre message ici..."></textarea>
         </div>
 
+        <div class="form-group">
+          <label>📷 Images (optionnel)</label>
+          <app-image-upload (imagesChange)="onImagesChange($event)"></app-image-upload>
+        </div>
+
         <div class="form-options">
           <label class="checkbox-label">
             <input 

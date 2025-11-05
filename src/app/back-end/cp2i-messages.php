@@ -18,6 +18,15 @@ if ($method === 'POST') {
         
         $input = json_decode(file_get_contents('php://input'), true);
         markMessageAsRead($user, $input);
+    } elseif ($action === 'send_with_images') {
+        // Seuls les admins peuvent envoyer des messages
+        if ($user['role'] !== 'admin') {
+            http_response_code(403);
+            echo json_encode(['error' => 'Accès refusé']);
+            exit;
+        }
+        
+        sendMessageWithImages($user);
     } else {
         // Seuls les admins peuvent envoyer des messages
         if ($user['role'] !== 'admin') {
@@ -167,5 +176,97 @@ function sendMessage($user, $data) {
         http_response_code(500);
         echo json_encode(['error' => 'Erreur lors de l\'envoi du message']);
     }
+}
+
+function sendMessageWithImages($user) {
+    $db = getDB();
+    
+    $subject = $_POST['subject'] ?? '';
+    $content = $_POST['content'] ?? '';
+    $send_to_all = $_POST['send_to_all'] === 'true';
+    
+    if (!$subject || !$content) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Sujet et contenu requis']);
+        return;
+    }
+    
+    try {
+        // Traiter les images
+        $imageUrls = [];
+        foreach ($_FILES as $key => $file) {
+            if (strpos($key, 'image_') === 0) {
+                $imageUrl = uploadImage($file, 'messages');
+                if ($imageUrl) {
+                    $imageUrls[] = $imageUrl;
+                }
+            }
+        }
+        
+        // Ajouter les images au contenu
+        $finalContent = $content;
+        if (!empty($imageUrls)) {
+            $finalContent .= '\n[IMAGES]' . json_encode($imageUrls);
+        }
+        
+        // Insérer le message
+        $stmt = $db->prepare("INSERT INTO cp2i_messages (sender_id, subject, content, images, send_to_all) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$user['user_id'], $subject, $finalContent, json_encode($imageUrls), $send_to_all ? 1 : 0]);
+        $message_id = $db->lastInsertId();
+        
+        $recipient_count = 0;
+        
+        if ($send_to_all) {
+            $stmt = $db->prepare("SELECT id FROM cp2i_users WHERE id != ?");
+            $stmt->execute([$user['user_id']]);
+            $all_recipients = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            
+            foreach ($all_recipients as $recipient_id) {
+                $stmt = $db->prepare("INSERT INTO cp2i_message_recipients (message_id, recipient_id) VALUES (?, ?)");
+                $stmt->execute([$message_id, $recipient_id]);
+            }
+            $recipient_count = count($all_recipients);
+        }
+        
+        echo json_encode([
+            'success' => true,
+            'message' => "Message avec images envoyé à $recipient_count destinataire(s)",
+            'images' => $imageUrls
+        ]);
+        
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Erreur lors de l\'envoi du message avec images']);
+    }
+}
+
+function uploadImage($file, $type = 'messages') {
+    // Dossier uploads directement dans public_html
+    $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $type . '/';
+    
+    if (!file_exists($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+    
+    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    $maxSize = 5 * 1024 * 1024;
+    
+    if (!in_array($file['type'], $allowedTypes)) {
+        return false;
+    }
+    
+    if ($file['size'] > $maxSize) {
+        return false;
+    }
+    
+    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $filename = uniqid() . '_' . time() . '.' . $extension;
+    $filepath = $uploadDir . $filename;
+    
+    if (move_uploaded_file($file['tmp_name'], $filepath)) {
+        return 'uploads/' . $type . '/' . $filename;
+    }
+    
+    return false;
 }
 ?>

@@ -10,6 +10,7 @@ export interface ChatMessage {
   sender_id: number;
   sender_type: 'participant' | 'admin';
   message: string;
+  images?: string;
   timestamp: string;
   read: boolean;
 }
@@ -169,5 +170,19 @@ export class ChatSupportService {
     };
     return this.http.get<any[]>(`${this.baseUrl}/chat-support.php?action=admins`, 
       { headers });
+  }
+
+  // Envoyer un message avec images
+  sendMessageWithImages(formData: FormData): Observable<any> {
+    const token = localStorage.getItem('cp2i_token');
+    const headers = { 'Authorization': `Bearer ${token}` };
+    return this.http.post(`${this.baseUrl}/chat-support.php?action=send_with_images`, formData, { headers });
+  }
+
+  // Créer une conversation avec images
+  createConversationWithImages(formData: FormData): Observable<any> {
+    const token = localStorage.getItem('cp2i_token');
+    const headers = { 'Authorization': `Bearer ${token}` };
+    return this.http.post(`${this.baseUrl}/chat-support.php?action=create_with_images`, formData, { headers });
   }
 }

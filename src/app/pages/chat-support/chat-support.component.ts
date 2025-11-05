@@ -21,6 +21,8 @@ export class ChatSupportComponent implements OnInit, OnDestroy {
   newSubject = '';
   newInitialMessage = '';
   showNewChatForm = false;
+  selectedImages: {file: File, preview: string, name: string}[] = [];
+  newChatImages: {file: File, preview: string, name: string}[] = [];
   
   user: any;
   isAdmin = false;
@@ -64,6 +66,21 @@ export class ChatSupportComponent implements OnInit, OnDestroy {
   loadMessages(conversationId: number) {
     this.chatService.getMessages(conversationId).subscribe({
       next: (messages) => {
+        console.log('=== DEBUG MESSAGES ===');
+        console.log('Messages bruts reçus:', messages);
+        
+        messages.forEach((msg, index) => {
+          console.log(`Message ${index}:`, {
+            id: msg.id,
+            text: msg.message,
+            images_field_raw: msg.images,
+            images_field_type: typeof msg.images,
+            has_images: !!msg.images,
+            parsed_images: this.getImagesFromField(msg.images || ''),
+            all_images: this.getAllImages(msg)
+          });
+        });
+        
         this.messages = messages;
         setTimeout(() => this.scrollToBottom(), 100);
       },
@@ -72,32 +89,47 @@ export class ChatSupportComponent implements OnInit, OnDestroy {
   }
 
   sendMessage() {
-    if (!this.newMessage.trim() || !this.selectedConversation) return;
+    if ((!this.newMessage.trim() && this.selectedImages.length === 0) || !this.selectedConversation) return;
 
-    this.chatService.sendMessage(this.selectedConversation.id!, this.newMessage).subscribe({
+    const formData = new FormData();
+    formData.append('conversation_id', this.selectedConversation.id!.toString());
+    formData.append('message', this.newMessage);
+    
+    this.selectedImages.forEach((image, index) => {
+      formData.append(`image_${index}`, image.file);
+    });
+
+    this.chatService.sendMessageWithImages(formData).subscribe({
       next: () => {
         this.newMessage = '';
+        this.selectedImages = [];
         this.loadMessages(this.selectedConversation!.id!);
         this.loadConversations();
       },
-      error: (err) => console.error('Erreur envoi message:', err)
+      error: (err: any) => console.error('Erreur envoi message:', err)
     });
   }
 
   createNewConversation() {
     if (!this.newSubject.trim() || !this.newInitialMessage.trim()) return;
 
-    console.log('Création conversation:', this.newSubject, this.newInitialMessage);
+    const formData = new FormData();
+    formData.append('subject', this.newSubject);
+    formData.append('initial_message', this.newInitialMessage);
+    
+    this.newChatImages.forEach((image, index) => {
+      formData.append(`image_${index}`, image.file);
+    });
 
-    this.chatService.createConversation(this.newSubject, this.newInitialMessage).subscribe({
-      next: (response) => {
-        console.log('Conversation créée:', response);
+    this.chatService.createConversationWithImages(formData).subscribe({
+      next: (response: any) => {
         this.newSubject = '';
         this.newInitialMessage = '';
+        this.newChatImages = [];
         this.showNewChatForm = false;
         this.loadConversations();
       },
-      error: (err) => console.error('Erreur création conversation:', err)
+      error: (err: any) => console.error('Erreur création conversation:', err)
     });
   }
 
@@ -199,5 +231,133 @@ export class ChatSupportComponent implements OnInit, OnDestroy {
 
   toggleNewChatForm() {
     this.showNewChatForm = true;
+  }
+
+  onFileSelect(event: any) {
+    const files = Array.from(event.target.files) as File[];
+    this.processFiles(files, this.selectedImages);
+  }
+
+  onNewChatFileSelect(event: any) {
+    const files = Array.from(event.target.files) as File[];
+    this.processFiles(files, this.newChatImages);
+  }
+
+  processFiles(files: File[], targetArray: {file: File, preview: string, name: string}[]) {
+    files.forEach(file => {
+      if (targetArray.length >= 5) return;
+      
+      if (!file.type.startsWith('image/')) {
+        alert('Seules les images sont autorisées');
+        return;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) {
+        alert(`L'image ${file.name} est trop volumineuse (max 5MB)`);
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        targetArray.push({
+          file,
+          preview: e.target?.result as string,
+          name: file.name
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  removeImage(index: number) {
+    this.selectedImages.splice(index, 1);
+  }
+
+  removeNewChatImage(index: number) {
+    this.newChatImages.splice(index, 1);
+  }
+  
+  getMessageText(message: string): string {
+    if (!message) return '';
+    if (message.includes('[IMAGES]')) {
+      const text = message.split('[IMAGES]')[0].replace(/\\n/g, '\n').trim();
+      return text || '';
+    }
+    return message.replace(/\\n/g, '\n');
+  }
+  
+  getMessageImages(message: string): string[] {
+    if (message.includes('[IMAGES]')) {
+      try {
+        const imagesPart = message.split('[IMAGES]')[1];
+        return JSON.parse(imagesPart) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  }
+  
+  getImageUrl(imagePath: string): string {
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    return `https://penccumndongo.com/${imagePath}`;
+  }
+  
+  openImage(imagePath: string) {
+    window.open(this.getImageUrl(imagePath), '_blank');
+  }
+  
+  getImagesFromField(imagesField: string): string[] {
+    if (!imagesField) return [];
+    try {
+      // Décoder les entités HTML et les échappements
+      let decoded = imagesField.replace(/&quot;/g, '"');
+      decoded = decoded.split('\\/').join('/');
+      decoded = decoded.split('\\"').join('"');
+      const parsed = JSON.parse(decoded);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      console.error('Erreur parsing images:', e, 'Data:', imagesField);
+      return [];
+    }
+  }
+  
+  getAllImages(message: any): string[] {
+    const images: string[] = [];
+    
+    console.log('getAllImages pour message:', {
+      id: message.id,
+      message_text: message.message,
+      images_field: message.images,
+      images_field_type: typeof message.images
+    });
+    
+    // Images du champ images (nouveau format)
+    if (message.images) {
+      const newFormatImages = this.getImagesFromField(message.images);
+      console.log('Images nouveau format:', newFormatImages);
+      images.push(...newFormatImages);
+    }
+    
+    // Images dans le message (ancien format)
+    if (message.message && message.message.includes('[IMAGES]')) {
+      const oldFormatImages = this.getMessageImages(message.message);
+      console.log('Images ancien format:', oldFormatImages);
+      images.push(...oldFormatImages);
+    }
+    
+    console.log('Total images trouvées:', images);
+    return images;
+  }
+  
+  onImageError(event: any) {
+    event.target.style.display = 'none';
+    // Masquer le conteneur parent si c'est la seule image
+    const parent = event.target.closest('.message-images');
+    if (parent && parent.children.length === 1) {
+      parent.style.display = 'none';
+    }
   }
 }

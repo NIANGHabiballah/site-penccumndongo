@@ -15,6 +15,23 @@
     <h3>Nouvelle demande de support</h3>
     <input type="text" [(ngModel)]="newSubject" placeholder="Sujet de votre demande" class="form-input">
     <textarea [(ngModel)]="newInitialMessage" placeholder="Décrivez votre problème..." rows="3" class="form-textarea"></textarea>
+    
+    <div class="image-upload-section">
+      <label>📷 Joindre des images (optionnel)</label>
+      <input type="file" 
+             accept="image/*" 
+             multiple
+             (change)="onNewChatFileSelect($event)"
+             class="file-input">
+      <div class="new-chat-images" *ngIf="newChatImages.length > 0">
+        <div class="image-item" *ngFor="let image of newChatImages; let i = index">
+          <img [src]="image.preview" [alt]="image.name">
+          <button class="remove-btn" (click)="removeNewChatImage(i)">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+    </div>
     <div class="form-actions">
       <button class="btn-primary" (click)="createNewConversation()">Envoyer</button>
       <button class="btn-secondary" (click)="showNewChatForm = false">Annuler</button>
@@ -119,7 +136,34 @@
               </span>
               <span class="timestamp">{{formatTime(message.timestamp)}}</span>
             </div>
-            <div class="message-text">{{message.message}}</div>
+            <div class="message-text" *ngIf="getMessageText(message.message)">{{getMessageText(message.message)}}</div>
+            
+            <!-- DEBUG: Affichage des informations d'images -->
+            <div style="background: yellow; padding: 5px; margin: 5px 0; font-size: 10px;">
+              <strong>DEBUG Images:</strong><br>
+              Images field: {{message.images}}<br>
+              Images count: {{getAllImages(message).length}}<br>
+              Images array: {{getAllImages(message) | json}}
+            </div>
+            
+            <div class="message-images" 
+                 style="display: block !important; background: lime !important; padding: 10px !important;">
+              <div style="color: black; font-weight: bold;">IMAGES TROUVÉES: {{getAllImages(message).length}}</div>
+              <div *ngIf="getAllImages(message).length > 0">
+                <img *ngFor="let img of getAllImages(message)" 
+                     [src]="getImageUrl(img)" 
+                     class="message-image"
+                     (click)="openImage(img)"
+                     (error)="onImageError($event)"
+                     style="border: 2px solid red !important; display: block !important; width: 100px !important; height: 100px !important;">
+              </div>
+              <div *ngIf="getAllImages(message).length === 0" style="color: red;">AUCUNE IMAGE</div>
+            </div>
+            
+            <!-- DEBUG: Forcer l'affichage si images field existe -->
+            <div *ngIf="message.images && message.images !== 'NULL'" style="background: orange; padding: 5px;">
+              <strong>FORCE DISPLAY:</strong> {{message.images}}
+            </div>
           </div>
         </div>
       </div>
@@ -133,9 +177,28 @@
             class="message-input"
             rows="2"
             (keydown.enter)="onEnterKey($event)"></textarea>
-          <button class="send-button" (click)="sendMessage()" [disabled]="!newMessage.trim()">
+          <button class="attach-button" (click)="fileInput.click()" title="Joindre une image">
+            <i class="fas fa-paperclip"></i>
+          </button>
+          <button class="send-button" (click)="sendMessage()" [disabled]="!newMessage.trim() && selectedImages.length === 0">
             <i class="fas fa-paper-plane"></i>
           </button>
+        </div>
+        
+        <input #fileInput 
+               type="file" 
+               accept="image/*" 
+               multiple
+               (change)="onFileSelect($event)"
+               style="display: none;">
+        
+        <div class="attached-images" *ngIf="selectedImages.length > 0">
+          <div class="image-preview" *ngFor="let image of selectedImages; let i = index">
+            <img [src]="image.preview" [alt]="image.name" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+            <button class="remove-image" (click)="removeImage(i)">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
         </div>
       </div>
 

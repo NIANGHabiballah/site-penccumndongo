@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { HttpClient } from '@angular/common/http';
+import { ImageUploadComponent } from '../../components/image-upload/image-upload.component';
 
 @Component({
   selector: 'app-messages',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImageUploadComponent],
   templateUrl: './messages.component.html',
   styleUrls: ['./messages.component.css']
 })
@@ -24,6 +25,8 @@ export class MessagesComponent implements OnInit {
     programmation: false,
     dateEnvoi: ''
   };
+
+  selectedImages: File[] = [];
 
   conversations = [
     {
@@ -69,29 +72,57 @@ export class MessagesComponent implements OnInit {
   }
 
   envoyerMessage() {
-    const messageData = {
-      subject: this.messageForm.sujet,
-      content: this.messageForm.contenu,
-      send_to_all: this.messageForm.destinataire === 'tous' || this.messageForm.destinataire === 'participants',
-      recipients: this.messageForm.destinataire === 'individuel' ? [] : undefined
-    };
+    if (this.selectedImages.length > 0) {
+      // Envoyer avec images
+      const formData = new FormData();
+      formData.append('subject', this.messageForm.sujet);
+      formData.append('content', this.messageForm.contenu);
+      formData.append('send_to_all', (this.messageForm.destinataire === 'tous' || this.messageForm.destinataire === 'participants').toString());
+      
+      this.selectedImages.forEach((image, index) => {
+        formData.append(`image_${index}`, image);
+      });
+      
+      const token = localStorage.getItem('cp2i_token');
+      const headers = { 'Authorization': `Bearer ${token}` };
+      
+      this.http.post('https://penccumndongo.com/src/app/back-end/cp2i-messages.php?action=send_with_images', formData, {
+        headers
+      }).subscribe({
+        next: (response: any) => {
+          alert(response.message || 'Message envoyé avec succès');
+          this.resetForm();
+        },
+        error: (err) => {
+          console.error('Erreur envoi:', err);
+          alert('Erreur lors de l\'envoi du message');
+        }
+      });
+    } else {
+      // Envoyer sans images (méthode existante)
+      const messageData = {
+        subject: this.messageForm.sujet,
+        content: this.messageForm.contenu,
+        send_to_all: this.messageForm.destinataire === 'tous' || this.messageForm.destinataire === 'participants',
+        recipients: this.messageForm.destinataire === 'individuel' ? [] : undefined
+      };
 
-    // Utiliser le bon endpoint
-    const token = localStorage.getItem('cp2i_token');
-    const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
-    
-    this.http.post('https://penccumndongo.com/src/app/back-end/cp2i-messages.php', messageData, {
-      headers
-    }).subscribe({
-      next: (response: any) => {
-        alert(response.message || 'Message envoyé avec succès');
-        this.resetForm();
-      },
-      error: (err) => {
-        console.error('Erreur envoi:', err);
-        alert('Erreur lors de l\'envoi du message');
-      }
-    });
+      const token = localStorage.getItem('cp2i_token');
+      const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+      
+      this.http.post('https://penccumndongo.com/src/app/back-end/cp2i-messages.php', messageData, {
+        headers
+      }).subscribe({
+        next: (response: any) => {
+          alert(response.message || 'Message envoyé avec succès');
+          this.resetForm();
+        },
+        error: (err) => {
+          console.error('Erreur envoi:', err);
+          alert('Erreur lors de l\'envoi du message');
+        }
+      });
+    }
   }
 
   resetForm() {
@@ -103,6 +134,7 @@ export class MessagesComponent implements OnInit {
       programmation: false,
       dateEnvoi: ''
     };
+    this.selectedImages = [];
   }
 
   utiliserTemplate(template: any) {
@@ -111,5 +143,9 @@ export class MessagesComponent implements OnInit {
 
   ouvrirConversation(conversation: any) {
     console.log('Ouvrir conversation:', conversation);
+  }
+
+  onImagesChange(images: File[]) {
+    this.selectedImages = images;
   }
 }

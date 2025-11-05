@@ -1,0 +1,10 @@
+<!-- Test pour forcer l'affichage des images -->
+<div class="message-images" style="background: green !important; padding: 10px !important; margin: 5px 0 !important; display: block !important;">
+  <p style="color: white !important;">IMAGES TROUVÉES: {{ getAllImages(message).length }}</p>
+  <div *ngFor="let image of getAllImages(message)" style="border: 2px solid red !important; margin: 5px !important; display: block !important;">
+    <img [src]="'https://penccumndongo.com/' + image" 
+         style="max-width: 200px !important; height: auto !important; display: block !important;"
+         (error)="onImageError($event, image)"
+         (load)="onImageLoad($event, image)">
+  </div>
+</div>

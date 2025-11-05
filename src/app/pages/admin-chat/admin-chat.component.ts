@@ -13,6 +13,7 @@ import { ChatSupportService } from '../../services/chat-support.service';
 export class AdminChatComponent implements OnInit {
   activeTab = 'conversations';
   showAddReplyForm = false;
+  isMobile = false;
   
   conversations: any[] = [];
   selectedConversation: any = null;
@@ -40,6 +41,7 @@ export class AdminChatComponent implements OnInit {
   constructor(private chatService: ChatSupportService) {}
 
   ngOnInit() {
+    this.checkMobile();
     this.loadAvailableAdmins();
     this.loadConversations();
     this.loadStats();
@@ -51,6 +53,18 @@ export class AdminChatComponent implements OnInit {
         this.loadMessages(this.selectedConversation.id);
       }
     }, 3000);
+
+    // Écouter les changements de taille d'écran
+    window.addEventListener('resize', () => this.checkMobile());
+  }
+
+  checkMobile() {
+    this.isMobile = window.innerWidth <= 768;
+  }
+
+  goBackToList() {
+    this.selectedConversation = null;
+    this.messages = [];
   }
 
   switchTab(tab: string) {
@@ -244,5 +258,23 @@ export class AdminChatComponent implements OnInit {
   onCloseConversation(conversationId: number, event: Event) {
     event.stopPropagation();
     this.closeConversation(conversationId);
+  }
+
+  // Méthodes pour gérer les images
+  getAllImages(message: any): string[] {
+    if (!message.images) {
+      return [];
+    }
+
+    try {
+      if (typeof message.images === 'string') {
+        return JSON.parse(message.images);
+      } else if (Array.isArray(message.images)) {
+        return message.images;
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
   }
 }
