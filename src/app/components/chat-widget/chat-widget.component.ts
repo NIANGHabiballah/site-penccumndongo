@@ -168,8 +168,9 @@ import { Subscription } from 'rxjs';
       padding: 1rem !important;
       overflow-y: auto !important;
       background: #f5f5f5 !important;
-      max-height: 250px !important;
-      min-height: 150px !important;
+      max-height: 300px !important;
+      min-height: 200px !important;
+      padding-bottom: 20px !important;
     }
 
     .message {
@@ -216,7 +217,9 @@ import { Subscription } from 'rxjs';
       background: white !important;
       position: sticky !important;
       bottom: 0 !important;
-      z-index: 10 !important;
+      z-index: 100 !important;
+      flex-shrink: 0 !important;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.1) !important;
     }
 
     .chat-input input {
@@ -333,14 +336,25 @@ import { Subscription } from 'rxjs';
     }
 
     @media (max-width: 768px) {
+      .chat-widget {
+        bottom: 10px;
+        right: 10px;
+      }
+      
       .chat-window {
-        width: 300px;
-        height: 450px;
+        width: calc(100vw - 20px);
+        max-width: 350px;
+        height: calc(100vh - 100px);
+        max-height: 500px;
+        position: fixed;
+        bottom: 80px;
+        right: 10px;
       }
       
       .messages {
-        max-height: 200px !important;
-        min-height: 120px !important;
+        max-height: calc(100vh - 300px) !important;
+        min-height: 200px !important;
+        padding-bottom: 30px !important;
       }
       
       .attached-images {
@@ -357,34 +371,77 @@ import { Subscription } from 'rxjs';
       }
       
       .chat-input {
-        padding: 0.5rem !important;
-        gap: 0.3rem !important;
+        padding: 0.75rem !important;
+        gap: 0.5rem !important;
         flex-wrap: nowrap !important;
+        position: sticky !important;
+        bottom: 0 !important;
+        background: white !important;
+        border-top: 2px solid #e0e0e0 !important;
       }
       
       .chat-input button {
-        min-width: 38px !important;
-        width: 38px !important;
-        height: 38px !important;
-        max-width: 38px !important;
+        min-width: 40px !important;
+        width: 40px !important;
+        height: 40px !important;
+        max-width: 40px !important;
         padding: 0 !important;
-        font-size: 12px !important;
+        font-size: 14px !important;
         flex-shrink: 0 !important;
-        border-radius: 50% !important;
+        border-radius: 8px !important;
       }
       
       .attach-btn {
-        min-width: 38px !important;
-        width: 38px !important;
-        height: 38px !important;
-        max-width: 38px !important;
+        min-width: 40px !important;
+        width: 40px !important;
+        height: 40px !important;
+        max-width: 40px !important;
       }
       
       .chat-input input {
-        font-size: 14px;
-        padding: 0.5rem 0.8rem;
+        font-size: 16px; /* Évite le zoom sur iOS */
+        padding: 0.75rem;
         min-width: 0;
         flex: 1;
+        border-radius: 8px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .chat-window {
+        width: calc(100vw - 10px);
+        height: calc(100vh - 80px);
+        bottom: 70px;
+        right: 5px;
+        left: 5px;
+        position: fixed;
+      }
+      
+      .messages {
+        max-height: calc(100vh - 250px) !important;
+        padding: 0.75rem !important;
+      }
+      
+      .message-content {
+        max-width: 90%;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+      }
+      
+      .chat-input {
+        padding: 0.5rem !important;
+      }
+      
+      .chat-input input {
+        font-size: 16px;
+        padding: 0.6rem;
+      }
+      
+      .chat-input button {
+        width: 35px !important;
+        height: 35px !important;
+        min-width: 35px !important;
+        font-size: 12px !important;
       }
     }
   `]

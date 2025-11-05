@@ -45,7 +45,7 @@
     </div>
   </div>
 
-  <div class="messages-layout">
+  <div class="messages-layout" [class.has-selection]="selectedMessage">
     <!-- Liste des messages -->
     <div class="messages-list">
       <div class="loading-state" *ngIf="loading">
@@ -98,6 +98,9 @@
     <div class="message-detail" *ngIf="selectedMessage">
       <div class="detail-header">
         <div class="detail-title">
+          <button class="btn-back" (click)="closeMessage()">
+            <i class="fas fa-arrow-left"></i>
+          </button>
           <h3>{{selectedMessage.subject}}</h3>
           <button class="btn-close" (click)="closeMessage()">
             <i class="fas fa-times"></i>
@@ -121,7 +124,18 @@
       </div>
       
       <div class="detail-content">
-        <div class="message-body" [innerHTML]="selectedMessage.content"></div>
+        <div class="message-body">
+          <div class="message-content-wrapper" *ngIf="getMessageText(selectedMessage.content) || getMessageImages(selectedMessage.content).length > 0">
+            <div [innerHTML]="getMessageText(selectedMessage.content)" *ngIf="getMessageText(selectedMessage.content)"></div>
+            <div class="message-images" *ngIf="getMessageImages(selectedMessage.content).length > 0">
+              <img *ngFor="let img of getMessageImages(selectedMessage.content)" 
+                   [src]="getImageUrl(img)" 
+                   class="message-image"
+                   (click)="openImage(img)"
+                   alt="Image du message">
+            </div>
+          </div>
+        </div>
       </div>
       
       <div class="detail-footer" *ngIf="selectedMessage.read_at">

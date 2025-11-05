@@ -70,23 +70,49 @@ function getMessages($user) {
             echo json_encode(['success' => true, 'messages' => $messages]);
         } else {
             // Pour les autres utilisateurs, retourner les messages reçus
+            // Inclure les messages collectifs ET les messages individuels
             $stmt = $pdo->prepare("
-                SELECT m.*, u.prenom as sender_prenom, u.nom as sender_nom, mr.read_at
+                SELECT DISTINCT m.id, m.subject, m.content, m.created_at, m.send_to_all,
+                       u.prenom as sender_prenom, u.nom as sender_nom, 
+                       mr.read_at,
+                       CASE WHEN mr.read_at IS NOT NULL THEN 1 ELSE 0 END as is_read
                 FROM cp2i_messages m
                 LEFT JOIN cp2i_users u ON m.sender_id = u.id
-                LEFT JOIN cp2i_message_recipients mr ON m.id = mr.message_id AND mr.recipient_id = ?
-                WHERE m.send_to_all = 1 OR mr.recipient_id = ?
+                LEFT JOIN cp2i_message_recipients mr ON m.id = mr.message_id
+                WHERE (m.send_to_all = 1 OR mr.recipient_id = ?)
+                  AND m.sender_id != ?
                 ORDER BY m.created_at DESC
             ");
             $stmt->execute([$user['user_id'], $user['user_id']]);
             $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Pour les messages collectifs, vérifier/créer l'entrée dans message_recipients
+            foreach ($messages as &$message) {
+                if ($message['send_to_all'] == 1 && !$message['read_at']) {
+                    // Créer l'entrée si elle n'existe pas
+                    $checkStmt = $pdo->prepare("SELECT id FROM cp2i_message_recipients WHERE message_id = ? AND recipient_id = ?");
+                    $checkStmt->execute([$message['id'], $user['user_id']]);
+                    
+                    if (!$checkStmt->fetch()) {
+                        $insertStmt = $pdo->prepare("INSERT IGNORE INTO cp2i_message_recipients (message_id, recipient_id) VALUES (?, ?)");
+                        $insertStmt->execute([$message['id'], $user['user_id']]);
+                    }
+                }
+            }
+            
+            error_log("Messages récupérés pour utilisateur {$user['user_id']}: " . count($messages));
             
             echo json_encode(['success' => true, 'messages' => $messages]);
         }
         
     } catch (Exception $e) {
         error_log('Error in getMessages: ' . $e->getMessage());
-        echo json_encode(['success' => true, 'messages' => []]);
+        error_log('Stack trace: ' . $e->getTraceAsString());
+        echo json_encode([
+            'success' => false, 
+            'messages' => [],
+            'error' => 'Erreur lors de la récupération des messages'
+        ]);
     }
 }
 
@@ -131,6 +157,15 @@ function sendMessage($user, $data) {
     $content = $data['content'] ?? '';
     $send_to_all = $data['send_to_all'] ?? false;
     
+    // Log des données reçues
+    error_log('sendMessage - Données reçues: ' . json_encode([
+        'user_id' => $user['user_id'],
+        'subject' => $subject,
+        'content_length' => strlen($content),
+        'send_to_all' => $send_to_all,
+        'recipients' => $data['recipients'] ?? []
+    ]));
+    
     if (!$subject || !$content) {
         http_response_code(400);
         echo json_encode(['error' => 'Sujet et contenu requis']);
@@ -143,6 +178,8 @@ function sendMessage($user, $data) {
         $stmt->execute([$user['user_id'], $subject, $content, $send_to_all ? 1 : 0]);
         $message_id = $db->lastInsertId();
         
+        error_log('Message inséré avec ID: ' . $message_id);
+        
         $recipient_count = 0;
         
         if ($send_to_all) {
@@ -150,6 +187,8 @@ function sendMessage($user, $data) {
             $stmt = $db->prepare("SELECT id FROM cp2i_users WHERE id != ?");
             $stmt->execute([$user['user_id']]);
             $all_recipients = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            
+            error_log('Destinataires pour envoi collectif: ' . json_encode($all_recipients));
             
             // Insérer chaque destinataire une seule fois
             foreach ($all_recipients as $recipient_id) {
@@ -159,22 +198,86 @@ function sendMessage($user, $data) {
             $recipient_count = count($all_recipients);
         } else {
             $recipients = $data['recipients'] ?? [];
-            // Insérer les destinataires sélectionnés
-            foreach ($recipients as $recipient_id) {
-                $stmt = $db->prepare("INSERT INTO cp2i_message_recipients (message_id, recipient_id) VALUES (?, ?)");
-                $stmt->execute([$message_id, $recipient_id]);
+            
+            error_log('Destinataires sélectionnés: ' . json_encode($recipients));
+            
+            // Vérifier que des destinataires sont fournis
+            if (empty($recipients)) {
+                error_log('Aucun destinataire fourni pour message individuel');
+                http_response_code(400);
+                echo json_encode(['error' => 'Aucun destinataire sélectionné pour ce message individuel']);
+                return;
             }
-            $recipient_count = count($recipients);
+            
+            // Insérer les destinataires sélectionnés avec transaction
+            $db->beginTransaction();
+            $valid_recipients = 0;
+            
+            try {
+                foreach ($recipients as $recipient_id) {
+                    // Vérifier que le destinataire existe et n'est pas l'expéditeur
+                    $stmt = $db->prepare("SELECT id, prenom, nom, email FROM cp2i_users WHERE id = ? AND id != ?");
+                    $stmt->execute([$recipient_id, $user['user_id']]);
+                    $recipient = $stmt->fetch(PDO::FETCH_ASSOC);
+                    
+                    if ($recipient) {
+                        // Insérer le destinataire
+                        $stmt = $db->prepare("INSERT INTO cp2i_message_recipients (message_id, recipient_id) VALUES (?, ?)");
+                        $stmt->execute([$message_id, $recipient_id]);
+                        $valid_recipients++;
+                        
+                        error_log("Destinataire ajouté: {$recipient['prenom']} {$recipient['nom']} (ID: {$recipient_id})");
+                    } else {
+                        error_log('Destinataire invalide ou expéditeur: ' . $recipient_id);
+                    }
+                }
+                
+                if ($valid_recipients === 0) {
+                    throw new Exception('Aucun destinataire valide trouvé');
+                }
+                
+                $db->commit();
+                $recipient_count = $valid_recipients;
+                
+                error_log("Message individuel envoyé avec succès à $valid_recipients destinataires");
+                
+            } catch (Exception $e) {
+                $db->rollback();
+                error_log('Erreur lors de l\'ajout des destinataires: ' . $e->getMessage());
+                http_response_code(500);
+                echo json_encode(['error' => 'Erreur lors de l\'ajout des destinataires: ' . $e->getMessage()]);
+                return;
+            }
         }
+        
+        // Vérification finale
+        $stmt = $db->prepare("SELECT COUNT(*) as count FROM cp2i_message_recipients WHERE message_id = ?");
+        $stmt->execute([$message_id]);
+        $final_count = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+        
+        error_log("Vérification finale: $final_count destinataires dans la base pour le message $message_id");
         
         echo json_encode([
             'success' => true,
-            'message' => "Message envoyé à $recipient_count destinataire(s)"
+            'message' => "Message envoyé avec succès à $recipient_count destinataire(s)",
+            'message_id' => $message_id,
+            'recipients_added' => $recipient_count,
+            'final_count' => $final_count
         ]);
         
     } catch (Exception $e) {
+        error_log('Erreur sendMessage: ' . $e->getMessage());
+        error_log('Stack trace: ' . $e->getTraceAsString());
         http_response_code(500);
-        echo json_encode(['error' => 'Erreur lors de l\'envoi du message']);
+        echo json_encode([
+            'error' => 'Erreur lors de l\'envoi du message: ' . $e->getMessage(),
+            'debug_info' => [
+                'user_id' => $user['user_id'],
+                'subject' => $subject,
+                'send_to_all' => $send_to_all,
+                'recipients_provided' => count($data['recipients'] ?? [])
+            ]
+        ]);
     }
 }
 
@@ -226,6 +329,21 @@ function sendMessageWithImages($user) {
                 $stmt->execute([$message_id, $recipient_id]);
             }
             $recipient_count = count($all_recipients);
+        } else {
+            // Pour les messages avec images individuels
+            $recipients = json_decode($_POST['recipients'] ?? '[]', true);
+            
+            if (!empty($recipients)) {
+                foreach ($recipients as $recipient_id) {
+                    $stmt = $db->prepare("SELECT id FROM cp2i_users WHERE id = ?");
+                    $stmt->execute([$recipient_id]);
+                    if ($stmt->fetch()) {
+                        $stmt = $db->prepare("INSERT INTO cp2i_message_recipients (message_id, recipient_id) VALUES (?, ?)");
+                        $stmt->execute([$message_id, $recipient_id]);
+                    }
+                }
+                $recipient_count = count($recipients);
+            }
         }
         
         echo json_encode([

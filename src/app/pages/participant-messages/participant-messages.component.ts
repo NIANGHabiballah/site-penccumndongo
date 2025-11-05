@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ParticipantMessagesService, ParticipantMessage } from '../../services/participant-messages.service';
 import { Subscription } from 'rxjs';
 
@@ -21,7 +22,7 @@ export class ParticipantMessagesComponent implements OnInit, OnDestroy {
   
   private subscriptions: Subscription[] = [];
 
-  constructor(private messagesService: ParticipantMessagesService) {}
+  constructor(private messagesService: ParticipantMessagesService, private sanitizer: DomSanitizer) {}
 
   ngOnInit() {
     this.loadMessages();
@@ -152,8 +153,56 @@ export class ParticipantMessagesComponent implements OnInit, OnDestroy {
   }
 
   formatContent(content: string): string {
+    // Supprimer les balises d'images, le mot "image" au début et les \n
+    let cleanContent = content.replace(/\[IMAGES\]\[.*?\]/g, '').replace(/^image\s*/i, '').replace(/\\n/g, ' ').replace(/\n/g, ' ').trim();
     // Limiter à 100 caractères pour l'aperçu
-    return content.length > 100 ? content.substring(0, 100) + '...' : content;
+    return cleanContent.length > 100 ? cleanContent.substring(0, 100) + '...' : cleanContent;
+  }
+
+  processMessageContent(content: string): SafeHtml {
+    console.log('DEBUG - Contenu original:', content);
+    
+    const imagePattern = /\[IMAGES\](\[.*?\])/;
+    const match = content.match(imagePattern);
+    
+    console.log('DEBUG - Match trouvé:', match);
+    
+    if (match) {
+      try {
+        let textContent = content.replace(imagePattern, '').trim();
+        console.log('DEBUG - Texte après suppression pattern:', textContent);
+        
+        // Supprimer le mot "image" au début s'il existe
+        textContent = textContent.replace(/^image\s*/i, '');
+        // Supprimer les \n échappés et les vrais \n
+        textContent = textContent.replace(/\\n/g, '').replace(/\n/g, '').trim();
+        console.log('DEBUG - Texte après suppression "image":', textContent);
+        
+        const imageUrls = JSON.parse(match[1]);
+        console.log('DEBUG - URLs d\'images parsées:', imageUrls);
+        
+        let html = textContent.replace(/\n/g, '<br>');
+        
+        if (imageUrls && imageUrls.length > 0) {
+          html += '<div class="message-images">';
+          imageUrls.forEach((url: string) => {
+            const fullUrl = url.startsWith('http') ? url : `https://penccumndongo.com/${url}`;
+            console.log('DEBUG - URL complète générée:', fullUrl);
+            html += `<a href="${fullUrl}" target="_blank"><img src="${fullUrl}" alt="Image du message" class="message-image" style="max-width: 180px; max-height: 120px; width: 180px; height: 120px; object-fit: cover; border-radius: 8px; cursor: pointer; display: block; margin: 10px auto;"></a>`;
+          });
+          html += '</div>';
+        }
+        
+        console.log('DEBUG - HTML final généré:', html);
+        return this.sanitizer.bypassSecurityTrustHtml(html);
+      } catch (e) {
+        console.error('DEBUG - Erreur lors du parsing:', e);
+        return this.sanitizer.bypassSecurityTrustHtml(content.replace(/\n/g, '<br>'));
+      }
+    }
+    
+    console.log('DEBUG - Aucune image trouvée, retour du texte simple');
+    return this.sanitizer.bypassSecurityTrustHtml(content.replace(/\n/g, '<br>'));
   }
 
   getSenderName(message: ParticipantMessage): string {
@@ -181,5 +230,43 @@ export class ParticipantMessagesComponent implements OnInit, OnDestroy {
 
   getReadMessages(): ParticipantMessage[] {
     return this.messages.filter(msg => msg.is_read);
+  }
+
+  getMessageText(content: string): string {
+    if (!content) return '';
+    if (content.includes('[IMAGES]')) {
+      let text = content.split('[IMAGES]')[0].trim();
+      text = text.replace(/^image\s*/i, '');
+      // Nettoyer tous les \n en fin de texte et traiter normalement
+      text = text.replace(/\\n+$/, '').replace(/\n+$/, '').trim();
+      text = text.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+      return text;
+    }
+    let text = content.replace(/^image\s*/i, '').trim();
+    text = text.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+    return text;
+  }
+  
+  getMessageImages(content: string): string[] {
+    if (content.includes('[IMAGES]')) {
+      try {
+        const imagesPart = content.split('[IMAGES]')[1];
+        return JSON.parse(imagesPart) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  }
+  
+  getImageUrl(imagePath: string): string {
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    return `https://penccumndongo.com/${imagePath}`;
+  }
+  
+  openImage(imagePath: string) {
+    window.open(this.getImageUrl(imagePath), '_blank');
   }
 }

@@ -959,6 +959,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   loadMessages() {
     this.cp2iApi.getMessages().subscribe({
       next: (data) => {
+        console.log('Messages reçus:', data);
         this.messages = data.messages || [];
       },
       error: (error) => {
@@ -1020,8 +1021,6 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   sendMessage() {
     if (!this.canSendMessage()) return;
     
-    const token = localStorage.getItem('cp2i_token');
-    
     if (this.selectedImages.length > 0) {
       // Envoyer avec images
       const formData = new FormData();
@@ -1038,24 +1037,41 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         formData.append(`image_${index}`, image.file);
       });
       
+      const token = localStorage.getItem('cp2i_token');
       const headers = { 'Authorization': token ? `Bearer ${token}` : '' };
       
-      this.http.post('https://penccumndongo.com/cp2i-messages.php?action=send_with_images', formData, {
+      this.http.post(`${this.cp2iApi['baseUrl']}/cp2i-messages.php?action=send_with_images`, formData, {
         headers
       }).subscribe({
         next: (response: any) => {
+          console.log('Réponse envoi message avec images:', response);
           const recipients = this.messageForm.sendToAll ? 'tous les utilisateurs' : `${this.getSelectedRecipientsCount()} utilisateurs`;
           this.logAdminAction('envoi_message', `Message avec images envoyé à ${recipients}: "${this.messageForm.subject}"`);
-          this.showToast(response.message || 'Message envoyé avec succès', 'success');
+          
+          let successMessage = 'Message avec images envoyé avec succès';
+          if (response.recipients_added) {
+            successMessage += ` à ${response.recipients_added} destinataire(s)`;
+          }
+          
+          this.showToast(successMessage, 'success');
           this.closeMessageModal();
           this.loadMessages();
         },
         error: (error: any) => {
-          this.showToast('Erreur lors de l\'envoi: ' + (error.error?.error || 'Erreur inconnue'), 'error');
+          console.error('Erreur envoi message avec images:', error);
+          let errorMessage = 'Erreur lors de l\'envoi du message avec images';
+          
+          if (error.error && error.error.error) {
+            errorMessage = error.error.error;
+          } else if (error.error && typeof error.error === 'string') {
+            errorMessage = error.error;
+          }
+          
+          this.showToast(errorMessage, 'error');
         }
       });
     } else {
-      // Envoyer sans images (méthode existante)
+      // Envoyer sans images via le service API
       const messageData = {
         subject: this.messageForm.subject,
         content: this.messageForm.content,
@@ -1063,21 +1079,36 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         recipients: this.messageForm.sendToAll ? [] : this.recipients.filter(r => r.selected).map(r => r.id)
       };
       
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : ''
-      };
-      
-      this.http.post(`https://penccumndongo.com/cp2i-messages.php`, messageData, { headers }).subscribe({
+      this.cp2iApi.sendMessage(messageData).subscribe({
         next: (response: any) => {
+          console.log('Réponse envoi message:', response);
           const recipients = this.messageForm.sendToAll ? 'tous les utilisateurs' : `${this.getSelectedRecipientsCount()} utilisateurs`;
           this.logAdminAction('envoi_message', `Message envoyé à ${recipients}: "${this.messageForm.subject}"`);
-          this.showToast(response.message, 'success');
+          
+          // Message de succès détaillé
+          let successMessage = 'Message envoyé avec succès';
+          if (response.recipients_added) {
+            successMessage += ` à ${response.recipients_added} destinataire(s)`;
+          }
+          if (response.message_id) {
+            successMessage += ` (ID: ${response.message_id})`;
+          }
+          
+          this.showToast(successMessage, 'success');
           this.closeMessageModal();
           this.loadMessages();
         },
         error: (error: any) => {
-          this.showToast('Erreur lors de l\'envoi: ' + (error.error?.error || 'Erreur inconnue'), 'error');
+          console.error('Erreur envoi message:', error);
+          let errorMessage = 'Erreur lors de l\'envoi du message';
+          
+          if (error.error && error.error.error) {
+            errorMessage = error.error.error;
+          } else if (error.error && typeof error.error === 'string') {
+            errorMessage = error.error;
+          }
+          
+          this.showToast(errorMessage, 'error');
         }
       });
     }

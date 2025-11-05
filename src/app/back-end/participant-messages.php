@@ -42,7 +42,7 @@ function getParticipantMessages($user) {
     try {
         // Messages destinés à cet utilisateur spécifiquement ou à tous
         $stmt = $pdo->prepare("
-            SELECT 
+            SELECT DISTINCT
                 m.id,
                 m.subject,
                 m.content,
@@ -58,11 +58,27 @@ function getParticipantMessages($user) {
             FROM cp2i_messages m
             LEFT JOIN cp2i_message_recipients mr ON m.id = mr.message_id AND mr.recipient_id = ?
             LEFT JOIN cp2i_users u ON m.sender_id = u.id
-            WHERE mr.recipient_id = ?
+            WHERE m.sender_id != ?
+              AND (m.send_to_all = 1 OR mr.recipient_id = ?)
             ORDER BY m.created_at DESC
         ");
-        $stmt->execute([$user['user_id'], $user['user_id']]);
+        $stmt->execute([$user['user_id'], $user['user_id'], $user['user_id']]);
         $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Pour les messages collectifs sans entrée dans message_recipients, créer l'entrée
+        foreach ($messages as &$message) {
+            if ($message['send_to_all'] == 1 && !$message['read_at']) {
+                $checkStmt = $pdo->prepare("SELECT id FROM cp2i_message_recipients WHERE message_id = ? AND recipient_id = ?");
+                $checkStmt->execute([$message['id'], $user['user_id']]);
+                
+                if (!$checkStmt->fetch()) {
+                    $insertStmt = $pdo->prepare("INSERT IGNORE INTO cp2i_message_recipients (message_id, recipient_id) VALUES (?, ?)");
+                    $insertStmt->execute([$message['id'], $user['user_id']]);
+                }
+            }
+        }
+        
+        error_log("Messages récupérés pour utilisateur {$user['user_id']}: " . count($messages));
         
         echo json_encode([
             'success' => true,
@@ -70,6 +86,7 @@ function getParticipantMessages($user) {
         ]);
         
     } catch (Exception $e) {
+        error_log('Erreur getParticipantMessages: ' . $e->getMessage());
         echo json_encode(['success' => false, 'error' => 'Erreur récupération messages']);
     }
 }

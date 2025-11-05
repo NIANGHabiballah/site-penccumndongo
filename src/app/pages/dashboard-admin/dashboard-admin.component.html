@@ -1564,10 +1564,14 @@
               
               <!-- Images du message -->
               <div class="message-images" *ngIf="getMessageImages(message.content).length > 0">
-                <img *ngFor="let image of getMessageImages(message.content)" 
-                     [src]="'https://penccumndongo.com/' + image" 
-                     class="message-image"
-                     alt="Image du message">
+                <a *ngFor="let image of getMessageImages(message.content)" 
+                   [href]="'https://penccumndongo.com/' + image" 
+                   target="_blank">
+                  <img [src]="'https://penccumndongo.com/' + image" 
+                       class="message-image"
+                       alt="Image du message"
+                       style="cursor: pointer;">
+                </a>
               </div>
             </div>
             

@@ -294,9 +294,10 @@
   margin: 0;
   color: #333;
   line-height: 1.4;
+  font-size: 1.1rem !important;
 }
 
-.btn-close {
+.btn-close, .btn-back {
   background: none;
   border: none;
   color: #666;
@@ -306,8 +307,22 @@
   transition: background-color 0.2s;
 }
 
-.btn-close:hover {
+.btn-close:hover, .btn-back:hover {
   background: #f5f5f5;
+}
+
+.btn-back {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .btn-back {
+    display: block;
+  }
+  
+  .btn-close {
+    display: none;
+  }
 }
 
 .detail-meta {
@@ -336,25 +351,29 @@
   white-space: pre-line;
 }
 
-.message-body img {
-  max-width: 150px !important;
-  max-height: 150px !important;
-  width: 150px !important;
-  height: 150px !important;
-  object-fit: cover !important;
-  border-radius: 6px !important;
-  margin: 0.5rem 0 !important;
+.message-content-wrapper {
+  background: #f8f9fa !important;
+  border: 1px solid #e9ecef !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  margin: 12px 0 !important;
 }
 
-/* Règle globale pour toutes les images dans les messages */
-.messages-container img,
-.message-detail img,
-.detail-content img {
-  max-width: 150px !important;
-  max-height: 150px !important;
-  width: 150px !important;
-  height: 150px !important;
-  object-fit: cover !important;
+.message-images {
+  margin-top: 10px !important;
+}
+
+.message-body img {
+  max-width: 400px !important;
+  max-height: 300px !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  border-radius: 8px !important;
+  margin: 5px 0 !important;
+  cursor: pointer !important;
+  display: block !important;
+  border: 1px solid #ddd !important;
 }
 
 .detail-footer {
@@ -407,6 +426,38 @@
   
   .message-detail {
     height: 50%;
+  }
+  
+  /* Masquer la liste quand un message est sélectionné sur mobile */
+  .messages-layout.has-selection .messages-list {
+    display: none;
+  }
+  
+  .messages-layout.has-selection .message-detail {
+    height: 100%;
+  }
+  
+  .messages-layout.has-selection .no-selection {
+    display: none;
+  }
+  
+  /* Adaptation mobile pour les messages */
+  .message-content-wrapper {
+    padding: 12px !important;
+    margin: 8px 0 !important;
+  }
+  
+  .message-body img {
+    max-width: 100% !important;
+    max-height: 250px !important;
+  }
+  
+  .detail-content {
+    padding: 1rem !important;
+  }
+  
+  .detail-title h3 {
+    font-size: 1rem !important;
   }
   
   .messages-filters {
