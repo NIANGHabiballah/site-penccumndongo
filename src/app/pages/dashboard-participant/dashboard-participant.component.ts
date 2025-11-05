@@ -115,6 +115,154 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     ceremonie_remise: '2026-01-10'
   };
   
+  // Section thèmes
+  selectedLanguage = 'francais';
+  
+  // Thèmes détaillés par langue
+  themesDetailles = {
+    francais: [
+      {
+        title: '1. Patriotisme',
+        icon: 'fas fa-flag',
+        description: 'Explorez l\'amour de la patrie, l\'attachement à son pays et la fierté nationale.',
+        keywords: ['Patrie', 'Nation', 'Fierté', 'Identité', 'Héritage']
+      },
+      {
+        title: '2. Justice et dignité',
+        icon: 'fas fa-balance-scale',
+        description: 'Questionnez l\'équité, les droits humains et la quête de justice sociale.',
+        keywords: ['Équité', 'Droits', 'Justice', 'Respect', 'Humanité']
+      },
+      {
+        title: '3. Beauté Africaine',
+        icon: 'fas fa-crown',
+        description: 'Célébrez la richesse culturelle, la diversité et l\'esthétique africaine.',
+        keywords: ['Culture', 'Tradition', 'Diversité', 'Art', 'Héritage']
+      },
+      {
+        title: '4. Jeunesse responsable',
+        icon: 'fas fa-users',
+        description: 'Réfléchissez sur le rôle et les responsabilités de la nouvelle génération.',
+        keywords: ['Avenir', 'Engagement', 'Leadership', 'Changement', 'Espoir']
+      },
+      {
+        title: '5. Sous l\'emprise des écrans',
+        icon: 'fas fa-mobile-alt',
+        description: 'Analysez l\'impact du numérique sur nos vies et nos relations humaines.',
+        keywords: ['Technologie', 'Dépendance', 'Connexion', 'Virtuel', 'Réalité']
+      }
+    ],
+    wolof: [
+      {
+        title: '1. Bëgg sa réew',
+        icon: 'fas fa-flag',
+        description: 'Xam-xam ci bëgg réew, jokko ak sa taaw ak ngor ci sa réew.',
+        keywords: ['Réew', 'Taaw', 'Ngor', 'Jikko', 'Aada']
+      },
+      {
+        title: '2. Yoon ak ngor',
+        icon: 'fas fa-balance-scale',
+        description: 'Laaj ci yoon, sag ak ngor nët kë nët.',
+        keywords: ['Yoon', 'Sag', 'Ngor', 'Jub', 'Nët kë nët']
+      },
+      {
+        title: '3. Taaru jigeenu afrik',
+        icon: 'fas fa-crown',
+        description: 'Benn ci rafet ak aada yu Afrik.',
+        keywords: ['Aada', 'Taaw', 'Rafet', 'Jigeenu', 'Afrik']
+      },
+      {
+        title: '4. Xale yu am responsabilite',
+        icon: 'fas fa-users',
+        description: 'Xam-xam ci jokko xale yi ak seen responsabilite.',
+        keywords: ['Xale', 'Jokko', 'Responsabilite', 'Avenir', 'Liggey']
+      },
+      {
+        title: '5. Ci ndigalu ekraŋ yi',
+        icon: 'fas fa-mobile-alt',
+        description: 'Xam-xam ci jafe ekraŋ yi ci seen dundu.',
+        keywords: ['Ekraŋ', 'Teknoloji', 'Jokko', 'Dundu', 'Yaram']
+      }
+    ],
+    anglais: [
+      {
+        title: '1. Patriotism',
+        icon: 'fas fa-flag',
+        description: 'Explore love for one\'s country, national pride and cultural identity.',
+        keywords: ['Country', 'Nation', 'Pride', 'Identity', 'Heritage']
+      },
+      {
+        title: '2. Justice and dignity',
+        icon: 'fas fa-balance-scale',
+        description: 'Question equity, human rights and the quest for social justice.',
+        keywords: ['Equity', 'Rights', 'Justice', 'Respect', 'Humanity']
+      },
+      {
+        title: '3. African Beauty',
+        icon: 'fas fa-crown',
+        description: 'Celebrate cultural richness, diversity and African aesthetics.',
+        keywords: ['Culture', 'Tradition', 'Diversity', 'Art', 'Heritage']
+      },
+      {
+        title: '4. Responsible Youth',
+        icon: 'fas fa-users',
+        description: 'Reflect on the role and responsibilities of the new generation.',
+        keywords: ['Future', 'Engagement', 'Leadership', 'Change', 'Hope']
+      },
+      {
+        title: '5. Under the grip of screens',
+        icon: 'fas fa-mobile-alt',
+        description: 'Analyze the impact of digital technology on our lives and relationships.',
+        keywords: ['Technology', 'Addiction', 'Connection', 'Virtual', 'Reality']
+      }
+    ],
+    arabe: [
+      {
+        title: '1. الوطنية',
+        icon: 'fas fa-flag',
+        description: 'استكشف حب الوطن والفخر الوطني والهوية الثقافية',
+        keywords: ['الوطن', 'الأمة', 'الفخر', 'الهوية', 'التراث']
+      },
+      {
+        title: '2. العدالة والكرامة',
+        icon: 'fas fa-balance-scale',
+        description: 'استجوب العدالة وحقوق الإنسان والبحث عن العدالة الاجتماعية',
+        keywords: ['العدالة', 'الحقوق', 'العدل', 'الاحترام', 'الإنسانية']
+      },
+      {
+        title: '3. الجمال الأفريقي',
+        icon: 'fas fa-crown',
+        description: 'احتفل بالثراء الثقافي والتنوع والجماليات الأفريقية',
+        keywords: ['الثقافة', 'التقليد', 'التنوع', 'الفن', 'التراث']
+      },
+      {
+        title: '4. الشباب المسؤول',
+        icon: 'fas fa-users',
+        description: 'تأمل في دور ومسؤوليات الجيل الجديد',
+        keywords: ['المستقبل', 'الالتزام', 'القيادة', 'التغيير', 'الأمل']
+      },
+      {
+        title: '5. تحت سيطرة الشاشات',
+        icon: 'fas fa-mobile-alt',
+        description: 'حلل تأثير التكنولوجيا الرقمية على حياتنا وعلاقاتنا',
+        keywords: ['التكنولوجيا', 'الإدمان', 'الاتصال', 'الافتراضي', 'الواقع']
+      }
+    ]
+  };
+  
+  // Partenaires officiels
+  partners = [
+    { name: 'Capture Vision', logo: 'Partenaires/Capture-Vision.png' },
+    { name: 'Comm Niit', logo: 'Partenaires/COMM-NIIT.png' },
+    { name: 'DCI', logo: 'Partenaires/DCI.png' },
+    { name: 'Gandal Afrik', logo: 'Partenaires/GANDAL-AFRIK.png' },
+    { name: 'Home School', logo: 'Partenaires/HomeSchool.png' },
+    { name: 'Mourchid Services', logo: 'Partenaires/MourchidServices.png' },
+    { name: 'Ndiaye Digital', logo: 'Partenaires/Ndiaye-Digital.png' },
+    { name: 'Tele Niandane', logo: 'Partenaires/TeleNiandane.png' },
+    { name: 'UGB Live', logo: 'Partenaires/UGB-LIVE.png' }
+  ];
+  
   private subscriptions: Subscription[] = [];
 
 
@@ -1306,6 +1454,11 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   
   openVerificationUrl() {
     window.open('https://penccumndongo.com/verify', '_blank');
+  }
+  
+  // Méthode pour obtenir les thèmes selon la langue sélectionnée
+  getThemesForSelectedLanguage() {
+    return this.themesDetailles[this.selectedLanguage as keyof typeof this.themesDetailles] || this.themesDetailles.francais;
   }
 
 
