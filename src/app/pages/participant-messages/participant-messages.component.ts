@@ -234,17 +234,12 @@ export class ParticipantMessagesComponent implements OnInit, OnDestroy {
 
   getMessageText(content: string): string {
     if (!content) return '';
+    let text = content;
     if (content.includes('[IMAGES]')) {
-      let text = content.split('[IMAGES]')[0].trim();
-      text = text.replace(/^image\s*/i, '');
-      // Nettoyer tous les \n en fin de texte et traiter normalement
-      text = text.replace(/\\n+$/, '').replace(/\n+$/, '').trim();
-      text = text.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
-      return text;
+      text = content.split('[IMAGES]')[0].trim();
     }
-    let text = content.replace(/^image\s*/i, '').trim();
-    text = text.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
-    return text;
+    // Garder l'espacement original exactement comme envoyé
+    return text.replace(/\\n/g, '<br>');
   }
   
   getMessageImages(content: string): string[] {
