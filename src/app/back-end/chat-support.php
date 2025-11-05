@@ -51,6 +51,14 @@ switch ($method) {
             sendMessageWithImages($user);
         } elseif ($action === 'create_with_images') {
             createConversationWithImages($user);
+        } elseif ($action === 'delete') {
+            deleteConversation($user, $data);
+        }
+        break;
+    case 'DELETE':
+        if ($action === 'delete') {
+            $conversationId = $_GET['conversation_id'] ?? null;
+            deleteConversation($user, ['conversation_id' => $conversationId]);
         }
         break;
 }
@@ -484,5 +492,50 @@ function uploadImage($file, $type = 'chat') {
     }
     
     return false;
+}
+
+function deleteConversation($user, $data) {
+    if ($user['role'] !== 'admin') {
+        http_response_code(403);
+        echo json_encode(['error' => 'Accès refusé - Seuls les admins peuvent supprimer']);
+        return;
+    }
+    
+    $pdo = getDB();
+    
+    try {
+        $conversationId = $data['conversation_id'];
+        
+        if (!$conversationId) {
+            http_response_code(400);
+            echo json_encode(['error' => 'ID de conversation manquant']);
+            return;
+        }
+        
+        $pdo->beginTransaction();
+        
+        // Supprimer d'abord tous les messages de la conversation
+        $stmt = $pdo->prepare("DELETE FROM chat_messages WHERE conversation_id = ?");
+        $stmt->execute([$conversationId]);
+        
+        // Ensuite supprimer la conversation
+        $stmt = $pdo->prepare("DELETE FROM chat_conversations WHERE id = ?");
+        $stmt->execute([$conversationId]);
+        
+        // Vérifier si la suppression a eu lieu
+        if ($stmt->rowCount() > 0) {
+            $pdo->commit();
+            echo json_encode(['success' => true, 'message' => 'Conversation supprimée avec succès']);
+        } else {
+            $pdo->rollBack();
+            http_response_code(404);
+            echo json_encode(['error' => 'Conversation non trouvée']);
+        }
+        
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        http_response_code(500);
+        echo json_encode(['error' => 'Erreur lors de la suppression: ' . $e->getMessage()]);
+    }
 }
 ?>

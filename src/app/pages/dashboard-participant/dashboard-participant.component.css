@@ -178,6 +178,16 @@ body {
   color: white;
 }
 
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+}
+
 /* Cards Grid */
 .cards-grid {
   display: grid;

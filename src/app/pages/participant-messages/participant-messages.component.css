@@ -333,7 +333,28 @@
 .message-body {
   line-height: 1.6;
   color: #333;
-  white-space: pre-wrap;
+  white-space: pre-line;
+}
+
+.message-body img {
+  max-width: 150px !important;
+  max-height: 150px !important;
+  width: 150px !important;
+  height: 150px !important;
+  object-fit: cover !important;
+  border-radius: 6px !important;
+  margin: 0.5rem 0 !important;
+}
+
+/* Règle globale pour toutes les images dans les messages */
+.messages-container img,
+.message-detail img,
+.detail-content img {
+  max-width: 150px !important;
+  max-height: 150px !important;
+  width: 150px !important;
+  height: 150px !important;
+  object-fit: cover !important;
 }
 
 .detail-footer {

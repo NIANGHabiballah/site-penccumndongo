@@ -56,6 +56,20 @@ export class MessagesComponent implements OnInit {
   }
 
   chargerDonnees() {
+    // Charger les messages envoyés
+    const token = localStorage.getItem('cp2i_token');
+    const headers = { 'Authorization': `Bearer ${token}` };
+    
+    this.http.get('https://penccumndongo.com/src/app/back-end/cp2i-messages.php?action=get_sent', {
+      headers
+    }).subscribe({
+      next: (response: any) => {
+        console.log('Messages envoyés:', response);
+        // Traiter les messages envoyés ici
+      },
+      error: (err) => console.error('Erreur messages envoyés:', err)
+    });
+    
     this.apiService.getConversations().subscribe({
       next: (conv) => this.conversations = conv,
       error: (err) => console.error('Erreur conversations:', err)

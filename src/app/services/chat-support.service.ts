@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, interval } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import { ApiService } from './api.service';
 
 export interface ChatMessage {
@@ -184,5 +184,25 @@ export class ChatSupportService {
     const token = localStorage.getItem('cp2i_token');
     const headers = { 'Authorization': `Bearer ${token}` };
     return this.http.post(`${this.baseUrl}/chat-support.php?action=create_with_images`, formData, { headers });
+  }
+
+  // Supprimer une conversation
+  deleteConversation(conversationId: number): Observable<any> {
+    const token = localStorage.getItem('cp2i_token');
+    const headers = { 
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+    
+    // Essayer d'abord avec DELETE
+    return this.http.delete(`${this.baseUrl}/chat-support.php?action=delete&conversation_id=${conversationId}`, 
+      { headers }).pipe(
+        // Si DELETE ne fonctionne pas, essayer avec POST
+        catchError(() => 
+          this.http.post(`${this.baseUrl}/chat-support.php?action=delete`, {
+            conversation_id: conversationId
+          }, { headers })
+        )
+      );
   }
 }

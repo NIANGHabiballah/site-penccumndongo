@@ -1560,7 +1560,15 @@
             </div>
             
             <div class="message-content">
-              <p>{{message.content | slice:0:150}}{{message.content?.length > 150 ? '...' : ''}}</p>
+              <p [innerHTML]="getMessageText(message.content)"></p>
+              
+              <!-- Images du message -->
+              <div class="message-images" *ngIf="getMessageImages(message.content).length > 0">
+                <img *ngFor="let image of getMessageImages(message.content)" 
+                     [src]="'https://penccumndongo.com/' + image" 
+                     class="message-image"
+                     alt="Image du message">
+              </div>
             </div>
             
             <div class="message-actions">
@@ -2014,6 +2022,29 @@
           <label>Contenu du message *</label>
           <textarea [(ngModel)]="messageForm.content" class="form-control" rows="6" placeholder="Tapez votre message ici..." required></textarea>
           <small class="char-count">{{messageForm.content.length || 0}} caractères</small>
+        </div>
+        
+        <div class="form-group">
+          <label>📷 Images (optionnel)</label>
+          <div class="image-upload-section">
+            <input type="file" 
+                   accept="image/*" 
+                   multiple
+                   (change)="onImagesSelect($event)"
+                   class="file-input"
+                   #fileInput>
+            <button type="button" class="upload-btn" (click)="fileInput.click()">
+              <i class="fas fa-paperclip"></i> Joindre des images
+            </button>
+            <div class="selected-images" *ngIf="selectedImages.length > 0">
+              <div class="image-preview" *ngFor="let image of selectedImages; let i = index">
+                <img [src]="image.preview" [alt]="image.name">
+                <button type="button" class="remove-image" (click)="removeImage(i)">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -66,21 +66,6 @@ export class ChatSupportComponent implements OnInit, OnDestroy {
   loadMessages(conversationId: number) {
     this.chatService.getMessages(conversationId).subscribe({
       next: (messages) => {
-        console.log('=== DEBUG MESSAGES ===');
-        console.log('Messages bruts reçus:', messages);
-        
-        messages.forEach((msg, index) => {
-          console.log(`Message ${index}:`, {
-            id: msg.id,
-            text: msg.message,
-            images_field_raw: msg.images,
-            images_field_type: typeof msg.images,
-            has_images: !!msg.images,
-            parsed_images: this.getImagesFromField(msg.images || ''),
-            all_images: this.getAllImages(msg)
-          });
-        });
-        
         this.messages = messages;
         setTimeout(() => this.scrollToBottom(), 100);
       },
@@ -319,7 +304,6 @@ export class ChatSupportComponent implements OnInit, OnDestroy {
       const parsed = JSON.parse(decoded);
       return Array.isArray(parsed) ? parsed : [];
     } catch (e) {
-      console.error('Erreur parsing images:', e, 'Data:', imagesField);
       return [];
     }
   }
@@ -327,28 +311,18 @@ export class ChatSupportComponent implements OnInit, OnDestroy {
   getAllImages(message: any): string[] {
     const images: string[] = [];
     
-    console.log('getAllImages pour message:', {
-      id: message.id,
-      message_text: message.message,
-      images_field: message.images,
-      images_field_type: typeof message.images
-    });
-    
     // Images du champ images (nouveau format)
     if (message.images) {
       const newFormatImages = this.getImagesFromField(message.images);
-      console.log('Images nouveau format:', newFormatImages);
       images.push(...newFormatImages);
     }
     
     // Images dans le message (ancien format)
     if (message.message && message.message.includes('[IMAGES]')) {
       const oldFormatImages = this.getMessageImages(message.message);
-      console.log('Images ancien format:', oldFormatImages);
       images.push(...oldFormatImages);
     }
     
-    console.log('Total images trouvées:', images);
     return images;
   }
   

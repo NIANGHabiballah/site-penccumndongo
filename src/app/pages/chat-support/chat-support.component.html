@@ -138,31 +138,13 @@
             </div>
             <div class="message-text" *ngIf="getMessageText(message.message)">{{getMessageText(message.message)}}</div>
             
-            <!-- DEBUG: Affichage des informations d'images -->
-            <div style="background: yellow; padding: 5px; margin: 5px 0; font-size: 10px;">
-              <strong>DEBUG Images:</strong><br>
-              Images field: {{message.images}}<br>
-              Images count: {{getAllImages(message).length}}<br>
-              Images array: {{getAllImages(message) | json}}
-            </div>
-            
-            <div class="message-images" 
-                 style="display: block !important; background: lime !important; padding: 10px !important;">
-              <div style="color: black; font-weight: bold;">IMAGES TROUVÉES: {{getAllImages(message).length}}</div>
-              <div *ngIf="getAllImages(message).length > 0">
-                <img *ngFor="let img of getAllImages(message)" 
-                     [src]="getImageUrl(img)" 
-                     class="message-image"
-                     (click)="openImage(img)"
-                     (error)="onImageError($event)"
-                     style="border: 2px solid red !important; display: block !important; width: 100px !important; height: 100px !important;">
-              </div>
-              <div *ngIf="getAllImages(message).length === 0" style="color: red;">AUCUNE IMAGE</div>
-            </div>
-            
-            <!-- DEBUG: Forcer l'affichage si images field existe -->
-            <div *ngIf="message.images && message.images !== 'NULL'" style="background: orange; padding: 5px;">
-              <strong>FORCE DISPLAY:</strong> {{message.images}}
+            <!-- Images -->
+            <div class="message-images" *ngIf="getAllImages(message).length > 0">
+              <img *ngFor="let img of getAllImages(message)" 
+                   [src]="getImageUrl(img)" 
+                   class="message-image"
+                   (click)="openImage(img)"
+                   alt="Image du message">
             </div>
           </div>
         </div>

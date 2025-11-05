@@ -12,6 +12,7 @@ import { QrCertificateService } from '../../services/qr-certificate.service';
 import { HttpClient } from '@angular/common/http';
 import { MessageNotificationComponent } from '../../components/message-notification/message-notification.component';
 import { ParticipantMessagesComponent } from '../participant-messages/participant-messages.component';
+import { ChatSupportService } from '../../services/chat-support.service';
 
 
 @Component({
@@ -269,12 +270,12 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
 
   constructor(
     private cp2iApi: Cp2iApiService,
-
     private router: Router,
     private participantMessagesService: ParticipantMessagesService,
     private qrService: QrCertificateService,
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private chatSupportService: ChatSupportService
   ) {}
 
   ngOnInit() {
@@ -1226,7 +1227,21 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   getUnreadMessagesCount(): number {
     // Utiliser le nouveau service de messages
     let count = 0;
-    this.participantMessagesService.unreadCount$.subscribe(c => count = c).unsubscribe();
+    this.participantMessagesService.unreadCount$.subscribe(c => {
+      count = c;
+      // Forcer la détection des changements
+      this.cdr.detectChanges();
+    }).unsubscribe();
+    return count;
+  }
+  
+  // Obtenir le nombre de messages non lus du chat support
+  getChatSupportUnreadCount(): number {
+    // Utiliser le même service que le chat widget
+    let count = 0;
+    if (this.chatSupportService) {
+      this.chatSupportService.unreadCount$.subscribe(c => count = c).unsubscribe();
+    }
     return count;
   }
   

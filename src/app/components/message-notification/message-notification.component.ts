@@ -9,7 +9,6 @@ import { Subscription } from 'rxjs';
   imports: [CommonModule],
   template: `
     <div class="message-notification" *ngIf="unreadCount > 0">
-      <i class="fas fa-envelope"></i>
       <span class="notification-badge">{{unreadCount}}</span>
     </div>
   `,
@@ -18,33 +17,22 @@ import { Subscription } from 'rxjs';
       position: relative;
       display: inline-flex;
       align-items: center;
-      color: #2196f3;
-      cursor: pointer;
-      transition: color 0.2s;
       margin-left: 0.5rem !important;
     }
     
-    .message-notification:hover {
-      color: #1976d2;
-    }
-    
     .notification-badge {
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      background: #f44336;
-      color: white;
-      border-radius: 50%;
-      padding: 2px 6px;
-      font-size: 0.7rem;
-      font-weight: bold;
-      min-width: 16px;
-      text-align: center;
-      line-height: 1.2;
-    }
-    
-    .fa-envelope {
-      font-size: 1.2rem;
+      background: #FF7F1A !important;
+      color: white !important;
+      border-radius: 50% !important;
+      padding: 2px 6px !important;
+      font-size: 0.7rem !important;
+      font-weight: bold !important;
+      min-width: 18px !important;
+      text-align: center !important;
+      line-height: 1.2 !important;
+      display: inline-block !important;
+      z-index: 10 !important;
+      position: relative !important;
     }
   `]
 })

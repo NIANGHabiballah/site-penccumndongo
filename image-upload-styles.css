@@ -1,0 +1,91 @@
+/* CSS pour l'upload d'images dans le dashboard admin */
+.image-upload-section {
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  transition: border-color 0.3s ease;
+}
+
+.image-upload-section:hover {
+  border-color: #0380C2;
+}
+
+.file-input {
+  display: none;
+}
+
+.upload-btn {
+  background: #0380C2;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s ease;
+}
+
+.upload-btn:hover {
+  background: #026a9e;
+}
+
+.selected-images {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.image-preview {
+  position: relative;
+  display: inline-block;
+}
+
+.image-preview img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.remove-image {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-image:hover {
+  background: #c82333;
+}
+
+/* Images dans les messages reçus */
+.message-images {
+  margin-top: 10px;
+}
+
+.message-image {
+  max-width: 100px !important;
+  width: 100px !important;
+  height: auto !important;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  margin: 5px 5px 5px 0;
+  cursor: pointer;
+}
+
+.message-image:hover {
+  opacity: 0.8;
+}

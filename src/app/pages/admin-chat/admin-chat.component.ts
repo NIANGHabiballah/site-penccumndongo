@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatSupportService } from '../../services/chat-support.service';
@@ -10,10 +10,15 @@ import { ChatSupportService } from '../../services/chat-support.service';
   templateUrl: './admin-chat.component.html',
   styleUrls: ['./admin-chat.component.css']
 })
-export class AdminChatComponent implements OnInit {
+export class AdminChatComponent implements OnInit, OnDestroy {
   activeTab = 'conversations';
   showAddReplyForm = false;
   isMobile = false;
+  showDeleteConfirm = false;
+  conversationToDelete: number | null = null;
+  isDeleting = false;
+  pollingInterval: any;
+  pollingEnabled = true;
   
   conversations: any[] = [];
   selectedConversation: any = null;
@@ -21,6 +26,7 @@ export class AdminChatComponent implements OnInit {
   newMessage = '';
   availableAdmins: any[] = [];
   showAssignMenu: number | null = null;
+  selectedImages: {file: File, preview: string, name: string}[] = [];
   
   quickReplies: any[] = [
     { id: 1, title: 'Salutation', message: 'Bonjour ! Comment puis-je vous aider ?', category: 'general' },
@@ -47,10 +53,12 @@ export class AdminChatComponent implements OnInit {
     this.loadStats();
     
     // Polling temps réel toutes les 3 secondes
-    setInterval(() => {
-      this.loadConversations();
-      if (this.selectedConversation) {
-        this.loadMessages(this.selectedConversation.id);
+    this.pollingInterval = setInterval(() => {
+      if (this.pollingEnabled) {
+        this.loadConversations();
+        if (this.selectedConversation) {
+          this.loadMessages(this.selectedConversation.id);
+        }
       }
     }, 3000);
 
@@ -105,11 +113,20 @@ export class AdminChatComponent implements OnInit {
   }
 
   sendMessage() {
-    if (!this.newMessage.trim() || !this.selectedConversation) return;
+    if ((!this.newMessage.trim() && this.selectedImages.length === 0) || !this.selectedConversation) return;
 
-    this.chatService.sendMessage(this.selectedConversation.id, this.newMessage).subscribe({
+    const formData = new FormData();
+    formData.append('conversation_id', this.selectedConversation.id.toString());
+    formData.append('message', this.newMessage);
+    
+    this.selectedImages.forEach((image, index) => {
+      formData.append(`image_${index}`, image.file);
+    });
+
+    this.chatService.sendMessageWithImages(formData).subscribe({
       next: () => {
         this.newMessage = '';
+        this.selectedImages = [];
         this.loadMessages(this.selectedConversation.id);
         this.loadConversations();
       },
@@ -275,6 +292,104 @@ export class AdminChatComponent implements OnInit {
       return [];
     } catch (e) {
       return [];
+    }
+  }
+
+  onFileSelect(event: any) {
+    const files = Array.from(event.target.files) as File[];
+    this.processFiles(files);
+  }
+
+  processFiles(files: File[]) {
+    files.forEach(file => {
+      if (this.selectedImages.length >= 5) return;
+      
+      if (!file.type.startsWith('image/')) {
+        alert('Seules les images sont autorisées');
+        return;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) {
+        alert(`L'image ${file.name} est trop volumineuse (max 5MB)`);
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.selectedImages.push({
+          file,
+          preview: e.target?.result as string,
+          name: file.name
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  removeImage(index: number) {
+    this.selectedImages.splice(index, 1);
+  }
+
+  formatMessage(message: string): string {
+    if (!message) return '';
+    return message.replace(/\\n/g, '<br>').replace(/\n/g, '<br>').replace(/\\r\\n/g, '<br>').replace(/\r\n/g, '<br>');
+  }
+
+  confirmDeleteConversation(conversationId: number, event: Event) {
+    event.stopPropagation();
+    this.conversationToDelete = conversationId;
+    this.showDeleteConfirm = true;
+  }
+
+  deleteConversation() {
+    if (!this.conversationToDelete || this.isDeleting) return;
+
+    this.isDeleting = true;
+    // Désactiver le polling pendant la suppression
+    this.pollingEnabled = false;
+    
+    this.chatService.deleteConversation(this.conversationToDelete).subscribe({
+      next: (response) => {
+        console.log('Suppression réussie:', response);
+        
+        // Mise à jour immédiate de la liste locale
+        this.conversations = this.conversations.filter(conv => conv.id !== this.conversationToDelete);
+        
+        // Si la conversation supprimée était sélectionnée, la désélectionner
+        if (this.selectedConversation?.id === this.conversationToDelete) {
+          this.selectedConversation = null;
+          this.messages = [];
+        }
+        
+        this.loadStats();
+        
+        this.isDeleting = false;
+        this.cancelDelete();
+        
+        // Réactiver le polling après 5 secondes
+        setTimeout(() => {
+          this.pollingEnabled = true;
+        }, 5000);
+      },
+      error: (err) => {
+        console.error('Erreur suppression:', err);
+        console.log('Détails erreur:', err.error);
+        alert('Erreur lors de la suppression de la conversation: ' + (err.error?.message || err.message));
+        this.isDeleting = false;
+        this.pollingEnabled = true; // Réactiver immédiatement en cas d'erreur
+        this.cancelDelete();
+      }
+    });
+  }
+
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.conversationToDelete = null;
+  }
+
+  ngOnDestroy() {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
     }
   }
 }

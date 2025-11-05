@@ -97,6 +97,10 @@
                       *ngIf="conv.status !== 'closed'" title="Fermer">
                 <i class="fas fa-times"></i>
               </button>
+              <button class="btn-delete" (click)="confirmDeleteConversation(conv.id, $event)" 
+                      title="Supprimer définitivement">
+                <i class="fas fa-trash"></i>
+              </button>
             </div>
           </div>
         </div>
@@ -136,13 +140,13 @@
                 </span>
                 <span class="timestamp">{{formatTime(message.timestamp)}}</span>
               </div>
-              <div class="message-text">{{message.message}}</div>
+              <div class="message-text" [innerHTML]="formatMessage(message.message)"></div>
               
               <!-- Images -->
               <div class="message-images" *ngIf="getAllImages(message).length > 0" style="margin-top: 10px;">
                 <div *ngFor="let image of getAllImages(message)" class="image-container" style="margin: 5px 0;">
                   <img [src]="'https://penccumndongo.com/' + image" 
-                       style="max-width: 200px; height: auto; border-radius: 8px; border: 1px solid #ddd;"
+                       style="max-width: 150px !important; max-height: 150px !important; width: 150px !important; height: 150px !important; object-fit: cover !important; border-radius: 8px; border: 1px solid #ddd;"
                        alt="Image du message">
                 </div>
               </div>
@@ -162,17 +166,45 @@
         </div>
 
         <div class="message-input-area" *ngIf="selectedConversation.status !== 'closed'">
-          <textarea [(ngModel)]="newMessage" 
-                    placeholder="Tapez votre réponse..."
-                    rows="3"
-                    class="message-input"></textarea>
-          <button class="send-btn" (click)="sendMessage()" [disabled]="!newMessage.trim()">
-            <i class="fas fa-paper-plane"></i> Envoyer
-          </button>
+          <div class="input-wrapper">
+            <textarea [(ngModel)]="newMessage" 
+                      placeholder="Tapez votre réponse..."
+                      rows="3"
+                      class="message-input"></textarea>
+            <button class="attach-button" (click)="fileInput.click()" title="Joindre une image">
+              <i class="fas fa-paperclip"></i>
+            </button>
+            <button class="send-btn" (click)="sendMessage()" [disabled]="!newMessage.trim() && selectedImages.length === 0">
+              <i class="fas fa-paper-plane"></i> Envoyer
+            </button>
+          </div>
+          
+          <input #fileInput 
+                 type="file" 
+                 accept="image/*" 
+                 multiple
+                 (change)="onFileSelect($event)"
+                 style="display: none;">
+          
+          <div class="attached-images" *ngIf="selectedImages.length > 0">
+            <div class="image-preview" *ngFor="let image of selectedImages; let i = index">
+              <img [src]="image.preview" [alt]="image.name">
+              <button class="remove-image" (click)="removeImage(i)">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="conversation-closed" *ngIf="selectedConversation.status === 'closed'">
           <p>Cette conversation est fermée.</p>
+        </div>
+        
+        <div class="conversation-actions" *ngIf="selectedConversation">
+          <button class="btn-delete-conversation" (click)="confirmDeleteConversation(selectedConversation.id, $event)" 
+                  title="Supprimer cette conversation">
+            <i class="fas fa-trash"></i> Supprimer la conversation
+          </button>
         </div>
       </div>
 
@@ -288,6 +320,32 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal-overlay" *ngIf="showDeleteConfirm" (click)="cancelDelete()">
+  <div class="modal-content small" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Confirmer la suppression</h3>
+      <button class="modal-close" (click)="cancelDelete()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="warning-message">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>Êtes-vous sûr de vouloir supprimer définitivement cette conversation ?</p>
+        <p><strong>Cette action est irréversible.</strong></p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="cancelDelete()" [disabled]="isDeleting">Annuler</button>
+      <button class="btn-danger" (click)="deleteConversation()" [disabled]="isDeleting">
+        <i class="fas fa-spinner fa-spin" *ngIf="isDeleting"></i>
+        {{isDeleting ? 'Suppression...' : 'Supprimer'}}
+      </button>
     </div>
   </div>
 </div>

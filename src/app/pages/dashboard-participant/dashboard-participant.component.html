@@ -50,6 +50,7 @@
       <div class="nav-item" [class.active]="currentView === 'support'" (click)="setCurrentView('support'); $event.preventDefault(); $event.stopPropagation()">
         <i class="fas fa-comments"></i>
         <span>Chat Support</span>
+        <span class="notification-badge" *ngIf="getChatSupportUnreadCount() > 0">{{getChatSupportUnreadCount()}}</span>
       </div>
       <div class="nav-item" [class.active]="currentView === 'guide'" (click)="setCurrentView('guide'); $event.preventDefault(); $event.stopPropagation()">
         <i class="fas fa-book"></i>
@@ -89,6 +90,7 @@
           <i class="fas fa-bell"></i>
           <app-message-notification></app-message-notification>
         </button>
+
         <button class="btn btn-small" [class.btn-primary]="stats.total_textes === 0" [class.btn-disabled]="stats.total_textes > 0" (click)="nouvellesoumission()" [disabled]="stats.total_textes > 0">
           <i class="fas fa-plus"></i>
           {{stats.total_textes > 0 ? 'Texte déjà soumis' : 'Nouveau Texte'}}

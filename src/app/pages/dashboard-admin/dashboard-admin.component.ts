@@ -94,6 +94,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     content: '',
     sendToAll: true
   };
+  selectedImages: {file: File, preview: string, name: string}[] = [];
   
   // Gestion des paramètres
   currentSettingsTab = 'concours';
@@ -992,6 +993,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   closeMessageModal() {
     this.showMessageModal = false;
+    this.selectedImages = [];
   }
   
   filterRecipients(filter: string) {
@@ -1018,34 +1020,67 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   sendMessage() {
     if (!this.canSendMessage()) return;
     
-    const messageData = {
-      subject: this.messageForm.subject,
-      content: this.messageForm.content,
-      send_to_all: this.messageForm.sendToAll,
-      recipients: this.messageForm.sendToAll ? [] : this.recipients.filter(r => r.selected).map(r => r.id)
-    };
-    
-    console.log('Sending message:', messageData);
-    console.log('Using endpoint: cp2i-messages.php');
-    
-    // Forcer l'utilisation du bon endpoint
     const token = localStorage.getItem('cp2i_token');
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : ''
-    };
-    this.http.post(`https://penccumndongo.com/cp2i-messages.php`, messageData, { headers }).subscribe({
-      next: (response: any) => {
-        const recipients = this.messageForm.sendToAll ? 'tous les utilisateurs' : `${this.getSelectedRecipientsCount()} utilisateurs`;
-        this.logAdminAction('envoi_message', `Message envoyé à ${recipients}: "${this.messageForm.subject}"`);
-        this.showToast(response.message, 'success');
-        this.closeMessageModal();
-        this.loadMessages();
-      },
-      error: (error: any) => {
-        this.showToast('Erreur lors de l\'envoi: ' + (error.error?.error || 'Erreur inconnue'), 'error');
+    
+    if (this.selectedImages.length > 0) {
+      // Envoyer avec images
+      const formData = new FormData();
+      formData.append('subject', this.messageForm.subject);
+      formData.append('content', this.messageForm.content);
+      formData.append('send_to_all', this.messageForm.sendToAll.toString());
+      
+      if (!this.messageForm.sendToAll) {
+        const selectedRecipients = this.recipients.filter(r => r.selected).map(r => r.id);
+        formData.append('recipients', JSON.stringify(selectedRecipients));
       }
-    });
+      
+      this.selectedImages.forEach((image, index) => {
+        formData.append(`image_${index}`, image.file);
+      });
+      
+      const headers = { 'Authorization': token ? `Bearer ${token}` : '' };
+      
+      this.http.post('https://penccumndongo.com/cp2i-messages.php?action=send_with_images', formData, {
+        headers
+      }).subscribe({
+        next: (response: any) => {
+          const recipients = this.messageForm.sendToAll ? 'tous les utilisateurs' : `${this.getSelectedRecipientsCount()} utilisateurs`;
+          this.logAdminAction('envoi_message', `Message avec images envoyé à ${recipients}: "${this.messageForm.subject}"`);
+          this.showToast(response.message || 'Message envoyé avec succès', 'success');
+          this.closeMessageModal();
+          this.loadMessages();
+        },
+        error: (error: any) => {
+          this.showToast('Erreur lors de l\'envoi: ' + (error.error?.error || 'Erreur inconnue'), 'error');
+        }
+      });
+    } else {
+      // Envoyer sans images (méthode existante)
+      const messageData = {
+        subject: this.messageForm.subject,
+        content: this.messageForm.content,
+        send_to_all: this.messageForm.sendToAll,
+        recipients: this.messageForm.sendToAll ? [] : this.recipients.filter(r => r.selected).map(r => r.id)
+      };
+      
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
+      };
+      
+      this.http.post(`https://penccumndongo.com/cp2i-messages.php`, messageData, { headers }).subscribe({
+        next: (response: any) => {
+          const recipients = this.messageForm.sendToAll ? 'tous les utilisateurs' : `${this.getSelectedRecipientsCount()} utilisateurs`;
+          this.logAdminAction('envoi_message', `Message envoyé à ${recipients}: "${this.messageForm.subject}"`);
+          this.showToast(response.message, 'success');
+          this.closeMessageModal();
+          this.loadMessages();
+        },
+        error: (error: any) => {
+          this.showToast('Erreur lors de l\'envoi: ' + (error.error?.error || 'Erreur inconnue'), 'error');
+        }
+      });
+    }
   }
   
   viewMessage(message: any) {
@@ -2093,5 +2128,62 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     const startDate = new Date('2025-11-03');
     const endDate = new Date('2025-11-23');
     return Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  }
+
+  // Méthodes de gestion des images
+  onImagesSelect(event: any) {
+    const files = Array.from(event.target.files) as File[];
+    this.processImages(files);
+  }
+
+  processImages(files: File[]) {
+    files.forEach(file => {
+      if (this.selectedImages.length >= 5) return;
+      
+      if (!file.type.startsWith('image/')) {
+        this.showToast('Seules les images sont autorisées', 'error');
+        return;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) {
+        this.showToast(`L'image ${file.name} est trop volumineuse (max 5MB)`, 'error');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.selectedImages.push({
+          file,
+          preview: e.target?.result as string,
+          name: file.name
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  removeImage(index: number) {
+    this.selectedImages.splice(index, 1);
+  }
+
+  // Méthodes pour afficher les images dans les messages reçus
+  getMessageText(message: string): string {
+    if (!message) return '';
+    let text = message;
+    if (message.includes('[IMAGES]')) {
+      text = message.split('[IMAGES]')[0].trim();
+    }
+    // Convertir les sauts de ligne pour l'affichage HTML
+    return text.replace(/\\n/g, '<br>').replace(/\n/g, '<br>').replace(/\\r\\n/g, '<br>').replace(/\r\n/g, '<br>');
+  }
+
+  getMessageImages(message: string): string[] {
+    if (!message || !message.includes('[IMAGES]')) return [];
+    try {
+      const imagesPart = message.split('[IMAGES]')[1];
+      return JSON.parse(imagesPart) || [];
+    } catch (e) {
+      return [];
+    }
   }
 }
