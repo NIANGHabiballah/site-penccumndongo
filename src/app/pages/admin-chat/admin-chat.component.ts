@@ -129,8 +129,14 @@ export class AdminChatComponent implements OnInit, OnDestroy {
         this.selectedImages = [];
         this.loadMessages(this.selectedConversation.id);
         this.loadConversations();
+        
+        // Notification spécifique au chat support
+        this.showNotification('Message envoyé avec succès dans la conversation');
       },
-      error: (err) => console.error('Erreur envoi:', err)
+      error: (err) => {
+        console.error('Erreur envoi:', err);
+        this.showNotification('Erreur lors de l\'envoi du message', 'error');
+      }
     });
   }
 
@@ -385,6 +391,29 @@ export class AdminChatComponent implements OnInit, OnDestroy {
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.conversationToDelete = null;
+  }
+
+  showNotification(message: string, type: 'success' | 'error' = 'success') {
+    // Créer une notification temporaire
+    const notification = document.createElement('div');
+    notification.className = `toast-notification ${type}`;
+    notification.innerHTML = `
+      <div class="toast-content">
+        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+        <span>${message}</span>
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Afficher la notification
+    setTimeout(() => notification.classList.add('show'), 100);
+    
+    // Masquer et supprimer après 3 secondes
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => document.body.removeChild(notification), 300);
+    }, 3000);
   }
 
   ngOnDestroy() {

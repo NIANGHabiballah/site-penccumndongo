@@ -104,7 +104,10 @@ export class MessagesComponent implements OnInit {
         headers
       }).subscribe({
         next: (response: any) => {
-          alert(response.message || 'Message envoyé avec succès');
+          console.log('Réponse serveur:', response);
+          // Message personnalisé selon le destinataire
+          const destinataireText = this.messageForm.destinataire === 'tous' ? 'tous les participants' : 'les destinataires sélectionnés';
+          alert(`Message envoyé avec succès à ${destinataireText}`);
           this.resetForm();
         },
         error: (err) => {
@@ -128,7 +131,10 @@ export class MessagesComponent implements OnInit {
         headers
       }).subscribe({
         next: (response: any) => {
-          alert(response.message || 'Message envoyé avec succès');
+          console.log('Réponse serveur:', response);
+          // Message personnalisé selon le destinataire
+          const destinataireText = this.messageForm.destinataire === 'tous' ? 'tous les participants' : 'les destinataires sélectionnés';
+          alert(`Message envoyé avec succès à ${destinataireText}`);
           this.resetForm();
         },
         error: (err) => {

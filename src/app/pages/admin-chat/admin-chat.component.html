@@ -171,8 +171,8 @@
                       placeholder="Tapez votre réponse..."
                       rows="3"
                       class="message-input"></textarea>
-            <button class="attach-button" (click)="fileInput.click()" title="Joindre une image">
-              <i class="fas fa-paperclip"></i>
+            <button class="attach-button" (click)="fileInput.click()" title="Joindre des images">
+              <i class="fas fa-paperclip"></i> Joindre des images
             </button>
             <button class="send-btn" (click)="sendMessage()" [disabled]="!newMessage.trim() && selectedImages.length === 0">
               <i class="fas fa-paper-plane"></i> Envoyer
@@ -184,7 +184,7 @@
                  accept="image/*" 
                  multiple
                  (change)="onFileSelect($event)"
-                 style="display: none;">
+                 style="display: none !important; position: absolute; left: -9999px; opacity: 0; pointer-events: none;">
           
           <div class="attached-images" *ngIf="selectedImages.length > 0">
             <div class="image-preview" *ngFor="let image of selectedImages; let i = index">
