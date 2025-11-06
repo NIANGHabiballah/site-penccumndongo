@@ -213,6 +213,17 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
   // --- Actualités ---
   articles: Article[] = [
     {
+      id: 12,
+      title: "Thèmes CP2I 2025-2026 - 5 Thèmes au Choix",
+      excerpt: "Découvrez les 5 thèmes officiels du Concours de Poésie Inédit & Innovant (CP2i) Édition 3 pour l'année 2025-2026. Choisissez votre thème et laissez libre cours à votre créativité poétique ! #cp2i #edition3 #themes",
+      image: "ThemesCP2I2025-2026 14.39.23.jpg",
+      date: new Date('2025-01-16'),
+      author: "Penccum Ndongo",
+      category: "CP2I",
+      linkedinUrl: "https://www.linkedin.com/posts/penccum-ndongo_cp2i-edition3-themes-activity-7391746138262962176-uLh6?utm_source=share&utm_medium=member_desktop&rcm=ACoAADqQAssBElpPsDolAtxkZ86cX_61QT4D7ZA",
+      featured: true
+    },
+    {
       id: 10,
       title: "Lancement Officiel CP2I 2025-2026",
       excerpt: "Nous sommes ravis d'annoncer le lancement officiel de la troisième édition du Concours de Poésie Inédit & Innovant (CP2i) pour l'année 2025-2026. Une nouvelle aventure poétique commence ! #cp2i #penccumndongo #edition3",
