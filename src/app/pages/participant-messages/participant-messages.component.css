@@ -285,26 +285,32 @@
 
 .detail-title {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
+  gap: 0.75rem;
   margin-bottom: 1rem;
+  justify-content: flex-start;
 }
 
 .detail-title h3 {
   margin: 0;
   color: #333;
-  line-height: 1.4;
+  line-height: 1.3;
   font-size: 1.1rem !important;
+  text-align: left;
+  flex: 1;
 }
 
+
+
 .btn-close, .btn-back {
-  background: none;
-  border: none;
-  color: #666;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  background: none !important;
+  border: none !important;
+  color: #666 !important;
+  cursor: pointer !important;
+  padding: 0.25rem !important;
+  border-radius: 4px !important;
+  transition: background-color 0.2s !important;
+  margin-left: -0.25rem !important;
 }
 
 .btn-close:hover, .btn-back:hover {
@@ -312,16 +318,36 @@
 }
 
 .btn-back {
-  display: none;
+  display: block !important;
+}
+
+.btn-close {
+  display: none !important;
 }
 
 @media (max-width: 768px) {
   .btn-back {
-    display: block;
+    display: block !important;
   }
   
   .btn-close {
-    display: none;
+    display: none !important;
+  }
+  
+  /* Titre à gauche sur mobile */
+  .detail-title {
+    justify-content: flex-start !important;
+    gap: 0.75rem !important;
+  }
+  
+  .detail-title h3 {
+    text-align: left !important;
+    max-width: calc(100% - 60px) !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    line-height: 1.2 !important;
   }
 }
 
@@ -411,20 +437,65 @@
 .empty-detail {
   text-align: center;
   color: #666;
+  padding: 1rem;
 }
 
 .empty-detail i {
-  font-size: 4rem;
-  margin-bottom: 1rem;
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
   color: #ddd;
 }
 
 .empty-detail h3 {
   margin: 0 0 0.5rem 0;
   color: #333;
+  font-size: 1.2rem;
+}
+
+.empty-detail p {
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 @media (max-width: 768px) {
+  .empty-detail {
+    padding: 0.75rem !important;
+  }
+  
+  .empty-detail i {
+    font-size: 2rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .empty-detail h3 {
+    font-size: 1rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+  
+  .empty-detail p {
+    font-size: 0.8rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .empty-detail {
+    padding: 0.5rem !important;
+  }
+  
+  .empty-detail i {
+    font-size: 1.5rem !important;
+  }
+  
+  .empty-detail h3 {
+    font-size: 0.9rem !important;
+  }
+  
+  .empty-detail p {
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 1024px) {
   .messages-layout {
     flex-direction: column;
   }
@@ -438,18 +509,21 @@
     height: 50%;
   }
   
-  /* Masquer la liste quand un message est sélectionné sur mobile */
+  /* Masquer la liste quand un message est sélectionné sur tablette et mobile */
   .messages-layout.has-selection .messages-list {
-    display: none;
+    display: none !important;
   }
   
   .messages-layout.has-selection .message-detail {
-    height: 100%;
+    height: 100% !important;
   }
   
   .messages-layout.has-selection .no-selection {
-    display: none;
+    display: none !important;
   }
+}
+
+@media (max-width: 768px) {
   
   /* Adaptation mobile pour les messages */
   .message-content-wrapper {
@@ -463,12 +537,34 @@
   }
   
   .detail-content {
-    padding: 1rem !important;
+    padding: 0.5rem !important;
+  }
+  
+  .detail-header {
+    padding: 0.75rem !important;
+  }
+  
+  .message-content-wrapper > div:first-child {
+    padding: 12px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .message-images {
+    padding: 8px !important;
   }
   
   .detail-title h3 {
-    font-size: 1rem !important;
+    font-size: 0.9rem !important;
+    line-height: 1.3 !important;
   }
+  
+  /* Titres plus petits dans la liste des messages */
+  .message-subject {
+    font-size: 0.8rem !important;
+    line-height: 1.2 !important;
+  }
+  
+
   
   .messages-filters {
     flex-direction: column;
@@ -544,4 +640,24 @@
     flex-direction: column !important;
     gap: 0.25rem !important;
   }
+  
+  /* Espace de lecture encore plus grand sur très petits écrans */
+  .messages-list {
+    height: 50% !important;
+  }
+  
+  .message-detail {
+    height: 50% !important;
+  }
+  
+  /* Titres encore plus petits */
+  .detail-title h3 {
+    font-size: 0.8rem !important;
+  }
+  
+  .message-subject {
+    font-size: 0.75rem !important;
+  }
+  
+
 }
