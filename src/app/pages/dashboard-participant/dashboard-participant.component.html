@@ -223,7 +223,7 @@
           <div class="submissions-grid" *ngIf="mesSoumissions.length > 0; else noSubmissions">
             <div class="submission-card" *ngFor="let texte of mesSoumissions">
               <div class="submission-header">
-                <h3>{{texte.titre}}</h3>
+                <h3>Titre : {{texte.titre}}</h3>
                 <span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span>
               </div>
               <div class="submission-details">
@@ -317,7 +317,7 @@
         <div class="submissions-detailed" *ngIf="mesSoumissions.length > 0; else noSubmissionsDetailed">
           <div class="submission-detailed-card" *ngFor="let texte of mesSoumissions">
             <div class="submission-detailed-header">
-              <h3>{{texte.titre}}</h3>
+              <h3>Titre : {{texte.titre}}</h3>
               <span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span>
             </div>
             <div class="submission-content">
@@ -457,7 +457,7 @@
           <h3>Évaluations Détaillées par Correcteur</h3>
           <div class="texte-evaluations" *ngFor="let texte of mesSoumissions">
             <div class="texte-header">
-              <h4>{{texte.titre}}</h4>
+              <h4>Titre : {{texte.titre}}</h4>
               <span class="texte-status" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span>
             </div>
             
