@@ -213,11 +213,33 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
   // --- Actualités ---
   articles: Article[] = [
     {
+      id: 13,
+      title: "Revivez notre passage sur Évidence TV !",
+      excerpt: "Retour sur l'émission Evi-Weekend où nous avons parlé du Concours de Poésie Inédit & Innovant (CP2i) — son objectif, son impact et les belles perspectives de cette 3ᵉ édition. Découvrez l'intégralité de l'émission et déposez vos textes avant le 23 novembre ! #cp2i #edition3 #poesie #penccumndongo",
+      image: "emissinEviWeekendTafsir.png",
+      date: new Date('2025-11-08'),
+      author: "Tafsir Haby NIANG",
+      category: "EMISSION",
+      linkedinUrl: "https://youtu.be/LIfY1eRjPnc?si=v0VYkilConuesZlD",
+      featured: true
+    },
+    {
+      id: 14,
+      title: "Écrivez avec vos mots, chantez dans votre langue !",
+      excerpt: "À l'occasion de la 3ᵉ édition du Concours de Poésie Inédit & Innovant (CP2i), Penccum Ndongo vous invite à transformer vos pensées en poésie et à faire résonner vos mots comme une mélodie. Laissez vos mots s'épanouir dans la langue qui vous inspire : Français, Anglais, Wolof, Arabe. #cp2i #edition3 #poesie #penccumndongo",
+      image: "LanguesCP2I2025-2026.jpg",
+      date: new Date('2025-11-07'),
+      author: "Penccum Ndongo",
+      category: "CP2I",
+      linkedinUrl: "https://web.facebook.com/share/p/15fjm85Dxr/",
+      featured: true
+    },
+    {
       id: 12,
       title: "Thèmes CP2I 2025-2026 - 5 Thèmes au Choix",
       excerpt: "Découvrez les 5 thèmes officiels du Concours de Poésie Inédit & Innovant (CP2i) Édition 3 pour l'année 2025-2026. Choisissez votre thème et laissez libre cours à votre créativité poétique ! #cp2i #edition3 #themes",
       image: "ThemesCP2I2025-2026 14.39.23.jpg",
-      date: new Date('2025-01-16'),
+      date: new Date('2025-11-05'),
       author: "Penccum Ndongo",
       category: "CP2I",
       linkedinUrl: "https://www.linkedin.com/posts/penccum-ndongo_cp2i-edition3-themes-activity-7391746138262962176-uLh6?utm_source=share&utm_medium=member_desktop&rcm=ACoAADqQAssBElpPsDolAtxkZ86cX_61QT4D7ZA",
@@ -228,7 +250,7 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
       title: "Lancement Officiel CP2I 2025-2026",
       excerpt: "Nous sommes ravis d'annoncer le lancement officiel de la troisième édition du Concours de Poésie Inédit & Innovant (CP2i) pour l'année 2025-2026. Une nouvelle aventure poétique commence ! #cp2i #penccumndongo #edition3",
       image: "LancementOfficielCP2I2025-2026.jpg",
-      date: new Date('2025-01-15'),
+      date: new Date('2025-11-03'),
       author: "Penccum Ndongo",
       category: "CP2I",
       linkedinUrl: "https://www.linkedin.com/posts/penccum-ndongo_cp2i-penccumndongo-edition3-activity-7391021385529073665-DRHq?utm_source=share&utm_medium=member_desktop&rcm=ACoAADqQAssBElpPsDolAtxkZ86cX_61QT4D7ZA",
@@ -239,7 +261,7 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
       title: "Appel aux Sponsors & Partenaires - CP2i Édition 3",
       excerpt: "Rejoignez-nous en tant que sponsor ou partenaire pour la troisième édition du CP2i ! Ensemble, soutenons la créativité poétique africaine et contribuons au rayonnement culturel de notre continent. #cp2i #penccumndongo #edition3",
       image: "AppelauxSponsorsPartenairesCP2iEdition3.jpg",
-      date: new Date('2025-01-10'),
+      date: new Date('2025-10-23'),
       author: "Penccum Ndongo",
       category: "CP2I",
       linkedinUrl: "https://www.linkedin.com/posts/penccum-ndongo_cp2i-penccumndongo-edition3-activity-7387216263854579712-OfjQ?utm_source=share&utm_medium=member_desktop&rcm=ACoAADqQAssBElpPsDolAtxkZ86cX_61QT4D7ZA",
@@ -327,7 +349,7 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
       date: new Date('2025-06-23'),
       author: "Tafsir Haby NIANG - CEO",
       category: "EMISSION",
-      linkedinUrl: "https://www.linkedin.com/feed/update/urn:li:activity:7342796778259292160"
+      linkedinUrl: "https://www.youtube.com/live/7BjB8PBy7a8?si=llICo6xH26NjD7DB"
     },
      {
       id: 7,
@@ -445,6 +467,10 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     return date > thirtyDaysAgo;
   }
+
+
+
+
 
 
 
