@@ -213,6 +213,17 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
   // --- Actualités ---
   articles: Article[] = [
     {
+      id: 15,
+      title: "Formation Infographie - Cohorte 2 Décembre",
+      excerpt: "Nouvelle cohorte de formation professionnelle en infographie ! Rejoignez-nous pour développer vos compétences créatives et techniques. Inscriptions ouvertes pour la session de décembre. #formation #infographie #penccumndongo",
+      image: "FormationInfographieCohorte2_Decembre.jpg",
+      date: new Date('2025-11-13'),
+      author: "Penccum Ndongo",
+      category: "FORMATION",
+      linkedinUrl: "https://web.facebook.com/share/p/1A5GTNMQD8/",
+      featured: true
+    },
+    {
       id: 13,
       title: "Revivez notre passage sur Évidence TV !",
       excerpt: "Retour sur l'émission Evi-Weekend où nous avons parlé du Concours de Poésie Inédit & Innovant (CP2i) — son objectif, son impact et les belles perspectives de cette 3ᵉ édition. Découvrez l'intégralité de l'émission et déposez vos textes avant le 23 novembre ! #cp2i #edition3 #poesie #penccumndongo",
