@@ -1,0 +1,287 @@
+.whatsapp-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.3s ease;
+}
+
+.whatsapp-popup {
+  background: white;
+  border-radius: 20px;
+  max-width: 450px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  position: relative;
+  animation: slideUp 0.4s ease;
+}
+
+.popup-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #f1f1f1;
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 1;
+}
+
+.popup-close:hover {
+  background: #e0e0e0;
+  transform: scale(1.1);
+}
+
+.popup-header {
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  color: white;
+  padding: 30px 25px 25px;
+  text-align: center;
+  border-radius: 20px 20px 0 0;
+}
+
+.popup-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  animation: bounce 2s infinite;
+}
+
+.popup-header h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: white;
+}
+
+.popup-header p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 0.95rem;
+  color: white;
+}
+
+.popup-content {
+  padding: 25px;
+}
+
+.whatsapp-options {
+  margin-bottom: 25px;
+}
+
+.whatsapp-option {
+  display: flex;
+  align-items: center;
+  padding: 18px;
+  border: 2px solid #f0f0f0;
+  border-radius: 15px;
+  margin-bottom: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.whatsapp-option:hover {
+  border-color: #25D366;
+  background: #f8fff8;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.15);
+}
+
+.whatsapp-option.group:hover {
+  border-color: #25D366;
+}
+
+.whatsapp-option.channel:hover {
+  border-color: #FF7F1A;
+}
+
+.option-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  font-size: 1.3rem;
+  color: white;
+}
+
+.whatsapp-option.group .option-icon {
+  background: linear-gradient(135deg, #25D366, #128C7E);
+}
+
+.whatsapp-option.channel .option-icon {
+  background: linear-gradient(135deg, #FF7F1A, #E6650A);
+}
+
+.option-content {
+  flex: 1;
+}
+
+.option-content h4 {
+  margin: 0 0 5px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.option-content p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+.option-arrow {
+  color: #ccc;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+.whatsapp-option:hover .option-arrow {
+  color: #25D366;
+  transform: translateX(5px);
+}
+
+.social-section {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 20px;
+  text-align: center;
+}
+
+.social-title {
+  margin: 0 0 15px 0;
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.social-btn {
+  width: 45px;
+  height: 45px;
+  border: none;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.2rem;
+  color: white;
+}
+
+.social-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.social-btn.linkedin {
+  background: linear-gradient(135deg, #0077B5, #005885);
+}
+
+.social-btn.facebook {
+  background: linear-gradient(135deg, #1877F2, #0C5AA6);
+}
+
+.social-btn.instagram {
+  background: linear-gradient(135deg, #E4405F, #C13584, #833AB4);
+}
+
+.social-btn.twitter {
+  background: linear-gradient(135deg, #1DA1F2, #0C85D0);
+}
+
+.social-btn.tiktok {
+  background: linear-gradient(135deg, #000000, #333333);
+}
+
+.popup-footer {
+  padding: 15px 25px;
+  text-align: center;
+  border-top: 1px solid #f0f0f0;
+  background: #fafafa;
+  border-radius: 0 0 20px 20px;
+}
+
+.popup-footer small {
+  color: #999;
+  font-size: 0.8rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+@media (max-width: 480px) {
+  .whatsapp-popup {
+    width: 95%;
+    margin: 10px;
+  }
+  
+  .popup-content {
+    padding: 20px;
+  }
+  
+  .whatsapp-option {
+    padding: 15px;
+  }
+  
+  .option-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+  
+  .social-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+  }
+}

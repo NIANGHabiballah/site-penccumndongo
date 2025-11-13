@@ -1,0 +1,70 @@
+<div class="whatsapp-popup-overlay" *ngIf="showPopup" (click)="closePopup()">
+  <div class="whatsapp-popup" (click)="$event.stopPropagation()">
+    <button class="popup-close" (click)="closePopup()">
+      <i class="fas fa-times"></i>
+    </button>
+    
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="fab fa-whatsapp"></i>
+      </div>
+      <h3>Rejoignez la Communauté CP2i !</h3>
+      <p>Connectez-vous avec les autres participants</p>
+    </div>
+    
+    <div class="popup-content">
+      <div class="whatsapp-options">
+        <div class="whatsapp-option group" (click)="joinWhatsAppGroup()">
+          <div class="option-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="option-content">
+            <h4>Groupe Participants CP2i</h4>
+            <p>Échangez avec tous les participants du concours</p>
+          </div>
+          <div class="option-arrow">
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </div>
+        
+        <div class="whatsapp-option channel" (click)="joinWhatsAppChannel()">
+          <div class="option-icon">
+            <i class="fas fa-broadcast-tower"></i>
+          </div>
+          <div class="option-content">
+            <h4>Chaîne Penccum Ndongo</h4>
+            <p>Recevez toutes nos actualités et annonces</p>
+          </div>
+          <div class="option-arrow">
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="social-section">
+        <p class="social-title">Suivez-nous aussi sur :</p>
+        <div class="social-links">
+          <button class="social-btn linkedin" (click)="openSocialLink('linkedin')" title="LinkedIn">
+            <i class="fab fa-linkedin"></i>
+          </button>
+          <button class="social-btn facebook" (click)="openSocialLink('facebook')" title="Facebook">
+            <i class="fab fa-facebook"></i>
+          </button>
+          <button class="social-btn instagram" (click)="openSocialLink('instagram')" title="Instagram">
+            <i class="fab fa-instagram"></i>
+          </button>
+          <button class="social-btn twitter" (click)="openSocialLink('twitter')" title="Twitter">
+            <i class="fab fa-x-twitter"></i>
+          </button>
+          <button class="social-btn tiktok" (click)="openSocialLink('tiktok')" title="TikTok">
+            <i class="fab fa-tiktok"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="popup-footer">
+      <small>Ce message s'affiche une fois par jour</small>
+    </div>
+  </div>
+</div>

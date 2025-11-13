@@ -13,12 +13,13 @@ import { HttpClient } from '@angular/common/http';
 import { MessageNotificationComponent } from '../../components/message-notification/message-notification.component';
 import { ParticipantMessagesComponent } from '../participant-messages/participant-messages.component';
 import { ChatSupportService } from '../../services/chat-support.service';
+import { WhatsappPopupComponent } from '../../components/whatsapp-popup/whatsapp-popup.component';
 
 
 @Component({
   selector: 'app-dashboard-participant',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ChatSupportComponent, ChatWidgetComponent, MessageNotificationComponent, ParticipantMessagesComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ChatSupportComponent, ChatWidgetComponent, MessageNotificationComponent, ParticipantMessagesComponent, WhatsappPopupComponent],
   templateUrl: './dashboard-participant.component.html',
   styleUrls: ['./dashboard-participant.component.css', './participant-sections.css', './certificats-styles.css', './cert-verification-styles.css']
 })
