@@ -208,7 +208,7 @@ export class FormationInfographieComponent implements OnInit {
       phone: ['', [Validators.required, Validators.pattern(/^(\+221)?[0-9]{9}$/)]],
       format: ['online', Validators.required],
       profession: ['', Validators.required],
-      motivation: ['', [Validators.required, Validators.minLength(50)]],
+      motivation: ['', [Validators.required, Validators.minLength(20)]],
       paymentMethod: ['', Validators.required],
       acceptTerms: [false, Validators.requiredTrue]
     });
@@ -223,7 +223,7 @@ export class FormationInfographieComponent implements OnInit {
     }
 
   startCountdown(): void {
-    const deadline = new Date('2025-10-03T23:59:59').getTime();
+    const deadline = new Date('2025-11-29T23:59:59').getTime();
     
     setInterval(() => {
       const now = new Date().getTime();
@@ -245,8 +245,11 @@ export class FormationInfographieComponent implements OnInit {
   }
 
   selectFormat(format: 'online' | 'presential'): void {
-    this.selectedFormat = format;
-    this.inscriptionForm.patchValue({ format });
+    // Pour le moment, seule l'option 'online' est disponible
+    if (format === 'online') {
+      this.selectedFormat = format;
+      this.inscriptionForm.patchValue({ format });
+    }
   }
 
   scrollToForm(): void {

@@ -14,7 +14,7 @@
     <div class="hero-content">
       <div class="badge-new">
         <span class="pulse"></span>
-        Nouvelle Session
+        Cohorte 2 - Décembre
       </div>
       
       <h1 class="hero-title">
@@ -53,7 +53,7 @@
       
       <!-- Countdown Timer -->
       <div class="countdown-wrapper">
-        <p class="countdown-label">Inscriptions ouvertes jusqu'au 3 octobre 2025</p>
+        <p class="countdown-label">Inscriptions ouvertes jusqu'au 29 novembre 2025</p>
         <div class="countdown">
           <div class="countdown-item">
             <span class="countdown-value">{{countdown.days || 0}}</span>
@@ -138,13 +138,73 @@
       
      <div class="promo-image-container" @scaleIn>
       <div class="promo-image-wrapper">
-        <span class="floating-badge">Nouveau</span>
-        <img src="Formation-Infographie.jpg" 
-            alt="Affiche Formation Infographie - PENCCUM NDONGO" 
+
+        <img src="FormationInfographieCohorte2_Decembre.jpg" 
+            alt="Affiche Formation Infographie Cohorte 2 - PENCCUM NDONGO" 
             class="formation-poster"
             loading="lazy">
       </div>
     </div>
+    </div>
+  </section>
+
+  <!-- Success Story Section -->
+  <section class="success-section">
+    <div class="container">
+      <div class="success-banner" @fadeIn>
+        <div class="success-visual">
+          <div class="success-icon-main">
+            <i class="fas fa-medal"></i>
+          </div>
+          <div class="success-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+          </div>
+        </div>
+        <div class="success-content">
+          <div class="success-header">
+            <i class="fas fa-star success-star"></i>
+            <h3>Cohorte 1 : Mission Accomplie !</h3>
+            <i class="fas fa-star success-star"></i>
+          </div>
+          <p class="success-description">
+            <strong>Nos participants</strong> viennent de transformer leur passion en compétences professionnelles. 
+            Ils maîtrisent désormais <strong>Photoshop, Illustrator, Canva Pro</strong> et ont créé leur portfolio.
+          </p>
+          <div class="success-stats">
+            <div class="stat-item">
+              <i class="fas fa-graduation-cap"></i>
+              <span class="stat-number">100%</span>
+              <span class="stat-label">Réussite</span>
+            </div>
+            <div class="stat-item">
+              <i class="fas fa-briefcase"></i>
+              <span class="stat-number">100%</span>
+              <span class="stat-label">Certifiés</span>
+            </div>
+            <div class="stat-item">
+              <i class="fas fa-rocket"></i>
+              <span class="stat-number">4</span>
+              <span class="stat-label">Semaines</span>
+            </div>
+          </div>
+          <div class="success-cta">
+            <span class="success-badge">
+              <i class="fas fa-check-circle"></i>
+              Formation Terminée avec Succès
+            </span>
+            <p class="success-motivation">
+              <strong>Vous voulez faire partie de la deuxième cohorte de designers que le marché attend ?</strong>
+            </p>
+            <button class="btn-join-cohorte" (click)="scrollToForm()">
+              <i class="fas fa-user-plus"></i>
+              Inscris-toi ici maintenant !
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -252,7 +312,7 @@
           <h3>Formation en Ligne</h3>
           <div class="format-price">
             <span class="currency">FCFA</span>
-            <span class="amount">50.000</span>
+            <span class="amount">30.000</span>
           </div>
           <ul class="format-features">
             <li><i>✓</i> 1 mois de formation</li>
@@ -267,10 +327,10 @@
           </button>
         </div>
         
-        <div class="format-card" [class.active]="selectedFormat === 'presential'" (click)="selectFormat('presential')">
+        <!-- Option présentiel temporairement désactivée -->
+        <!-- <div class="format-card" [class.active]="selectedFormat === 'presential'" (click)="selectFormat('presential')">
           <div class="format-badge">Premium</div>
           <div class="format-icon">
-            <!-- Illustration SVG bâtiment (présentiel) -->
             <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="8" y="18" width="32" height="18" rx="4" fill="#eaf6ff" stroke="#0085CA" stroke-width="3"/>
               <rect x="16" y="26" width="6" height="10" rx="2" fill="#fff" stroke="#0085CA" stroke-width="2"/>
@@ -295,7 +355,7 @@
           <button class="btn-select" [class.selected]="selectedFormat === 'presential'">
             {{selectedFormat === 'presential' ? 'Sélectionné' : 'Sélectionner'}}
           </button>
-        </div>
+        </div> -->
       </div>
     </div>
   </section>
@@ -411,7 +471,7 @@
     <div class="container">
       <div class="section-header" @fadeIn>
         <h2 class="section-title">Inscription à la Formation</h2>
-        <p class="section-subtitle">Places limitées - Inscrivez-vous avant le 3 octobre 2025</p>
+        <p class="section-subtitle">Places limitées - Inscrivez-vous avant le 29 novembre 2025</p>
       </div>
       <div class="form-card card-shadow animated-fade-in">
         <h3 class="form-main-title">Formulaire d'inscription</h3>
@@ -510,8 +570,8 @@
                     formControlName="format"
                     class="form-control"
                     [class.error]="inscriptionForm.get('format')?.touched && inscriptionForm.get('format')?.invalid">
-              <option value="online">En ligne (50.000 FCFA)</option>
-              <option value="presential">Présentiel (150.000 FCFA)</option>
+              <option value="online">En ligne (30.000 FCFA)</option>
+              <!-- <option value="presential">Présentiel (150.000 FCFA)</option> -->
             </select>
             <span class="error-message" *ngIf="inscriptionForm.get('format')?.touched && inscriptionForm.get('format')?.invalid">
               {{getErrorMessage('format')}}
@@ -526,7 +586,7 @@
                     class="form-control"
                     [class.error]="inscriptionForm.get('motivation')?.touched && inscriptionForm.get('motivation')?.invalid"
                     rows="4"
-                    placeholder="Pourquoi souhaitez-vous suivre cette formation? (minimum 50 caractères)"></textarea>
+                    placeholder="Pourquoi souhaitez-vous suivre cette formation? (minimum 20 caractères)"></textarea>
           <span class="error-message" *ngIf="inscriptionForm.get('motivation')?.touched && inscriptionForm.get('motivation')?.invalid">
             {{getErrorMessage('motivation')}}
           </span>
