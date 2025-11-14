@@ -26,12 +26,11 @@ $phone = htmlspecialchars($data['phone'] ?? '');
 $format = htmlspecialchars($data['format'] ?? '');
 $profession = htmlspecialchars($data['profession'] ?? '');
 $motivation = htmlspecialchars($data['motivation'] ?? '');
-$paymentMethod = htmlspecialchars($data['paymentMethod'] ?? '');
 $acceptTerms = !empty($data['acceptTerms']) ? 1 : 0;
 $submittedAt = date('Y-m-d H:i:s');
 $formationType = 'infographie';
 
-if (!$firstName || !$lastName || !$email || !$phone || !$format || !$profession || !$motivation || !$paymentMethod) {
+if (!$firstName || !$lastName || !$email || !$phone || !$format || !$profession || !$motivation) {
     echo json_encode(['success' => false, 'message' => 'Merci de remplir tous les champs obligatoires.']);
     exit;
 }
@@ -43,8 +42,8 @@ try {
         'Tafsir#27',
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
-    $stmt = $pdo->prepare('INSERT INTO formation_infographie_inscriptions (first_name, last_name, email, phone, format, profession, motivation, payment_method, accept_terms, submitted_at, formation_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-    $success = $stmt->execute([$firstName, $lastName, $email, $phone, $format, $profession, $motivation, $paymentMethod, $acceptTerms, $submittedAt, $formationType]);
+    $stmt = $pdo->prepare('INSERT INTO formation_infographie_inscriptions (first_name, last_name, email, phone, format, profession, motivation, accept_terms, submitted_at, formation_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    $success = $stmt->execute([$firstName, $lastName, $email, $phone, $format, $profession, $motivation, $acceptTerms, $submittedAt, $formationType]);
     if ($success) {
         echo json_encode(['success' => true, 'message' => 'Votre inscription a bien été enregistrée !']);
     } else {

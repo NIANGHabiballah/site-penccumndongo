@@ -592,43 +592,14 @@
           </span>
         </div>
         
-        <!-- Payment Information -->
-        <div class="form-section-title">
-          <span class="section-number">3</span>
-          <h3>Modalités de Paiement</h3>
-        </div>
-        
-        <div class="form-group">
-          <label class="payment-method-label">Méthode de Paiement *</label>
-          <div class="payment-options payment-cards">
-            <label class="payment-option card" [class.selected]="inscriptionForm.get('paymentMethod')?.value === 'orange'">
-              <input type="radio" formControlName="paymentMethod" value="orange">
-              <div class="option-content">
-                <img src="Orange_Money-Logo.wine.svg" alt="Orange Money" class="payment-logo"/>
-                <span class="option-label">Orange Money</span>
-              </div>
-            </label>
-            <label class="payment-option card" [class.selected]="inscriptionForm.get('paymentMethod')?.value === 'wave'">
-              <input type="radio" formControlName="paymentMethod" value="wave">
-              <div class="option-content">
-                <img src="logowave.png" alt="Wave" class="payment-logo"/>
-                <span class="option-label">Wave</span>
-              </div>
-            </label>
-            <label class="payment-option card" [class.selected]="inscriptionForm.get('paymentMethod')?.value === 'free'">
-              <input type="radio" formControlName="paymentMethod" value="free">
-              <div class="option-content">
-                <img src="free-money.png" alt="Free Money" class="payment-logo"/>
-                <span class="option-label">Free Money</span>
-              </div>
-            </label>
-          </div>
-          <span class="error-message" *ngIf="inscriptionForm.get('paymentMethod')?.touched && inscriptionForm.get('paymentMethod')?.invalid">
-            {{getErrorMessage('paymentMethod')}}
-          </span>
-        </div>
+
         
         <!-- Terms and Conditions -->
+        <div class="form-section-title">
+          <span class="section-number">3</span>
+          <h3>Confirmation</h3>
+        </div>
+        
         <div class="form-group checkbox-group">
           <label class="checkbox-label cgu-card">
             <input type="checkbox" formControlName="acceptTerms">

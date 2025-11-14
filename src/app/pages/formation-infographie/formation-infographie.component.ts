@@ -209,7 +209,6 @@ export class FormationInfographieComponent implements OnInit {
       format: ['online', Validators.required],
       profession: ['', Validators.required],
       motivation: ['', [Validators.required, Validators.minLength(20)]],
-      paymentMethod: ['', Validators.required],
       acceptTerms: [false, Validators.requiredTrue]
     });
   }
