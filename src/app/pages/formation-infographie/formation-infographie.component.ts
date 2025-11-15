@@ -252,6 +252,16 @@ export class FormationInfographieComponent implements OnInit {
   }
 
   scrollToForm(): void {
+    // Track Facebook Pixel InitiateCheckout event
+    if (typeof (window as any).fbq !== 'undefined') {
+      (window as any).fbq('track', 'InitiateCheckout', {
+        content_name: 'Formation Infographie Cohorte 2',
+        content_category: 'Formation',
+        value: 30000,
+        currency: 'XOF'
+      });
+    }
+    
     this.formSection.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
@@ -281,6 +291,17 @@ export class FormationInfographieComponent implements OnInit {
           next: (response) => {
             this.loading = false;
             this.showSuccessMessage = true;
+            
+            // Track Facebook Pixel Lead event
+            if (typeof (window as any).fbq !== 'undefined') {
+              (window as any).fbq('track', 'Lead', {
+                content_name: 'Formation Infographie Cohorte 2',
+                content_category: 'Formation',
+                value: 30000,
+                currency: 'XOF'
+              });
+            }
+            
             this.inscriptionForm.reset();
             setTimeout(() => {
               this.showSuccessMessage = false;
