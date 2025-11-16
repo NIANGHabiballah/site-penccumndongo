@@ -294,11 +294,7 @@ export class FormationInfographieComponent implements OnInit {
               console.log('✅ INSCRIPTION CONFIRMÉE - ID:', response.data.id);
             }
             
-            // Ouvrir la popup de paiement avec les données utilisateur
-            if (response.popup_url) {
-              const popupUrl = `${response.popup_url}?firstName=${encodeURIComponent(formData.firstName)}&lastName=${encodeURIComponent(formData.lastName)}&email=${encodeURIComponent(formData.email)}`;
-              window.open(popupUrl, 'popup-paiement', 'width=700,height=800,scrollbars=yes,resizable=yes');
-            }
+            // Plus de popup - l'email contient toutes les informations
             
             this.loading = false;
             this.showSuccessMessage = true;

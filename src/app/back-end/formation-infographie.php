@@ -172,19 +172,18 @@ $headers = [
     'Reply-To: pencc.penccumndongo@gmail.com'
 ];
 
-// Email temporairement désactivé par Hostinger
-// $emailSent = mail($to, $subject, $htmlMessage, implode("\r\n", $headers));
-$emailSent = false; // Temporaire jusqu'à réactivation Hostinger
+// Utiliser Gmail SMTP au lieu de mail() Hostinger
+require_once 'gmail-smtp.php';
+$emailSent = sendEmailViaSMTP($to, $subject, $htmlMessage, 'PENCCUM NDONGO Formation');
 
 // Réponse de succès
 echo json_encode([
     'success' => true,
-    'message' => 'Inscription enregistrée avec succès !',
+    'message' => 'Inscription enregistrée avec succès ! Un email de confirmation vous a été envoyé.',
     'data' => [
         'email' => $data['email'],
         'name' => $data['firstName'] . ' ' . $data['lastName']
     ],
-    'email_sent' => $emailSent,
-    'popup_url' => 'https://penccumndongo.com/popup-paiement.html'
+    'email_sent' => $emailSent
 ]);
 ?>
