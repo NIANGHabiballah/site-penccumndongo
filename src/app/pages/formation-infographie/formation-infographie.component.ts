@@ -84,6 +84,7 @@ export class FormationInfographieComponent implements OnInit {
   showSuccessMessage = false;
   showErrorMessage = false;
   loading = false;
+  userEmail = '';
   currentTestimonial = 0;
   countdown: any = {};
   inscriptionsClosed = false; // Inscriptions clôturées
@@ -297,6 +298,8 @@ export class FormationInfographieComponent implements OnInit {
             // Plus de popup - l'email contient toutes les informations
             
             this.loading = false;
+            // Sauvegarder l'email avant de réinitialiser le formulaire
+            this.userEmail = this.inscriptionForm.get('email')?.value || '';
             this.showSuccessMessage = true;
             
             // Track Facebook Pixel Lead event
@@ -312,7 +315,7 @@ export class FormationInfographieComponent implements OnInit {
             this.inscriptionForm.reset();
             setTimeout(() => {
               this.showSuccessMessage = false;
-            }, 5000);
+            }, 15000);
           },
           error: (error) => {
             console.error('Erreur inscription:', error);

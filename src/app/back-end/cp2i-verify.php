@@ -45,7 +45,7 @@ function showVerificationPage($success, $message, $user = null) {
         <style>
             body {
                 font-family: Arial, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, #0085CA 0%, #005a8b 100%);
                 margin: 0;
                 padding: 20px;
                 min-height: 100vh;

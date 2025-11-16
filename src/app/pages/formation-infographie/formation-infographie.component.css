@@ -517,7 +517,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0085CA 0%, #001f3f 100%);
+  background: #0085CA;
   overflow: hidden;
   padding: 80px 20px;
 }

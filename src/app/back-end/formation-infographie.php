@@ -1,4 +1,6 @@
 <?php
+require_once 'gmail-smtp.php';
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -107,7 +109,7 @@ try {
 
 // Envoyer l'email de confirmation avec template HTML
 $to = $data['email'];
-$subject = "✅ Inscription confirmée - Formation Infographie Cohorte 2";
+$subject = "Inscription confirmée - Formation Infographie Cohorte 2";
 
 $htmlMessage = "
 <!DOCTYPE html>
@@ -118,11 +120,19 @@ $htmlMessage = "
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
         .container { max-width: 600px; margin: 0 auto; background-color: white; }
-        .header { background-color: #1e40af; color: white; padding: 30px; text-align: center; }
-        .header h1, .header p { color: white; }
+        .header { background-color: #0085CA; color: white !important; padding: 30px; text-align: center; }
+        .header h1, .header p { color: white !important; }
+        .header * { color: white !important; }
         .content { padding: 30px; }
-        .payment-info { background-color: #fef3c7; border: 1px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; }
-        .btn { background-color: #3b82f6; color: white !important; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 10px 0; }
+        .payment-info { background-color: #fef3c7; border: 1px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 20px 0; color: #000000; }
+        .payment-info h3, .payment-info h4, .payment-info p, .payment-info li, .payment-info ul, .payment-info strong { color: #000000 !important; opacity: 1 !important; }
+        .btn { background-color: #FF7F32; color: white !important; padding: 12px 24px; text-decoration: none !important; border-radius: 6px; display: inline-block; margin: 10px 0; font-weight: bold; }
+        .btn, .btn *, .btn span, .btn i { color: white !important; }
+        a.btn, a.btn *, a.btn span, a.btn i { color: white !important; }
+        a.btn:visited, a.btn:visited *, a.btn:visited span, a.btn:visited i { color: white !important; }
+        a.btn:hover, a.btn:hover *, a.btn:hover span, a.btn:hover i { color: white !important; }
+        a.btn:link, a.btn:link *, a.btn:link span, a.btn:link i { color: white !important; }
+        a.btn:active, a.btn:active *, a.btn:active span, a.btn:active i { color: white !important; }
     </style>
 </head>
 <body>
@@ -153,9 +163,9 @@ $htmlMessage = "
                 
                 <p><strong><i class='fas fa-exclamation-triangle'></i> Important :</strong> Envoyez-nous une capture d'écran de votre paiement par WhatsApp pour confirmation.</p>
                 
-                <a href='https://wa.me/221776290639?text=Bonjour%20PENCCUM%20NDONGO,%20je%20viens%20de%20finaliser%20mon%20inscription%20%C3%A0%20la%20Formation%20Infographie%20Cohorte%202.%20Je%20vous%20envoie%20ma%20capture%20d%27%C3%A9cran%20de%20paiement%20de%20la%20premi%C3%A8re%20tranche%20(15%20000%20FCFA)%20pour%20validation.%20Merci.' class='btn'><i class='fab fa-whatsapp'></i> Envoyer capture de paiement</a>
+                <a href='https://wa.me/221776290639?text=Bonjour%20PENCCUM%20NDONGO,%20je%20viens%20de%20finaliser%20mon%20inscription%20%C3%A0%20la%20Formation%20Infographie%20Cohorte%202.%20Je%20vous%20envoie%20ma%20capture%20d%27%C3%A9cran%20de%20paiement%20de%20la%20premi%C3%A8re%20tranche%20(15%20000%20FCFA)%20pour%20validation.%20Merci.' class='btn' style='color: white !important; text-decoration: none !important; background-color: #FF7F32 !important;'><i class='fab fa-whatsapp' style='color: white !important;'></i> <span style='color: white !important; font-weight: bold;'>Envoyer capture de paiement</span></a>
                 
-                <a href='https://chat.whatsapp.com/I8O4QfOZ7CgIhvZS88VjVd' class='btn' style='background-color: #10b981; margin-top: 10px; display: block;'><i class='fas fa-users'></i> Rejoindre le groupe Formation Infographie</a>
+                <a href='https://chat.whatsapp.com/I8O4QfOZ7CgIhvZS88VjVd' class='btn' style='background-color: #10b981 !important; margin-top: 10px; display: block; color: white !important; font-weight: bold; text-decoration: none !important;'><i class='fas fa-users' style='color: white !important;'></i> <span style='color: white !important; font-weight: bold;'>Rejoindre le groupe Formation Infographie</span></a>
             </div>
             
             <p>Cordialement,<br><strong>L'équipe PENCCUM NDONGO</strong></p>
@@ -165,16 +175,9 @@ $htmlMessage = "
 </html>
 ";
 
-$headers = [
-    'MIME-Version: 1.0',
-    'Content-type: text/html; charset=UTF-8',
-    'From: PENCCUM NDONGO <pencc.penccumndongo@gmail.com>',
-    'Reply-To: pencc.penccumndongo@gmail.com'
-];
-
-// Utiliser Gmail SMTP au lieu de mail() Hostinger
-require_once 'gmail-smtp.php';
-$emailSent = sendEmailViaSMTP($to, $subject, $htmlMessage, 'PENCCUM NDONGO Formation');
+// Envoyer l'email via Gmail SMTP
+$emailSent = sendEmailViaSMTP($to, $subject, $htmlMessage, 'PENCCUM NDONGO');
+error_log('Email envoyé via SMTP à ' . $to . ': ' . ($emailSent ? 'SUCCÈS' : 'ÉCHEC'));
 
 // Réponse de succès
 echo json_encode([
@@ -184,6 +187,7 @@ echo json_encode([
         'email' => $data['email'],
         'name' => $data['firstName'] . ' ' . $data['lastName']
     ],
-    'email_sent' => $emailSent
+    'email_sent' => $emailSent,
+    'debug' => 'Email envoyé: ' . ($emailSent ? 'SUCCÈS' : 'ÉCHEC')
 ]);
 ?>

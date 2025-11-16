@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+require_once 'gmail-smtp.php';
 setCorsHeaders();
 
 // Fonction centralisée pour gérer les mots de passe
@@ -250,11 +251,11 @@ function sendVerificationEmail($email, $nom, $prenom, $token) {
     </html>
     ";
     
-    $headers = "MIME-Version: 1.0" . "\r\n";
-    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    $headers .= "From: CP2i <noreply@penccumndongo.com>" . "\r\n";
+    // Envoyer l'email via Gmail SMTP
+    $emailSent = sendEmailViaSMTP($email, $subject, $message, 'CP2i PENCCUM NDONGO');
+    error_log('CP2i - Email envoyé via SMTP à ' . $email . ': ' . ($emailSent ? 'SUCCÈS' : 'ÉCHEC'));
     
-    mail($email, $subject, $message, $headers);
+    return $emailSent;
 }
 
 function refreshToken() {
