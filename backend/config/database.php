@@ -1,8 +1,8 @@
 <?php
 $host = 'localhost';
 $dbname = 'u122559880_form_contact';
-$username = 'u122559880_form_contact';
-$password = 'VotreMotDePasse'; // À remplacer par votre vrai mot de passe
+$username = 'u122559880_root';
+$password = 'Tafsir#27';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);

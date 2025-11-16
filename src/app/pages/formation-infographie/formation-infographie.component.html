@@ -632,7 +632,31 @@
           <i class="alert-icon">✅</i>
           <div>
             <h4>Inscription réussie!</h4>
-            <p>Vous recevrez un email de confirmation avec les détails de paiement et l'accès à la formation.</p>
+            <p>Un email de confirmation avec les détails de paiement devrait vous être envoyé à <strong>{{ inscriptionForm.get('email')?.value }}</strong>.</p>
+            <div class="email-notice">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span><strong>Important :</strong> Vérifiez votre dossier SPAM/COURRIER INDÉSIRABLE. L'email peut s'y trouver.</span>
+            </div>
+            <div class="success-details">
+              <h5><i class="fas fa-envelope"></i> Vérifiez votre email</h5>
+              <p>Vous y trouverez :</p>
+              <ul>
+                <li><i class="fas fa-check-circle"></i> Confirmation de votre inscription</li>
+                <li><i class="fas fa-money-bill-wave"></i> Instructions de paiement (première tranche : 15 000 FCFA)</li>
+                <li><i class="fas fa-calendar-alt"></i> Date limite : 29 novembre 2025</li>
+                <li><i class="fas fa-phone"></i> Contacts pour assistance</li>
+              </ul>
+              <div class="success-actions">
+                <a href="https://wa.me/221776290639?text=Bonjour, je viens de m'inscrire à la formation infographie." 
+                   class="whatsapp-btn" target="_blank">
+                  <i class="fab fa-whatsapp"></i> Contacter sur WhatsApp
+                </a>
+                <a href="https://chat.whatsapp.com/I8O4QfOZ7CgIhvZS88VjVd" 
+                   class="whatsapp-group-btn" target="_blank">
+                  <i class="fab fa-whatsapp"></i> Rejoindre le groupe Formation
+                </a>
+              </div>
+            </div>
           </div>
         </div>
         <div class="alert alert-error" *ngIf="showErrorMessage" @fadeIn>

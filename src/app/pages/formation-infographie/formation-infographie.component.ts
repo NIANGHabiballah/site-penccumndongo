@@ -285,10 +285,21 @@ export class FormationInfographieComponent implements OnInit {
         formationType: 'infographie'
       };
 
-      // Simuler l'envoi (remplacer par votre endpoint API)
+      // Envoyer l'inscription
       this.http.post('https://penccumndongo.com/formation-infographie.php', formData)
         .subscribe({
-          next: (response) => {
+          next: (response: any) => {
+            console.log('Réponse serveur complète:', JSON.stringify(response, null, 2));
+            if (response && response.data && response.data.id) {
+              console.log('✅ INSCRIPTION CONFIRMÉE - ID:', response.data.id);
+            }
+            
+            // Ouvrir la popup de paiement avec les données utilisateur
+            if (response.popup_url) {
+              const popupUrl = `${response.popup_url}?firstName=${encodeURIComponent(formData.firstName)}&lastName=${encodeURIComponent(formData.lastName)}&email=${encodeURIComponent(formData.email)}`;
+              window.open(popupUrl, 'popup-paiement', 'width=700,height=800,scrollbars=yes,resizable=yes');
+            }
+            
             this.loading = false;
             this.showSuccessMessage = true;
             
@@ -308,6 +319,7 @@ export class FormationInfographieComponent implements OnInit {
             }, 5000);
           },
           error: (error) => {
+            console.error('Erreur inscription:', error);
             this.loading = false;
             this.showErrorMessage = true;
             setTimeout(() => {
@@ -375,5 +387,7 @@ export class FormationInfographieComponent implements OnInit {
   scrollToBottom() {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   }
+
+
   
 }
