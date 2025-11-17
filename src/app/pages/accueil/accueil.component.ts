@@ -213,6 +213,17 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
   // --- Actualités ---
   articles: Article[] = [
     {
+      id: 16,
+      title: "Passage en direct sur la RTS – Émission Plus Près de Vous !",
+      excerpt: "Ce matin, j'ai eu le plaisir d'intervenir en direct dans l'émission Plus Près de Vous sur la RTS pour parler du Concours de Poésie Inédit & Innovant (CP2i). Un moment d'échange enrichissant où j'ai pu rappeler l'objectif du CP2i, présenter les règlements et les nouveautés de cette édition, ainsi que mettre en avant la promotion des talents et l'expression poétique comme outil d'impact. #cp2i #rts #poesie #penccumndongo #tafsirhabyniang",
+      image: "emissionRTS.png",
+      date: new Date('2025-11-17'),
+      author: "Tafsir Haby NIANG",
+      category: "EMISSION",
+      linkedinUrl: "https://youtu.be/YL9X_wVNU5c?si=mWyR1j3oWllrHgWK",
+      featured: true
+    },
+    {
       id: 15,
       title: "Formation Infographie - Cohorte 2 Décembre",
       excerpt: "Nouvelle cohorte de formation professionnelle en infographie ! Rejoignez-nous pour développer vos compétences créatives et techniques. Inscriptions ouvertes pour la session de décembre. #formation #infographie #penccumndongo",
