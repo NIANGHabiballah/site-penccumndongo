@@ -213,6 +213,17 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
   // --- Actualités ---
   articles: Article[] = [
     {
+      id: 17,
+      title: "Comment s'inscrire et soumettre votre texte sur la plateforme CP2i ?",
+      excerpt: "Pour vous accompagner dans votre participation à la troisième édition du Concours de Poésie Inédit & Innovant (CP2i), organisé par Penccum Ndongo, nous avons préparé une courte vidéo explicative pour vous guider étape par étape : ➜ Création de compte / Inscription ➜ Connexion à la plateforme ➜ Soumission d'un nouveau texte. Merci de la regarder attentivement et de la partager avec tous les participants.",
+      image: "tuto.jpeg",
+      date: new Date('2025-11-20'),
+      author: "Penccum Ndongo",
+      category: "TUTORIEL",
+      linkedinUrl: "https://youtu.be/QjJk12AhaZY?si=Kic0ipzo6qorkOkL",
+      featured: true
+    },
+    {
       id: 16,
       title: "Passage en direct sur la RTS – Émission Plus Près de Vous !",
       excerpt: "Ce matin, j'ai eu le plaisir d'intervenir en direct dans l'émission Plus Près de Vous sur la RTS pour parler du Concours de Poésie Inédit & Innovant (CP2i). Un moment d'échange enrichissant où j'ai pu rappeler l'objectif du CP2i, présenter les règlements et les nouveautés de cette édition, ainsi que mettre en avant la promotion des talents et l'expression poétique comme outil d'impact. #cp2i #rts #poesie #penccumndongo #tafsirhabyniang",
