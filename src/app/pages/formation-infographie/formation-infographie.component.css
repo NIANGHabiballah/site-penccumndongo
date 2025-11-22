@@ -519,7 +519,7 @@
   justify-content: center;
   background: #0085CA;
   overflow: hidden;
-  padding: 80px 20px;
+  padding: 120px 20px 80px 20px;
 }
 
 .hero-background {
@@ -2159,7 +2159,7 @@
 /* Responsive Design */
 @media (max-width: 1024px) {
   .hero-section {
-    padding: 60px 20px;
+    padding: 100px 20px 60px 20px;
   }
   
   .formateur-card {
@@ -2197,16 +2197,44 @@
 }
 
 @media (max-width: 768px) {
+  /* Titre sur 3 lignes pour tablette */
+  .title-line {
+    display: block !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-weight: 800 !important;
+  }
+  
+  /* Espacement réduit pour les features */
   .hero-features {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 12px !important;
+    margin-bottom: 30px !important;
+  }
+  
+  .feature-item {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-weight: 600 !important;
+    gap: 6px !important;
+  }
+  
+  /* Date sur 2 lignes pour tablette */
+  .date-line {
+    display: block !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-weight: 700 !important;
   }
   
   .countdown {
     flex-wrap: wrap;
     gap: 15px;
     justify-content: center;
+  }
+  
+  .countdown-label {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-weight: 700 !important;
   }
   
   .form-row {
@@ -2264,8 +2292,48 @@
 
 @media (max-width: 480px) {
   .hero-section {
-    padding: 40px 15px;
+    padding: 80px 15px 40px 15px;
     text-align: center;
+  }
+  
+  /* Titre Formation sur 3 lignes */
+  .hero-title {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-size: clamp(1.8rem, 4vw, 2.5rem) !important;
+    line-height: 1.1 !important;
+  }
+  
+  .title-line {
+    display: block !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-weight: 800 !important;
+  }
+  
+  /* Espacement très réduit entre les features */
+  .hero-features {
+    gap: 8px !important;
+    margin-bottom: 25px !important;
+  }
+  
+  .feature-item {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    gap: 4px !important;
+  }
+  
+  /* Date countdown sur 2 lignes */
+  .countdown-label {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+  }
+  
+  .date-line {
+    display: block !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-weight: 700 !important;
   }
   
   .container {
