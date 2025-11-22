@@ -91,6 +91,8 @@ function resetPassword($data) {
 }
 
 function sendResetEmail($email, $nom, $prenom, $token) {
+    require_once 'gmail-smtp.php';
+    
     $resetUrl = "https://penccumndongo.com/reset-password?token=" . $token . "&email=" . urlencode($email);
     
     $subject = "CP2i - Réinitialisation de mot de passe";
@@ -117,10 +119,6 @@ function sendResetEmail($email, $nom, $prenom, $token) {
     </html>
     ";
     
-    $headers = "MIME-Version: 1.0\r\n";
-    $headers .= "Content-type:text/html;charset=UTF-8\r\n";
-    $headers .= "From: CP2i <noreply@penccumndongo.com>\r\n";
-    
-    mail($email, $subject, $message, $headers);
+    return sendEmailViaSMTP($email, $subject, $message, 'CP2i - PENCCUM NDONGO');
 }
 ?>
