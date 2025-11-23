@@ -820,6 +820,15 @@
             <button class="filter-tab" [class.active]="currentEvaluationFilter === 'en_attente'" (click)="filterEvaluations('en_attente')">En attente</button>
             <button class="filter-tab" [class.active]="currentEvaluationFilter === 'termines'" (click)="filterEvaluations('termines')">Terminés</button>
           </div>
+          <div class="evaluation-search">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" 
+                     placeholder="Rechercher par nom, titre ou langue..." 
+                     [(ngModel)]="evaluationSearchTerm"
+                     (input)="onEvaluationSearch($event)">
+            </div>
+          </div>
           <div class="evaluation-actions">
             <button class="btn btn-primary" (click)="generateEvaluationReport()"><i class="fas fa-download"></i> Rapport</button>
             <button class="btn btn-secondary" (click)="sendReminders()"><i class="fas fa-bell"></i> Relancer</button>

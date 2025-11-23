@@ -60,6 +60,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   // Filtrage des évaluations
   currentEvaluationFilter = 'all';
+  evaluationSearchTerm = '';
   filteredTextes: any[] = [];
   
   // Modal d'évaluation
@@ -785,9 +786,15 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.applyEvaluationFilters();
   }
   
+  onEvaluationSearch(event: any) {
+    this.evaluationSearchTerm = event.target.value;
+    this.applyEvaluationFilters();
+  }
+  
   applyEvaluationFilters() {
     let filtered = [...this.textes];
     
+    // Filtrer par statut
     switch (this.currentEvaluationFilter) {
       case 'en_attente':
         filtered = filtered.filter(t => t.statut === 'en_attente');
@@ -798,6 +805,18 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       default:
         // 'all' - pas de filtre
         break;
+    }
+    
+    // Filtrer par recherche
+    if (this.evaluationSearchTerm && this.evaluationSearchTerm.trim()) {
+      const searchTerm = this.evaluationSearchTerm.toLowerCase().trim();
+      filtered = filtered.filter(texte => 
+        texte.titre?.toLowerCase().includes(searchTerm) ||
+        texte.prenom?.toLowerCase().includes(searchTerm) ||
+        texte.nom?.toLowerCase().includes(searchTerm) ||
+        texte.langue?.toLowerCase().includes(searchTerm) ||
+        `${texte.prenom} ${texte.nom}`.toLowerCase().includes(searchTerm)
+      );
     }
     
     this.filteredTextes = filtered;
