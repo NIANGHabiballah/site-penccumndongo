@@ -1721,12 +1721,13 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       }))
       .sort((a, b) => b.count - a.count);
     
-    // Garder le top 5 + regrouper le reste dans "Autres"
-    const top5 = cities.slice(0, 5);
-    const others = cities.slice(5);
+    // Garder le top 5 sans "Autres" existant + regrouper le reste
+    const top5 = cities.filter(c => c.name !== 'Autres').slice(0, 5);
+    const others = cities.filter(c => c.name !== 'Autres').slice(5);
+    const existingOthers = cities.find(c => c.name === 'Autres');
     
-    if (others.length > 0) {
-      const othersCount = others.reduce((sum, city) => sum + city.count, 0);
+    if (others.length > 0 || existingOthers) {
+      const othersCount = others.reduce((sum, city) => sum + city.count, 0) + (existingOthers?.count || 0);
       const othersPercentage = Math.round((othersCount / total) * 100);
       
       if (othersPercentage > 0) {
