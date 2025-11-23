@@ -25,6 +25,9 @@
       <div class="nav-item" [class.active]="currentView === 'affectations'" (click)="setCurrentView('affectations')">
         <i class="fas fa-user-tie"></i> Affectations
       </div>
+      <div class="nav-item" [class.active]="currentView === 'correcteurs'" (click)="setCurrentView('correcteurs')">
+        <i class="fas fa-user-check"></i> Correcteurs
+      </div>
       <div class="nav-item" [class.active]="currentView === 'utilisateurs'" (click)="setCurrentView('utilisateurs')">
         <i class="fas fa-users"></i> Utilisateurs
       </div>
@@ -53,6 +56,9 @@
       </div>
       <div class="nav-item" [class.active]="currentView === 'parametres'" (click)="setCurrentView('parametres')">
         <i class="fas fa-cog"></i> Paramètres
+      </div>
+      <div class="nav-item" [class.active]="currentView === 'finalistes'" (click)="setCurrentView('finalistes')">
+        <i class="fas fa-trophy"></i> Sélection Finalistes
       </div>
       <div class="nav-item" [class.active]="currentView === 'authenticity'" (click)="setCurrentView('authenticity')">
         <i class="fas fa-shield-alt"></i> Vérification Authenticité
@@ -241,6 +247,105 @@
             </div>
             <div *ngIf="textes.length === 0" class="no-data">
               <p>Aucun texte soumis pour le moment</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gestion des correcteurs -->
+      <div *ngSwitchCase="'correcteurs'" class="correcteurs-management">
+        <div class="correcteurs-header">
+          <div class="header-content">
+            <h2><i class="fas fa-user-check"></i> Suivi des correcteurs</h2>
+            <p>{{correcteurs.length}} correcteurs actifs</p>
+          </div>
+        </div>
+
+        <!-- Statistiques globales -->
+        <div class="correcteurs-stats">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-content">
+              <h3>{{correcteurs.length}}</h3>
+              <p>Correcteurs actifs</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-tasks"></i></div>
+            <div class="stat-content">
+              <h3>{{getTotalAssignments()}}</h3>
+              <p>Affectations totales</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-content">
+              <h3>{{getTotalCorrected()}}</h3>
+              <p>Textes corrigés</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+            <div class="stat-content">
+              <h3>{{getTotalPending()}}</h3>
+              <p>En attente</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Liste des correcteurs -->
+        <div class="correcteurs-list">
+          <div class="correcteur-card" *ngFor="let correcteur of getCorrecteurDetails()">
+            <div class="correcteur-header">
+              <div class="correcteur-info">
+                <div class="correcteur-avatar">{{correcteur.prenom?.[0]}}{{correcteur.nom?.[0]}}</div>
+                <div class="correcteur-details">
+                  <h4>{{correcteur.prenom}} {{correcteur.nom}}</h4>
+                  <span class="correcteur-email">{{correcteur.email}}</span>
+                </div>
+              </div>
+              <div class="correcteur-progress">
+                <div class="progress-circle" [attr.data-progress]="correcteur.progressPercentage">
+                  <span>{{correcteur.progressPercentage}}%</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="correcteur-stats">
+              <div class="stat-item">
+                <span class="stat-label">Assignés:</span>
+                <span class="stat-value">{{correcteur.textesAssignes}}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Corrigés:</span>
+                <span class="stat-value success">{{correcteur.textesCorreges}}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Restants:</span>
+                <span class="stat-value warning">{{correcteur.textesRestants}}</span>
+              </div>
+            </div>
+            
+            <div class="textes-assignes" *ngIf="correcteur.textesDetails.length > 0">
+              <h5>Textes assignés:</h5>
+              <div class="texte-item" *ngFor="let texte of correcteur.textesDetails">
+                <div class="texte-info">
+                  <strong>{{texte.titre}}</strong>
+                  <span>par {{texte.prenom}} {{texte.nom}}</span>
+                </div>
+                <div class="texte-status">
+                  <span class="status-badge" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="correcteur-actions">
+              <button class="btn btn-sm btn-outline" (click)="viewCorrecteurDetails(correcteur)">
+                <i class="fas fa-eye"></i> Détails
+              </button>
+              <button class="btn btn-sm btn-primary" (click)="sendReminderToCorrecteur(correcteur)">
+                <i class="fas fa-bell"></i> Relancer
+              </button>
             </div>
           </div>
         </div>
@@ -937,8 +1042,29 @@
 
       <!-- Statistiques -->
       <div *ngSwitchCase="'statistiques'" class="statistics-management">
+        <!-- Filtres et recherche -->
+        <div class="statistics-filters">
+          <div class="filter-tabs">
+            <button class="filter-tab" [class.active]="currentStatsFilter === 'all'" (click)="filterStats('all')">Toutes</button>
+            <button class="filter-tab" [class.active]="currentStatsFilter === 'affectations'" (click)="filterStats('affectations')">Affectations</button>
+            <button class="filter-tab" [class.active]="currentStatsFilter === 'graphiques'" (click)="filterStats('graphiques')">Graphiques</button>
+            <button class="filter-tab" [class.active]="currentStatsFilter === 'qualite'" (click)="filterStats('qualite')">Qualité</button>
+            <button class="filter-tab" [class.active]="currentStatsFilter === 'geographie'" (click)="filterStats('geographie')">Géographie</button>
+            <button class="filter-tab" [class.active]="currentStatsFilter === 'performance'" (click)="filterStats('performance')">Performance</button>
+          </div>
+          <div class="stats-search">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" 
+                     placeholder="Rechercher dans les statistiques..." 
+                     [(ngModel)]="statsSearchTerm"
+                     (input)="onStatsSearch($event)">
+            </div>
+          </div>
+        </div>
+
         <!-- KPIs d'affectation -->
-        <div class="kpi-grid">
+        <div class="kpi-grid" [class.hidden]="!isStatsVisible('affectations')">
           <div class="kpi-card primary">
             <div class="kpi-icon"><i class="fas fa-users"></i></div>
             <div class="kpi-content">
@@ -973,42 +1099,17 @@
           </div>
         </div>
 
-        <!-- Charge de travail des correcteurs -->
-        <div class="panel" *ngIf="stats.correcteurs_stats?.length > 0">
-          <div class="panel-header">
-            <h3><i class="fas fa-tasks"></i> Charge de travail des correcteurs</h3>
-          </div>
-          <div class="panel-content">
-            <div class="correcteurs-stats">
-              <div class="correcteur-card" *ngFor="let correcteur of stats.correcteurs_stats">
-                <div class="correcteur-info">
-                  <h4>{{correcteur.prenom}} {{correcteur.nom}}</h4>
-                </div>
-                <div class="correcteur-numbers">
-                  <div class="stat-item">
-                    <span class="stat-value">{{correcteur.textes_assignes}}</span>
-                    <span class="stat-label">Textes assignés</span>
-                  </div>
-                  <div class="stat-item">
-                    <span class="stat-value">{{correcteur.textes_corriges}}</span>
-                    <span class="stat-label">Textes corrigés</span>
-                  </div>
-                  <div class="stat-item">
-                    <span class="stat-value">{{correcteur.textes_restants}}</span>
-                    <span class="stat-label">Textes restants</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+
         
         <!-- Statistiques détaillées des affectations -->
-        <div class="panel">
+        <div class="panel" [class.hidden]="!isStatsVisible('affectations')">
           <div class="panel-header">
             <h3><i class="fas fa-list-alt"></i> Détail des affectations par texte <i class="fas fa-star" style="color: #FF7F1A; margin-left: 0.5rem;"></i> NOUVEAU</h3>
+            <button class="toggle-btn" (click)="toggleAffectationsDetails()" [title]="showAffectationsDetails ? 'Masquer' : 'Afficher'">
+              <i class="fas" [class.fa-chevron-up]="showAffectationsDetails" [class.fa-chevron-down]="!showAffectationsDetails"></i>
+            </button>
           </div>
-          <div class="panel-content">
+          <div class="panel-content" *ngIf="showAffectationsDetails">
             <div *ngIf="stats && stats.textes_affectations && stats.textes_affectations.length > 0; else noAffectations">
               <div class="affectations-table">
                 <div class="affectation-header">
@@ -1079,7 +1180,7 @@
         </div>
 
         <!-- Statistiques générales -->
-        <div class="stats-section-spacing">
+        <div class="stats-section-spacing" [class.hidden]="!isStatsVisible('general')">
           <div class="kpi-grid-compact">
             <div class="kpi-card-small success">
               <div class="kpi-icon-small"><i class="fas fa-file-alt"></i></div>
@@ -1113,7 +1214,7 @@
         </div>
 
         <!-- Graphiques -->
-        <div class="charts-grid">
+        <div class="charts-grid" [class.hidden]="!isStatsVisible('graphiques')">
           <div class="chart-container">
             <div class="chart-header">
               <h4><i class="fas fa-chart-line"></i> Évolution des soumissions</h4>
@@ -1230,7 +1331,7 @@
         </div>
 
         <!-- Statistiques de qualité -->
-        <div class="quality-stats">
+        <div class="quality-stats" [class.hidden]="!isStatsVisible('qualite')">
           <div class="panel">
             <div class="panel-header">
               <h3><i class="fas fa-chart-bar"></i> Distribution des notes</h3>
@@ -1250,7 +1351,7 @@
         </div>
 
         <!-- Statistiques thématiques -->
-        <div class="theme-stats" *ngIf="getThemeDistribution().length > 0">
+        <div class="theme-stats" *ngIf="getThemeDistribution().length > 0" [class.hidden]="!isStatsVisible('qualite')">
           <div class="panel">
             <div class="panel-header">
               <h3><i class="fas fa-tags"></i> Répartition par thème</h3>
@@ -1273,7 +1374,7 @@
         </div>
 
         <!-- Performance des correcteurs -->
-        <div class="corrector-performance" *ngIf="getCorrectorPerformance().length > 0">
+        <div class="corrector-performance" *ngIf="getCorrectorPerformance().length > 0" [class.hidden]="!isStatsVisible('performance')">
           <div class="panel">
             <div class="panel-header">
               <h3><i class="fas fa-user-check"></i> Performance des correcteurs</h3>
@@ -1296,7 +1397,7 @@
         </div>
 
         <!-- Statistiques de délais -->
-        <div class="delay-stats">
+        <div class="delay-stats" [class.hidden]="!isStatsVisible('performance')">
           <div class="panel">
             <div class="panel-header">
               <h3><i class="fas fa-clock"></i> Analyse des délais</h3>
@@ -1330,7 +1431,7 @@
         </div>
 
         <!-- Statistiques d'engagement -->
-        <div class="engagement-stats">
+        <div class="engagement-stats" [class.hidden]="!isStatsVisible('performance')">
           <div class="panel">
             <div class="panel-header">
               <h3><i class="fas fa-users"></i> Engagement des participants</h3>
@@ -1359,7 +1460,7 @@
         </div>
 
         <!-- Statistiques de qualité avancées -->
-        <div class="quality-advanced-stats">
+        <div class="quality-advanced-stats" [class.hidden]="!isStatsVisible('qualite')">
           <div class="panel">
             <div class="panel-header">
               <h3><i class="fas fa-chart-line"></i> Analyse de qualité avancée</h3>
@@ -1398,7 +1499,7 @@
         </div>
 
         <!-- Statistiques géographiques avancées -->
-        <div class="geo-advanced-stats">
+        <div class="geo-advanced-stats" [class.hidden]="!isStatsVisible('geographie')">
           <div class="panel">
             <div class="panel-header">
               <h3><i class="fas fa-map-marked-alt"></i> Analyse géographique</h3>
@@ -1438,7 +1539,7 @@
         </div>
 
         <!-- Statistiques prédictives -->
-        <div class="predictive-stats">
+        <div class="predictive-stats" [class.hidden]="!isStatsVisible('performance')">
           <div class="panel">
             <div class="panel-header">
               <h3><i class="fas fa-crystal-ball"></i> Projections et tendances</h3>
@@ -1475,7 +1576,7 @@
         </div>
 
         <!-- Tableau de performance -->
-        <div class="performance-table">
+        <div class="performance-table" [class.hidden]="!isStatsVisible('performance')">
           <div class="panel">
             <div class="panel-header">
               <h3><i class="fas fa-trophy"></i> Top Participants</h3>
@@ -1950,6 +2051,152 @@
       <!-- Chat Support -->
       <div *ngSwitchCase="'chat-support'" class="chat-support-section">
         <app-admin-chat></app-admin-chat>
+      </div>
+
+      <!-- Sélection des Finalistes -->
+      <div *ngSwitchCase="'finalistes'" class="finalistes-management">
+        <div class="finalistes-header">
+          <div class="header-content">
+            <h2><i class="fas fa-trophy"></i> Sélection des Finalistes</h2>
+            <p>Système de sélection équitable avec représentation proportionnelle par langue</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" (click)="selectFinalistes()">
+              <i class="fas fa-magic"></i> Sélectionner les Finalistes
+            </button>
+            <button class="btn btn-outline" *ngIf="finalistesSelection.finalistes.length > 0" (click)="exportFinalistes()">
+              <i class="fas fa-download"></i> Exporter
+            </button>
+          </div>
+        </div>
+
+        <!-- Explication du système -->
+        <div class="selection-info">
+          <div class="info-card">
+            <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            <div class="info-content">
+              <h4>Système de Sélection Équitable</h4>
+              <p>La sélection des 5 finalistes se base sur :</p>
+              <ul>
+                <li><strong>Représentation proportionnelle :</strong> Chaque langue obtient un nombre de places proportionnel à sa représentation dans le concours</li>
+                <li><strong>Mérite académique :</strong> Les meilleurs textes de chaque langue sont sélectionnés selon leur note</li>
+                <li><strong>Diversité linguistique :</strong> Garantit une représentation équitable de toutes les langues</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistiques actuelles -->
+        <div class="current-stats" *ngIf="!finalistesSelection.selectionActive">
+          <h3>Répartition actuelle des textes par langue</h3>
+          <div class="language-distribution">
+            <div class="lang-stat">
+              <div class="lang-info">
+                <span class="lang-name">Français</span>
+                <span class="lang-count">{{getLanguageCount('francais')}} textes</span>
+              </div>
+              <div class="lang-bar">
+                <div class="bar-fill french" [style.width.%]="getLanguageStats().francais"></div>
+              </div>
+              <span class="lang-percentage">{{getLanguageStats().francais}}%</span>
+            </div>
+            <div class="lang-stat">
+              <div class="lang-info">
+                <span class="lang-name">Wolof</span>
+                <span class="lang-count">{{getLanguageCount('wolof')}} textes</span>
+              </div>
+              <div class="lang-bar">
+                <div class="bar-fill wolof" [style.width.%]="getLanguageStats().wolof"></div>
+              </div>
+              <span class="lang-percentage">{{getLanguageStats().wolof}}%</span>
+            </div>
+            <div class="lang-stat">
+              <div class="lang-info">
+                <span class="lang-name">Anglais</span>
+                <span class="lang-count">{{getLanguageCount('anglais')}} textes</span>
+              </div>
+              <div class="lang-bar">
+                <div class="bar-fill english" [style.width.%]="getLanguageStats().anglais"></div>
+              </div>
+              <span class="lang-percentage">{{getLanguageStats().anglais}}%</span>
+            </div>
+            <div class="lang-stat">
+              <div class="lang-info">
+                <span class="lang-name">Arabe</span>
+                <span class="lang-count">{{getLanguageCount('arabe')}} textes</span>
+              </div>
+              <div class="lang-bar">
+                <div class="bar-fill arabic" [style.width.%]="getLanguageStats().arabe"></div>
+              </div>
+              <span class="lang-percentage">{{getLanguageStats().arabe}}%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Résultats de la sélection -->
+        <div class="selection-results" *ngIf="finalistesSelection.selectionActive">
+          <div class="results-header">
+            <h3><i class="fas fa-trophy"></i> Finalistes Sélectionnés</h3>
+            <div class="selection-summary">
+              <span class="total-finalistes">{{finalistesSelection.finalistes.length}} finalistes</span>
+              <span class="selection-date">Sélection effectuée le {{getCurrentDate()}}</span>
+            </div>
+          </div>
+
+          <!-- Répartition par langue -->
+          <div class="repartition-summary">
+            <h4>Répartition des places par langue</h4>
+            <div class="repartition-grid">
+              <div class="repartition-item" *ngFor="let langue of ['francais', 'wolof', 'anglais', 'arabe']">
+                <span class="langue-label">{{langue | titlecase}}</span>
+                <span class="places-count">{{finalistesSelection.repartitionLangues[langue] || 0}} place(s)</span>
+                <div class="places-visual">
+                  <span class="place-dot" *ngFor="let i of [].constructor(finalistesSelection.repartitionLangues[langue] || 0)"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Liste des finalistes -->
+          <div class="finalistes-list">
+            <div class="finaliste-card" *ngFor="let finaliste of finalistesSelection.finalistes; let i = index">
+              <div class="finaliste-rank">
+                <div class="rank-number">{{i + 1}}</div>
+                <div class="rank-medal" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
+                  <i class="fas fa-medal" *ngIf="i < 3"></i>
+                  <i class="fas fa-star" *ngIf="i >= 3"></i>
+                </div>
+              </div>
+              
+              <div class="finaliste-info">
+                <h4>{{finaliste.titre}}</h4>
+                <div class="finaliste-meta">
+                  <span class="author"><i class="fas fa-user"></i> {{finaliste.prenom}} {{finaliste.nom}}</span>
+                  <span class="language"><i class="fas fa-globe"></i> {{finaliste.langue | titlecase}}</span>
+                  <span class="theme"><i class="fas fa-tag"></i> {{getThemeLabel(finaliste.theme)}}</span>
+                </div>
+              </div>
+              
+              <div class="finaliste-score">
+                <div class="score-main">{{finaliste.note}}/20</div>
+                <div class="score-details">
+                  <span class="lang-rank">{{finaliste.rang_langue}}ème en {{finaliste.langue_selection}}</span>
+                  <span class="submission-date">{{finaliste.created_at | date:'dd/MM/yyyy'}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions sur la sélection -->
+          <div class="selection-actions">
+            <button class="btn btn-outline" (click)="finalistesSelection.selectionActive = false; finalistesSelection.finalistes = []">
+              <i class="fas fa-redo"></i> Nouvelle Sélection
+            </button>
+            <button class="btn btn-success" (click)="exportFinalistes()">
+              <i class="fas fa-download"></i> Exporter la Liste
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Vérification Authenticité -->

@@ -63,6 +63,11 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   evaluationSearchTerm = '';
   filteredTextes: any[] = [];
   
+  // Filtrage des statistiques
+  currentStatsFilter = 'all';
+  statsSearchTerm = '';
+  showAffectationsDetails = true;
+  
   // Modal d'évaluation
   showEvaluationModal = false;
   evaluationForm = {
@@ -789,6 +794,42 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   onEvaluationSearch(event: any) {
     this.evaluationSearchTerm = event.target.value;
     this.applyEvaluationFilters();
+  }
+  
+  // Méthodes pour le filtrage des statistiques
+  filterStats(filter: string) {
+    this.currentStatsFilter = filter;
+  }
+  
+  onStatsSearch(event: any) {
+    this.statsSearchTerm = event.target.value.toLowerCase();
+  }
+  
+  isStatsVisible(category: string): boolean {
+    // Si recherche active, vérifier si la catégorie correspond
+    if (this.statsSearchTerm) {
+      const searchTerms = {
+        'affectations': ['affectation', 'correcteur', 'assigné', 'texte'],
+        'graphiques': ['graphique', 'chart', 'langue', 'soumission', 'nationalité', 'ville', 'région'],
+        'qualite': ['qualité', 'note', 'distribution', 'thème', 'cohérence'],
+        'geographie': ['géographie', 'ville', 'région', 'pays', 'nationalité'],
+        'performance': ['performance', 'délai', 'engagement', 'prédiction', 'top'],
+        'general': ['général', 'kpi', 'compact']
+      };
+      
+      const categoryTerms = searchTerms[category as keyof typeof searchTerms] || [];
+      const matchesSearch = categoryTerms.some(term => term.includes(this.statsSearchTerm));
+      
+      if (!matchesSearch) return false;
+    }
+    
+    // Filtrage par catégorie
+    if (this.currentStatsFilter === 'all') return true;
+    return this.currentStatsFilter === category;
+  }
+  
+  toggleAffectationsDetails() {
+    this.showAffectationsDetails = !this.showAffectationsDetails;
   }
   
   applyEvaluationFilters() {
@@ -2148,6 +2189,121 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     return countries.size;
   }
   
+  // Système de sélection des finalistes
+  finalistesSelection = {
+    totalFinalistes: 5,
+    selectionActive: false,
+    finalistes: [] as any[],
+    repartitionLangues: {} as any
+  };
+  showFinalistesModal = false;
+
+  // Sélection équitable des finalistes avec représentation proportionnelle
+  selectFinalistes() {
+    const textesEvalues = this.textes.filter(t => t.note && t.note > 0 && (t.statut === 'accepte' || t.statut === 'refuse'));
+    
+    if (textesEvalues.length === 0) {
+      this.showToast('Aucun texte évalué disponible pour la sélection', 'error');
+      return;
+    }
+
+    // Calculer la répartition par langue
+    const statsLangues = this.getLanguageStats();
+    const totalTextes = textesEvalues.length;
+    
+    // Répartition proportionnelle des 5 places
+    const repartition = {
+      francais: Math.round((statsLangues.francais / 100) * this.finalistesSelection.totalFinalistes),
+      wolof: Math.round((statsLangues.wolof / 100) * this.finalistesSelection.totalFinalistes),
+      anglais: Math.round((statsLangues.anglais / 100) * this.finalistesSelection.totalFinalistes),
+      arabe: Math.round((statsLangues.arabe / 100) * this.finalistesSelection.totalFinalistes)
+    };
+
+    // Ajuster pour avoir exactement 5 finalistes
+    let totalRepartition = Object.values(repartition).reduce((sum, val) => sum + val, 0);
+    if (totalRepartition < this.finalistesSelection.totalFinalistes) {
+      // Ajouter les places manquantes à la langue la plus représentée
+      const langueDominante = Object.keys(repartition).reduce((a, b) => 
+        repartition[a as keyof typeof repartition] > repartition[b as keyof typeof repartition] ? a : b
+      );
+      repartition[langueDominante as keyof typeof repartition] += (this.finalistesSelection.totalFinalistes - totalRepartition);
+    } else if (totalRepartition > this.finalistesSelection.totalFinalistes) {
+      // Retirer les places en trop de la langue la plus représentée
+      const langueDominante = Object.keys(repartition).reduce((a, b) => 
+        repartition[a as keyof typeof repartition] > repartition[b as keyof typeof repartition] ? a : b
+      );
+      repartition[langueDominante as keyof typeof repartition] -= (totalRepartition - this.finalistesSelection.totalFinalistes);
+    }
+
+    // Sélectionner les meilleurs textes par langue
+    const finalistes: any[] = [];
+    
+    Object.keys(repartition).forEach(langue => {
+      const nbPlaces = repartition[langue as keyof typeof repartition];
+      if (nbPlaces > 0) {
+        const textesLangue = textesEvalues
+          .filter(t => t.langue?.toLowerCase() === langue.toLowerCase() || 
+                      (langue === 'francais' && t.langue?.toLowerCase() === 'français'))
+          .sort((a, b) => parseFloat(b.note) - parseFloat(a.note))
+          .slice(0, nbPlaces);
+        
+        finalistes.push(...textesLangue.map(t => ({
+          ...t,
+          langue_selection: langue,
+          rang_langue: textesLangue.indexOf(t) + 1
+        })));
+      }
+    });
+
+    // Trier les finalistes par note décroissante
+    finalistes.sort((a, b) => parseFloat(b.note) - parseFloat(a.note));
+
+    this.finalistesSelection.finalistes = finalistes;
+    this.finalistesSelection.repartitionLangues = repartition;
+    this.finalistesSelection.selectionActive = true;
+    
+    this.showFinalistesModal = true;
+    this.logAdminAction('selection_finalistes', `Sélection de ${finalistes.length} finalistes avec répartition proportionnelle`);
+  }
+
+  closeFinalistesModal() {
+    this.showFinalistesModal = false;
+  }
+
+  getCurrentDate(): string {
+    return new Date().toLocaleDateString();
+  }
+
+  exportFinalistes() {
+    if (this.finalistesSelection.finalistes.length === 0) {
+      this.showToast('Aucun finaliste sélectionné', 'error');
+      return;
+    }
+
+    const headers = ['Rang', 'Titre', 'Auteur', 'Langue', 'Note', 'Thème', 'Rang dans la langue', 'Date soumission'];
+    const rows = this.finalistesSelection.finalistes.map((finaliste, index) => [
+      index + 1,
+      finaliste.titre,
+      `${finaliste.prenom} ${finaliste.nom}`,
+      finaliste.langue,
+      finaliste.note + '/20',
+      this.getThemeLabel(finaliste.theme),
+      finaliste.rang_langue,
+      new Date(finaliste.created_at).toLocaleDateString()
+    ]);
+    
+    const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `finalistes_cp2i_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    this.showToast('Liste des finalistes exportée avec succès', 'success');
+  }
+
   // Statistiques prédictives
   getPredictedFinalParticipants(): number {
     const currentParticipants = this.participants.length;
@@ -2178,6 +2334,60 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     const startDate = new Date('2025-11-03');
     const endDate = new Date('2025-11-23');
     return Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  }
+
+  // Méthodes pour la gestion des correcteurs
+  getCorrecteurDetails() {
+    return this.correcteurs.map(correcteur => {
+      const textesAssignes = this.affectations.filter(a => a.corrector_id === correcteur.id);
+      const textesDetails = textesAssignes.map(affectation => {
+        return this.textes.find(t => t.id === affectation.texte_id);
+      }).filter(t => t);
+      
+      const textesCorreges = textesDetails.filter(t => t.statut === 'accepte' || t.statut === 'refuse').length;
+      const textesRestants = textesDetails.filter(t => t.statut === 'en_attente').length;
+      const progressPercentage = textesAssignes.length > 0 ? Math.round((textesCorreges / textesAssignes.length) * 100) : 0;
+      
+      return {
+        ...correcteur,
+        textesAssignes: textesAssignes.length,
+        textesCorreges,
+        textesRestants,
+        progressPercentage,
+        textesDetails
+      };
+    }).sort((a, b) => b.textesAssignes - a.textesAssignes);
+  }
+
+  getTotalAssignments(): number {
+    return this.affectations.length;
+  }
+
+  getTotalCorrected(): number {
+    return this.textes.filter(t => t.statut === 'accepte' || t.statut === 'refuse').length;
+  }
+
+  getTotalPending(): number {
+    return this.textes.filter(t => t.statut === 'en_attente').length;
+  }
+
+  viewCorrecteurDetails(correcteur: any) {
+    // TODO: Implémenter les détails du correcteur
+  }
+
+  sendReminderToCorrecteur(correcteur: any) {
+    const textesEnAttente = correcteur.textesDetails.filter((t: any) => t.statut === 'en_attente');
+    
+    if (textesEnAttente.length === 0) {
+      this.showToast(`${correcteur.prenom} ${correcteur.nom} n'a aucun texte en attente`, 'error');
+      return;
+    }
+    
+    const message = `Rappel envoyé à ${correcteur.prenom} ${correcteur.nom} pour ${textesEnAttente.length} texte(s) en attente`;
+    this.showToast(message, 'success');
+    
+    // Ici on pourrait appeler l'API pour envoyer un vrai email/notification
+    // this.cp2iApi.sendReminderToCorrector(correcteur.id, textesEnAttente).subscribe();
   }
 
   // Méthodes de gestion des images
