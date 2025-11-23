@@ -102,6 +102,9 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   showConfirmationModal = false;
   texteToDelete: any = null;
   
+  // Modal de clôture des soumissions
+  showSubmissionClosedModal = false;
+  
   // Modal d'aperçu certificat
   showCertificatPreview = false;
   selectedCertificat: any = null;
@@ -983,6 +986,12 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
 
 
   nouvellesoumission() {
+    // Vérifier si les soumissions sont clôturées
+    if (this.isSubmissionPeriodClosed()) {
+      this.showSubmissionClosedModal = true;
+      return;
+    }
+    
     if (this.mesSoumissions.length > 0) {
       this.showToast('Vous avez déjà soumis un texte pour cette édition. Un seul texte par participant est autorisé.', 'error');
       return;
@@ -1045,6 +1054,12 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   
   onSubmitTexte() {
     if (this.isSubmitting) return;
+    
+    // Vérifier si les soumissions sont clôturées
+    if (this.isSubmissionPeriodClosed()) {
+      this.showSubmissionClosedModal = true;
+      return;
+    }
     
     // Vérifier et alerter pour chaque champ manquant
     if (!this.texte.titre) {
@@ -1475,6 +1490,56 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   // Méthode pour obtenir les thèmes selon la langue sélectionnée
   getThemesForSelectedLanguage() {
     return this.themesDetailles[this.selectedLanguage as keyof typeof this.themesDetailles] || this.themesDetailles.francais;
+  }
+  
+  // Vérifier si la période de soumission est clôturée
+  isSubmissionPeriodClosed(): boolean {
+    const now = new Date();
+    const deadline = new Date('2025-11-24T00:00:00');
+    return now >= deadline;
+  }
+  
+  // Fermer le modal de clôture des soumissions
+  closeSubmissionClosedModal(): void {
+    this.showSubmissionClosedModal = false;
+  }
+  
+  // Rejoindre le groupe WhatsApp des participants
+  joinParticipantsWhatsAppGroup(): void {
+    window.open('https://chat.whatsapp.com/JDkwJ791REJEfjUDzn4o7y?mode=hqrt3', '_blank');
+    this.closeSubmissionClosedModal();
+  }
+  
+  // Rejoindre la chaîne WhatsApp PENCCUM NDONGO
+  joinPenccumWhatsAppChannel(): void {
+    window.open('https://whatsapp.com/channel/0029VasVCCY4dTnKoyeJK13Q', '_blank');
+    this.closeSubmissionClosedModal();
+  }
+  
+  // Ouvrir un lien de réseau social
+  openSocialLink(url: string): void {
+    window.open(url, '_blank');
+  }
+  
+  // Ouvrir tous les réseaux sociaux
+  openAllSocialNetworks(): void {
+    const socialLinks = [
+      'https://www.linkedin.com/company/penccum-ndongo/',
+      'https://www.facebook.com/share/1Ce2vCmuuV/?mibextid=wwXIfr',
+      'https://x.com/penccumndongo?s=21',
+      'https://www.instagram.com/penccumndongo?igsh=MXIzZ2FremxqeG9xdg%3D%3D&utm_source=qr',
+      'https://www.tiktok.com/@penccum.ndongo?_t=ZM-8xRXEUCzSdC&_r=1',
+      'https://youtube.com/@penccumndongo?si=wG-jaIUBmL1LrNR-'
+    ];
+    
+    // Ouvrir chaque lien avec un délai pour éviter le blocage des pop-ups
+    socialLinks.forEach((link, index) => {
+      setTimeout(() => {
+        window.open(link, '_blank');
+      }, index * 300); // Délai de 300ms entre chaque ouverture
+    });
+    
+    this.closeSubmissionClosedModal();
   }
 
 

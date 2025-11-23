@@ -1183,3 +1183,68 @@
     </div>
   </div>
 </div>
+
+<!-- Modal de clôture des soumissions -->
+<div class="submission-closed-modal" *ngIf="showSubmissionClosedModal" (click)="closeSubmissionClosedModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title-closed">Soumissions Clôturées</h3>
+      <button class="modal-close" (click)="closeSubmissionClosedModal()">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="modal-icon">
+        <i class="fas fa-calendar-times" style="font-size: 4rem; color: #dc3545 !important;"></i>
+      </div>
+      <p class="modal-message">
+        Nous comprenons votre déception... Les soumissions de textes au <strong>Concours CP2i</strong> sont désormais <strong>clôturées</strong> depuis le 23 novembre à 23h59.
+      </p>
+      <p class="modal-submessage">
+        Mais ne vous inquiétez pas ! Restez connecté avec PENCCUM NDONGO pour ne plus jamais rater nos prochaines opportunités :
+      </p>
+    </div>
+    
+    <div class="modal-actions">
+      <button class="btn-whatsapp-group" (click)="joinParticipantsWhatsAppGroup()">
+        <i class="fab fa-whatsapp"></i>
+        Groupe WhatsApp Participants CP2i
+      </button>
+      <button class="btn-whatsapp-contact" (click)="joinPenccumWhatsAppChannel()">
+        <i class="fab fa-whatsapp"></i>
+        Chaîne WhatsApp PENCCUM NDONGO
+      </button>
+      <div class="social-networks-grid">
+        <button class="btn-social" (click)="openSocialLink('https://www.linkedin.com/company/penccum-ndongo/')">
+          <i class="fab fa-linkedin"></i>
+          LinkedIn
+        </button>
+        <button class="btn-social" (click)="openSocialLink('https://www.facebook.com/share/1Ce2vCmuuV/?mibextid=wwXIfr')">
+          <i class="fab fa-facebook"></i>
+          Facebook
+        </button>
+        <button class="btn-social" (click)="openSocialLink('https://x.com/penccumndongo?s=21')">
+          <i class="fab fa-x-twitter"></i>
+          X (Twitter)
+        </button>
+        <button class="btn-social" (click)="openSocialLink('https://www.instagram.com/penccumndongo?igsh=MXIzZ2FremxqeG9xdg%3D%3D&utm_source=qr')">
+          <i class="fab fa-instagram"></i>
+          Instagram
+        </button>
+        <button class="btn-social" (click)="openSocialLink('https://www.tiktok.com/@penccum.ndongo?_t=ZM-8xRXEUCzSdC&_r=1')">
+          <i class="fab fa-tiktok"></i>
+          TikTok
+        </button>
+        <button class="btn-social" (click)="openSocialLink('https://youtube.com/@penccumndongo?si=wG-jaIUBmL1LrNR-')">
+          <i class="fab fa-youtube"></i>
+          YouTube
+        </button>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <p class="modal-note">
+        En nous suivant, vous serez informé en priorité de toutes nos actualités, formations, concours et opportunités. Ne ratez plus rien avec PENCCUM NDONGO !
+      </p>
+    </div>
+  </div>
+</div>

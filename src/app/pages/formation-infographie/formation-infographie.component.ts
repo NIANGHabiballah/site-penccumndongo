@@ -370,7 +370,7 @@ export class FormationInfographieComponent implements OnInit {
   }
 
   joinWhatsAppGroup(): void {
-    window.open('https://chat.whatsapp.com/DSnk6NSXxLO5qfSKudT5Aw', '_blank');
+    window.open('https://chat.whatsapp.com/H2HX0arxjCA70EgrcbRWUG?mode=ems_copy_c', '_blank');
     this.closeModal();
   }
 

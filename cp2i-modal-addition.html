@@ -1,0 +1,53 @@
+<!-- Modal de clôture des inscriptions CP2i -->
+<div class="closed-modal" *ngIf="showClosedModal" (click)="closeClosedModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title-closed">Inscriptions Clôturées</h3>
+      <button class="modal-close" (click)="closeClosedModal()">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="modal-icon">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 2V5" stroke="#0085CA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 2V5" stroke="#0085CA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3.5 9.09H20.5" stroke="#0085CA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="#0085CA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M15.6947 13.7002H15.7037" stroke="#FF7F32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M15.6947 16.7002H15.7037" stroke="#FF7F32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M11.9955 13.7002H12.0045" stroke="#FF7F32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M11.9955 16.7002H12.0045" stroke="#FF7F32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8.29431 13.7002H8.30329" stroke="#FF7F32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8.29431 16.7002H8.30329" stroke="#FF7F32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <p class="modal-message">
+        Nous comprenons votre déception... Les inscriptions au <strong>Concours CP2i</strong> sont désormais <strong>clôturées</strong> depuis le 23 novembre à 23h59.
+      </p>
+      <p class="modal-submessage">
+        Mais ne vous inquiétez pas ! Restez connecté avec PENCCUM NDONGO pour ne plus jamais rater nos prochaines opportunités :
+      </p>
+    </div>
+    
+    <div class="modal-actions">
+      <button class="btn-whatsapp-group" onclick="window.open('https://chat.whatsapp.com/JDkwJ791REJEfjUDzn4o7y?mode=hqrt3', '_blank')">
+        <i class="fab fa-whatsapp"></i>
+        Groupe WhatsApp Participants CP2i
+      </button>
+      <button class="btn-whatsapp-contact" onclick="window.open('https://whatsapp.com/channel/0029VasVCCY4dTnKoyeJK13Q', '_blank')">
+        <i class="fab fa-whatsapp"></i>
+        Chaîne WhatsApp PENCCUM NDONGO
+      </button>
+      <button class="btn-social-links" (click)="openAllSocialNetworks()">
+        <i class="fas fa-share-alt"></i>
+        Suivre sur tous nos réseaux
+      </button>
+    </div>
+    
+    <div class="modal-footer">
+      <p class="modal-note">
+        En nous suivant, vous serez informé en priorité de toutes nos actualités, formations, concours et opportunités. Ne ratez plus rien avec PENCCUM NDONGO !
+      </p>
+    </div>
+  </div>
+</div>

@@ -41,10 +41,14 @@
       </div>
     </div>
     <div class="hero-cta">
-      <a routerLink="/auth/register" class="cta-primary">
+      <a *ngIf="!inscriptionsClosed" routerLink="/auth/register" class="cta-primary">
         <span>Participer maintenant</span>
         <i class="fas fa-user-plus"></i>
       </a>
+      <button *ngIf="inscriptionsClosed" (click)="openClosedModal()" class="cta-primary cta-closed">
+        <span>Inscriptions clôturées</span>
+        <i class="fas fa-lock"></i>
+      </button>
       <a routerLink="/auth/login" class="cta-secondary">
         <span>Se connecter</span>
         <i class="fas fa-sign-in-alt"></i>
@@ -57,8 +61,9 @@
     
     <!-- Countdown Timer -->
     <div class="countdown-wrapper">
-      <p class="countdown-label">Inscriptions ouvertes jusqu'au 23 novembre 2025</p>
-      <div class="countdown">
+      <p class="countdown-label" *ngIf="!inscriptionsClosed">Inscriptions ouvertes jusqu'au 23 novembre 2025 à 23h59</p>
+      <p class="countdown-label" *ngIf="inscriptionsClosed">Inscriptions clôturées depuis le 24 novembre 2025 à 00h00. Attendez la prochaine édition...</p>
+      <div class="countdown" *ngIf="!inscriptionsClosed">
         <div class="countdown-item">
           <span class="countdown-value">{{countdown.days || 0}}</span>
           <span class="countdown-unit">Jours</span>
@@ -76,6 +81,8 @@
           <span class="countdown-unit">Secondes</span>
         </div>
       </div>
+      
+
     </div>
   </div>
 </section>
@@ -286,8 +293,6 @@
   </div>
 </section>
 
-
-
 <!-- Partners Section -->
 <section class="partners-section">
   <div class="container">
@@ -317,10 +322,14 @@
       <h2>Rejoignez l'aventure CP2i</h2>
       <p>Concours ouvert à tous les Africains - Participez à la prochaine édition ou soutenez notre initiative culturelle</p>
       <div class="cta-buttons">
-        <a routerLink="/auth/register" class="cta-primary">
+        <a *ngIf="!inscriptionsClosed" routerLink="/auth/register" class="cta-primary">
           <span>Participer</span>
           <i class="fas fa-user-plus"></i>
         </a>
+        <button *ngIf="inscriptionsClosed" (click)="openClosedModal()" class="cta-primary cta-closed">
+          <span>Inscriptions clôturées</span>
+          <i class="fas fa-lock"></i>
+        </button>
         <a routerLink="/opportunites" class="cta-secondary">
           <span>Nous soutenir</span>
         </a>
@@ -373,3 +382,67 @@
   </div>
 </div>
 
+<!-- Modal de clôture des inscriptions CP2i -->
+<div class="closed-modal" *ngIf="showClosedModal" (click)="closeClosedModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title-closed">Inscriptions Clôturées</h3>
+      <button class="modal-close" (click)="closeClosedModal()">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="modal-icon">
+        <i class="fas fa-calendar-times" style="font-size: 4rem; color: #dc3545 !important;"></i>
+      </div>
+      <p class="modal-message">
+        Nous comprenons votre déception... Les inscriptions au <strong>Concours CP2i</strong> sont désormais <strong>clôturées</strong> depuis le 23 novembre à 23h59.
+      </p>
+      <p class="modal-submessage">
+        Mais ne vous inquiétez pas ! Restez connecté avec PENCCUM NDONGO pour ne plus jamais rater nos prochaines opportunités :
+      </p>
+    </div>
+    
+    <div class="modal-actions">
+      <button class="btn-whatsapp-group" (click)="joinParticipantsWhatsAppGroup()">
+        <i class="fab fa-whatsapp"></i>
+        Groupe WhatsApp Participants CP2i
+      </button>
+      <button class="btn-whatsapp-contact" (click)="joinPenccumWhatsAppChannel()">
+        <i class="fab fa-whatsapp"></i>
+        Chaîne WhatsApp PENCCUM NDONGO
+      </button>
+      <div class="social-networks-grid">
+        <button class="btn-social" (click)="openSocialLink('https://www.linkedin.com/company/penccum-ndongo/')">
+          <i class="fab fa-linkedin"></i>
+          LinkedIn
+        </button>
+        <button class="btn-social" (click)="openSocialLink('https://www.facebook.com/share/1Ce2vCmuuV/?mibextid=wwXIfr')">
+          <i class="fab fa-facebook"></i>
+          Facebook
+        </button>
+        <button class="btn-social" (click)="openSocialLink('https://x.com/penccumndongo?s=21')">
+          <i class="fab fa-x-twitter"></i>
+          X (Twitter)
+        </button>
+        <button class="btn-social" (click)="openSocialLink('https://www.instagram.com/penccumndongo?igsh=MXIzZ2FremxqeG9xdg%3D%3D&utm_source=qr')">
+          <i class="fab fa-instagram"></i>
+          Instagram
+        </button>
+        <button class="btn-social" (click)="openSocialLink('https://www.tiktok.com/@penccum.ndongo?_t=ZM-8xRXEUCzSdC&_r=1')">
+          <i class="fab fa-tiktok"></i>
+          TikTok
+        </button>
+        <button class="btn-social" (click)="openSocialLink('https://youtube.com/@penccumndongo?si=wG-jaIUBmL1LrNR-')">
+          <i class="fab fa-youtube"></i>
+          YouTube
+        </button>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <p class="modal-note">
+        En nous suivant, vous serez informé en priorité de toutes nos actualités, formations, concours et opportunités. Ne ratez plus rien avec PENCCUM NDONGO !
+      </p>
+    </div>
+  </div>
+</div>

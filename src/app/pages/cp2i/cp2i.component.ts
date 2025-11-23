@@ -55,12 +55,15 @@ export class Cp2iComponent implements OnInit {
   showThanksLightbox = false;
   bookLightboxOpen = false;
   showGalleryModal = false;
+  showClosedModal = false;
+  inscriptionsClosed = false;
   
   // Index actuels
   currentBookImg = 0;
   galleryIndex = 0;
   selectedGalleryImage = '';
   countdown: any = {};
+  nextEditionCountdown: any = {};
 
   // Langues disponibles
   selectedLanguage = 'francais';
@@ -118,6 +121,7 @@ export class Cp2iComponent implements OnInit {
   ];
 
   ngOnInit() {
+    this.checkDeadlines();
     this.startCountdown();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -227,11 +231,14 @@ export class Cp2iComponent implements OnInit {
 
   // Countdown pour les inscriptions CP2i
   startCountdown(): void {
-    const deadline = new Date('2025-11-23T23:59:59').getTime();
+    const deadline = new Date('2025-11-24T00:00:00').getTime();
+    
+    const nextEditionDeadline = new Date('2026-11-23T23:59:59').getTime();
     
     setInterval(() => {
       const now = new Date().getTime();
       const distance = deadline - now;
+      const nextDistance = nextEditionDeadline - now;
       
       this.countdown = {
         days: Math.floor(distance / (1000 * 60 * 60 * 24)),
@@ -239,6 +246,64 @@ export class Cp2iComponent implements OnInit {
         minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
         seconds: Math.floor((distance % (1000 * 60)) / 1000)
       };
+      
+      this.nextEditionCountdown = {
+        days: Math.floor(nextDistance / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((nextDistance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((nextDistance % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((nextDistance % (1000 * 60)) / 1000)
+      };
     }, 1000);
+  }
+
+  checkDeadlines(): void {
+    const now = new Date();
+    const deadline = new Date('2025-11-24T00:00:00');
+    
+    if (now >= deadline) {
+      this.inscriptionsClosed = true;
+    }
+  }
+
+  openClosedModal(): void {
+    this.showClosedModal = true;
+  }
+
+  closeClosedModal(): void {
+    this.showClosedModal = false;
+  }
+
+  joinParticipantsWhatsAppGroup(): void {
+    window.open('https://chat.whatsapp.com/JDkwJ791REJEfjUDzn4o7y?mode=hqrt3', '_blank');
+    this.closeClosedModal();
+  }
+
+  joinPenccumWhatsAppChannel(): void {
+    window.open('https://whatsapp.com/channel/0029VasVCCY4dTnKoyeJK13Q', '_blank');
+    this.closeClosedModal();
+  }
+
+  openSocialLink(url: string): void {
+    window.open(url, '_blank');
+  }
+
+  openAllSocialNetworks(): void {
+    const socialLinks = [
+      'https://www.linkedin.com/company/penccum-ndongo/',
+      'https://www.facebook.com/share/1Ce2vCmuuV/?mibextid=wwXIfr',
+      'https://x.com/penccumndongo?s=21',
+      'https://www.instagram.com/penccumndongo?igsh=MXIzZ2FremxqeG9xdg%3D%3D&utm_source=qr',
+      'https://www.tiktok.com/@penccum.ndongo?_t=ZM-8xRXEUCzSdC&_r=1',
+      'https://youtube.com/@penccumndongo?si=wG-jaIUBmL1LrNR-'
+    ];
+    
+    // Ouvrir chaque lien avec un délai pour éviter le blocage des pop-ups
+    socialLinks.forEach((link, index) => {
+      setTimeout(() => {
+        window.open(link, '_blank');
+      }, index * 300); // Délai de 300ms entre chaque ouverture
+    });
+    
+    this.closeClosedModal();
   }
 }
