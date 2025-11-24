@@ -112,12 +112,13 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   // Dates officielles du concours CP2i 2025
   concoursSchedule = {
     inscription_debut: '2025-11-03',
-    inscription_fin: '2025-11-23',
-    correction_debut: '2025-11-24',
-    correction_fin: '2025-11-30',
-    correction_prolongement: '2025-12-03',
-    deliberation: '2025-12-10',
-    ceremonie_remise: '2026-01-10'
+    inscription_fin: '2025-11-23', // Initialement jusqu'au 23 novembre
+    inscription_prolongee: '2025-11-25', // Prolongée jusqu'au 25 novembre
+    correction_debut: '2025-11-26',
+    correction_fin: '2025-12-03',
+    correction_prolongement: '2025-12-10',
+    deliberation: '2025-12-15',
+    ceremonie_remise: '2026-01-15'
   };
   
   // Section thèmes
@@ -576,19 +577,19 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   }
   
   calculateDeadline() {
-    // Pour les participants, toujours afficher les jours restants pour soumettre (jusqu'au 23 novembre)
-    this.joursRestants = this.getJoursRestants(this.concoursSchedule.inscription_fin);
+    // Pour les participants, toujours afficher les jours restants pour soumettre (prolongé jusqu'au 25 novembre)
+    this.joursRestants = this.getJoursRestants(this.concoursSchedule.inscription_prolongee || this.concoursSchedule.inscription_fin);
   }
   
   isSubmissionPeriodActive(): boolean {
     const today = new Date();
-    const submissionDeadline = new Date(this.concoursSchedule.inscription_fin);
+    const submissionDeadline = new Date(this.concoursSchedule.inscription_prolongee || this.concoursSchedule.inscription_fin);
     return today <= submissionDeadline;
   }
   
   getSubmissionStatus(): string {
     if (this.isSubmissionPeriodActive()) {
-      return this.joursRestants > 0 ? 'Jusqu\'au 23 novembre' : 'Dernier jour';
+      return this.joursRestants > 0 ? 'Prolongé jusqu\'au 25 novembre' : 'Dernier jour';
     } else {
       return 'Soumissions clôturées';
     }
@@ -1495,7 +1496,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   // Vérifier si la période de soumission est clôturée
   isSubmissionPeriodClosed(): boolean {
     const now = new Date();
-    const deadline = new Date('2025-11-24T00:00:00');
+    const deadline = new Date('2025-11-25T23:59:59');
     return now >= deadline;
   }
   

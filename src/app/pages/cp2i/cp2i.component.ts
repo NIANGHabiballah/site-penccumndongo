@@ -231,7 +231,7 @@ export class Cp2iComponent implements OnInit {
 
   // Countdown pour les inscriptions CP2i
   startCountdown(): void {
-    const deadline = new Date('2025-11-24T00:00:00').getTime();
+    const deadline = new Date('2025-11-25T23:59:59').getTime();
     
     const nextEditionDeadline = new Date('2026-11-23T23:59:59').getTime();
     
@@ -258,7 +258,7 @@ export class Cp2iComponent implements OnInit {
 
   checkDeadlines(): void {
     const now = new Date();
-    const deadline = new Date('2025-11-24T00:00:00');
+    const deadline = new Date('2025-11-25T23:59:59');
     
     if (now >= deadline) {
       this.inscriptionsClosed = true;
