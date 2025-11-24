@@ -582,9 +582,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   }
   
   isSubmissionPeriodActive(): boolean {
-    const today = new Date();
-    const submissionDeadline = new Date(this.concoursSchedule.inscription_prolongee || this.concoursSchedule.inscription_fin);
-    return today <= submissionDeadline;
+    return false; // Période fermée
   }
   
   getSubmissionStatus(): string {
@@ -1495,9 +1493,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   
   // Vérifier si la période de soumission est clôturée
   isSubmissionPeriodClosed(): boolean {
-    const now = new Date();
-    const deadline = new Date('2025-11-25T23:59:59');
-    return now >= deadline;
+    return true; // Soumissions fermées
   }
   
   // Fermer le modal de clôture des soumissions

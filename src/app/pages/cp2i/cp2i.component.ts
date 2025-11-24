@@ -257,12 +257,7 @@ export class Cp2iComponent implements OnInit {
   }
 
   checkDeadlines(): void {
-    const now = new Date();
-    const deadline = new Date('2025-11-25T23:59:59');
-    
-    if (now >= deadline) {
-      this.inscriptionsClosed = true;
-    }
+    this.inscriptionsClosed = true; // Inscriptions fermées
   }
 
   openClosedModal(): void {
