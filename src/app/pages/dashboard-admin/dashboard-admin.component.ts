@@ -68,6 +68,9 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   statsSearchTerm = '';
   showAffectationsDetails = true;
   
+  // Filtrage de l'historique
+  currentHistoryFilter = 'all';
+  
   // Modal d'évaluation
   showEvaluationModal = false;
   evaluationForm = {
@@ -86,6 +89,14 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   selectedTextForReassign: any = null;
   reassignForm = {
     correcteur_id: 0
+  };
+  
+  // Modal de modification de texte
+  showEditTextModal = false;
+  selectedTextForEdit: any = null;
+  editTextForm = {
+    titre: '',
+    contenu: ''
   };
   
   // Gestion des messages
@@ -307,7 +318,18 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.cp2iApi.getHistory().subscribe({
       next: (data) => {
         this.history = data.history || [];
-
+        console.log('Historique chargé:', this.history);
+        console.log('Exemple d\'entrée:', this.history[0]);
+        
+        // Déboguer les sujets détectés
+        if (this.history.length > 0) {
+          this.history.forEach((item, index) => {
+            if (index < 5) { // Afficher seulement les 5 premiers pour le debug
+              const subject = this.getHistorySubject(item.action || item.description || '');
+              console.log(`Item ${index}: action="${item.action}", description="${item.description}", subject="${subject}"`);
+            }
+          });
+        }
       },
       error: (error) => {
         console.error('Erreur historique:', error);
@@ -961,6 +983,56 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.showToast('Erreur lors de la réassignation', 'error');
+      }
+    });
+  }
+  
+  // Méthodes pour la modification des textes
+  openEditTextModal(texte: any) {
+    this.selectedTextForEdit = texte;
+    this.editTextForm = {
+      titre: texte.titre || '',
+      contenu: texte.contenu || ''
+    };
+    this.showEditTextModal = true;
+  }
+
+  closeEditTextModal() {
+    this.showEditTextModal = false;
+    this.selectedTextForEdit = null;
+    this.editTextForm = {
+      titre: '',
+      contenu: ''
+    };
+  }
+
+  saveTextEdit() {
+    if (!this.selectedTextForEdit || !this.editTextForm.titre || !this.editTextForm.contenu) {
+      this.showToast('Veuillez remplir tous les champs', 'error');
+      return;
+    }
+
+    const textData = {
+      id: this.selectedTextForEdit.id,
+      titre: this.editTextForm.titre,
+      contenu: this.editTextForm.contenu,
+      langue: this.selectedTextForEdit.langue,
+      theme: this.selectedTextForEdit.theme
+    };
+
+    this.cp2iApi.updateText(textData).subscribe({
+      next: (response) => {
+        if (response && response.success) {
+          this.showToast('Texte modifié avec succès (anonymisé)', 'success');
+          this.logAdminAction('modification_texte', `Modification du texte "${this.editTextForm.titre}" pour anonymisation`);
+          this.closeEditTextModal();
+          this.loadData();
+        } else {
+          this.showToast('Erreur lors de la modification: ' + (response?.error || 'Erreur inconnue'), 'error');
+        }
+      },
+      error: (error) => {
+        this.showToast('Erreur lors de la modification du texte', 'error');
       }
     });
   }
@@ -1932,6 +2004,83 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     // this.cp2iApi.logAction(action, description).subscribe();
   }
   
+  // Méthodes pour l'historique
+  filterHistory(filter: string) {
+    this.currentHistoryFilter = filter;
+  }
+  
+  getFilteredHistory(): any[] {
+    if (this.currentHistoryFilter === 'all') {
+      return this.history;
+    }
+    return this.history.filter(item => {
+      const subject = this.getHistorySubject(item);
+      return subject === this.currentHistoryFilter;
+    });
+  }
+  
+  getHistoryCountBySubject(subject: string): number {
+    return this.history.filter(item => {
+      const itemSubject = this.getHistorySubject(item);
+      return itemSubject === subject;
+    }).length;
+  }
+  
+  getHistorySubject(item: any): string {
+    if (!item) return 'autre';
+    
+    const text = (item.action || item.description || '').toLowerCase();
+    
+    // Debug
+    if (text.includes('registration') || text.includes('inscription') || text.includes('user')) {
+      return 'utilisateurs';
+    }
+    if (text.includes('submission') || text.includes('soumission') || text.includes('text') || text.includes('texte')) {
+      return 'textes';
+    }
+    if (text.includes('evaluation') || text.includes('correction')) {
+      return 'evaluations';
+    }
+    if (text.includes('affectation') || text.includes('assign')) {
+      return 'affectations';
+    }
+    if (text.includes('message')) {
+      return 'messages';
+    }
+    return 'autre';
+  }
+  
+  getHistorySubjectClass(item: any): string {
+    const subject = this.getHistorySubject(item);
+    return `timeline-${subject}`;
+  }
+  
+  getHistorySubjectIcon(item: any): string {
+    const subject = this.getHistorySubject(item);
+    const icons = {
+      'utilisateurs': 'fas fa-users',
+      'textes': 'fas fa-file-alt',
+      'evaluations': 'fas fa-star',
+      'affectations': 'fas fa-user-tie',
+      'messages': 'fas fa-envelope',
+      'autre': 'fas fa-cog'
+    };
+    return icons[subject as keyof typeof icons] || 'fas fa-circle';
+  }
+  
+  getHistoryTitle(action: string): string {
+    const titles = {
+      'creation_utilisateur': 'Création d\'utilisateur',
+      'modification_utilisateur': 'Modification d\'utilisateur',
+      'suppression_utilisateur': 'Suppression d\'utilisateur',
+      'modification_texte': 'Modification de texte',
+      'affectation': 'Affectation de correcteur',
+      'envoi_message': 'Envoi de message',
+      'selection_finalistes': 'Sélection des finalistes'
+    };
+    return titles[action as keyof typeof titles] || action.replace('_', ' ');
+  }
+
   getTimeAgo(dateString: string): string {
     if (!dateString) return 'Jamais';
     

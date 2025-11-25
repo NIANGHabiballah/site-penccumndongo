@@ -987,6 +987,9 @@
               <button class="btn-action reassign" *ngIf="texte.statut === 'en_attente'" title="Réassigner" (click)="reassignTexte(texte)">
                 <i class="fas fa-user-edit"></i> Réassigner
               </button>
+              <button class="btn-action edit" title="Modifier le texte" (click)="openEditTextModal(texte)">
+                <i class="fas fa-edit"></i> Modifier
+              </button>
             </div>
           </div>
         </div>
@@ -1013,29 +1016,62 @@
 
       <!-- Historique des actions -->
       <div *ngSwitchCase="'historique'" class="history-management">
-        <div class="panel">
-          <div class="panel-header">
-            <h3>Historique des actions</h3>
+        <div class="history-header">
+          <div class="header-content">
+            <h2><i class="fas fa-history"></i> Historique des actions</h2>
+            <p>{{getFilteredHistory().length}} actions au total</p>
           </div>
-          <div class="panel-content">
-            <table class="history-table">
-              <thead>
-                <tr>
-                  <th>Utilisateur</th>
-                  <th>Action</th>
-                  <th>Description</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let item of history">
-                  <td>{{item.prenom}} {{item.nom}}</td>
-                  <td><span class="action-badge">{{item.action}}</span></td>
-                  <td>{{item.description || 'Aucune description'}}</td>
-                  <td>{{item.created_at | date:'dd/MM/yyyy HH:mm'}}</td>
-                </tr>
-              </tbody>
-            </table>
+        </div>
+
+        <!-- Filtres par sujet -->
+        <div class="history-filters">
+          <div class="filter-tabs">
+            <button class="filter-tab" [class.active]="currentHistoryFilter === 'all'" (click)="filterHistory('all')">
+              <i class="fas fa-list"></i> Toutes ({{history.length}})
+            </button>
+            <button class="filter-tab" [class.active]="currentHistoryFilter === 'utilisateurs'" (click)="filterHistory('utilisateurs')">
+              <i class="fas fa-users"></i> Utilisateurs ({{getHistoryCountBySubject('utilisateurs')}})
+            </button>
+            <button class="filter-tab" [class.active]="currentHistoryFilter === 'textes'" (click)="filterHistory('textes')">
+              <i class="fas fa-file-alt"></i> Textes ({{getHistoryCountBySubject('textes')}})
+            </button>
+            <button class="filter-tab" [class.active]="currentHistoryFilter === 'evaluations'" (click)="filterHistory('evaluations')">
+              <i class="fas fa-star"></i> Évaluations ({{getHistoryCountBySubject('evaluations')}})
+            </button>
+            <button class="filter-tab" [class.active]="currentHistoryFilter === 'affectations'" (click)="filterHistory('affectations')">
+              <i class="fas fa-user-tie"></i> Affectations ({{getHistoryCountBySubject('affectations')}})
+            </button>
+            <button class="filter-tab" [class.active]="currentHistoryFilter === 'messages'" (click)="filterHistory('messages')">
+              <i class="fas fa-envelope"></i> Messages ({{getHistoryCountBySubject('messages')}})
+            </button>
+          </div>
+        </div>
+
+        <!-- Liste des actions -->
+        <div class="history-timeline">
+          <div class="timeline-item" *ngFor="let item of getFilteredHistory()">
+            <div class="timeline-marker" [class]="getHistorySubjectClass(item)">
+              <i [class]="getHistorySubjectIcon(item)"></i>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <h4>{{getHistoryTitle(item.action)}}</h4>
+                <span class="timeline-date">{{item.created_at | date:'dd/MM/yyyy à HH:mm'}}</span>
+              </div>
+              <div class="timeline-body">
+                <p class="timeline-user">
+                  <i class="fas fa-user"></i>
+                  <strong>{{item.prenom}} {{item.nom}}</strong>
+                </p>
+                <p class="timeline-description">{{item.description || 'Aucune description'}}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="no-history" *ngIf="getFilteredHistory().length === 0">
+            <i class="fas fa-history"></i>
+            <h3>Aucune action trouvée</h3>
+            <p>Aucune action ne correspond au filtre sélectionné</p>
           </div>
         </div>
       </div>
@@ -2453,6 +2489,46 @@
     <div class="modal-footer">
       <button class="btn btn-outline" (click)="closeReassignModal()">Annuler</button>
       <button class="btn btn-primary" (click)="saveReassignment()" [disabled]="!reassignForm.correcteur_id">Réassigner</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Modification Texte -->
+<div class="modal-overlay" *ngIf="showEditTextModal" (click)="closeEditTextModal()">
+  <div class="modal-content large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="fas fa-edit"></i> Modifier le texte (Anonymisation)</h3>
+      <button class="modal-close" (click)="closeEditTextModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" *ngIf="selectedTextForEdit">
+      <div class="edit-text-info">
+        <h4>{{selectedTextForEdit.titre}}</h4>
+        <p><strong>Auteur :</strong> {{selectedTextForEdit.prenom}} {{selectedTextForEdit.nom}}</p>
+        <p><strong>Langue :</strong> {{selectedTextForEdit.langue | titlecase}}</p>
+        <div class="anonymization-notice">
+          <i class="fas fa-user-secret"></i>
+          <span>Supprimez toute signature ou référence à l'auteur pour garantir l'anonymat lors de la correction</span>
+        </div>
+      </div>
+      
+      <div class="edit-form">
+        <div class="form-group">
+          <label>Titre du texte</label>
+          <input type="text" [(ngModel)]="editTextForm.titre" class="form-control">
+        </div>
+        
+        <div class="form-group">
+          <label>Contenu du texte</label>
+          <textarea [(ngModel)]="editTextForm.contenu" class="form-control" rows="15" placeholder="Contenu du poème..."></textarea>
+          <small class="form-help">Supprimez les signatures, noms d'auteur ou toute référence personnelle</small>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" (click)="closeEditTextModal()">Annuler</button>
+      <button class="btn btn-primary" (click)="saveTextEdit()" [disabled]="!editTextForm.titre || !editTextForm.contenu">
+        <i class="fas fa-save"></i> Sauvegarder
+      </button>
     </div>
   </div>
 </div>
