@@ -230,6 +230,18 @@ if ($method === 'POST' && isset($_GET['action'])) {
         case 'assign_corrector':
             assignCorrector($input);
             break;
+        case 'unassign_corrector':
+            unassignCorrector($input);
+            break;
+        case 'remove_all_assignments':
+            removeAllAssignments();
+            break;
+        case 'reset_all_assignments':
+            resetAllAssignments();
+            break;
+        case 'direct_unassign':
+            directUnassign($input);
+            break;
         case 'send_message':
             sendMessage($user, $input);
             break;
@@ -306,22 +318,55 @@ function getUsers() {
 function assignCorrector($data) {
     $db = getDB();
     
+    // Log des données reçues pour débogage
+    error_log('assignCorrector - Données reçues: ' . json_encode($data));
+    
     $texte_id = $data['texte_id'] ?? 0;
     $corrector_id = $data['corrector_id'] ?? 0;
     
-    if (!$texte_id || !$corrector_id) {
+    // Validation plus stricte
+    if (!$texte_id || !$corrector_id || !is_numeric($texte_id) || !is_numeric($corrector_id)) {
+        error_log('assignCorrector - IDs invalides: texte_id=' . $texte_id . ', corrector_id=' . $corrector_id);
         http_response_code(400);
-        echo json_encode(['error' => 'IDs texte et correcteur requis']);
+        echo json_encode(['error' => 'IDs texte et correcteur requis et doivent être numériques']);
         return;
     }
     
     try {
+        // Vérifier que le texte existe
+        $stmt = $db->prepare("SELECT id FROM cp2i_textes WHERE id = ?");
+        $stmt->execute([$texte_id]);
+        if (!$stmt->fetch()) {
+            error_log('assignCorrector - Texte inexistant: ' . $texte_id);
+            http_response_code(400);
+            echo json_encode(['error' => 'Texte inexistant']);
+            return;
+        }
+        
+        // Vérifier que le correcteur existe et a le bon rôle
+        $stmt = $db->prepare("SELECT id, role FROM cp2i_users WHERE id = ?");
+        $stmt->execute([$corrector_id]);
+        $corrector = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$corrector) {
+            error_log('assignCorrector - Correcteur inexistant: ' . $corrector_id);
+            http_response_code(400);
+            echo json_encode(['error' => 'Correcteur inexistant']);
+            return;
+        }
+        if ($corrector['role'] !== 'correcteur') {
+            error_log('assignCorrector - Utilisateur pas correcteur: ' . $corrector_id . ' (rôle: ' . $corrector['role'] . ')');
+            http_response_code(400);
+            echo json_encode(['error' => 'L\'utilisateur n\'est pas un correcteur']);
+            return;
+        }
+        
         // Vérifier si ce correcteur est déjà affecté à ce texte
         $stmt = $db->prepare("SELECT id FROM cp2i_affectations WHERE texte_id = ? AND corrector_id = ?");
         $stmt->execute([$texte_id, $corrector_id]);
         $existing = $stmt->fetch();
         
         if ($existing) {
+            error_log('assignCorrector - Affectation déjà existante: texte=' . $texte_id . ', correcteur=' . $corrector_id);
             http_response_code(400);
             echo json_encode(['error' => 'Ce correcteur est déjà affecté à ce texte']);
             return;
@@ -333,20 +378,73 @@ function assignCorrector($data) {
         $count = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
         
         if ($count >= 3) {
+            error_log('assignCorrector - Texte déjà complet: ' . $texte_id . ' (' . $count . ' correcteurs)');
             http_response_code(400);
             echo json_encode(['error' => 'Ce texte a déjà 3 correcteurs assignés']);
             return;
         }
         
         // Créer la nouvelle affectation
-        $stmt = $db->prepare("INSERT INTO cp2i_affectations (texte_id, corrector_id) VALUES (?, ?)");
+        $stmt = $db->prepare("INSERT INTO cp2i_affectations (texte_id, corrector_id, created_at) VALUES (?, ?, NOW())");
         $stmt->execute([$texte_id, $corrector_id]);
         
+        error_log('assignCorrector - Succès: texte=' . $texte_id . ', correcteur=' . $corrector_id);
         echo json_encode(['success' => true, 'message' => 'Correcteur affecté avec succès']);
         
     } catch (Exception $e) {
+        error_log('assignCorrector - Exception: ' . $e->getMessage());
         http_response_code(500);
         echo json_encode(['error' => 'Erreur lors de l\'affectation: ' . $e->getMessage()]);
+    }
+}
+
+function unassignCorrector($data) {
+    $db = getDB();
+    
+    // Log des données reçues pour débogage
+    error_log('unassignCorrector - Données reçues: ' . json_encode($data));
+    
+    $texte_id = $data['texte_id'] ?? 0;
+    $corrector_id = $data['corrector_id'] ?? 0;
+    
+    // Validation plus stricte
+    if (!$texte_id || !$corrector_id || !is_numeric($texte_id) || !is_numeric($corrector_id)) {
+        error_log('unassignCorrector - IDs invalides: texte_id=' . $texte_id . ', corrector_id=' . $corrector_id);
+        http_response_code(400);
+        echo json_encode(['error' => 'IDs texte et correcteur requis et doivent être numériques']);
+        return;
+    }
+    
+    try {
+        // Vérifier si l'affectation existe
+        $stmt = $db->prepare("SELECT id FROM cp2i_affectations WHERE texte_id = ? AND corrector_id = ?");
+        $stmt->execute([$texte_id, $corrector_id]);
+        $existing = $stmt->fetch();
+        
+        if (!$existing) {
+            error_log('unassignCorrector - Affectation inexistante: texte=' . $texte_id . ', correcteur=' . $corrector_id);
+            http_response_code(400);
+            echo json_encode(['error' => 'Cette affectation n\'existe pas']);
+            return;
+        }
+        
+        // Supprimer l'affectation
+        $stmt = $db->prepare("DELETE FROM cp2i_affectations WHERE texte_id = ? AND corrector_id = ?");
+        $result = $stmt->execute([$texte_id, $corrector_id]);
+        
+        if ($result && $stmt->rowCount() > 0) {
+            error_log('unassignCorrector - Succès: texte=' . $texte_id . ', correcteur=' . $corrector_id);
+            echo json_encode(['success' => true, 'message' => 'Correcteur désassigné avec succès']);
+        } else {
+            error_log('unassignCorrector - Échec suppression: texte=' . $texte_id . ', correcteur=' . $corrector_id);
+            http_response_code(500);
+            echo json_encode(['error' => 'Échec de la suppression de l\'affectation']);
+        }
+        
+    } catch (Exception $e) {
+        error_log('unassignCorrector - Exception: ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['error' => 'Erreur lors de la désassignation: ' . $e->getMessage()]);
     }
 }
 
@@ -473,6 +571,72 @@ function deleteMessage($user, $data) {
         $db->rollback();
         http_response_code(500);
         echo json_encode(['error' => 'Erreur lors de la suppression']);
+    }
+}
+
+function removeAllAssignments() {
+    $db = getDB();
+    
+    try {
+        $stmt = $db->prepare("DELETE FROM cp2i_affectations");
+        $result = $stmt->execute();
+        $count = $stmt->rowCount();
+        
+        error_log('removeAllAssignments - Suppression de ' . $count . ' affectations');
+        
+        echo json_encode([
+            'success' => true, 
+            'message' => "$count affectations supprimées",
+            'count' => $count
+        ]);
+        
+    } catch (Exception $e) {
+        error_log('removeAllAssignments - Exception: ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['error' => 'Erreur lors de la suppression: ' . $e->getMessage()]);
+    }
+}
+
+function resetAllAssignments() {
+    $db = getDB();
+    
+    try {
+        $stmt = $db->prepare("DELETE FROM cp2i_affectations");
+        $result = $stmt->execute();
+        $count = $stmt->rowCount();
+        
+        echo json_encode([
+            'success' => true, 
+            'message' => "RESET: $count affectations supprimées",
+            'count' => $count
+        ]);
+        
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Erreur reset: ' . $e->getMessage()]);
+    }
+}
+
+function directUnassign($data) {
+    $db = getDB();
+    
+    $texte_id = $data['texte_id'] ?? 0;
+    $corrector_id = $data['corrector_id'] ?? 0;
+    
+    try {
+        $stmt = $db->prepare("DELETE FROM cp2i_affectations WHERE texte_id = ? AND corrector_id = ?");
+        $result = $stmt->execute([$texte_id, $corrector_id]);
+        $count = $stmt->rowCount();
+        
+        echo json_encode([
+            'success' => true, 
+            'message' => "Affectation supprimée",
+            'count' => $count
+        ]);
+        
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Erreur: ' . $e->getMessage()]);
     }
 }
 ?>

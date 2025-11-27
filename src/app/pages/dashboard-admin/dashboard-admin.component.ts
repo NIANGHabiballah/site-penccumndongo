@@ -35,6 +35,28 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   selectedTexte: number = 0;
   selectedCorrector: number = 0;
   selectedTexteForEvaluation: any = null;
+  assignmentView: 'by-text' | 'by-corrector' | 'by-language' = 'by-text';
+  quickAssignCorrector: {[key: number]: number} = {};
+  
+  // Nouvelles propriétés pour la gestion améliorée des affectations
+  assignmentStats = {
+    totalTexts: 0,
+    fullyAssigned: 0,
+    unassigned: 0,
+    averagePerCorrector: 0
+  };
+  
+  // Gestion de l'affichage des détails
+  showFormSection = true;
+  textDetailsVisible: boolean[] = [];
+  correctorDetailsVisible: boolean[] = [];
+  languageDetailsVisible: {[key: string]: boolean} = {};
+  languageAssignmentFilter = 'all'; // 'all', 'assigned', 'unassigned'
+  
+  // Recherche de textes
+  textSearchTerm = '';
+  languageFilter = '';
+  filteredTexts: any[] = [];
   
   // Filtres et recherche
   currentFilter = 'all';
@@ -221,6 +243,71 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.filteredAccounts = [];
     
     this.loadData();
+    this.initializeVisibilityArrays();
+  }
+  
+  initializeVisibilityArrays() {
+    this.textDetailsVisible = new Array(this.textes.length).fill(false);
+    this.correctorDetailsVisible = new Array(this.correcteurs.length).fill(false);
+  }
+  
+  toggleFormSection() {
+    this.showFormSection = !this.showFormSection;
+  }
+  
+  toggleTextDetails(index: number) {
+    this.textDetailsVisible[index] = !this.textDetailsVisible[index];
+  }
+  
+  toggleCorrectorDetails(index: number) {
+    this.correctorDetailsVisible[index] = !this.correctorDetailsVisible[index];
+  }
+  
+  toggleLanguageDetails(langue: string) {
+    this.languageDetailsVisible[langue] = !this.languageDetailsVisible[langue];
+  }
+  
+  getFilteredTextsByLanguage(langue: string): any[] {
+    const textes = this.getTextsByLanguage(langue);
+    if (this.languageAssignmentFilter === 'assigned') {
+      return textes.filter(texte => this.getCorrectorsCount(texte.id) === 3);
+    } else if (this.languageAssignmentFilter === 'unassigned') {
+      return textes.filter(texte => this.getCorrectorsCount(texte.id) < 3);
+    }
+    return textes;
+  }
+  
+  filterTexts() {
+    let filtered = [...this.textes];
+    
+    // Filtrer par langue
+    if (this.languageFilter) {
+      filtered = filtered.filter(texte => 
+        texte.langue?.toLowerCase() === this.languageFilter.toLowerCase() ||
+        (this.languageFilter === 'francais' && texte.langue?.toLowerCase() === 'français')
+      );
+    }
+    
+    // Filtrer par recherche textuelle
+    if (this.textSearchTerm.trim()) {
+      const searchTerm = this.textSearchTerm.toLowerCase().trim();
+      filtered = filtered.filter(texte => 
+        texte.titre?.toLowerCase().includes(searchTerm) ||
+        texte.prenom?.toLowerCase().includes(searchTerm) ||
+        texte.nom?.toLowerCase().includes(searchTerm) ||
+        `${texte.prenom} ${texte.nom}`.toLowerCase().includes(searchTerm) ||
+        texte.langue?.toLowerCase().includes(searchTerm)
+      );
+    }
+    
+    this.filteredTexts = filtered;
+  }
+  
+  getFilteredTexts() {
+    if (!this.textSearchTerm.trim() && !this.languageFilter) {
+      return this.textes;
+    }
+    return this.filteredTexts;
   }
 
   ngOnDestroy() {
@@ -271,6 +358,9 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         this.correcteurs = this.users.filter(u => u.role === 'correcteur');
         this.affectations = data?.affectations || [];
         
+        // Initialiser les tableaux de visibilité
+        this.initializeVisibilityArrays();
+        
         // Générer les stats d'affectation après avoir chargé les données
         setTimeout(() => this.generateAffectationStats(), 100);
       },
@@ -290,6 +380,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         this.textes = data.textes || [];
         // Le champ theme est maintenant supporté par l'API
         this.filteredTextes = [...this.textes];
+        this.filteredTexts = [...this.textes];
         this.applyEvaluationFilters();
         
         // Charger les évaluations détaillées pour chaque texte
@@ -318,18 +409,6 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.cp2iApi.getHistory().subscribe({
       next: (data) => {
         this.history = data.history || [];
-        console.log('Historique chargé:', this.history);
-        console.log('Exemple d\'entrée:', this.history[0]);
-        
-        // Déboguer les sujets détectés
-        if (this.history.length > 0) {
-          this.history.forEach((item, index) => {
-            if (index < 5) { // Afficher seulement les 5 premiers pour le debug
-              const subject = this.getHistorySubject(item.action || item.description || '');
-              console.log(`Item ${index}: action="${item.action}", description="${item.description}", subject="${subject}"`);
-            }
-          });
-        }
       },
       error: (error) => {
         console.error('Erreur historique:', error);
@@ -414,7 +493,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
 
   getCorrectorsCount(texteId: number): number {
-    return this.affectations.filter(a => a.texte_id === texteId).length;
+    return this.affectations.filter(a => a.texte_id == texteId).length;
   }
 
   getAssignedCorrectorsNames(texteId: number): string {
@@ -1091,7 +1170,6 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   loadMessages() {
     this.cp2iApi.getMessages().subscribe({
       next: (data) => {
-        console.log('Messages reçus:', data);
         this.messages = data.messages || [];
       },
       error: (error) => {
@@ -2035,7 +2113,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     if (text.includes('registration') || text.includes('inscription') || text.includes('user')) {
       return 'utilisateurs';
     }
-    if (text.includes('submission') || text.includes('soumission') || text.includes('text') || text.includes('texte')) {
+    if (text.includes('submission') || text.includes('soumission') || text.includes('text') || text.includes('texte') || text.includes('edit')) {
       return 'textes';
     }
     if (text.includes('evaluation') || text.includes('correction')) {
@@ -2595,5 +2673,510 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     } catch (e) {
       return [];
     }
+  }
+
+  // Nouvelles méthodes pour la gestion des affectations
+  getAssignedCorrectorsForText(texteId: number): any[] {
+    return this.affectations
+      .filter(a => a.texte_id == texteId)
+      .map(affectation => {
+        const correcteur = this.correcteurs.find(c => c.id === affectation.corrector_id);
+        return {
+          ...affectation,
+          correcteur_prenom: correcteur?.prenom,
+          correcteur_nom: correcteur?.nom
+        };
+      });
+  }
+
+  getAvailableCorrectorsForText(texteId: number): any[] {
+    const assignedIds = this.affectations
+      .filter(a => a.texte_id === texteId)
+      .map(a => a.corrector_id);
+    return this.correcteurs.filter(c => !assignedIds.includes(c.id));
+  }
+
+  getTextsAssignedToCorrector(correcteurId: number): any[] {
+    return this.affectations
+      .filter(a => a.corrector_id === correcteurId)
+      .map(affectation => {
+        const texte = this.textes.find(t => t.id === affectation.texte_id);
+        return {
+          ...affectation,
+          texte_titre: texte?.titre,
+          texte_langue: texte?.langue,
+          texte_statut: texte?.statut,
+          auteur_prenom: texte?.prenom,
+          auteur_nom: texte?.nom
+        };
+      })
+      .filter(item => item.texte_titre);
+  }
+
+  getCorrecteurAssignmentsCount(correcteurId: number): number {
+    return this.affectations.filter(a => a.corrector_id === correcteurId).length;
+  }
+
+  getCorrecteurCompletedCount(correcteurId: number): number {
+    const assignedTextes = this.getTextsAssignedToCorrector(correcteurId);
+    return assignedTextes.filter(t => t.texte_statut === 'accepte' || t.texte_statut === 'refuse').length;
+  }
+
+  getCorrecteurPendingCount(correcteurId: number): number {
+    const assignedTextes = this.getTextsAssignedToCorrector(correcteurId);
+    return assignedTextes.filter(t => t.texte_statut === 'en_attente').length;
+  }
+
+  getTextsWithFullAssignments(): number {
+    return this.textes.filter(texte => this.getCorrectorsCount(texte.id) === 3).length;
+  }
+
+  getTextsWithoutAssignments(): number {
+    return this.textes.filter(texte => this.getCorrectorsCount(texte.id) === 0).length;
+  }
+
+  getTextsWithoutFullAssignments(): number {
+    return this.textes.filter(texte => this.getCorrectorsCount(texte.id) < 3).length;
+  }
+
+  quickAssignToText(texteId: number): void {
+    const correcteurId = this.quickAssignCorrector[texteId];
+    if (!correcteurId) return;
+
+    this.cp2iApi.assignCorrector(texteId, correcteurId).subscribe({
+      next: (response) => {
+        this.showToast('Correcteur assigné avec succès!', 'success');
+        this.quickAssignCorrector[texteId] = 0;
+        this.loadData();
+      },
+      error: (error) => {
+        this.showToast('Erreur lors de l\'assignation: ' + (error.error?.error || 'Erreur inconnue'), 'error');
+      }
+    });
+  }
+
+  unassignCorrector(texteId: number, correcteurId: number): void {
+    console.log('🔥 === DÉBUT DÉSASSIGNATION ===');
+    console.log('🔥 Texte ID:', texteId, 'Type:', typeof texteId);
+    console.log('🔥 Correcteur ID:', correcteurId, 'Type:', typeof correcteurId);
+    
+    // Vérifications de base
+    if (!texteId || !correcteurId) {
+      console.error('🚨 IDs manquants:', { texteId, correcteurId });
+      this.showToast('Erreur: IDs manquants pour la désassignation', 'error');
+      return;
+    }
+    
+    // Vérifier que l'affectation existe
+    const affectationExiste = this.affectations.find(a => 
+      a.texte_id == texteId && a.corrector_id == correcteurId
+    );
+    
+    console.log('🔍 Recherche affectation pour texte:', texteId, 'correcteur:', correcteurId);
+    console.log('🔍 Affectations disponibles:', this.affectations.length);
+    console.log('🔍 Première affectation exemple:', this.affectations[0]);
+    
+    if (!affectationExiste) {
+      console.error('🚨 Affectation non trouvée dans les données locales:', { texteId, correcteurId });
+      console.log('🚨 Toutes les affectations:', this.affectations);
+      
+      // Essayer quand même l'API au cas où les données locales ne seraient pas à jour
+      console.log('⚠️ Tentative de désassignation via API malgré tout...');
+    }
+    
+    if (affectationExiste) {
+      console.log('✅ Affectation trouvée:', affectationExiste);
+    }
+    
+    // Utiliser l'action directe qui fonctionne
+    this.http.post(`${this.cp2iApi['baseUrl']}/cp2i-dashboard.php?action=direct_unassign`, 
+      { texte_id: texteId, corrector_id: correcteurId }, 
+      { headers: this.getHeaders() }
+    ).subscribe({
+      next: (response) => {
+        console.log('✅ Désassignation réussie:', response);
+        this.showToast('Correcteur désassigné avec succès', 'success');
+        this.logAdminAction('desaffectation', `Désassignation correcteur ID ${correcteurId} du texte ID ${texteId}`);
+        
+        // Recharger les données pour mettre à jour l'affichage
+        // Recharger les données
+        this.loadData();
+      },
+      error: (error) => {
+        console.error('🚨 Erreur désassignation:', error);
+        console.error('🚨 Détails erreur:', {
+          status: error.status,
+          statusText: error.statusText,
+          message: error.message,
+          error: error.error
+        });
+        
+        let errorMessage = 'Erreur lors de la désassignation';
+        if (error.error?.error) {
+          errorMessage += ': ' + error.error.error;
+        } else if (error.error?.message) {
+          errorMessage += ': ' + error.error.message;
+        } else if (error.message) {
+          errorMessage += ': ' + error.message;
+        }
+        
+        this.showToast(errorMessage, 'error');
+      }
+    });
+  }
+
+  removeAllAssignmentsIndividually(): void {
+    const assignationsToRemove = [...this.affectations];
+    let removedCount = 0;
+    let totalCount = 5;
+    
+    this.showToast(`Test de suppression de 5 assignations...`, 'success');
+    
+    // Tester seulement les 5 premières pour voir si ça marche
+    const testAssignations = assignationsToRemove.slice(0, 5);
+    
+    testAssignations.forEach((affectation, index) => {
+      console.log(`🔥 Test suppression ${index + 1}/5: texte ${affectation.texte_id}, correcteur ${affectation.corrector_id}`);
+      
+      this.cp2iApi.unassignCorrector(affectation.texte_id, affectation.corrector_id).subscribe({
+        next: (response) => {
+          console.log(`✅ Suppression ${index + 1} réussie:`, response);
+          removedCount++;
+        },
+        error: (error) => {
+          console.error(`🚨 Erreur suppression ${index + 1}:`, error);
+          removedCount++;
+        }
+      });
+    });
+  }
+
+  removeAllAssignments(): void {
+    if (this.affectations.length === 0) {
+      this.showToast('Aucune assignation à supprimer', 'error');
+      return;
+    }
+
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer toutes les ${this.affectations.length} assignations ?`)) {
+      return;
+    }
+
+    console.log('🔥 Début suppression de', this.affectations.length, 'assignations');
+    
+    // Utiliser l'action reset dans l'API existante
+    this.http.post(`${this.cp2iApi['baseUrl']}/cp2i-dashboard.php?action=reset_all_assignments`, {}, { headers: this.getHeaders() }).subscribe({
+      next: (response) => {
+        console.log('✅ Réponse script direct:', response);
+        const res = response as any;
+        if (res && res.success) {
+          this.showToast(`${res.count} assignations supprimées définitivement`, 'success');
+          this.logAdminAction('suppression_toutes_assignations', `Suppression directe de ${res.count} assignations`);
+          // Vider immédiatement les affectations locales
+          this.affectations = [];
+          // Recharger toutes les données
+          this.loadData();
+        } else {
+          this.showToast('Erreur lors de la suppression directe', 'error');
+        }
+      },
+      error: (error) => {
+        console.error('🚨 Erreur script direct:', error);
+        this.showToast('Erreur lors de la suppression: ' + (error.error?.error || error.message || 'Erreur inconnue'), 'error');
+      }
+    });
+  }
+
+  autoAssignAll(): void {
+    const textesNonAssignes = this.textes.filter(texte => this.getCorrectorsCount(texte.id) < 3);
+
+    if (textesNonAssignes.length === 0) {
+      this.showToast('Tous les textes sont déjà complètement assignés', 'error');
+      return;
+    }
+
+    let assignmentsCount = 0;
+    textesNonAssignes.forEach(texte => {
+      const placesRestantes = 3 - this.getCorrectorsCount(texte.id);
+      const correcteursDisponiblesPourTexte = this.getAvailableCorrectorsForText(texte.id);
+      
+      correcteursDisponiblesPourTexte.sort((a, b) => 
+        this.getCorrecteurAssignmentsCount(a.id) - this.getCorrecteurAssignmentsCount(b.id)
+      );
+
+      for (let i = 0; i < Math.min(placesRestantes, correcteursDisponiblesPourTexte.length); i++) {
+        const correcteur = correcteursDisponiblesPourTexte[i];
+        this.cp2iApi.assignCorrector(texte.id, correcteur.id).subscribe({
+          next: () => assignmentsCount++,
+          error: (error) => console.error('Erreur auto-assignation:', error)
+        });
+      }
+    });
+
+    this.showToast(`Affectation automatique en cours pour ${textesNonAssignes.length} textes...`, 'success');
+    
+    setTimeout(() => {
+      this.showToast(`${assignmentsCount} affectations automatiques réalisées`, 'success');
+      this.loadData();
+    }, 2000);
+  }
+
+  assignRandomTextToCorrector(correcteurId: number): void {
+    const textesDisponibles = this.textes.filter(texte => {
+      const correctorsCount = this.getCorrectorsCount(texte.id);
+      const isAlreadyAssigned = this.affectations.some(a => a.texte_id === texte.id && a.corrector_id === correcteurId);
+      return correctorsCount < 3 && !isAlreadyAssigned;
+    });
+
+    if (textesDisponibles.length === 0) {
+      this.showToast('Aucun texte disponible pour ce correcteur', 'error');
+      return;
+    }
+
+    const randomTexte = textesDisponibles[Math.floor(Math.random() * textesDisponibles.length)];
+    
+    this.cp2iApi.assignCorrector(randomTexte.id, correcteurId).subscribe({
+      next: (response) => {
+        this.showToast(`Texte "${randomTexte.titre}" assigné au correcteur`, 'success');
+        this.loadData();
+      },
+      error: (error) => {
+        this.showToast('Erreur lors de l\'assignation', 'error');
+      }
+    });
+  }
+
+  getCorrecteurLoadPercentage(correcteurId: number): number {
+    const maxAssignments = Math.max(...this.correcteurs.map(c => this.getCorrecteurAssignmentsCount(c.id)), 1);
+    const currentAssignments = this.getCorrecteurAssignmentsCount(correcteurId);
+    return (currentAssignments / maxAssignments) * 100;
+  }
+
+  getAverageAssignmentsPerCorrector(): number {
+    if (this.correcteurs.length === 0) return 0;
+    const totalAssignments = this.correcteurs.reduce((sum, c) => sum + this.getCorrecteurAssignmentsCount(c.id), 0);
+    return totalAssignments / this.correcteurs.length;
+  }
+
+  async rebalanceAssignments(): Promise<void> {
+    // Validation préliminaire
+    if (this.correcteurs.length < 2) {
+      this.showToast('Il faut au moins 2 correcteurs pour rééquilibrer', 'error');
+      return;
+    }
+
+    console.log('Début rééquilibrage');
+    
+    const moyenne = this.getAverageAssignmentsPerCorrector();
+    console.log('Moyenne par correcteur:', moyenne);
+    
+    // Trouver le correcteur le plus chargé et le moins chargé
+    const correcteurLePlusCharge = this.correcteurs.reduce((prev, current) => 
+      this.getCorrecteurAssignmentsCount(current.id) > this.getCorrecteurAssignmentsCount(prev.id) ? current : prev
+    );
+    
+    const correcteurLeMoinsCharge = this.correcteurs.reduce((prev, current) => 
+      this.getCorrecteurAssignmentsCount(current.id) < this.getCorrecteurAssignmentsCount(prev.id) ? current : prev
+    );
+    
+    const chargeMax = this.getCorrecteurAssignmentsCount(correcteurLePlusCharge.id);
+    const chargeMin = this.getCorrecteurAssignmentsCount(correcteurLeMoinsCharge.id);
+    
+    console.log(`Plus chargé: ${correcteurLePlusCharge.prenom} (${chargeMax}), Moins chargé: ${correcteurLeMoinsCharge.prenom} (${chargeMin})`);
+    
+    if (chargeMax - chargeMin < 2) {
+      this.showToast('Les affectations sont déjà équilibrées', 'success');
+      return;
+    }
+
+    this.showToast('Rééquilibrage des affectations en cours...', 'success');
+    
+    // Transférer des textes du plus chargé vers le moins chargé
+    const textesAssignes = this.getTextsAssignedToCorrector(correcteurLePlusCharge.id);
+    const textesEnAttente = textesAssignes.filter(t => t.texte_statut === 'en_attente');
+    const nombreATransferer = Math.min(textesEnAttente.length, Math.floor((chargeMax - chargeMin) / 2));
+    
+    console.log(`Transfert de ${nombreATransferer} textes`);
+
+    if (nombreATransferer === 0) {
+      this.showToast('Aucun texte en attente à transférer', 'error');
+      return;
+    }
+
+    let rebalanceCount = 0;
+    let errorCount = 0;
+    
+    try {
+      // Traiter les transferts avec une meilleure gestion d'erreur
+      for (let i = 0; i < nombreATransferer && errorCount < 3; i++) {
+        const texteAReassigner = textesEnAttente[i];
+        
+        if (!texteAReassigner || !texteAReassigner.texte_id) {
+          console.error('Texte invalide:', texteAReassigner);
+          errorCount++;
+          continue;
+        }
+        
+        try {
+          console.log(`Transfert ${i + 1}/${nombreATransferer}: Texte ID ${texteAReassigner.texte_id}`);
+          
+          // Désassignation avec timeout
+          await Promise.race([
+            new Promise((resolve, reject) => {
+              this.cp2iApi.unassignCorrector(texteAReassigner.texte_id, correcteurLePlusCharge.id).subscribe({
+                next: (response) => {
+                  console.log('Désassignation réussie:', response);
+                  resolve(true);
+                },
+                error: (error) => {
+                  console.error('Erreur désassignation:', error);
+                  reject(error);
+                }
+              });
+            }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout désassignation')), 10000))
+          ]);
+          
+          // Délai entre désassignation et réassignation
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Réassignation avec timeout
+          await Promise.race([
+            new Promise((resolve, reject) => {
+              this.cp2iApi.assignCorrector(texteAReassigner.texte_id, correcteurLeMoinsCharge.id).subscribe({
+                next: (response) => {
+                  console.log('Réassignation réussie:', response);
+                  resolve(true);
+                },
+                error: (error) => {
+                  console.error('Erreur réassignation:', error);
+                  reject(error);
+                }
+              });
+            }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout réassignation')), 10000))
+          ]);
+          
+          rebalanceCount++;
+          console.log(`Texte ${texteAReassigner.texte_id} transféré avec succès (${rebalanceCount}/${nombreATransferer})`);
+          
+          // Délai entre chaque transfert pour éviter la surcharge
+          if (i < nombreATransferer - 1) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+          
+        } catch (error) {
+          console.error(`Erreur lors du transfert du texte ${texteAReassigner.texte_id}:`, error);
+          errorCount++;
+          
+          // Si c'est une erreur de timeout ou de réseau, on attend plus longtemps
+          if ((error as any).message?.includes('Timeout') || (error as any).status === 0) {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          }
+        }
+      }
+      
+      if (rebalanceCount > 0) {
+        this.showToast(`${rebalanceCount} textes transférés pour rééquilibrer`, 'success');
+        this.logAdminAction('reequilibrage', `Rééquilibrage: ${rebalanceCount} textes transférés de ${correcteurLePlusCharge.prenom} vers ${correcteurLeMoinsCharge.prenom}`);
+      } else {
+        this.showToast('Aucun texte n\'a pu être transféré', 'error');
+      }
+      
+      if (errorCount > 0) {
+        this.showToast(`${errorCount} erreurs rencontrées pendant le rééquilibrage`, 'error');
+      }
+      
+    } catch (error) {
+      console.error('Erreur générale lors du rééquilibrage:', error);
+      this.showToast('Erreur lors du rééquilibrage des affectations', 'error');
+    } finally {
+      // Recharger les données après le rééquilibrage
+      console.log('Rechargement des données après rééquilibrage');
+      setTimeout(() => {
+        this.loadData();
+      }, 1000);
+    }
+  }
+
+  // Méthodes pour la vue par langue
+  getTextsByLanguage(langue: string): any[] {
+    return this.textes.filter(texte => 
+      texte.langue?.toLowerCase() === langue.toLowerCase() ||
+      (langue === 'francais' && texte.langue?.toLowerCase() === 'français')
+    );
+  }
+
+  getAssignedTextsByLanguage(langue: string): any[] {
+    return this.getTextsByLanguage(langue).filter(texte => this.getCorrectorsCount(texte.id) === 3);
+  }
+
+  getUnassignedTextsByLanguage(langue: string): any[] {
+    return this.getTextsByLanguage(langue).filter(texte => this.getCorrectorsCount(texte.id) < 3);
+  }
+
+  getLanguageAssignmentPercentage(langue: string): number {
+    const totalTextes = this.getTextsByLanguage(langue).length;
+    if (totalTextes === 0) return 0;
+    const assignedTextes = this.getAssignedTextsByLanguage(langue).length;
+    return Math.round((assignedTextes / totalTextes) * 100);
+  }
+
+  openQuickAssignModal(texte: any): void {
+    // Pour l'instant, on utilise le premier correcteur disponible
+    const availableCorrecteurs = this.getAvailableCorrectorsForText(texte.id);
+    if (availableCorrecteurs.length === 0) {
+      this.showToast('Aucun correcteur disponible pour ce texte', 'error');
+      return;
+    }
+
+    // Sélectionner le correcteur le moins chargé
+    const correcteurOptimal = availableCorrecteurs.reduce((prev, current) => 
+      this.getCorrecteurAssignmentsCount(current.id) < this.getCorrecteurAssignmentsCount(prev.id) ? current : prev
+    );
+
+    this.cp2iApi.assignCorrector(texte.id, correcteurOptimal.id).subscribe({
+      next: (response) => {
+        this.showToast(`Texte assigné à ${correcteurOptimal.prenom} ${correcteurOptimal.nom}`, 'success');
+        this.loadData();
+      },
+      error: (error) => {
+        this.showToast('Erreur lors de l\'assignation', 'error');
+      }
+    });
+  }
+
+  autoAssignLanguage(langue: string): void {
+    const textesNonAssignes = this.getUnassignedTextsByLanguage(langue);
+    
+    if (textesNonAssignes.length === 0) {
+      this.showToast(`Tous les textes en ${langue} sont déjà assignés`, 'error');
+      return;
+    }
+
+    // Pas de confirmation, assignation directe
+
+    let assignmentsCount = 0;
+    textesNonAssignes.forEach(texte => {
+      const availableCorrecteurs = this.getAvailableCorrectorsForText(texte.id);
+      
+      if (availableCorrecteurs.length > 0) {
+        // Sélectionner le correcteur le moins chargé
+        const correcteurOptimal = availableCorrecteurs.reduce((prev, current) => 
+          this.getCorrecteurAssignmentsCount(current.id) < this.getCorrecteurAssignmentsCount(prev.id) ? current : prev
+        );
+
+        this.cp2iApi.assignCorrector(texte.id, correcteurOptimal.id).subscribe({
+          next: () => assignmentsCount++,
+          error: (error) => console.error('Erreur auto-assignation langue:', error)
+        });
+      }
+    });
+
+    this.showToast(`Assignation automatique en cours pour ${textesNonAssignes.length} textes en ${langue}...`, 'success');
+    
+    setTimeout(() => {
+      this.showToast(`${assignmentsCount} textes en ${langue} assignés automatiquement`, 'success');
+      this.loadData();
+    }, 2000);
   }
 }

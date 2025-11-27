@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, throwError } from 'rxjs';
+import { retry, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface User {
@@ -164,6 +165,38 @@ export class Cp2iApiService {
     return this.http.post(`${this.baseUrl}/cp2i-dashboard.php?action=assign_corrector`, 
       { texte_id: texteId, corrector_id: correctorId }, 
       { headers: this.getHeaders() }
+    ).pipe(
+      retry(2),
+      catchError(error => {
+        console.error('Erreur assignCorrector:', error);
+        return throwError(error);
+      })
+    );
+  }
+
+  unassignCorrector(texteId: number, correctorId: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cp2i-dashboard.php?action=unassign_corrector`, 
+      { texte_id: texteId, corrector_id: correctorId }, 
+      { headers: this.getHeaders() }
+    ).pipe(
+      retry(2),
+      catchError(error => {
+        console.error('Erreur unassignCorrector:', error);
+        return throwError(error);
+      })
+    );
+  }
+
+  removeAllAssignments(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cp2i-dashboard.php?action=remove_all_assignments`, 
+      {}, 
+      { headers: this.getHeaders() }
+    ).pipe(
+      retry(2),
+      catchError(error => {
+        console.error('Erreur removeAllAssignments:', error);
+        return throwError(error);
+      })
     );
   }
 

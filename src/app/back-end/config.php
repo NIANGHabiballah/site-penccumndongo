@@ -5,9 +5,10 @@ define('DB_NAME', 'u122559880_form_contact');
 define('DB_USER', 'u122559880_root');
 define('DB_PASS', 'Tafsir#27');
 
-// Désactiver l'affichage des erreurs pour éviter les problèmes JSON
-ini_set('display_errors', 0);
-error_reporting(0);
+// Activer temporairement les logs d'erreur pour déboguer
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+ini_set('log_errors', 1);
 define('JWT_SECRET', 'cp2i_secret_key_2024');
 
 // Headers CORS

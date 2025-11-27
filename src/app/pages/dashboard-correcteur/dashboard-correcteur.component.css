@@ -214,7 +214,7 @@ body {
   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: auto;
   min-width: 0;
 }
 
@@ -246,6 +246,14 @@ body {
   line-height: 1.8;
   font-size: 1.1rem;
   color: #2c3e50;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-width: 100%;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
 }
 
 .evaluation-panel {
@@ -566,6 +574,14 @@ body {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+    overflow-x: auto;
+  }
+  
+  .text-content {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    overflow-x: auto;
+    max-width: 100%;
   }
   
   .correction-grid {
