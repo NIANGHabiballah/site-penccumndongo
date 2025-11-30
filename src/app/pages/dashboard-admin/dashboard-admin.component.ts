@@ -3202,6 +3202,42 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Méthodes pour la section Notes & Classement
+  getParticipantTextsCount(prenom: string, nom: string): number {
+    return this.textes.filter(t => t.prenom === prenom && t.nom === nom).length;
+  }
+
+  getParticipantTexts(prenom: string, nom: string): any[] {
+    return this.textes.filter(t => t.prenom === prenom && t.nom === nom);
+  }
+
+  getTextCorrectorsCount(texteId: number): number {
+    return this.affectations.filter(a => a.texte_id === texteId).length;
+  }
+
+  getTextEvaluations(texteId: number): any[] {
+    // Récupérer les affectations pour ce texte
+    const textAffectations = this.affectations.filter(a => a.texte_id === texteId);
+    
+    return textAffectations.map(affectation => {
+      // Trouver le correcteur
+      const correcteur = this.correcteurs.find(c => c.id === affectation.corrector_id);
+      
+      // Trouver le texte pour récupérer les données d'évaluation
+      const texte = this.textes.find(t => t.id === texteId);
+      
+      return {
+        correcteur_id: affectation.corrector_id,
+        correcteur_prenom: correcteur?.prenom || 'Correcteur',
+        correcteur_nom: correcteur?.nom || 'Inconnu',
+        note: texte?.note || null,
+        commentaire: texte?.commentaire || null,
+        statut: texte?.statut || 'en_attente',
+        date_evaluation: texte?.updated_at || null
+      };
+    });
+  }
+
   // Méthodes pour la vue par langue
   getTextsByLanguage(langue: string): any[] {
     return this.textes.filter(texte => 

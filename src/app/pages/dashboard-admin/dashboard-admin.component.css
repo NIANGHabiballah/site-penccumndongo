@@ -7123,3 +7123,563 @@ input:checked + .slider:before {
 }
 
 /* Import des styles pour la section Notes des Participants */
+/* Section Notes & Classement des Participants */
+.notes-participants-management {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.participants-notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.participant-notes-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  border: 1px solid #f0f0f0;
+  transition: all 0.3s;
+}
+
+.participant-notes-card:hover {
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
+}
+
+.participant-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #f8f9fa;
+}
+
+.participant-info {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.participant-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0380C2, #4a90e2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 1.8rem;
+  box-shadow: 0 4px 15px rgba(3, 128, 194, 0.3);
+}
+
+.participant-details h4 {
+  margin: 0 0 0.5rem 0;
+  color: #1e3c72;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.participant-email {
+  color: #6c757d;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.participant-city {
+  color: #FF7F1A;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.participant-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 200px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #0380C2;
+}
+
+.summary-label {
+  font-weight: 600;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.summary-value {
+  font-weight: 700;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.summary-value.note-display {
+  background: linear-gradient(135deg, #28a745, #34ce57);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 1rem;
+}
+
+.participant-texts {
+  margin-top: 1rem;
+}
+
+.participant-texts h5 {
+  margin: 0 0 1.5rem 0;
+  color: #1e3c72;
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.participant-texts h5::before {
+  content: '📝';
+  font-size: 1.1rem;
+}
+
+.texts-evaluations {
+  margin-bottom: 2rem;
+}
+
+.text-card {
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  transition: all 0.3s;
+}
+
+.text-card:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
+}
+
+.text-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.text-header h6 {
+  margin: 0 0 0.75rem 0;
+  color: #1e3c72;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.text-meta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.language-tag {
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  color: #1976d2;
+  padding: 0.3rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.theme-tag {
+  background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+  color: #7b1fa2;
+  padding: 0.3rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.date-tag {
+  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+  color: #856404;
+  padding: 0.3rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.evaluations-details {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border-left: 4px solid #0380C2;
+}
+
+.evaluations-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.evaluations-title {
+  font-weight: 600;
+  color: #1e3c72;
+  font-size: 1rem;
+}
+
+.correcteurs-count {
+  background: linear-gradient(135deg, #FF7F1A, #ff9a3d);
+  color: white;
+  padding: 0.3rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.correcteur-evaluations {
+  margin-bottom: 1.5rem;
+}
+
+.evaluation-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.25rem;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 1rem;
+  transition: all 0.3s;
+}
+
+.evaluation-card:hover {
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border-color: #0380C2;
+}
+
+.correcteur-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.correcteur-avatar-small {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6f42c1, #8e5dd8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.correcteur-name strong {
+  display: block;
+  color: #2c3e50;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.correcteur-name small {
+  color: #6c757d;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.evaluation-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.evaluation-note {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.note-label {
+  font-weight: 600;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.note-value {
+  font-weight: 700;
+  font-size: 1.2rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+}
+
+.note-value.excellent {
+  background: linear-gradient(135deg, #28a745, #34ce57);
+  color: white;
+}
+
+.note-value.good {
+  background: linear-gradient(135deg, #17a2b8, #20c997);
+  color: white;
+}
+
+.note-value.average {
+  background: linear-gradient(135deg, #FF7F1A, #ff9a3d);
+  color: white;
+}
+
+.note-value.poor {
+  background: linear-gradient(135deg, #dc3545, #e74c3c);
+  color: white;
+}
+
+.evaluation-comment {
+  background: white;
+  border-radius: 6px;
+  padding: 1rem;
+  border-left: 3px solid #0380C2;
+}
+
+.comment-label {
+  font-weight: 600;
+  color: #6c757d;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.comment-text {
+  color: #2c3e50;
+  line-height: 1.6;
+  font-style: italic;
+  margin: 0;
+}
+
+.evaluation-status {
+  display: flex;
+  justify-content: center;
+}
+
+.no-evaluations {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+  background: white;
+  border-radius: 8px;
+  border: 2px dashed #e9ecef;
+}
+
+.no-evaluations i {
+  font-size: 2rem;
+  color: #FF7F1A;
+  margin-bottom: 0.5rem;
+}
+
+.text-final-note {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid #e9ecef;
+}
+
+.final-note-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #e8f5e8, #d4edda);
+  border-radius: 8px;
+  border: 1px solid #28a745;
+}
+
+.final-note-label {
+  font-weight: 600;
+  color: #155724;
+  font-size: 1rem;
+}
+
+.final-note-value {
+  font-weight: 700;
+  font-size: 1.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+}
+
+.final-note-value.excellent {
+  background: linear-gradient(135deg, #28a745, #34ce57);
+  color: white;
+}
+
+.final-note-value.good {
+  background: linear-gradient(135deg, #17a2b8, #20c997);
+  color: white;
+}
+
+.final-note-value.average {
+  background: linear-gradient(135deg, #FF7F1A, #ff9a3d);
+  color: white;
+}
+
+.final-note-value.poor {
+  background: linear-gradient(135deg, #dc3545, #e74c3c);
+  color: white;
+}
+
+.no-texts {
+  text-align: center;
+  padding: 3rem;
+  color: #6c757d;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px dashed #e9ecef;
+}
+
+.no-texts i {
+  font-size: 3rem;
+  color: #0380C2;
+  margin-bottom: 1rem;
+}
+
+/* Responsive pour la section Notes & Classement */
+@media (max-width: 768px) {
+  .notes-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .participant-header {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+  
+  .participant-summary {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .text-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .evaluations-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+  
+  .correcteur-info {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+  
+  .evaluation-note {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  
+  .final-note-card {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .participant-notes-card {
+    padding: 1.5rem;
+  }
+  
+  .participant-info {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .participant-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+  }
+  
+  .participant-details h4 {
+    font-size: 1.2rem;
+  }
+  
+  .text-card {
+    padding: 1rem;
+  }
+  
+  .evaluations-details {
+    padding: 1rem;
+  }
+  
+  .evaluation-card {
+    padding: 1rem;
+  }
+}
+
+/* Animation d'entrée pour les cartes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.participant-notes-card {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.participant-notes-card:nth-child(1) { animation-delay: 0.1s; }
+.participant-notes-card:nth-child(2) { animation-delay: 0.2s; }
+.participant-notes-card:nth-child(3) { animation-delay: 0.3s; }
+.participant-notes-card:nth-child(4) { animation-delay: 0.4s; }
+.participant-notes-card:nth-child(5) { animation-delay: 0.5s; }
+
+/* Effet de survol pour les évaluations */
+.evaluation-card:hover .correcteur-avatar-small {
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(111, 66, 193, 0.4);
+}
+
+.evaluation-card:hover .note-value {
+  transform: scale(1.05);
+}
