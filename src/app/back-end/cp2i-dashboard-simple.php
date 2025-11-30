@@ -73,40 +73,66 @@ function getSimpleStats($user) {
         $stmt->execute();
         $textes_affectations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Statistiques d'affectation
+        // Statistiques d'affectation globales
         $stmt = $db->prepare("
             SELECT 
-                COUNT(DISTINCT t.id) as total_textes,
-                COUNT(DISTINCT CASE WHEN a.corrector_id IS NOT NULL THEN t.id END) as participants_affectes,
-                COUNT(DISTINCT CASE WHEN a.corrector_id IS NULL THEN t.id END) as participants_non_affectes
-            FROM cp2i_textes t
-            LEFT JOIN cp2i_affectations a ON t.id = a.texte_id
+                COUNT(*) as total_affectations,
+                COUNT(CASE WHEN EXISTS(
+                    SELECT 1 FROM cp2i_evaluations e 
+                    WHERE e.texte_id = a.texte_id AND e.correcteur_id = a.corrector_id
+                ) THEN 1 END) as affectations_terminees,
+                COUNT(CASE WHEN NOT EXISTS(
+                    SELECT 1 FROM cp2i_evaluations e 
+                    WHERE e.texte_id = a.texte_id AND e.correcteur_id = a.corrector_id
+                ) THEN 1 END) as affectations_restantes
+            FROM cp2i_affectations a
         ");
         $stmt->execute();
         $affectation_stats = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        // Statistiques des correcteurs
-        $stmt = $db->prepare("
-            SELECT 
-                c.id,
-                c.prenom,
-                c.nom,
-                COUNT(a.texte_id) as textes_assignes,
-                COUNT(CASE WHEN t.statut IN ('accepte', 'refuse') THEN 1 END) as textes_corriges,
-                COUNT(CASE WHEN t.statut = 'en_attente' THEN 1 END) as textes_restants
-            FROM cp2i_users c
-            LEFT JOIN cp2i_affectations a ON c.id = a.corrector_id
-            LEFT JOIN cp2i_textes t ON a.texte_id = t.id
-            WHERE c.role = 'correcteur'
-            GROUP BY c.id, c.prenom, c.nom
-            ORDER BY textes_assignes DESC
-        ");
+        // Statistiques des correcteurs - calcul correct
+        $correcteurs_stats = [];
+        $stmt = $db->prepare("SELECT id, prenom, nom, email FROM cp2i_users WHERE role = 'correcteur' ORDER BY nom");
         $stmt->execute();
-        $correcteurs_stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $correcteurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($correcteurs as $correcteur) {
+            // Textes assignés
+            $stmt = $db->prepare("SELECT COUNT(*) FROM cp2i_affectations WHERE corrector_id = ?");
+            $stmt->execute([$correcteur['id']]);
+            $assignes = (int)$stmt->fetchColumn();
+            
+            // Textes évalués par ce correcteur sur SES textes assignés
+            $stmt = $db->prepare("
+                SELECT COUNT(*) 
+                FROM cp2i_evaluations e
+                INNER JOIN cp2i_affectations a ON e.texte_id = a.texte_id
+                WHERE e.correcteur_id = ? AND a.corrector_id = ?
+            ");
+            $stmt->execute([$correcteur['id'], $correcteur['id']]);
+            $corriges = (int)$stmt->fetchColumn();
+            
+            $correcteurs_stats[] = [
+                'id' => $correcteur['id'],
+                'prenom' => $correcteur['prenom'],
+                'nom' => $correcteur['nom'],
+                'textes_assignes' => $assignes,
+                'textes_corriges' => $corriges,
+                'textes_restants' => $assignes - $corriges
+            ];
+        }
+        
+        $stmt = $db->prepare("SELECT 1"); // Requête factice pour éviter l'erreur
+        $stmt->execute();
         
         $stats['textes_affectations'] = $textes_affectations;
         $stats['affectation_stats'] = $affectation_stats;
         $stats['correcteurs_stats'] = $correcteurs_stats;
+        
+        // Ajouter les statistiques globales d'affectations
+        $stats['total_affectations'] = (int)$affectation_stats['total_affectations'];
+        $stats['affectations_terminees'] = (int)$affectation_stats['affectations_terminees'];
+        $stats['affectations_restantes'] = (int)$affectation_stats['affectations_restantes'];
     }
     
     echo json_encode(['stats' => $stats]);

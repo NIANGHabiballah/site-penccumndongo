@@ -1,0 +1,546 @@
+/* Styles pour le classement détaillé */
+.classement-detaille-management {
+  padding: 1rem;
+}
+
+.classement-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  color: white;
+}
+
+.classement-header h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.classement-header p {
+  margin: 0.5rem 0 0 0;
+  opacity: 0.9;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Statistiques du classement */
+.classement-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card.gold {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: white;
+}
+
+.stat-card.silver {
+  background: linear-gradient(135deg, #C0C0C0, #A9A9A9);
+  color: white;
+}
+
+.stat-card.bronze {
+  background: linear-gradient(135deg, #CD7F32, #B8860B);
+  color: white;
+}
+
+.stat-card.info {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
+}
+
+/* Filtres */
+.classement-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filter-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.filter-btn:hover {
+  background: #e9ecef;
+}
+
+.filter-btn.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+/* Cartes des participants */
+.participants-classement {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.participant-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.participant-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.participant-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-bottom: 1px solid #dee2e6;
+}
+
+.rang-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.rang-numero {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  background: #6c757d;
+  color: white;
+  position: relative;
+}
+
+.rang-numero.podium-gold {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
+}
+
+.rang-numero.podium-silver {
+  background: linear-gradient(135deg, #C0C0C0, #A9A9A9);
+  box-shadow: 0 4px 8px rgba(192, 192, 192, 0.3);
+}
+
+.rang-numero.podium-bronze {
+  background: linear-gradient(135deg, #CD7F32, #B8860B);
+  box-shadow: 0 4px 8px rgba(205, 127, 50, 0.3);
+}
+
+.rang-numero i {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 0.8rem;
+}
+
+.participant-identite h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #2c3e50;
+}
+
+.participant-email {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.participant-stats {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.nb-textes {
+  background: #e9ecef;
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: #495057;
+}
+
+.mention-badge {
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.mention-tres-bien {
+  background: #d4edda;
+  color: #155724;
+}
+
+.mention-bien {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.mention-assez-bien {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.mention-passable {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.mention-insuffisant {
+  background: #f5c6cb;
+  color: #721c24;
+}
+
+.moyenne-finale {
+  text-align: right;
+}
+
+.note-principale {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.note-excellent {
+  color: #28a745;
+}
+
+.note-tres-bien {
+  color: #17a2b8;
+}
+
+.note-bien {
+  color: #ffc107;
+}
+
+.note-passable {
+  color: #fd7e14;
+}
+
+.note-insuffisant {
+  color: #dc3545;
+}
+
+.note-details small {
+  color: #6c757d;
+}
+
+/* Détails des évaluations */
+.notes-details {
+  padding: 1.5rem;
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.details-header h4 {
+  margin: 0;
+  color: #495057;
+}
+
+.toggle-details {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background 0.3s ease;
+}
+
+.toggle-details:hover {
+  background: #e9ecef;
+}
+
+.evaluations-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.evaluation-item {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 4px solid #007bff;
+}
+
+.evaluation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.texte-titre {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.texte-meta {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.langue-badge {
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.langue-francais {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.langue-wolof {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.langue-anglais {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.langue-arabe {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.date-soumission {
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+.note-evaluation {
+  text-align: right;
+}
+
+.note-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.note-bar {
+  width: 60px;
+  height: 6px;
+  background: #e9ecef;
+  border-radius: 3px;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.note-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #dc3545, #ffc107, #28a745);
+  transition: width 0.3s ease;
+}
+
+.correcteur-info {
+  margin-bottom: 1rem;
+}
+
+.correcteur-details {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.correcteur-nom, .evaluation-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.remarques-section {
+  background: white;
+  border-radius: 6px;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+}
+
+.remarques-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: #495057;
+  font-weight: 500;
+}
+
+.remarques-content p {
+  margin: 0;
+  line-height: 1.5;
+  color: #212529;
+}
+
+.no-remarques {
+  color: #6c757d;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Résumé rapide */
+.evaluation-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.texte-titre-mini {
+  font-weight: 500;
+  color: #495057;
+  flex: 1;
+}
+
+.note-mini {
+  font-weight: bold;
+  margin: 0 0.5rem;
+}
+
+.correcteur-mini {
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+/* État vide */
+.no-participants {
+  text-align: center;
+  padding: 3rem;
+}
+
+.empty-state {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.empty-state i {
+  font-size: 4rem;
+  color: #dee2e6;
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  color: #6c757d;
+  margin-bottom: 1rem;
+}
+
+.empty-state p {
+  color: #adb5bd;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.empty-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .classement-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .classement-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-group {
+    justify-content: center;
+  }
+
+  .participant-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .rang-info {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .evaluation-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .correcteur-details {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .summary-item {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .empty-actions {
+    flex-direction: column;
+  }
+}

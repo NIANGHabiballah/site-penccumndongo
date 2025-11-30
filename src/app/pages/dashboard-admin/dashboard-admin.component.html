@@ -40,6 +40,9 @@
       <div class="nav-item" [class.active]="currentView === 'evaluations'" (click)="setCurrentView('evaluations')">
         <i class="fas fa-star"></i> Évaluations
       </div>
+      <div class="nav-item" [class.active]="currentView === 'notes-participants'" (click)="setCurrentView('notes-participants')">
+        <i class="fas fa-chart-bar"></i> Notes & Classement
+      </div>
       <div class="nav-item" [class.active]="currentView === 'statistiques'" (click)="setCurrentView('statistiques')">
         <i class="fas fa-chart-line"></i> Statistiques
       </div>
@@ -1178,6 +1181,8 @@
   </div>
 </div>
 
+
+
       <!-- Évaluations -->
       <div *ngSwitchCase="'evaluations'" class="evaluations-management">
         <!-- Statistiques d'évaluation -->
@@ -1396,27 +1401,27 @@
         <!-- KPIs d'affectation -->
         <div class="kpi-grid" [class.hidden]="!isStatsVisible('affectations')">
           <div class="kpi-card primary">
-            <div class="kpi-icon"><i class="fas fa-users"></i></div>
+            <div class="kpi-icon"><i class="fas fa-tasks"></i></div>
             <div class="kpi-content">
-              <h3>{{participants.length}}</h3>
-              <p>Participants inscrits</p>
-              <span class="kpi-trend up">Total</span>
+              <h3>{{stats.total_affectations || 0}}</h3>
+              <p>Total affectations</p>
+              <span class="kpi-trend up">Faites</span>
             </div>
           </div>
           <div class="kpi-card success">
-            <div class="kpi-icon"><i class="fas fa-user-check"></i></div>
+            <div class="kpi-icon"><i class="fas fa-check-circle"></i></div>
             <div class="kpi-content">
-              <h3>{{stats.affectation_stats?.participants_affectes || 0}}</h3>
-              <p>Participants affectés</p>
-              <span class="kpi-trend up">Assignés</span>
+              <h3>{{stats.affectations_terminees || 0}}</h3>
+              <p>Affectations terminées</p>
+              <span class="kpi-trend up">Corrigées</span>
             </div>
           </div>
           <div class="kpi-card warning">
-            <div class="kpi-icon"><i class="fas fa-user-times"></i></div>
+            <div class="kpi-icon"><i class="fas fa-clock"></i></div>
             <div class="kpi-content">
-              <h3>{{stats.affectation_stats?.participants_non_affectes || 0}}</h3>
-              <p>Participants non affectés</p>
-              <span class="kpi-trend down">À assigner</span>
+              <h3>{{stats.affectations_restantes || 0}}</h3>
+              <p>Affectations restantes</p>
+              <span class="kpi-trend down">À corriger</span>
             </div>
           </div>
           <div class="kpi-card info">

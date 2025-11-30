@@ -1,0 +1,24 @@
+        <!-- Filtres et recherche -->
+        <div class="classement-filters">
+          <div class="filter-group">
+            <button class="filter-btn" [class.active]="classementFilter === 'all'" (click)="setClassementFilter('all')">
+              <i class="fas fa-list"></i> Tous ({{getParticipantsAvecNotes().length}})
+            </button>
+            <button class="filter-btn" [class.active]="classementFilter === 'podium'" (click)="setClassementFilter('podium')">
+              <i class="fas fa-medal"></i> Top 3
+            </button>
+            <button class="filter-btn" [class.active]="classementFilter === 'admis'" (click)="setClassementFilter('admis')">
+              <i class="fas fa-check-circle"></i> Admis (≥10)
+            </button>
+            <button class="filter-btn" [class.active]="classementFilter === 'excellence'" (click)="setClassementFilter('excellence')">
+              <i class="fas fa-star"></i> Excellence (≥16)
+            </button>
+          </div>
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" 
+                   placeholder="Rechercher un participant..." 
+                   [(ngModel)]="classementSearchTerm"
+                   (input)="filterClassement()">
+          </div>
+        </div>

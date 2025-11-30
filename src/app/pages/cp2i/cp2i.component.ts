@@ -121,7 +121,6 @@ export class Cp2iComponent implements OnInit {
   ];
 
   ngOnInit() {
-    this.checkDeadlines();
     this.startCountdown();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -256,9 +255,7 @@ export class Cp2iComponent implements OnInit {
     }, 1000);
   }
 
-  checkDeadlines(): void {
-    this.inscriptionsClosed = true; // Inscriptions fermées
-  }
+
 
   openClosedModal(): void {
     this.showClosedModal = true;

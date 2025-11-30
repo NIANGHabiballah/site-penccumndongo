@@ -7121,3 +7121,5 @@ input:checked + .slider:before {
     justify-content: center;
   }
 }
+
+/* Import des styles pour la section Notes des Participants */

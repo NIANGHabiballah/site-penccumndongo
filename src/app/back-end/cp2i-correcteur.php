@@ -56,26 +56,61 @@ function getCorrecteurTexts($correcteurId) {
     try {
         $db = getDB();
         
-        // Solution définitive : requête simple et directe
+        // Récupérer les textes assignés à CE correcteur via cp2i_affectations
         $stmt = $db->prepare("
-            SELECT DISTINCT t.id, t.titre, t.contenu, t.langue, t.theme, t.created_at, t.note, 
-                   u.prenom, u.nom, 'en_attente' as statut
-            FROM cp2i_textes t, cp2i_users u, cp2i_affectations a
-            WHERE t.user_id = u.id 
-            AND a.texte_id = t.id 
-            AND a.corrector_id = ?
+            SELECT DISTINCT t.id, t.titre, t.contenu, t.langue, t.theme, t.created_at, 
+                   u.prenom, u.nom
+            FROM cp2i_textes t
+            JOIN cp2i_users u ON t.user_id = u.id 
+            WHERE EXISTS (
+                SELECT 1 FROM cp2i_affectations a 
+                WHERE a.texte_id = t.id AND a.corrector_id = ?
+            )
             ORDER BY t.created_at DESC
         ");
         $stmt->execute([$correcteurId]);
         $textes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-
-        
-        // Mettre à jour le statut réel
+        // Pour chaque texte, vérifier SEULEMENT l'évaluation de CE correcteur
         foreach ($textes as &$texte) {
-            $stmt2 = $db->prepare("SELECT COUNT(*) FROM cp2i_evaluations WHERE texte_id = ? AND correcteur_id = ?");
+            // Vérifier si CE correcteur a évalué ce texte
+            $stmt2 = $db->prepare("
+                SELECT note_totale, remarques 
+                FROM cp2i_evaluations 
+                WHERE texte_id = ? AND correcteur_id = ?
+            ");
             $stmt2->execute([$texte['id'], $correcteurId]);
-            $texte['statut'] = $stmt2->fetchColumn() > 0 ? 'corrige' : 'en_attente';
+            $evaluation = $stmt2->fetch(PDO::FETCH_ASSOC);
+            
+            if ($evaluation) {
+                // Ce correcteur a évalué ce texte - récupérer tous les détails
+                $stmt3 = $db->prepare("
+                    SELECT pertinence, coherence, correction, presentation, note_totale, remarques 
+                    FROM cp2i_evaluations 
+                    WHERE texte_id = ? AND correcteur_id = ?
+                ");
+                $stmt3->execute([$texte['id'], $correcteurId]);
+                $details = $stmt3->fetch(PDO::FETCH_ASSOC);
+                
+                $texte['statut'] = 'corrige';
+                $texte['note'] = $details['note_totale'];
+                $texte['commentaire'] = $details['remarques'];
+                $texte['pertinence'] = $details['pertinence'];
+                $texte['coherence'] = $details['coherence'];
+                $texte['correction'] = $details['correction'];
+                $texte['presentation'] = $details['presentation'];
+                $texte['corrected_by_me'] = true;
+            } else {
+                // Ce correcteur n'a pas encore évalué ce texte
+                $texte['statut'] = 'en_attente';
+                $texte['note'] = null;
+                $texte['commentaire'] = '';
+                $texte['pertinence'] = null;
+                $texte['coherence'] = null;
+                $texte['correction'] = null;
+                $texte['presentation'] = null;
+                $texte['corrected_by_me'] = false;
+            }
         }
         
         echo json_encode(['success' => true, 'textes' => $textes]);
@@ -118,12 +153,12 @@ function getCorrecteurHistory($correcteurId) {
         
         // Historique des évaluations du correcteur
         $stmt = $db->prepare("
-            SELECT t.titre, e.note_totale as note, e.remarques as commentaire, t.statut, e.updated_at, u.prenom, u.nom
+            SELECT t.titre, e.note_totale as note, e.remarques as commentaire, t.statut, e.created_at as updated_at, u.prenom, u.nom
             FROM cp2i_evaluations e
             JOIN cp2i_textes t ON e.texte_id = t.id
             JOIN cp2i_users u ON t.user_id = u.id
             WHERE e.correcteur_id = ?
-            ORDER BY e.updated_at DESC
+            ORDER BY e.created_at DESC
             LIMIT 50
         ");
         $stmt->execute([$correcteurId]);
@@ -144,17 +179,17 @@ function getCorrecteurStats($correcteurId) {
     try {
         $db = getDB();
         
-        // Nombre total de textes assignés
+        // Nombre total de textes assignés à CE correcteur
         $stmt = $db->prepare("SELECT COUNT(*) FROM cp2i_affectations WHERE corrector_id = ?");
         $stmt->execute([$correcteurId]);
         $totalAssignes = (int)$stmt->fetchColumn();
         
-        // Nombre de textes corrigés (avec évaluations)
-        $stmt = $db->prepare("SELECT COUNT(DISTINCT texte_id) FROM cp2i_evaluations WHERE correcteur_id = ?");
+        // Nombre de textes corrigés PAR CE correcteur uniquement
+        $stmt = $db->prepare("SELECT COUNT(*) FROM cp2i_evaluations WHERE correcteur_id = ?");
         $stmt->execute([$correcteurId]);
         $corriges = (int)$stmt->fetchColumn();
         
-        // Nombre à corriger
+        // Nombre à corriger pour CE correcteur
         $aCorreger = $totalAssignes - $corriges;
         
         echo json_encode([

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -61,6 +61,16 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   // Filtres et recherche
   currentFilter = 'all';
   searchTerm = '';
+  
+  // Filtres pour la section Notes des Participants
+  currentNotesFilter = 'all';
+  notesSearchTerm = '';
+  
+  // Cache pour les valeurs calculées (éviter les recalculs pendant change detection)
+  private _cachedGlobalAverageNote: number | null = null;
+  private _cachedBestNote: number | null = null;
+  private _cachedTotalEvaluations: number | null = null;
+  private _lastCalculationTime = 0;
   
   // Filtres pour la section comptes
   currentAccountFilter = 'all';
@@ -215,7 +225,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     private cp2iApi: Cp2iApiService,
     private router: Router,
     private http: HttpClient,
-    private chatService: ChatSupportService
+    private chatService: ChatSupportService,
+    private cdr: ChangeDetectorRef
   ) {}
   
   private getHeaders() {
@@ -337,11 +348,15 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     // Charger les statistiques du dashboard (incluant les stats par langue)
     this.http.get(`${this.cp2iApi['baseUrl']}/cp2i-dashboard.php?action=stats`, { headers: this.getHeaders() }).subscribe({
       next: (data: any) => {
+        console.log('Stats reçues du dashboard:', data);
         if (data.stats) {
           this.stats = { ...this.stats, ...data.stats };
         }
         if (data.stats_langues) {
           this.stats.stats_langues = data.stats_langues;
+        }
+        if (data.affectation_stats) {
+          this.stats = { ...this.stats, ...data.affectation_stats };
         }
       },
       error: (error) => console.error('Erreur stats dashboard:', error)
@@ -362,6 +377,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         this.initializeVisibilityArrays();
         
         // Générer les stats d'affectation après avoir chargé les données
+        this.generateAffectationStats();
         setTimeout(() => this.generateAffectationStats(), 100);
       },
       error: (error) => {
@@ -387,9 +403,12 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         this.loadDetailedEvaluations();
         
         this.calculateStatsFromTexts();
+        // Générer les stats d'affectation immédiatement
+        this.generateAffectationStats();
         setTimeout(() => {
           this.calculateStatsFromTexts();
           this.generateAffectationStats();
+          this.cdr.detectChanges();
         }, 500);
       },
       error: (error) => console.error('Erreur textes:', error)
@@ -420,7 +439,21 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.loadMessages();
     this.loadRecipients();
     
-    // Charger les statistiques d'affectation
+    // Charger les statistiques d'affectation depuis l'API dédiée
+    this.cp2iApi.getDashboardStats().subscribe({
+      next: (data: any) => {
+        console.log('Stats admin reçues:', data);
+        if (data.stats) {
+          this.stats = { ...this.stats, ...data.stats };
+        }
+      },
+      error: (error) => {
+        console.error('Erreur stats admin:', error);
+        // Fallback: générer les stats depuis les données locales
+        this.generateAffectationStats();
+      }
+    });
+    
     this.loadAffectationStats();
     
     // Démarrer la vérification des messages de chat
@@ -1572,8 +1605,12 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       this.cp2iApi.getTextCorrections(texte.id).subscribe({
         next: (data) => {
           texte.evaluations = data.corrections || [];
+          this.cdr.detectChanges();
         },
-        error: (error) => console.error(`Erreur évaluations texte ${texte.id}:`, error)
+        error: (error) => {
+          // En cas d'erreur, initialiser un tableau vide
+          texte.evaluations = [];
+        }
       });
     });
   }
@@ -1633,6 +1670,22 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   generateAffectationStats() {
     if (this.textes.length === 0) return;
     
+    // Calculer les statistiques d'affectation
+    const totalAffectations = this.affectations.length;
+    const affectationsTerminees = this.affectations.filter(a => {
+      const texte = this.textes.find(t => t.id === a.texte_id);
+      return texte && (texte.statut === 'accepte' || texte.statut === 'refuse');
+    }).length;
+    const affectationsRestantes = this.affectations.filter(a => {
+      const texte = this.textes.find(t => t.id === a.texte_id);
+      return texte && texte.statut === 'en_attente';
+    }).length;
+    
+    // Mettre à jour les stats
+    this.stats.total_affectations = totalAffectations;
+    this.stats.affectations_terminees = affectationsTerminees;
+    this.stats.affectations_restantes = affectationsRestantes;
+    
     const affectationsStats = this.textes.map(texte => {
       // Utiliser seulement texte_id pour les affectations
       const affectationsTexte = this.affectations.filter(a => a.texte_id === texte.id);
@@ -1653,6 +1706,15 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     });
     
     this.stats.textes_affectations = affectationsStats;
+    
+    console.log('Stats d\'affectation générées localement:', {
+      total_affectations: this.stats.total_affectations,
+      affectations_terminees: this.stats.affectations_terminees,
+      affectations_restantes: this.stats.affectations_restantes
+    });
+    
+    // Forcer la détection des changements
+    this.cdr.detectChanges();
   }
   
   // Statistiques réelles pour les graphiques
@@ -2572,8 +2634,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         return this.textes.find(t => t.id === affectation.texte_id);
       }).filter(t => t);
       
-      const textesCorreges = textesDetails.filter(t => t.statut === 'accepte' || t.statut === 'refuse').length;
-      const textesRestants = textesDetails.filter(t => t.statut === 'en_attente').length;
+      const textesCorreges = this.getCorrecteurCompletedCount(correcteur.id);
+      const textesRestants = this.getCorrecteurPendingCount(correcteur.id);
       const progressPercentage = textesAssignes.length > 0 ? Math.round((textesCorreges / textesAssignes.length) * 100) : 0;
       
       return {
@@ -2718,13 +2780,15 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
 
   getCorrecteurCompletedCount(correcteurId: number): number {
-    const assignedTextes = this.getTextsAssignedToCorrector(correcteurId);
-    return assignedTextes.filter(t => t.texte_statut === 'accepte' || t.texte_statut === 'refuse').length;
+    // Utiliser les données du backend directement
+    const correcteurStats = this.stats.correcteurs_stats?.find((c: any) => c.id === correcteurId);
+    return correcteurStats?.textes_corriges || 0;
   }
 
   getCorrecteurPendingCount(correcteurId: number): number {
-    const assignedTextes = this.getTextsAssignedToCorrector(correcteurId);
-    return assignedTextes.filter(t => t.texte_statut === 'en_attente').length;
+    // Utiliser les données du backend directement
+    const correcteurStats = this.stats.correcteurs_stats?.find((c: any) => c.id === correcteurId);
+    return correcteurStats?.textes_restants || 0;
   }
 
   getTextsWithFullAssignments(): number {
@@ -3179,4 +3243,6 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       this.loadData();
     }, 2000);
   }
+  
+
 }

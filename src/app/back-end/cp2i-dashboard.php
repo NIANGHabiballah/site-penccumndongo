@@ -105,33 +105,49 @@ function getStats($user) {
         $stmt->execute();
         $users_stats = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        // Stats d'affectation
+        // Stats d'affectation détaillées
         $stmt = $db->prepare("
             SELECT 
+                (SELECT COUNT(*) FROM cp2i_affectations) as total_affectations,
+                (SELECT COUNT(*) FROM cp2i_affectations a JOIN cp2i_textes t ON a.texte_id = t.id WHERE t.statut IN ('accepte', 'refuse')) as affectations_terminees,
+                (SELECT COUNT(*) FROM cp2i_affectations a JOIN cp2i_textes t ON a.texte_id = t.id WHERE t.statut = 'en_attente') as affectations_restantes,
                 (SELECT COUNT(DISTINCT t.id) FROM cp2i_textes t JOIN cp2i_affectations a ON t.id = a.texte_id) as textes_affectes,
                 (SELECT COUNT(*) FROM cp2i_textes t LEFT JOIN cp2i_affectations a ON t.id = a.texte_id WHERE a.texte_id IS NULL) as textes_non_affectes
         ");
         $stmt->execute();
         $affectation_stats = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        // Stats par correcteur avec noms des textes assignés
-        $stmt = $db->prepare("
-            SELECT 
-                c.id, 
-                CONCAT(c.prenom, ' ', c.nom) as correcteur_nom_complet,
-                c.email as correcteur_email,
-                COUNT(a.texte_id) as textes_assignes,
-                GROUP_CONCAT(t.titre SEPARATOR ', ') as textes_noms,
-                0 as textes_corriges,
-                COUNT(a.texte_id) as textes_restants
-            FROM cp2i_users c
-            LEFT JOIN cp2i_affectations a ON c.id = a.corrector_id
-            LEFT JOIN cp2i_textes t ON a.texte_id = t.id
-            WHERE c.role = 'correcteur'
-            GROUP BY c.id
-        ");
+        // Stats par correcteur - calcul simple et séparé
+        $correcteurs_stats = [];
+        $stmt = $db->prepare("SELECT id, prenom, nom, email FROM cp2i_users WHERE role = 'correcteur' ORDER BY nom");
         $stmt->execute();
-        $correcteurs_stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $correcteurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($correcteurs as $correcteur) {
+            // Textes assignés à ce correcteur
+            $stmt = $db->prepare("SELECT COUNT(*) FROM cp2i_affectations WHERE corrector_id = ?");
+            $stmt->execute([$correcteur['id']]);
+            $assignes = (int)$stmt->fetchColumn();
+            
+            // Compter les évaluations faites par ce correcteur sur SES textes assignés
+            $stmt = $db->prepare("
+                SELECT COUNT(*) 
+                FROM cp2i_evaluations e
+                INNER JOIN cp2i_affectations a ON e.texte_id = a.texte_id
+                WHERE e.correcteur_id = ? AND a.corrector_id = ?
+            ");
+            $stmt->execute([$correcteur['id'], $correcteur['id']]);
+            $corriges = (int)$stmt->fetchColumn();
+            
+            $correcteurs_stats[] = [
+                'id' => $correcteur['id'],
+                'correcteur_nom_complet' => $correcteur['prenom'] . ' ' . $correcteur['nom'],
+                'correcteur_email' => $correcteur['email'],
+                'textes_assignes' => $assignes,
+                'textes_corriges' => $corriges,
+                'textes_restants' => $assignes - $corriges
+            ];
+        }
         
         // Statistiques détaillées des affectations par texte avec noms complets
         $stmt = $db->prepare("
@@ -192,11 +208,14 @@ function getStats($user) {
         echo json_encode([
             'stats' => array_merge($stats, [
                 'textes_affectations' => $textes_affectations,
-                'affectation_stats' => $affectation_stats,
+                'total_affectations' => $affectation_stats['total_affectations'] ?? 0,
+                'affectations_terminees' => $affectation_stats['affectations_terminees'] ?? 0,
+                'affectations_restantes' => $affectation_stats['affectations_restantes'] ?? 0,
                 'correcteurs_stats' => $correcteurs_stats
             ]),
             'stats_langues' => $stats_langues,
-            'users_stats' => $users_stats
+            'users_stats' => $users_stats,
+            'affectation_stats' => $affectation_stats
         ]);
     }
 }

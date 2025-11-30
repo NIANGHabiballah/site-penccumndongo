@@ -86,28 +86,11 @@ export class SoumissionTexteComponent implements OnInit {
         this.isEditing = true;
         this.editingTexteId = +params['edit'];
         this.loadTexteForEdit(this.editingTexteId);
-      } else {
-        // Vérifier si l'utilisateur a déjà soumis un texte (seulement pour nouvelle soumission)
-        this.checkExistingSubmission();
       }
     });
   }
   
-  checkExistingSubmission() {
-    this.cp2iApi.getUserTexts().subscribe({
-      next: (data) => {
-        if (data.textes && data.textes.length > 0) {
-          this.showToast('Vous avez déjà soumis un texte pour cette édition.', 'error');
-          setTimeout(() => {
-            this.router.navigate(['/dashboard-participant']);
-          }, 2000);
-        }
-      },
-      error: (error) => {
-        console.error('Erreur lors de la vérification:', error);
-      }
-    });
-  }
+
   
   loadTexteForEdit(texteId: number) {
     this.cp2iApi.getUserTexts().subscribe({

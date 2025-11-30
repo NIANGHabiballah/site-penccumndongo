@@ -34,6 +34,19 @@ try {
     $stmt->execute();
     $stats = $stmt->fetch(PDO::FETCH_ASSOC);
     
+    // Statistiques d'affectation
+    $stmt = $db->prepare("
+        SELECT 
+            (SELECT COUNT(*) FROM cp2i_affectations) as total_affectations,
+            (SELECT COUNT(*) FROM cp2i_affectations a JOIN cp2i_textes t ON a.texte_id = t.id WHERE t.statut IN ('accepte', 'refuse')) as affectations_terminees,
+            (SELECT COUNT(*) FROM cp2i_affectations a JOIN cp2i_textes t ON a.texte_id = t.id WHERE t.statut = 'en_attente') as affectations_restantes
+    ");
+    $stmt->execute();
+    $affectation_stats = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Fusionner les statistiques
+    $stats = array_merge($stats, $affectation_stats);
+    
     echo json_encode([
         'success' => true,
         'stats' => $stats
@@ -48,7 +61,10 @@ try {
             'textes_acceptes' => 0,
             'textes_refuses' => 0,
             'textes_en_attente' => 0,
-            'note_moyenne' => null
+            'note_moyenne' => null,
+            'total_affectations' => 0,
+            'affectations_terminees' => 0,
+            'affectations_restantes' => 0
         ]
     ]);
 }
