@@ -1623,13 +1623,16 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     let toutesLesNotes: number[] = [];
     
     participantTextes.forEach(texte => {
-      if (texte.evaluations && Array.isArray(texte.evaluations)) {
+      // Vérifier d'abord la note directe du texte
+      if (texte.note && parseFloat(texte.note) > 0) {
+        toutesLesNotes.push(parseFloat(texte.note));
+      }
+      // Puis vérifier les évaluations détaillées
+      else if (texte.evaluations && Array.isArray(texte.evaluations)) {
         const notesEvaluations = texte.evaluations
-          .filter((evaluation: any) => evaluation.note && evaluation.note > 0)
+          .filter((evaluation: any) => evaluation.note && parseFloat(evaluation.note) > 0)
           .map((evaluation: any) => parseFloat(evaluation.note));
         toutesLesNotes.push(...notesEvaluations);
-      } else if (texte.note && texte.note > 0) {
-        toutesLesNotes.push(parseFloat(texte.note));
       }
     });
     
@@ -2298,6 +2301,34 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   getCorrectorPerformance() {
+    // Utiliser les données backend si disponibles (même source que la section affectations)
+    if (this.stats.correcteurs_stats && this.stats.correcteurs_stats.length > 0) {
+      return this.stats.correcteurs_stats.map((correcteurStats: any) => {
+        const assignes = correcteurStats.textes_assignes || 0;
+        const corriges = correcteurStats.textes_corriges || 0;
+        const completion = assignes > 0 ? Math.round((corriges / assignes) * 100) : 0;
+        
+        // Récupérer le nom depuis la liste des correcteurs locaux
+        const correcteurLocal = this.correcteurs.find(c => c.id === correcteurStats.id);
+        let nomComplet = correcteurStats.nom;
+        if (!nomComplet && correcteurLocal) {
+          nomComplet = `${correcteurLocal.prenom} ${correcteurLocal.nom}`;
+        }
+        if (!nomComplet) {
+          nomComplet = `Correcteur ${correcteurStats.id}`;
+        }
+        
+        return {
+          id: correcteurStats.id,
+          nom: nomComplet,
+          assignes,
+          corriges,
+          completion
+        };
+      }).filter((c: any) => c.assignes > 0).sort((a: any, b: any) => b.completion - a.completion);
+    }
+    
+    // Fallback: utiliser les données locales si pas de stats backend
     if (this.correcteurs.length === 0 || this.affectations.length === 0) return [];
     
     return this.correcteurs.map(correcteur => {
@@ -2316,7 +2347,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         corriges,
         completion
       };
-    }).filter(c => c.assignes > 0).sort((a, b) => b.completion - a.completion);
+    }).filter((c: any) => c.assignes > 0).sort((a: any, b: any) => b.completion - a.completion);
   }
   
   // Statistiques de délais
@@ -2348,8 +2379,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   getFastestCorrector(): string {
     const performance = this.getCorrectorPerformance();
     if (performance.length === 0) return 'Aucun';
-    const fastest = performance.reduce((prev, current) => current.completion > prev.completion ? current : prev);
-    return fastest.nom.split(' ')[0];
+    const fastest = performance.reduce((prev: any, current: any) => current.completion > prev.completion ? current : prev);
+    return fastest && fastest.nom ? fastest.nom.split(' ')[0] : 'Aucun';
   }
   
   // Statistiques d'engagement
@@ -2614,7 +2645,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   getCorrectorsAtRisk(): number {
-    return this.getCorrectorPerformance().filter(c => c.completion < 50 && c.assignes > 2).length;
+    return this.getCorrectorPerformance().filter((c: any) => c.completion < 50 && c.assignes > 2).length;
   }
   
   getPeakSubmissionDay(): string {
