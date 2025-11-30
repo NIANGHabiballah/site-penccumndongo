@@ -186,7 +186,7 @@ function getStats($user) {
                     COUNT(*) as total_textes,
                     SUM(CASE WHEN statut = 'accepte' THEN 1 ELSE 0 END) as textes_acceptes,
                     SUM(CASE WHEN statut = 'refuse' THEN 1 ELSE 0 END) as textes_refuses,
-                    SUM(CASE WHEN statut = 'en_attente' THEN 1 ELSE 0 END) as textes_en_attente,
+                    COUNT(DISTINCT CASE WHEN EXISTS(SELECT 1 FROM cp2i_affectations a WHERE a.texte_id = cp2i_textes.id) AND statut = 'en_attente' THEN cp2i_textes.id END) as textes_en_attente,
                     AVG(CASE WHEN note IS NOT NULL AND note > 0 THEN note ELSE NULL END) as note_moyenne
                 FROM cp2i_textes
             ");

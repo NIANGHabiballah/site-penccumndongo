@@ -1670,16 +1670,25 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   generateAffectationStats() {
     if (this.textes.length === 0) return;
     
-    // Calculer les statistiques d'affectation
+    // Calculer les statistiques d'affectation depuis les données correcteurs
     const totalAffectations = this.affectations.length;
-    const affectationsTerminees = this.affectations.filter(a => {
-      const texte = this.textes.find(t => t.id === a.texte_id);
-      return texte && (texte.statut === 'accepte' || texte.statut === 'refuse');
-    }).length;
-    const affectationsRestantes = this.affectations.filter(a => {
-      const texte = this.textes.find(t => t.id === a.texte_id);
-      return texte && texte.statut === 'en_attente';
-    }).length;
+    let affectationsTerminees = 0;
+    let affectationsRestantes = 0;
+    
+    if (this.stats.correcteurs_stats) {
+      affectationsTerminees = this.stats.correcteurs_stats.reduce((sum: number, c: any) => sum + (c.textes_corriges || 0), 0);
+      affectationsRestantes = this.stats.correcteurs_stats.reduce((sum: number, c: any) => sum + (c.textes_restants || 0), 0);
+    } else {
+      // Fallback si pas de données backend
+      affectationsTerminees = this.affectations.filter(a => {
+        const texte = this.textes.find(t => t.id === a.texte_id);
+        return texte && (texte.statut === 'accepte' || texte.statut === 'refuse');
+      }).length;
+      affectationsRestantes = this.affectations.filter(a => {
+        const texte = this.textes.find(t => t.id === a.texte_id);
+        return texte && texte.statut === 'en_attente';
+      }).length;
+    }
     
     // Mettre à jour les stats
     this.stats.total_affectations = totalAffectations;
