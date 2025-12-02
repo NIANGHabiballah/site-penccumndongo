@@ -94,6 +94,7 @@
       <button class="btn btn-primary" (click)="setCurrentView('utilisateurs')">Gérer utilisateurs</button>
       <button class="btn btn-secondary" (click)="setCurrentView('textes')">Gérer textes</button>
       <button class="btn btn-success" (click)="setCurrentView('affectations')">Affecter correcteurs</button>
+
     </div>
 
     <div class="stats-grid">
@@ -548,6 +549,7 @@
             <button class="btn btn-danger" (click)="removeAllAssignments()">
               <i class="fas fa-trash-alt"></i> Supprimer toutes
             </button>
+
           </div>
         </div>
 
@@ -580,6 +582,68 @@
               <h3>{{getAverageAssignmentsPerCorrector() | number:'1.1-1'}}</h3>
               <p>Moyenne par correcteur</p>
             </div>
+          </div>
+        </div>
+
+        <!-- Section de suppression pour toutes les affectations -->
+        <div style="background: #fff3cd; padding: 15px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #ffc107;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h4>Suppression d'assignations individuelles</h4>
+            <button class="btn btn-sm btn-outline" (click)="showAssignmentsList = !showAssignmentsList">
+              {{showAssignmentsList ? 'Masquer' : 'Afficher'}} ({{affectations.length}})
+            </button>
+          </div>
+          
+          <div *ngIf="showAssignmentsList">
+            <!-- Filtres -->
+            <div style="background: #f8f9fa; padding: 10px; margin-bottom: 15px; border-radius: 4px; display: flex; gap: 15px; flex-wrap: wrap;">
+              <div>
+                <label style="font-size: 12px; font-weight: bold;">Rechercher:</label>
+                <input type="text" [(ngModel)]="assignmentSearchTerm" placeholder="Titre, auteur ou correcteur..." style="padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 200px;">
+              </div>
+              <div>
+                <label style="font-size: 12px; font-weight: bold;">Langue:</label>
+                <select [(ngModel)]="assignmentLangueFilter" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px;">
+                  <option value="">Toutes</option>
+                  <option value="francais">Français</option>
+                  <option value="wolof">Wolof</option>
+                  <option value="arabe">Arabe</option>
+                  <option value="anglais">Anglais</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size: 12px; font-weight: bold;">Statut:</label>
+                <select [(ngModel)]="assignmentStatutFilter" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px;">
+                  <option value="">Tous</option>
+                  <option value="en_attente">En attente</option>
+                  <option value="accepte">Accepté</option>
+                  <option value="refuse">Refusé</option>
+                </select>
+              </div>
+            </div>
+            
+            <div *ngFor="let affectation of getFilteredAssignments()" style="background: white; padding: 10px; margin: 8px 0; border-radius: 4px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong>{{getTexteTitle(affectation.texte_id)}}</strong>
+                <br>
+                <small>par {{getTexteAuthor(affectation.texte_id)}} ({{getTexteLangue(affectation.texte_id)}})</small>
+                <br>
+                <small>Statut: <span [style.color]="getTexteStatut(affectation.texte_id) === 'en_attente' ? 'orange' : (getTexteStatut(affectation.texte_id) === 'accepte' ? 'green' : 'red')">{{getTexteStatutLabel(affectation.texte_id)}}</span></small>
+                <br>
+                <small>Correcteur: {{getCorrecteurName(affectation.corrector_id)}}</small>
+              </div>
+              <button class="btn btn-sm" 
+                      [class.btn-danger]="getTexteStatut(affectation.texte_id) === 'en_attente'"
+                      [class.btn-secondary]="getTexteStatut(affectation.texte_id) !== 'en_attente'"
+                      [disabled]="getTexteStatut(affectation.texte_id) === 'accepte' || getTexteStatut(affectation.texte_id) === 'refuse'"
+                      (click)="unassignCorrector(affectation.texte_id, affectation.corrector_id)">
+                <span *ngIf="getTexteStatut(affectation.texte_id) === 'en_attente'">SUPPRIMER</span>
+                <span *ngIf="getTexteStatut(affectation.texte_id) === 'accepte'">DÉJÀ CORRIGÉ</span>
+                <span *ngIf="getTexteStatut(affectation.texte_id) === 'refuse'">DÉJÀ CORRIGÉ</span>
+              </button>
+            </div>
+            
+            <p style="margin-top: 15px; font-size: 12px; color: #666;">{{getFilteredAssignments().length}} assignations affichées sur {{affectations.length}} au total</p>
           </div>
         </div>
 
@@ -657,30 +721,30 @@
 
           <div class="texts-assignments-list">
             <div class="text-assignment-card" *ngFor="let texte of getFilteredTexts(); let i = index">
-              <div class="text-header">
-                <div class="text-info">
-                  <h4>{{texte.titre}}</h4>
-                  <span class="author">par {{texte.prenom}} {{texte.nom}}</span>
-                  <span class="language-tag">{{texte.langue | titlecase}}</span>
-                  <div class="assignment-info" *ngIf="textSearchTerm">
-                    <small><strong>{{getCorrectorsCount(texte.id)}}</strong> correcteur(s) assigné(s)</small>
-                    <small *ngIf="getAssignedCorrectorsForText(texte.id).length > 0">
-                      À: {{getAssignedCorrectorsNames(texte.id)}}
-                    </small>
+                <div class="text-header">
+                  <div class="text-info">
+                    <h4>{{texte.titre}}</h4>
+                    <span class="author">par {{texte.prenom}} {{texte.nom}}</span>
+                    <span class="language-tag">{{texte.langue | titlecase}}</span>
+                    <div class="assignment-info" *ngIf="textSearchTerm">
+                      <small><strong>{{getCorrectorsCount(texte.id)}}</strong> correcteur(s) assigné(s)</small>
+                      <small *ngIf="getAssignedCorrectorsForText(texte.id).length > 0">
+                        À: {{getAssignedCorrectorsNames(texte.id)}}
+                      </small>
+                    </div>
+                  </div>
+                  <div class="assignment-status">
+                    <span class="correcteurs-count" 
+                          [class.full]="getCorrectorsCount(texte.id) === 3" 
+                          [class.partial]="getCorrectorsCount(texte.id) > 0 && getCorrectorsCount(texte.id) < 3" 
+                          [class.empty]="getCorrectorsCount(texte.id) === 0">
+                      {{getCorrectorsCount(texte.id)}}/3 correcteurs
+                    </span>
+                    <button class="toggle-btn" (click)="toggleTextDetails(i)" [title]="textDetailsVisible[i] ? 'Masquer' : 'Afficher'">
+                      <i class="fas" [class.fa-chevron-up]="textDetailsVisible[i]" [class.fa-chevron-down]="!textDetailsVisible[i]"></i>
+                    </button>
                   </div>
                 </div>
-                <div class="assignment-status">
-                  <span class="correcteurs-count" 
-                        [class.full]="getCorrectorsCount(texte.id) === 3" 
-                        [class.partial]="getCorrectorsCount(texte.id) > 0 && getCorrectorsCount(texte.id) < 3" 
-                        [class.empty]="getCorrectorsCount(texte.id) === 0">
-                    {{getCorrectorsCount(texte.id)}}/3 correcteurs
-                  </span>
-                  <button class="toggle-btn" (click)="toggleTextDetails(i)" [title]="textDetailsVisible[i] ? 'Masquer' : 'Afficher'">
-                    <i class="fas" [class.fa-chevron-up]="textDetailsVisible[i]" [class.fa-chevron-down]="!textDetailsVisible[i]"></i>
-                  </button>
-                </div>
-              </div>
               
               <div class="text-details" *ngIf="textDetailsVisible[i]">
                 <div class="assigned-correctors" *ngIf="getAssignedCorrectorsForText(texte.id).length > 0">
@@ -691,11 +755,9 @@
                         <i class="fas fa-user"></i>
                         <span>{{assignment.correcteur_prenom}} {{assignment.correcteur_nom}}</span>
                       </div>
-                      <button class="btn-remove" (click)="unassignCorrector(texte.id, assignment.corrector_id)" title="Désassigner">
-                        &times;
-                      </button>
                     </div>
                   </div>
+
                 </div>
                 
                 <div class="quick-assign" *ngIf="getCorrectorsCount(texte.id) < 3">
@@ -717,7 +779,7 @@
         </div>
 
         <!-- Vue par correcteur -->
-        <div class="assignments-content" *ngIf="assignmentView === 'by-corrector'">
+        <div class="assignments-content" *ngIf="assignmentView == 'by-corrector'">
           <div class="correctors-assignments-list">
             <div class="corrector-assignment-card" *ngFor="let correcteur of correcteurs; let j = index">
               <div class="corrector-header">
@@ -766,12 +828,10 @@
                       </div>
                       <div class="text-status">
                         <span class="status-badge" [ngClass]="getStatusClass(assignment.texte_statut)">{{getStatusLabel(assignment.texte_statut)}}</span>
-                        <button class="btn-remove" (click)="unassignCorrector(assignment.texte_id, correcteur.id)" title="Désassigner">
-                          &times;
-                        </button>
                       </div>
                     </div>
                   </div>
+
                 </div>
                 
                 <div class="corrector-actions">
@@ -788,7 +848,7 @@
         </div>
 
         <!-- Vue par langue -->
-        <div class="assignments-content" *ngIf="assignmentView === 'by-language'">
+        <div class="assignments-content" *ngIf="assignmentView == 'by-language'">
           <!-- Filtres par statut d'assignation -->
           <div class="language-filters">
             <div class="filter-group">
