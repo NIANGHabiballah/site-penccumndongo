@@ -1922,7 +1922,7 @@
                   <div class="rank">{{i + 1}}</div>
                   <div class="participant-info">
                     <strong>{{participant.prenom}} {{participant.nom}}</strong>
-                    <span>{{participant.nb_textes || 0}} textes</span>
+                    <span>{{participant.nb_evaluations || 0}}/3 notes</span>
                   </div>
                   <div class="score">{{participant.note_moyenne ? (participant.note_moyenne | number:'1.1-1') + '/20' : 'N/A'}}</div>
                 </div>
@@ -2606,14 +2606,24 @@
                         <div class="evaluation-content">
                           <div class="evaluation-note">
                             <span class="note-label">Note:</span>
-                            <span class="note-value" [class.excellent]="evaluation.note >= 16" [class.good]="evaluation.note >= 12 && evaluation.note < 16" [class.average]="evaluation.note >= 8 && evaluation.note < 12" [class.poor]="evaluation.note < 8">
-                              {{evaluation.note ? (evaluation.note + '/20') : 'Non évalué'}}
+                            <span class="note-value" *ngIf="evaluation.note !== null && evaluation.note !== undefined && evaluation.note > 0" [class.excellent]="evaluation.note >= 16" [class.good]="evaluation.note >= 12 && evaluation.note < 16" [class.average]="evaluation.note >= 8 && evaluation.note < 12" [class.poor]="evaluation.note < 8">
+                              {{evaluation.note}}/20
+                            </span>
+                            <span class="note-pending" *ngIf="evaluation.note === null || evaluation.note === undefined || evaluation.note <= 0">
+                              -
                             </span>
                           </div>
                           
-                          <div class="evaluation-comment" *ngIf="evaluation.commentaire">
+                          <div class="evaluation-comment" *ngIf="evaluation.commentaire && evaluation.commentaire.trim()">
                             <span class="comment-label">Commentaire:</span>
                             <p class="comment-text">{{evaluation.commentaire}}</p>
+                          </div>
+                          
+                          <div class="evaluation-pending" *ngIf="evaluation.note === null || evaluation.note === undefined || evaluation.note <= 0">
+                            <span class="pending-text">En attente d'évaluation</span>
+                            <button class="btn btn-xs btn-primary" (click)="openEvaluationModal(texte)" style="margin-left: 10px;">
+                              À corriger
+                            </button>
                           </div>
                           
                           <div class="evaluation-status">
@@ -2630,12 +2640,20 @@
                     </div>
                     
                     <!-- Note finale du texte -->
-                    <div class="text-final-note" *ngIf="texte.note">
+                    <div class="text-final-note" *ngIf="getTextFinalNote(texte.id) !== null && (getTextFinalNote(texte.id) || 0) > 0">
                       <div class="final-note-card">
                         <span class="final-note-label">Note finale du texte:</span>
-                        <span class="final-note-value" [class.excellent]="texte.note >= 16" [class.good]="texte.note >= 12 && texte.note < 16" [class.average]="texte.note >= 8 && texte.note < 12" [class.poor]="texte.note < 8">
-                          {{texte.note}}/20
+                        <span class="final-note-value" [class.excellent]="(getTextFinalNote(texte.id) || 0) >= 16" [class.good]="(getTextFinalNote(texte.id) || 0) >= 12 && (getTextFinalNote(texte.id) || 0) < 16" [class.average]="(getTextFinalNote(texte.id) || 0) >= 8 && (getTextFinalNote(texte.id) || 0) < 12" [class.poor]="(getTextFinalNote(texte.id) || 0) < 8">
+                          {{(getTextFinalNote(texte.id) || 0) | number:'1.2-2'}}/20
                         </span>
+                      </div>
+                    </div>
+                    
+                    <!-- Message si pas encore de note finale -->
+                    <div class="text-no-final-note" *ngIf="getTextFinalNote(texte.id) === null || (getTextFinalNote(texte.id) || 0) <= 0">
+                      <div class="no-final-note-card">
+                        <i class="fas fa-clock"></i>
+                        <span>Note finale en attente des évaluations</span>
                       </div>
                     </div>
                   </div>

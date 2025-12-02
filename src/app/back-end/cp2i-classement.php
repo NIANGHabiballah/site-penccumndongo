@@ -13,19 +13,19 @@ require_once 'config.php';
 try {
     $db = getDB();
     
-    // Récupérer toutes les notes moyennes des participants
+    // Récupérer tous les participants avec leurs textes et notes
     $stmt = $db->prepare("
         SELECT 
-            t.user_id,
+            u.id as user_id,
             u.nom, u.prenom,
+            COUNT(e.id) as nb_evaluations,
             AVG(e.note_totale) as note_moyenne
-        FROM cp2i_textes t
-        JOIN cp2i_users u ON t.user_id = u.id  
+        FROM cp2i_users u
+        JOIN cp2i_textes t ON u.id = t.user_id
         JOIN cp2i_evaluations e ON t.id = e.texte_id
         WHERE u.role = 'participant'
-        GROUP BY t.user_id, u.nom, u.prenom
-        HAVING note_moyenne IS NOT NULL
-        ORDER BY note_moyenne DESC
+        GROUP BY u.id, u.nom, u.prenom
+        ORDER BY note_moyenne DESC, nb_evaluations DESC
     ");
     $stmt->execute();
     $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);

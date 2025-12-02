@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NewsletterComponent } from '../../components/newsletter/newsletter.component';
 import { BannerComponent } from '../../components/banner/banner.component';
-import { Cp2iPopupComponent } from '../../components/cp2i-popup/cp2i-popup.component';
+
 
 
 import { trigger, state, style, transition, animate, query, stagger, keyframes } from '@angular/animations';
@@ -140,7 +140,7 @@ type WebTab = 'vitrine' | 'ecommerce' | 'onepage' | 'refontes';
   templateUrl: './accueil.component.html',
   styleUrls: ['./accueil.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, BannerComponent, NewsletterComponent, RecaptchaModule, RouterModule, Cp2iPopupComponent
+  imports: [CommonModule, FormsModule, BannerComponent, NewsletterComponent, RecaptchaModule, RouterModule
   ],
 
 
