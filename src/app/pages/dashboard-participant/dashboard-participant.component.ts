@@ -582,7 +582,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   }
   
   isSubmissionPeriodActive(): boolean {
-    return false; // Période fermée
+    return false; // Période de soumission fermée
   }
   
   getSubmissionStatus(): string {
@@ -1493,7 +1493,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   
   // Vérifier si la période de soumission est clôturée
   isSubmissionPeriodClosed(): boolean {
-    return false; // Soumissions ouvertes
+    return true; // Soumissions fermées
   }
   
   // Fermer le modal de clôture des soumissions

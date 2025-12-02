@@ -263,7 +263,12 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   initializeVisibilityArrays() {
     this.textDetailsVisible = new Array(this.textes.length).fill(false);
+    this.correctorDetailsVisible = new Array(this.correcteurs.length).fill(true);
+  }
+  
+  updateCorrectorsVisibilityArray() {
     this.correctorDetailsVisible = new Array(this.correcteurs.length).fill(false);
+    console.log('Correcteurs visibility array initialized:', this.correctorDetailsVisible.length, 'correcteurs');
   }
   
   toggleFormSection() {
@@ -275,6 +280,9 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   toggleCorrectorDetails(index: number) {
+    if (!this.correctorDetailsVisible) {
+      this.correctorDetailsVisible = new Array(this.correcteurs.length).fill(true);
+    }
     this.correctorDetailsVisible[index] = !this.correctorDetailsVisible[index];
   }
   
@@ -379,6 +387,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         
         // Initialiser les tableaux de visibilité
         this.initializeVisibilityArrays();
+        this.updateCorrectorsVisibilityArray();
         
         // Générer les stats d'affectation après avoir chargé les données
         this.generateAffectationStats();
@@ -2927,10 +2936,29 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     return filtered;
   }
 
+  canUnassignCorrector(texteId: number, correcteurId: number): boolean {
+    const texte = this.textes.find(t => t.id === texteId);
+    if (texte && texte.real_evaluations) {
+      const evaluation = texte.real_evaluations.find((e: any) => e.correcteur_id === correcteurId);
+      return !(evaluation && evaluation.note !== null && evaluation.note !== undefined);
+    }
+    return true; // Par défaut, on peut désaffecter
+  }
+
   unassignCorrector(texteId: number, correcteurId: number): void {
     if (!texteId || !correcteurId) {
       this.showToast('Erreur: IDs manquants', 'error');
       return;
+    }
+    
+    // Vérifier si ce correcteur a déjà corrigé ce texte
+    const texte = this.textes.find(t => t.id === texteId);
+    if (texte && texte.real_evaluations) {
+      const evaluation = texte.real_evaluations.find((e: any) => e.correcteur_id === correcteurId);
+      if (evaluation && evaluation.note !== null && evaluation.note !== undefined) {
+        this.showToast('Impossible de désaffecter : ce correcteur a déjà corrigé ce texte', 'error');
+        return;
+      }
     }
     
     this.http.post(`${this.cp2iApi['baseUrl']}/cp2i-dashboard.php?action=direct_unassign`, 

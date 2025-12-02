@@ -633,13 +633,12 @@
                 <small>Correcteur: {{getCorrecteurName(affectation.corrector_id)}}</small>
               </div>
               <button class="btn btn-sm" 
-                      [class.btn-danger]="getTexteStatut(affectation.texte_id) === 'en_attente'"
-                      [class.btn-secondary]="getTexteStatut(affectation.texte_id) !== 'en_attente'"
-                      [disabled]="getTexteStatut(affectation.texte_id) === 'accepte' || getTexteStatut(affectation.texte_id) === 'refuse'"
+                      [class.btn-danger]="canUnassignCorrector(affectation.texte_id, affectation.corrector_id)"
+                      [class.btn-secondary]="!canUnassignCorrector(affectation.texte_id, affectation.corrector_id)"
+                      [disabled]="!canUnassignCorrector(affectation.texte_id, affectation.corrector_id)"
                       (click)="unassignCorrector(affectation.texte_id, affectation.corrector_id)">
-                <span *ngIf="getTexteStatut(affectation.texte_id) === 'en_attente'">SUPPRIMER</span>
-                <span *ngIf="getTexteStatut(affectation.texte_id) === 'accepte'">DÉJÀ CORRIGÉ</span>
-                <span *ngIf="getTexteStatut(affectation.texte_id) === 'refuse'">DÉJÀ CORRIGÉ</span>
+                <span *ngIf="canUnassignCorrector(affectation.texte_id, affectation.corrector_id)">SUPPRIMER</span>
+                <span *ngIf="!canUnassignCorrector(affectation.texte_id, affectation.corrector_id)">DÉJÀ CORRIGÉ</span>
               </button>
             </div>
             
