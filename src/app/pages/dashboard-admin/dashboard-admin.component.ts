@@ -485,6 +485,11 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     
     // Charger le classement
     this.loadClassement();
+    
+    // Charger les notes détaillées pour tous les participants
+    setTimeout(() => {
+      this.loadDetailedNotesForAllParticipants();
+    }, 1500);
   }
   
   startChatNotificationCheck() {
@@ -2166,6 +2171,136 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     });
   }
   
+  // Données détaillées pour Notes & Classement
+  participantsWithDetailedNotes: any[] = [];
+  participantDetailsVisible: boolean[] = [];
+  
+  loadDetailedNotesForAllParticipants() {
+    // Obtenir tous les participants uniques depuis les textes
+    const participantsMap = new Map();
+    
+    this.textes.forEach(texte => {
+      const key = `${texte.prenom}_${texte.nom}`;
+      if (!participantsMap.has(key)) {
+        participantsMap.set(key, {
+          prenom: texte.prenom,
+          nom: texte.nom,
+          textes: []
+        });
+      }
+      participantsMap.get(key).textes.push(texte);
+    });
+    
+    this.participantsWithDetailedNotes = Array.from(participantsMap.values());
+    
+    // Charger les évaluations détaillées pour chaque texte
+    this.participantsWithDetailedNotes.forEach(participant => {
+      participant.textes.forEach((texte: any) => {
+        this.cp2iApi.getEvaluationsForTexte(texte.id).subscribe({
+          next: (data) => {
+            if (data && data.length > 0) {
+              texte.detailed_evaluations = data;
+            } else {
+              texte.detailed_evaluations = [];
+            }
+            this.calculateParticipantAverages(participant);
+          },
+          error: (error) => {
+            console.error('Erreur évaluations texte', texte.id, ':', error);
+            texte.detailed_evaluations = [];
+          }
+        });
+      });
+    });
+    
+    // Trier par note moyenne décroissante
+    setTimeout(() => {
+      this.participantsWithDetailedNotes.sort((a, b) => {
+        const noteA = a.note_moyenne || 0;
+        const noteB = b.note_moyenne || 0;
+        return noteB - noteA;
+      });
+    }, 2000);
+  }
+  
+  calculateParticipantAverages(participant: any) {
+    let totalNotes = 0;
+    let countNotes = 0;
+    
+    participant.textes.forEach((texte: any) => {
+      if (texte.detailed_evaluations && texte.detailed_evaluations.length > 0) {
+        let texteTotal = 0;
+        let texteCount = 0;
+        
+        texte.detailed_evaluations.forEach((evaluation: any) => {
+          if (evaluation.note_totale && evaluation.note_totale > 0) {
+            texteTotal += parseFloat(evaluation.note_totale);
+            texteCount++;
+          }
+        });
+        
+        if (texteCount > 0) {
+          texte.note_moyenne = texteTotal / texteCount;
+          totalNotes += texte.note_moyenne;
+          countNotes++;
+        }
+      }
+    });
+    
+    participant.note_moyenne = countNotes > 0 ? totalNotes / countNotes : null;
+  }
+  
+  getFilteredParticipantsNotes() {
+    let filtered = [...this.participantsWithDetailedNotes];
+    
+    // Filtrer par catégorie
+    switch (this.currentNotesFilter) {
+      case 'with_notes':
+        filtered = filtered.filter(p => p.note_moyenne && p.note_moyenne > 0);
+        break;
+      case 'without_notes':
+        filtered = filtered.filter(p => !p.note_moyenne || p.note_moyenne === 0);
+        break;
+      case 'top_5':
+        filtered = filtered.filter(p => p.note_moyenne && p.note_moyenne > 0)
+                          .sort((a, b) => (b.note_moyenne || 0) - (a.note_moyenne || 0))
+                          .slice(0, 5);
+        break;
+      case 'top_10':
+        filtered = filtered.filter(p => p.note_moyenne && p.note_moyenne > 0)
+                          .sort((a, b) => (b.note_moyenne || 0) - (a.note_moyenne || 0))
+                          .slice(0, 10);
+        break;
+      default:
+        // 'all' - pas de filtre
+        break;
+    }
+    
+    // Filtrer par recherche
+    if (this.notesSearchTerm.trim()) {
+      const searchTerm = this.notesSearchTerm.toLowerCase().trim();
+      filtered = filtered.filter(p => 
+        p.prenom?.toLowerCase().includes(searchTerm) ||
+        p.nom?.toLowerCase().includes(searchTerm) ||
+        `${p.prenom} ${p.nom}`.toLowerCase().includes(searchTerm)
+      );
+    }
+    
+    return filtered;
+  }
+  
+  filterNotes(filter: string) {
+    this.currentNotesFilter = filter;
+  }
+  
+  getParticipantsWithNotes(): number {
+    return this.participantsWithDetailedNotes.filter(p => p.note_moyenne && p.note_moyenne > 0).length;
+  }
+  
+  getParticipantsWithoutNotes(): number {
+    return this.participantsWithDetailedNotes.filter(p => !p.note_moyenne || p.note_moyenne === 0).length;
+  }
+  
   logAdminAction(action: string, description: string) {
     // Enregistrer l'action dans l'historique local
     const newAction = {
@@ -3509,6 +3644,13 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     window.URL.revokeObjectURL(url);
     
     this.showToast('Export des notes réalisé avec succès', 'success');
+  }
+  
+  toggleParticipantDetails(index: number) {
+    if (!this.participantDetailsVisible) {
+      this.participantDetailsVisible = new Array(this.participantsWithDetailedNotes.length).fill(false);
+    }
+    this.participantDetailsVisible[index] = !this.participantDetailsVisible[index];
   }
   
 

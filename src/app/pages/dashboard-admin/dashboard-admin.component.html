@@ -2606,39 +2606,81 @@
             <p>Vue détaillée des évaluations et notes par participant</p>
           </div>
           <div class="header-actions">
-            <button class="btn btn-secondary" (click)="forceRefreshNotes()"><i class="fas fa-sync"></i> Recalculer notes</button>
+            <button class="btn btn-secondary" (click)="loadDetailedNotesForAllParticipants()"><i class="fas fa-sync"></i> Actualiser notes</button>
             <button class="btn btn-outline" (click)="exportParticipantsNotes()"><i class="fas fa-download"></i> Exporter notes</button>
           </div>
         </div>
 
-        <!-- Liste des participants avec leurs notes -->
+        <!-- Filtres et recherche -->
+        <div class="notes-filters">
+          <div class="filter-tabs">
+            <button class="filter-tab" [class.active]="currentNotesFilter === 'all'" (click)="filterNotes('all')">
+              <i class="fas fa-list"></i> Tous ({{participantsWithDetailedNotes.length}})
+            </button>
+            <button class="filter-tab" [class.active]="currentNotesFilter === 'with_notes'" (click)="filterNotes('with_notes')">
+              <i class="fas fa-star"></i> Avec notes ({{getParticipantsWithNotes()}})
+            </button>
+            <button class="filter-tab" [class.active]="currentNotesFilter === 'without_notes'" (click)="filterNotes('without_notes')">
+              <i class="fas fa-clock"></i> Sans notes ({{getParticipantsWithoutNotes()}})
+            </button>
+            <button class="filter-tab" [class.active]="currentNotesFilter === 'top_5'" (click)="filterNotes('top_5')">
+              <i class="fas fa-medal"></i> Top 5
+            </button>
+            <button class="filter-tab" [class.active]="currentNotesFilter === 'top_10'" (click)="filterNotes('top_10')">
+              <i class="fas fa-trophy"></i> Top 10
+            </button>
+          </div>
+          <div class="notes-search">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" placeholder="Rechercher un participant..." [(ngModel)]="notesSearchTerm">
+            </div>
+          </div>
+        </div>
+        
+        <div class="search-results" *ngIf="notesSearchTerm || currentNotesFilter !== 'all'">
+          <span>{{getFilteredParticipantsNotes().length}} participant(s) affiché(s)</span>
+        </div>
+
+        <!-- Liste des participants avec leurs notes détaillées -->
         <div class="participants-notes-list">
-          <div class="participant-notes-card" *ngFor="let participant of getAllUniqueParticipants(); let i = index">
+          <div class="participant-notes-card" *ngFor="let participant of getFilteredParticipantsNotes(); let i = index">
             <div class="participant-header">
+              <div class="participant-rank-number">
+                <div class="rank-circle" [class.rank-gold]="i === 0" [class.rank-silver]="i === 1" [class.rank-bronze]="i === 2" [class.rank-top]="i >= 3 && i < 10" [class.rank-normal]="i >= 10">
+                  <span class="rank-text">{{i + 1}}</span>
+                </div>
+              </div>
               <div class="participant-info">
                 <div class="participant-avatar">{{participant.prenom?.[0]}}{{participant.nom?.[0]}}</div>
                 <div class="participant-details">
                   <h4>{{participant.prenom}} {{participant.nom}}</h4>
-                  <span class="participant-email">{{participant.email || 'Email non disponible'}}</span>
-                  <span class="participant-city">{{participant.ville || 'Ville non renseignée'}}</span>
+                  <div class="participant-rank">
+                    <span class="rank-badge">{{i + 1}}{{i === 0 ? 'er' : 'ème'}} au classement</span>
+                  </div>
                 </div>
               </div>
               <div class="participant-summary">
                 <div class="summary-item">
                   <span class="summary-label">Textes soumis:</span>
-                  <span class="summary-value">{{getParticipantTextsCount(participant.prenom, participant.nom)}}</span>
+                  <span class="summary-value">{{participant.textes.length}}</span>
                 </div>
                 <div class="summary-item">
                   <span class="summary-label">Note moyenne:</span>
-                  <span class="summary-value note-display">{{getParticipantAverageNote(participant.prenom, participant.nom) ? (getParticipantAverageNote(participant.prenom, participant.nom) | number:'1.1-1') + '/20' : 'N/A'}}</span>
+                  <span class="summary-value note-display" [class.excellent]="participant.note_moyenne >= 16" [class.good]="participant.note_moyenne >= 12 && participant.note_moyenne < 16" [class.average]="participant.note_moyenne >= 8 && participant.note_moyenne < 12" [class.poor]="participant.note_moyenne < 8">
+                    {{participant.note_moyenne ? (participant.note_moyenne | number:'1.2-2') + '/20' : 'N/A'}}
+                  </span>
                 </div>
+                <button class="toggle-details-btn" (click)="toggleParticipantDetails(i)" [title]="participantDetailsVisible[i] ? 'Masquer' : 'Afficher'">
+                  <i class="fas" [class.fa-chevron-up]="participantDetailsVisible[i]" [class.fa-chevron-down]="!participantDetailsVisible[i]"></i>
+                </button>
               </div>
             </div>
             
             <!-- Détails des textes et évaluations -->
-            <div class="participant-texts">
+            <div class="participant-texts" *ngIf="participantDetailsVisible[i]">
               <h5>Textes soumis et évaluations reçues:</h5>
-              <div class="texts-evaluations" *ngFor="let texte of getParticipantTexts(participant.prenom, participant.nom)">
+              <div class="texts-evaluations" *ngFor="let texte of participant.textes">
                 <div class="text-card">
                   <div class="text-header">
                     <h6>{{texte.titre}}</h6>
@@ -2646,6 +2688,9 @@
                       <span class="language-tag">{{texte.langue | titlecase}}</span>
                       <span class="theme-tag">{{getThemeLabel(texte.theme)}}</span>
                       <span class="date-tag">{{texte.created_at | date:'dd/MM/yyyy'}}</span>
+                      <span class="note-moyenne-texte" *ngIf="texte.note_moyenne">
+                        Moyenne: {{texte.note_moyenne | number:'1.2-2'}}/20
+                      </span>
                     </div>
                   </div>
                   
@@ -2653,10 +2698,10 @@
                   <div class="evaluations-details">
                     <div class="evaluations-header">
                       <span class="evaluations-title">Évaluations par correcteur:</span>
-                      <span class="correcteurs-count">{{getTextCorrectorsCount(texte.id)}} correcteur(s) assigné(s)</span>
+                      <span class="correcteurs-count">{{texte.detailed_evaluations?.length || 0}} évaluation(s)</span>
                     </div>
                     
-                    <div class="correcteur-evaluations" *ngFor="let evaluation of getTextEvaluations(texte.id)">
+                    <div class="correcteur-evaluations" *ngFor="let evaluation of texte.detailed_evaluations">
                       <div class="evaluation-card">
                         <div class="correcteur-info">
                           <div class="correcteur-avatar-small">{{evaluation.correcteur_prenom?.[0]}}{{evaluation.correcteur_nom?.[0]}}</div>
@@ -2668,64 +2713,60 @@
                         
                         <div class="evaluation-content">
                           <div class="evaluation-note">
-                            <span class="note-label">Note:</span>
-                            <span class="note-value" *ngIf="evaluation.note !== null && evaluation.note !== undefined && evaluation.note > 0" [class.excellent]="evaluation.note >= 16" [class.good]="evaluation.note >= 12 && evaluation.note < 16" [class.average]="evaluation.note >= 8 && evaluation.note < 12" [class.poor]="evaluation.note < 8">
-                              {{evaluation.note}}/20
-                            </span>
-                            <span class="note-pending" *ngIf="evaluation.note === null || evaluation.note === undefined || evaluation.note <= 0">
-                              -
+                            <span class="note-label">Note totale:</span>
+                            <span class="note-value" [class.excellent]="evaluation.note_totale >= 16" [class.good]="evaluation.note_totale >= 12 && evaluation.note_totale < 16" [class.average]="evaluation.note_totale >= 8 && evaluation.note_totale < 12" [class.poor]="evaluation.note_totale < 8">
+                              {{evaluation.note_totale || 0}}/20
                             </span>
                           </div>
                           
-                          <div class="evaluation-comment" *ngIf="evaluation.commentaire && evaluation.commentaire.trim()">
-                            <span class="comment-label">Commentaire:</span>
-                            <p class="comment-text">{{evaluation.commentaire}}</p>
+                          <!-- Grille d'évaluation détaillée -->
+                          <div class="grille-evaluation">
+                            <div class="critere-item">
+                              <span class="critere-label">Pertinence</span>
+                              <span class="critere-score">{{evaluation.pertinence || 0}}/5</span>
+                            </div>
+                            <div class="critere-item">
+                              <span class="critere-label">Cohérence</span>
+                              <span class="critere-score">{{evaluation.coherence || 0}}/5</span>
+                            </div>
+                            <div class="critere-item">
+                              <span class="critere-label">Correction de la langue</span>
+                              <span class="critere-score">{{evaluation.correction || 0}}/5</span>
+                            </div>
+                            <div class="critere-item">
+                              <span class="critere-label">Présentation</span>
+                              <span class="critere-score">{{evaluation.presentation || 0}}/5</span>
+                            </div>
                           </div>
                           
-                          <div class="evaluation-pending" *ngIf="evaluation.note === null || evaluation.note === undefined || evaluation.note <= 0">
-                            <span class="pending-text">En attente d'évaluation</span>
-                            <button class="btn btn-xs btn-primary" (click)="openEvaluationModal(texte)" style="margin-left: 10px;">
-                              À corriger
-                            </button>
+                          <div class="evaluation-comment">
+                            <h6 style="color: #FF7F1A;"><i class="fas fa-comment-dots"></i> Remarques du correcteur:</h6>
+                            <p *ngIf="evaluation.remarques && evaluation.remarques.trim(); else noComments">{{evaluation.remarques}}</p>
+                            <ng-template #noComments>
+                              <p style="color: #6c757d; font-style: italic;">Aucun commentaire de ce correcteur</p>
+                            </ng-template>
                           </div>
                           
                           <div class="evaluation-status">
-                            <span class="status-badge" [ngClass]="getStatusClass(evaluation.statut || texte.statut)">{{getStatusLabel(evaluation.statut || texte.statut)}}</span>
+                            <span class="status-badge" [class.status-accepte]="evaluation.note_totale >= 10" [class.status-refuse]="evaluation.note_totale < 10">
+                              {{evaluation.note_totale >= 10 ? 'Admis (≥ 10/20)' : 'Non admis (< 10/20)'}}
+                            </span>
                           </div>
                         </div>
                       </div>
                     </div>
                     
                     <!-- Si aucune évaluation -->
-                    <div class="no-evaluations" *ngIf="getTextEvaluations(texte.id).length === 0">
+                    <div class="no-evaluations" *ngIf="!texte.detailed_evaluations || texte.detailed_evaluations.length === 0">
                       <i class="fas fa-clock"></i>
                       <span>En attente d'évaluation</span>
-                    </div>
-                    
-                    <!-- Note finale du texte -->
-                    <div class="text-final-note" *ngIf="getTextFinalNote(texte.id) !== null && (getTextFinalNote(texte.id) || 0) > 0">
-                      <div class="final-note-card">
-                        <span class="final-note-label">Note finale du texte:</span>
-                        <span class="final-note-value" [class.excellent]="(getTextFinalNote(texte.id) || 0) >= 16" [class.good]="(getTextFinalNote(texte.id) || 0) >= 12 && (getTextFinalNote(texte.id) || 0) < 16" [class.average]="(getTextFinalNote(texte.id) || 0) >= 8 && (getTextFinalNote(texte.id) || 0) < 12" [class.poor]="(getTextFinalNote(texte.id) || 0) < 8">
-                          {{(getTextFinalNote(texte.id) || 0) | number:'1.2-2'}}/20
-                        </span>
-                        <small class="note-calculation">Moyenne calculée</small>
-                      </div>
-                    </div>
-                    
-                    <!-- Message si pas encore de note finale -->
-                    <div class="text-no-final-note" *ngIf="getTextFinalNote(texte.id) === null || (getTextFinalNote(texte.id) || 0) <= 0">
-                      <div class="no-final-note-card">
-                        <i class="fas fa-clock"></i>
-                        <span>Note finale en attente des évaluations</span>
-                      </div>
                     </div>
                   </div>
                 </div>
               </div>
               
               <!-- Si aucun texte soumis -->
-              <div class="no-texts" *ngIf="getParticipantTexts(participant.prenom, participant.nom).length === 0">
+              <div class="no-texts" *ngIf="participant.textes.length === 0">
                 <i class="fas fa-file-alt"></i>
                 <span>Aucun texte soumis</span>
               </div>

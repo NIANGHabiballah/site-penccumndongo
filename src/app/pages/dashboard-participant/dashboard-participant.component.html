@@ -422,25 +422,28 @@
                 <div class="grille-evaluation">
                   <div class="critere-item">
                     <span class="critere-label">Pertinence</span>
-                    <span class="critere-score">{{correction.note_pertinence || '-'}}/5</span>
+                    <span class="critere-score">{{correction.note_pertinence !== null && correction.note_pertinence !== undefined ? correction.note_pertinence : '0'}}/5</span>
                   </div>
                   <div class="critere-item">
                     <span class="critere-label">Cohérence</span>
-                    <span class="critere-score">{{correction.note_coherence || '-'}}/5</span>
+                    <span class="critere-score">{{correction.note_coherence !== null && correction.note_coherence !== undefined ? correction.note_coherence : '0'}}/5</span>
                   </div>
                   <div class="critere-item">
                     <span class="critere-label">Correction de la langue</span>
-                    <span class="critere-score">{{correction.note_correction || '-'}}/5</span>
+                    <span class="critere-score">{{correction.note_correction !== null && correction.note_correction !== undefined ? correction.note_correction : '0'}}/5</span>
                   </div>
                   <div class="critere-item">
                     <span class="critere-label">Présentation</span>
-                    <span class="critere-score">{{correction.note_presentation || '-'}}/5</span>
+                    <span class="critere-score">{{correction.note_presentation !== null && correction.note_presentation !== undefined ? correction.note_presentation : '0'}}/5</span>
                   </div>
                 </div>
                 
-                <div class="remarques" *ngIf="correction.commentaires">
+                <div class="remarques">
                   <h6 style="color: #FF7F1A;"><i class="fas fa-comment-dots"></i> Remarques du correcteur:</h6>
-                  <p>{{correction.commentaires}}</p>
+                  <p *ngIf="correction.commentaires; else noComments">{{correction.commentaires}}</p>
+                  <ng-template #noComments>
+                    <p style="color: #6c757d; font-style: italic;">Aucun commentaire de ce correcteur</p>
+                  </ng-template>
                 </div>
               </div>
             </div>

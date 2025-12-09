@@ -402,4 +402,9 @@ export class Cp2iApiService {
   getEvaluationsForTexte(texteId: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/get-evaluations-by-texte.php?texte_id=${texteId}`, { headers: this.getHeaders() });
   }
+
+  // Récupérer les notes et classement pour l'admin avec détails par critère
+  getAdminNotesClassement(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/get-admin-notes-classement.php`, { headers: this.getHeaders() });
+  }
 }
