@@ -1969,21 +1969,135 @@
           </div>
         </div>
 
-        <!-- Tableau de performance -->
-        <div class="performance-table" [class.hidden]="!isStatsVisible('performance')">
+        <!-- Tableau de délibération - Top Participants -->
+        <div class="deliberation-table" [class.hidden]="!isStatsVisible('performance')">
           <div class="panel">
             <div class="panel-header">
-              <h3><i class="fas fa-trophy"></i> Top Participants</h3>
+              <div class="header-title">
+                <h3><i class="fas fa-trophy"></i> Top Participants - Tableau de Délibération</h3>
+                <p>Classement officiel pour la délibération du jury</p>
+              </div>
+              <div class="header-actions">
+                <button class="btn btn-secondary" (click)="forceRefreshNotes()" title="Recalculer toutes les notes">
+                  <i class="fas fa-calculator"></i> Recalculer notes
+                </button>
+                <button class="btn btn-primary" (click)="downloadDeliberationTable()" title="Télécharger en image">
+                  <i class="fas fa-download"></i> Télécharger
+                </button>
+                <button class="btn btn-outline" (click)="refreshDeliberationData()" title="Actualiser les données">
+                  <i class="fas fa-sync"></i> Actualiser
+                </button>
+              </div>
             </div>
             <div class="panel-content">
-              <div class="top-participants">
-                <div class="participant-row" *ngFor="let participant of getTopParticipants(); let i = index">
-                  <div class="rank">{{i + 1}}</div>
-                  <div class="participant-info">
-                    <strong>{{participant.prenom}} {{participant.nom}}</strong>
-                    <span>{{participant.nb_evaluations || 0}}/3 notes</span>
+              <div class="deliberation-info">
+                <div class="info-badge">
+                  <i class="fas fa-users"></i>
+                  <span>{{getDeliberationParticipants().length}} participants classés</span>
+                </div>
+                <div class="info-badge">
+                  <i class="fas fa-calendar"></i>
+                  <span>Données du {{getCurrentDateTime()}}</span>
+                </div>
+                <div class="info-badge" *ngIf="getParticipantsWithoutNotes() > 0" style="background: linear-gradient(135deg, #fff3cd, #ffeaa7); color: #856404;">
+                  <i class="fas fa-exclamation-triangle"></i>
+                  <span>{{getParticipantsWithoutNotes()}} participants sans notes</span>
+                </div>
+              </div>
+              
+              <div class="deliberation-table-container" id="deliberation-table-export">
+                <div class="table-header">
+                  <h2>CONCOURS DE POÉSIE INÉDIT & INNOVANT (CP2i) - 2025</h2>
+                  <h3>TABLEAU DE DÉLIBÉRATION OFFICIEL</h3>
+                  <p>Classement des participants par note moyenne décroissante</p>
+                </div>
+                
+                <table class="deliberation-table-main">
+                  <thead>
+                    <tr>
+                      <th class="col-rank">Rang</th>
+                      <th class="col-name">Prénom</th>
+                      <th class="col-name">Nom</th>
+                      <th class="col-address">Adresse/Ville</th>
+                      <th class="col-theme">Thème principal</th>
+                      <th class="col-language">Langue</th>
+                      <th class="col-average">Moyenne</th>
+                      <th class="col-status">Statut</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let participant of getDeliberationParticipants(); let i = index" 
+                        [class.top-5]="i < 5" 
+                        [class.top-10]="i < 10"
+                        [class.finalist]="i < 5">
+                      <td class="col-rank">
+                        <div class="rank-display">
+                          <span class="rank-number">{{i + 1}}</span>
+                          <i class="fas fa-medal" *ngIf="i === 0" style="color: #FFD700;"></i>
+                          <i class="fas fa-medal" *ngIf="i === 1" style="color: #C0C0C0;"></i>
+                          <i class="fas fa-medal" *ngIf="i === 2" style="color: #CD7F32;"></i>
+                          <i class="fas fa-medal" *ngIf="i === 3" style="color: #6f42c1;"></i>
+                          <i class="fas fa-medal" *ngIf="i === 4" style="color: #28a745;"></i>
+                        </div>
+                      </td>
+                      <td class="col-name">{{participant.prenom}}</td>
+                      <td class="col-name">{{participant.nom}}</td>
+                      <td class="col-address">{{participant.ville || 'Non renseignée'}}</td>
+                      <td class="col-theme">{{getParticipantMainTheme(participant)}}</td>
+                      <td class="col-language">{{getParticipantMainLanguage(participant)}}</td>
+                      <td class="col-average">
+                        <span class="average-score" 
+                              [class.excellent]="participant.note_moyenne && participant.note_moyenne >= 16" 
+                              [class.good]="participant.note_moyenne && participant.note_moyenne >= 12 && participant.note_moyenne < 16"
+                              [class.average]="participant.note_moyenne && participant.note_moyenne >= 8 && participant.note_moyenne < 12"
+                              [class.poor]="participant.note_moyenne && participant.note_moyenne < 8"
+                              [class.no-note]="!participant.note_moyenne">
+                          <span *ngIf="participant.note_moyenne; else noNoteTemplate">
+                            {{participant.note_moyenne | number:'1.2-2'}}/20
+                          </span>
+                          <ng-template #noNoteTemplate>
+                            <span class="no-note-text">En attente</span>
+                          </ng-template>
+                        </span>
+                        <button class="debug-btn" 
+                                (click)="debugParticipantNotes(participant.prenom, participant.nom)"
+                                title="Déboguer les notes"
+                                style="margin-left: 5px; font-size: 10px; padding: 2px 4px;">
+                          <i class="fas fa-bug"></i>
+                        </button>
+                      </td>
+                      <td class="col-status">
+                        <span class="status-badge" 
+                              [class.qualified]="participant.note_moyenne && participant.note_moyenne >= 10" 
+                              [class.not-qualified]="participant.note_moyenne && participant.note_moyenne < 10"
+                              [class.pending]="!participant.note_moyenne">
+                          <span *ngIf="participant.note_moyenne; else pendingStatusTemplate">
+                            {{participant.note_moyenne >= 10 ? 'Admis' : 'Non admis'}}
+                          </span>
+                          <ng-template #pendingStatusTemplate>
+                            En attente d'évaluation
+                          </ng-template>
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                
+                <div class="table-footer">
+                  <div class="footer-info">
+                    <p><strong>Critères d'évaluation :</strong> Pertinence (5pts), Cohérence (5pts), Correction de la langue (5pts), Présentation (5pts)</p>
+                    <p><strong>Seuil d'admission :</strong> 10/20 | <strong>Date de délibération :</strong> {{getCurrentDateTime()}}</p>
                   </div>
-                  <div class="score">{{participant.note_moyenne ? (participant.note_moyenne | number:'1.1-1') + '/20' : 'N/A'}}</div>
+                  <div class="footer-stats">
+                    <div class="stat-item">
+                      <span class="stat-label">Participants admis :</span>
+                      <span class="stat-value">{{getQualifiedCount()}}</span>
+                    </div>
+                    <div class="stat-item">
+                      <span class="stat-label">Note moyenne générale :</span>
+                      <span class="stat-value">{{getGeneralAverage()}}/20</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -407,4 +407,19 @@ export class Cp2iApiService {
   getAdminNotesClassement(): Observable<any> {
     return this.http.get(`${this.baseUrl}/get-admin-notes-classement.php`, { headers: this.getHeaders() });
   }
+
+  // Forcer le recalcul des notes moyennes
+  forceRecalculateNotes(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cp2i-dashboard.php?action=recalculate_notes`, {}, { headers: this.getHeaders() });
+  }
+
+  // Vérifier la cohérence des données de notes
+  checkNotesConsistency(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-dashboard.php?action=check_notes_consistency`, { headers: this.getHeaders() });
+  }
+
+  // Réparer les données de notes incohérentes
+  repairNotesData(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cp2i-dashboard.php?action=repair_notes_data`, {}, { headers: this.getHeaders() });
+  }
 }

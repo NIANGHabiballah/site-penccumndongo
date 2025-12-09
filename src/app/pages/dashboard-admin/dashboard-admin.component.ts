@@ -1665,10 +1665,36 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     let nombreTextes = 0;
     
     participantTextes.forEach(texte => {
-      // Utiliser directement la note du texte si elle existe
+      // Vérifier plusieurs sources de notes
+      let noteTexte = null;
+      
+      // 1. Note directe du texte
       if (texte.note && texte.note > 0) {
-        const noteValue = typeof texte.note === 'string' ? parseFloat(texte.note) : texte.note;
-        totalNotes += noteValue;
+        noteTexte = typeof texte.note === 'string' ? parseFloat(texte.note) : texte.note;
+      }
+      // 2. Note depuis les évaluations détaillées
+      else if (texte.real_evaluations && texte.real_evaluations.length > 0) {
+        const notesEvaluations = texte.real_evaluations
+          .filter((e: any) => e.note_totale && e.note_totale > 0)
+          .map((e: any) => parseFloat(e.note_totale));
+        
+        if (notesEvaluations.length > 0) {
+          noteTexte = notesEvaluations.reduce((sum: number, note: number) => sum + note, 0) / notesEvaluations.length;
+        }
+      }
+      // 3. Note depuis detailed_evaluations
+      else if (texte.detailed_evaluations && texte.detailed_evaluations.length > 0) {
+        const notesEvaluations = texte.detailed_evaluations
+          .filter((e: any) => e.note_totale && e.note_totale > 0)
+          .map((e: any) => parseFloat(e.note_totale));
+        
+        if (notesEvaluations.length > 0) {
+          noteTexte = notesEvaluations.reduce((sum: number, note: number) => sum + note, 0) / notesEvaluations.length;
+        }
+      }
+      
+      if (noteTexte && noteTexte > 0) {
+        totalNotes += noteTexte;
         nombreTextes++;
       }
     });
@@ -2298,7 +2324,17 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   getParticipantsWithoutNotes(): number {
-    return this.participantsWithDetailedNotes.filter(p => !p.note_moyenne || p.note_moyenne === 0).length;
+    // Compter tous les participants qui ont soumis des textes mais n'ont pas de notes
+    const allParticipants = this.getAllUniqueParticipants();
+    return allParticipants.filter(p => {
+      const noteMoyenne = this.getParticipantAverageNote(p.prenom, p.nom);
+      return !noteMoyenne || noteMoyenne === 0;
+    }).length;
+  }
+  
+  // Méthode pour obtenir le nombre de participants avec des textes soumis
+  getParticipantsWithSubmissions(): number {
+    return this.getAllUniqueParticipants().length;
   }
   
   logAdminAction(action: string, description: string) {
@@ -3557,17 +3593,91 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   // Méthode pour forcer le recalcul immédiat des notes (bouton manuel)
   forceRefreshNotes() {
-    this.showToast('Recalcul des notes en cours...', 'success');
+    this.showToast('Vérification et recalcul des notes en cours...', 'success');
     
     // Debug: afficher les données des textes
     console.log('Textes avec notes:', this.textes.filter(t => t.note && t.note > 0));
     console.log('Tous les textes:', this.textes);
     
-    this.loadData();
+    // 1. Vérifier la cohérence des données
+    this.cp2iApi.checkNotesConsistency().subscribe({
+      next: (response) => {
+        console.log('Vérification cohérence:', response);
+        
+        // 2. Réparer les données si nécessaire
+        if (response.needs_repair) {
+          this.cp2iApi.repairNotesData().subscribe({
+            next: (repairResponse) => {
+              console.log('Réparation:', repairResponse);
+              this.showToast('Données réparées avec succès', 'success');
+              this.continueRefreshProcess();
+            },
+            error: (error) => {
+              console.error('Erreur réparation:', error);
+              this.continueRefreshProcess();
+            }
+          });
+        } else {
+          this.continueRefreshProcess();
+        }
+      },
+      error: (error) => {
+        console.error('Erreur vérification:', error);
+        this.continueRefreshProcess();
+      }
+    });
+  }
+  
+  private continueRefreshProcess() {
+    // 3. Forcer le recalcul des notes
+    this.cp2iApi.forceRecalculateNotes().subscribe({
+      next: (response) => {
+        console.log('Recalcul forcé:', response);
+        
+        // 4. Recharger toutes les données
+        this.loadDetailedEvaluations();
+        this.loadDetailedNotesForAllParticipants();
+        this.loadData();
+        
+        setTimeout(() => {
+          this.showToast('Notes recalculées et mises à jour avec succès', 'success');
+        }, 2000);
+      },
+      error: (error) => {
+        console.error('Erreur recalcul:', error);
+        // Fallback: recharger normalement
+        this.loadDetailedEvaluations();
+        this.loadDetailedNotesForAllParticipants();
+        this.loadData();
+        
+        setTimeout(() => {
+          this.showToast('Données rechargées (recalcul partiel)', 'success');
+        }, 2000);
+      }
+    });
+  }
+  
+  // Méthode de débogage pour vérifier les notes d'un participant
+  debugParticipantNotes(prenom: string, nom: string): void {
+    console.log(`=== DEBUG NOTES POUR ${prenom} ${nom} ===`);
     
-    setTimeout(() => {
-      this.showToast('Notes mises à jour avec succès', 'success');
-    }, 2000);
+    const participantTextes = this.textes.filter(t => 
+      t.prenom?.trim() === prenom?.trim() && t.nom?.trim() === nom?.trim()
+    );
+    
+    console.log('Textes trouvés:', participantTextes.length);
+    
+    participantTextes.forEach((texte, index) => {
+      console.log(`Texte ${index + 1}: "${texte.titre}"`);
+      console.log('  - Note directe:', texte.note);
+      console.log('  - Real evaluations:', texte.real_evaluations);
+      console.log('  - Detailed evaluations:', texte.detailed_evaluations);
+      console.log('  - Statut:', texte.statut);
+    });
+    
+    const moyenne = this.getParticipantAverageNote(prenom, nom);
+    console.log('Note moyenne calculée:', moyenne);
+    console.log('=== FIN DEBUG ===');
   }
   
   // Méthode pour exporter les notes des participants
@@ -3653,5 +3763,233 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.participantDetailsVisible[index] = !this.participantDetailsVisible[index];
   }
   
+  // Méthodes pour le tableau de délibération
+  getDeliberationParticipants(): any[] {
+    // Obtenir tous les participants uniques avec leurs notes
+    const participantsMap = new Map<string, any>();
+    
+    // Parcourir tous les utilisateurs participants
+    this.participants.forEach(participant => {
+      const key = `${participant.prenom?.trim()}_${participant.nom?.trim()}`;
+      if (!participantsMap.has(key)) {
+        // Chercher les infos complètes dans allAccounts
+        const fullInfo = this.allAccounts.find(account => 
+          account.prenom?.trim() === participant.prenom?.trim() && 
+          account.nom?.trim() === participant.nom?.trim()
+        );
+        
+        participantsMap.set(key, {
+          prenom: participant.prenom,
+          nom: participant.nom,
+          email: fullInfo?.email || participant.email,
+          ville: fullInfo?.ville || participant.ville || 'Non renseignée',
+          telephone: fullInfo?.telephone || participant.telephone,
+          whatsapp: fullInfo?.whatsapp || participant.whatsapp,
+          textes: [],
+          note_moyenne: null
+        });
+      }
+    });
+    
+    // Ajouter les textes et calculer les notes
+    this.textes.forEach(texte => {
+      const key = `${texte.prenom?.trim()}_${texte.nom?.trim()}`;
+      let participant = participantsMap.get(key);
+      
+      if (!participant) {
+        // Créer le participant s'il n'existe pas (cas où il a soumis un texte mais n'est pas dans users)
+        const fullInfo = this.allAccounts.find(account => 
+          account.prenom?.trim() === texte.prenom?.trim() && 
+          account.nom?.trim() === texte.nom?.trim()
+        );
+        
+        participant = {
+          prenom: texte.prenom,
+          nom: texte.nom,
+          email: fullInfo?.email || 'Email non disponible',
+          ville: fullInfo?.ville || 'Non renseignée',
+          telephone: fullInfo?.telephone,
+          whatsapp: fullInfo?.whatsapp,
+          textes: [],
+          note_moyenne: null
+        };
+        participantsMap.set(key, participant);
+      }
+      
+      participant.textes.push(texte);
+    });
+    
+    // Calculer les notes moyennes avec débogage
+    Array.from(participantsMap.values()).forEach(participant => {
+      const noteMoyenne = this.getParticipantAverageNote(participant.prenom, participant.nom);
+      participant.note_moyenne = noteMoyenne;
+      
+      // Debug pour les participants sans notes
+      if (!noteMoyenne) {
+        console.log(`Participant sans note: ${participant.prenom} ${participant.nom}`);
+        console.log('Textes:', participant.textes.map((t: any) => ({ titre: t.titre, note: t.note, statut: t.statut })));
+      }
+    });
+    
+    // Trier tous les participants (avec et sans notes)
+    const allParticipants = Array.from(participantsMap.values())
+      .sort((a, b) => {
+        // Les participants avec notes en premier, triés par note décroissante
+        if (a.note_moyenne && b.note_moyenne) {
+          return b.note_moyenne - a.note_moyenne;
+        }
+        if (a.note_moyenne && !b.note_moyenne) {
+          return -1; // a avant b
+        }
+        if (!a.note_moyenne && b.note_moyenne) {
+          return 1; // b avant a
+        }
+        // Si aucun n'a de note, trier par nom
+        return `${a.prenom} ${a.nom}`.localeCompare(`${b.prenom} ${b.nom}`);
+      });
+    
+    // Marquer les 5 premiers avec notes comme finalistes
+    let finalistCount = 0;
+    allParticipants.forEach((participant, index) => {
+      if (participant.note_moyenne && finalistCount < 5) {
+        participant.isTop5 = true;
+        finalistCount++;
+      } else {
+        participant.isTop5 = false;
+      }
+    });
+    
+    return allParticipants;
+  }
+  
+  getParticipantMainTheme(participant: any): string {
+    if (!participant.textes || participant.textes.length === 0) return 'Aucun';
+    
+    // Compter les thèmes
+    const themeCount: { [key: string]: number } = {};
+    participant.textes.forEach((texte: any) => {
+      const theme = texte.theme || 'non_specifie';
+      themeCount[theme] = (themeCount[theme] || 0) + 1;
+    });
+    
+    // Trouver le thème le plus fréquent
+    const mainTheme = Object.keys(themeCount).reduce((a, b) => 
+      themeCount[a] > themeCount[b] ? a : b
+    );
+    
+    return this.getThemeLabel(mainTheme);
+  }
+  
+  getParticipantMainLanguage(participant: any): string {
+    if (!participant.textes || participant.textes.length === 0) return 'Aucune';
+    
+    // Compter les langues
+    const langueCount: { [key: string]: number } = {};
+    participant.textes.forEach((texte: any) => {
+      const langue = texte.langue || 'non_specifie';
+      langueCount[langue] = (langueCount[langue] || 0) + 1;
+    });
+    
+    // Trouver la langue la plus fréquente
+    const mainLangue = Object.keys(langueCount).reduce((a, b) => 
+      langueCount[a] > langueCount[b] ? a : b
+    );
+    
+    return mainLangue.charAt(0).toUpperCase() + mainLangue.slice(1);
+  }
+  
+  getCurrentDateTime(): string {
+    return new Date().toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+  
+  getQualifiedCount(): number {
+    return this.getDeliberationParticipants().filter(p => p.note_moyenne >= 10).length;
+  }
+  
+  getGeneralAverage(): string {
+    const participants = this.getDeliberationParticipants();
+    if (participants.length === 0) return 'N/A';
+    
+    const total = participants.reduce((sum, p) => sum + (p.note_moyenne || 0), 0);
+    const average = total / participants.length;
+    return average.toFixed(2);
+  }
+  
+  refreshDeliberationData(): void {
+    this.showToast('Actualisation des données de délibération...', 'success');
+    this.loadData();
+    setTimeout(() => {
+      this.showToast('Données actualisées avec succès', 'success');
+    }, 1500);
+  }
+  
+  downloadDeliberationTable(): void {
+    // Utiliser html2canvas pour capturer le tableau
+    const element = document.getElementById('deliberation-table-export');
+    if (!element) {
+      this.showToast('Erreur: Tableau non trouvé', 'error');
+      return;
+    }
+    
+    // Import dynamique de html2canvas
+    import('html2canvas').then(html2canvas => {
+      html2canvas.default(element, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        allowTaint: true,
+        width: element.scrollWidth,
+        height: element.scrollHeight
+      }).then(canvas => {
+        // Créer le lien de téléchargement
+        const link = document.createElement('a');
+        link.download = `tableau-deliberation-cp2i-${new Date().toISOString().split('T')[0]}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        
+        this.showToast('Tableau téléchargé avec succès', 'success');
+        this.logAdminAction('export_deliberation', 'Téléchargement du tableau de délibération en image');
+      }).catch(error => {
+        console.error('Erreur capture:', error);
+        this.showToast('Erreur lors de la capture du tableau', 'error');
+      });
+    }).catch(error => {
+      console.error('Erreur import html2canvas:', error);
+      // Fallback: export CSV
+      this.exportDeliberationCSV();
+    });
+  }
+  
+  exportDeliberationCSV(): void {
+    const participants = this.getDeliberationParticipants();
+    const headers = ['Rang', 'Prénom', 'Nom', 'Adresse/Ville', 'Thème principal', 'Langue', 'Moyenne', 'Statut'];
+    const rows = participants.map((participant, index) => [
+      index + 1,
+      participant.prenom,
+      participant.nom,
+      participant.ville || 'Non renseignée',
+      this.getParticipantMainTheme(participant),
+      this.getParticipantMainLanguage(participant),
+      participant.note_moyenne ? participant.note_moyenne.toFixed(2) + '/20' : 'N/A',
+      participant.note_moyenne >= 10 ? 'Admis' : 'Non admis'
+    ]);
+    
+    const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tableau-deliberation-cp2i-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    this.showToast('Tableau exporté en CSV', 'success');
+  }
 
 }
