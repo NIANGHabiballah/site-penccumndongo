@@ -17,6 +17,47 @@
   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
 
+.notes-header .header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.notes-header .header-actions .btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.notes-header .header-actions .btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.notes-header .header-actions .btn-secondary:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+}
+
+.notes-header .header-actions .btn-outline {
+  background: transparent;
+  color: #0380C2;
+  border: 2px solid #0380C2;
+}
+
+.notes-header .header-actions .btn-outline:hover {
+  background: #0380C2;
+  color: white;
+  transform: translateY(-2px);
+}
+
 .notes-header .header-content h2 {
   color: #2c3e50;
   margin: 0 0 0.5rem 0;
@@ -492,6 +533,89 @@
   font-weight: bold;
   padding: 0.4rem 0.8rem;
   border-radius: 12px;
+}
+
+.evaluation-note .note-value.excellent {
+  background: linear-gradient(135deg, #28a745, #34ce57);
+  color: white;
+}
+
+.evaluation-note .note-value.good {
+  background: linear-gradient(135deg, #0380C2, #4a90e2);
+  color: white;
+}
+
+.evaluation-note .note-value.average {
+  background: linear-gradient(135deg, #FF7F1A, #ff9a3d);
+  color: white;
+}
+
+.evaluation-note .note-value.poor {
+  background: linear-gradient(135deg, #dc3545, #e4606d);
+  color: white;
+}
+
+.note-pending {
+  color: #6c757d;
+  font-style: italic;
+  padding: 0.4rem 0.8rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px dashed #dee2e6;
+}
+
+.note-label {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-right: 0.5rem;
+}
+
+/* Styles pour les notes finales */
+.final-note-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.final-note-label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.final-note-value {
+  font-size: 1.4rem;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.final-note-value.excellent {
+  background: linear-gradient(135deg, #28a745, #34ce57);
+  color: white;
+}
+
+.final-note-value.good {
+  background: linear-gradient(135deg, #0380C2, #4a90e2);
+  color: white;
+}
+
+.final-note-value.average {
+  background: linear-gradient(135deg, #FF7F1A, #ff9a3d);
+  color: white;
+}
+
+.final-note-value.poor {
+  background: linear-gradient(135deg, #dc3545, #e4606d);
+  color: white;
+}
+
+.note-calculation {
+  color: #6c757d;
+  font-style: italic;
+  font-size: 0.8rem;
 }
 
 /* Détails par critères */

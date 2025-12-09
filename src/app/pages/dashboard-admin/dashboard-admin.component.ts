@@ -425,6 +425,15 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
           this.generateAffectationStats();
           this.cdr.detectChanges();
         }, 500);
+        
+        this.calculateStatsFromTexts();
+        // Générer les stats d'affectation immédiatement
+        this.generateAffectationStats();
+        setTimeout(() => {
+          this.calculateStatsFromTexts();
+          this.generateAffectationStats();
+          this.cdr.detectChanges();
+        }, 500);
       },
       error: (error) => console.error('Erreur textes:', error)
     });
@@ -1620,28 +1629,30 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   loadDetailedEvaluations() {
     // Charger les évaluations pour tous les textes en une seule fois
-    this.textes.forEach(texte => {
-      // Utiliser la nouvelle API d'évaluations
-      this.http.get(`${this.cp2iApi['baseUrl']}/cp2i-evaluations.php?texte_id=${texte.id}`, { headers: this.getHeaders() }).subscribe({
-        next: (data: any) => {
-          if (data.evaluations && data.evaluations.length > 0) {
-            texte.real_evaluations = data.evaluations;
+    this.textes.forEach((texte, index) => {
+      // Ajouter un délai progressif pour éviter la surcharge du serveur
+      setTimeout(() => {
+        this.http.get(`${this.cp2iApi['baseUrl']}/cp2i-evaluations.php?texte_id=${texte.id}`, { headers: this.getHeaders() }).subscribe({
+          next: (data: any) => {
+            if (data.evaluations && data.evaluations.length > 0) {
+              texte.real_evaluations = data.evaluations;
+              // Recalculer les statistiques après chaque chargement d'évaluation
+              this.calculateStatsFromTexts();
+            }
+            this.cdr.detectChanges();
+          },
+          error: (error) => {
+            console.error('Erreur chargement évaluations pour texte', texte.id, ':', error);
           }
-          this.cdr.detectChanges();
-        },
-        error: (error) => {
-          console.error('Erreur chargement évaluations pour texte', texte.id, ':', error);
-          console.error('Response body:', error.error);
-          console.error('Response text:', error.error?.text || 'No text');
-          console.error('Status:', error.status);
-          console.error('URL:', error.url);
-        }
-      });
+        });
+      }, index * 100); // Délai de 100ms entre chaque requête
     });
   }
 
   getParticipantAverageNote(prenom: string, nom: string): number | null {
-    const participantTextes = this.textes.filter(t => t.prenom === prenom && t.nom === nom);
+    const participantTextes = this.textes.filter(t => 
+      t.prenom?.trim() === prenom?.trim() && t.nom?.trim() === nom?.trim()
+    );
     
     if (participantTextes.length === 0) return null;
     
@@ -1649,16 +1660,18 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     let nombreTextes = 0;
     
     participantTextes.forEach(texte => {
-      const finalNote = this.getTextFinalNote(texte.id);
-      if (finalNote !== null && finalNote > 0) {
-        totalNotes += finalNote;
+      // Utiliser directement la note du texte si elle existe
+      if (texte.note && texte.note > 0) {
+        const noteValue = typeof texte.note === 'string' ? parseFloat(texte.note) : texte.note;
+        totalNotes += noteValue;
         nombreTextes++;
       }
     });
     
     if (nombreTextes === 0) return null;
     
-    return Math.round((totalNotes / nombreTextes) * 10) / 10;
+    const moyenne = totalNotes / nombreTextes;
+    return Math.round(moyenne * 100) / 100;
   }
   
   getThemeLabel(theme: string): string {
@@ -3268,11 +3281,15 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
 
   // Méthodes pour la section Notes & Classement
   getParticipantTextsCount(prenom: string, nom: string): number {
-    return this.textes.filter(t => t.prenom === prenom && t.nom === nom).length;
+    return this.textes.filter(t => 
+      t.prenom?.trim() === prenom?.trim() && t.nom?.trim() === nom?.trim()
+    ).length;
   }
 
   getParticipantTexts(prenom: string, nom: string): any[] {
-    return this.textes.filter(t => t.prenom === prenom && t.nom === nom);
+    return this.textes.filter(t => 
+      t.prenom?.trim() === prenom?.trim() && t.nom?.trim() === nom?.trim()
+    );
   }
 
   getTextCorrectorsCount(texteId: number): number {
@@ -3280,89 +3297,43 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
 
   getTextFinalNote(texteId: number): number | null {
-    const evaluations = this.getTextEvaluations(texteId);
-    if (evaluations.length === 0) return null;
+    const texte = this.textes.find(t => t.id === texteId);
     
-    const notes = evaluations.map(e => {
-      if (e.note === null || e.note === undefined) return null;
-      const noteValue = typeof e.note === 'string' ? parseFloat(e.note) : e.note;
-      return noteValue > 0 ? noteValue : null;
-    }).filter(n => n !== null);
+    // Utiliser directement la note du texte si elle existe
+    if (texte && texte.note && texte.note > 0) {
+      const noteValue = typeof texte.note === 'string' ? parseFloat(texte.note) : texte.note;
+      return Math.round(noteValue * 100) / 100;
+    }
     
-    if (notes.length === 0) return null;
-    
-    const moyenne = notes.reduce((sum, note) => sum + note, 0) / notes.length;
-    return Math.round(moyenne * 100) / 100;
+    return null;
   }
 
   getTextEvaluations(texteId: number): any[] {
     const texte = this.textes.find(t => t.id === texteId);
-    if (texte && texte.real_evaluations) {
-      return texte.real_evaluations;
-    }
-    
-    // Charger les évaluations réelles si pas encore fait
-    if (texte && !texte.loading_evaluations) {
-      texte.loading_evaluations = true;
-      this.http.get(`${this.cp2iApi['baseUrl']}/cp2i-evaluations.php?texte_id=${texteId}`, { headers: this.getHeaders() }).subscribe({
-        next: (data: any) => {
-          if (data.evaluations && data.evaluations.length > 0) {
-            texte.real_evaluations = data.evaluations;
-          } else {
-            // Si pas d'évaluations réelles, créer des entrées en attente
-            const textAffectations = this.affectations.filter(a => a.texte_id === texteId);
-            texte.real_evaluations = textAffectations.map(affectation => {
-              const correcteur = this.correcteurs.find(c => c.id === affectation.corrector_id);
-              return {
-                correcteur_id: affectation.corrector_id,
-                correcteur_prenom: correcteur?.prenom || 'Correcteur',
-                correcteur_nom: correcteur?.nom || 'Inconnu',
-                note: null,
-                commentaire: null,
-                statut: 'en_attente',
-                date_evaluation: null
-              };
-            });
-          }
-          this.cdr.detectChanges();
-        },
-        error: (error) => {
-          console.error('Erreur chargement évaluations:', error);
-          console.error('Response body:', error.error);
-          console.error('Response text:', error.error?.text || 'No text');
-          console.error('Status:', error.status);
-          console.error('URL:', error.url);
-          // En cas d'erreur, créer des entrées en attente
-          const textAffectations = this.affectations.filter(a => a.texte_id === texteId);
-          texte.real_evaluations = textAffectations.map(affectation => {
-            const correcteur = this.correcteurs.find(c => c.id === affectation.corrector_id);
-            return {
-              correcteur_id: affectation.corrector_id,
-              correcteur_prenom: correcteur?.prenom || 'Correcteur',
-              correcteur_nom: correcteur?.nom || 'Inconnu',
-              note: null,
-              commentaire: null,
-              statut: 'en_attente',
-              date_evaluation: null
-            };
-          });
-          this.cdr.detectChanges();
-        }
-      });
-    }
-    
-    // Retourner les correcteurs assignés en attente par défaut pendant le chargement
     const textAffectations = this.affectations.filter(a => a.texte_id === texteId);
+    
     return textAffectations.map(affectation => {
       const correcteur = this.correcteurs.find(c => c.id === affectation.corrector_id);
+      
+      // Si le texte a une note, l'attribuer à cette évaluation
+      let noteEvaluation = null;
+      let statutEvaluation = 'en_attente';
+      let commentaireEvaluation = null;
+      
+      if (texte && texte.note && texte.note > 0) {
+        noteEvaluation = typeof texte.note === 'string' ? parseFloat(texte.note) : texte.note;
+        statutEvaluation = texte.statut || 'accepte';
+        commentaireEvaluation = texte.commentaire || null;
+      }
+      
       return {
         correcteur_id: affectation.corrector_id,
         correcteur_prenom: correcteur?.prenom || 'Correcteur',
         correcteur_nom: correcteur?.nom || 'Inconnu',
-        note: null,
-        commentaire: null,
-        statut: 'en_attente',
-        date_evaluation: null
+        note: noteEvaluation,
+        commentaire: commentaireEvaluation,
+        statut: statutEvaluation,
+        date_evaluation: texte?.updated_at || null
       };
     });
   }
@@ -3447,6 +3418,97 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       this.showToast(`${assignmentsCount} textes en ${langue} assignés automatiquement`, 'success');
       this.loadData();
     }, 2000);
+  }
+  
+  // Méthode pour forcer le recalcul immédiat des notes (bouton manuel)
+  forceRefreshNotes() {
+    this.showToast('Recalcul des notes en cours...', 'success');
+    
+    // Debug: afficher les données des textes
+    console.log('Textes avec notes:', this.textes.filter(t => t.note && t.note > 0));
+    console.log('Tous les textes:', this.textes);
+    
+    this.loadData();
+    
+    setTimeout(() => {
+      this.showToast('Notes mises à jour avec succès', 'success');
+    }, 2000);
+  }
+  
+  // Méthode pour exporter les notes des participants
+  // Méthode pour obtenir tous les participants uniques (depuis users et textes)
+  getAllUniqueParticipants(): any[] {
+    const participantsMap = new Map<string, any>();
+    
+    // Ajouter les participants depuis la liste des utilisateurs
+    this.participants.forEach(participant => {
+      const key = `${participant.prenom?.trim()}_${participant.nom?.trim()}`;
+      participantsMap.set(key, {
+        prenom: participant.prenom,
+        nom: participant.nom,
+        email: participant.email,
+        ville: participant.ville,
+        telephone: participant.telephone,
+        whatsapp: participant.whatsapp,
+        source: 'users'
+      });
+    });
+    
+    // Ajouter les participants depuis les textes (au cas où ils ne seraient pas dans users)
+    this.textes.forEach(texte => {
+      const key = `${texte.prenom?.trim()}_${texte.nom?.trim()}`;
+      if (!participantsMap.has(key)) {
+        // Chercher les infos complètes dans allAccounts
+        const fullInfo = this.allAccounts.find(account => 
+          account.prenom?.trim() === texte.prenom?.trim() && 
+          account.nom?.trim() === texte.nom?.trim()
+        );
+        
+        participantsMap.set(key, {
+          prenom: texte.prenom,
+          nom: texte.nom,
+          email: fullInfo?.email || 'Email non disponible',
+          ville: fullInfo?.ville || 'Ville non renseignée',
+          telephone: fullInfo?.telephone,
+          whatsapp: fullInfo?.whatsapp,
+          source: 'textes'
+        });
+      }
+    });
+    
+    return Array.from(participantsMap.values()).sort((a, b) => 
+      `${a.prenom} ${a.nom}`.localeCompare(`${b.prenom} ${b.nom}`)
+    );
+  }
+  
+  exportParticipantsNotes() {
+    const headers = ['Prénom', 'Nom', 'Email', 'Ville', 'Textes soumis', 'Note moyenne', 'Détail des textes'];
+    const rows = this.getAllUniqueParticipants().map(participant => {
+      const textes = this.getParticipantTexts(participant.prenom, participant.nom);
+      const noteMoyenne = this.getParticipantAverageNote(participant.prenom, participant.nom);
+      const detailTextes = textes.map(t => `"${t.titre}" (${this.getTextFinalNote(t.id) || 'N/A'}/20)`).join('; ');
+      
+      return [
+        participant.prenom,
+        participant.nom,
+        participant.email,
+        participant.ville || 'Non renseignée',
+        textes.length,
+        noteMoyenne ? noteMoyenne.toFixed(2) + '/20' : 'N/A',
+        detailTextes || 'Aucun texte'
+      ];
+    });
+    
+    const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `notes_participants_cp2i_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    this.showToast('Export des notes réalisé avec succès', 'success');
   }
   
 

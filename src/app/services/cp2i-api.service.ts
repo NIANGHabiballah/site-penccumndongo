@@ -369,7 +369,7 @@ export class Cp2iApiService {
   }
 
   getDetailedEvaluations(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/cp2i-participant.php?action=evaluations`, { headers: this.getHeaders() });
+    return this.http.get(`${this.baseUrl}/evaluations-mouhamadou.php`);
   }
 
   getTextCorrections(texteId: number): Observable<any> {
@@ -396,5 +396,10 @@ export class Cp2iApiService {
 
   deleteTexte(texteId: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/cp2i-textes.php?id=${texteId}`, { headers: this.getHeaders() });
+  }
+
+  // Récupérer toutes les évaluations pour un texte spécifique depuis cp2i_evaluations
+  getEvaluationsForTexte(texteId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/get-evaluations-by-texte.php?texte_id=${texteId}`, { headers: this.getHeaders() });
   }
 }

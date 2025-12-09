@@ -40,7 +40,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   certificats: any[] = [];
   classement: any = {};
   joursRestants = 0;
-  evaluationsDetaillees: any[] = [];
+
   Math = Math;
   
   // Modal de soumission
@@ -582,7 +582,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   }
   
   isSubmissionPeriodActive(): boolean {
-    return false; // Période de soumission fermée
+    return true; // Période de soumission ouverte
   }
   
   getSubmissionStatus(): string {
@@ -720,35 +720,30 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   }
   
   loadEvaluationsDetaillees() {
-    
-    let evaluationsChargees = 0;
-    const totalTextes = this.mesSoumissions.filter(t => t.id && t.note).length;
-    
-    if (totalTextes === 0) {
-      this.calculateRealStats();
-      return;
-    }
-    
-    // Charger les vraies évaluations depuis l'API
+    // Charger toutes les évaluations pour chaque texte basées sur texte_id
     this.mesSoumissions.forEach(texte => {
-      if (texte.id && texte.note) {
-        this.cp2iApi.getTextCorrections(texte.id).subscribe({
-          next: (data) => {
-            if (data && data.success && data.corrections && data.corrections.length > 0) {
-              texte.corrections = data.corrections;
+      if (texte.id) {
+        this.cp2iApi.getEvaluationsForTexte(texte.id).subscribe({
+          next: (evaluations) => {
+            if (evaluations && evaluations.length > 0) {
+              // Mapper les évaluations avec la structure attendue
+              texte.corrections = evaluations.map((evaluation: any) => ({
+                id: evaluation.id,
+                note_totale: evaluation.note_totale,
+                note: evaluation.note_totale, // Compatibilité
+                note_pertinence: evaluation.pertinence,
+                note_coherence: evaluation.coherence,
+                note_correction: evaluation.correction,
+                note_presentation: evaluation.presentation,
+                commentaires: evaluation.remarques,
+                correcteur_id: evaluation.correcteur_id
+              }));
             }
-            
-            evaluationsChargees++;
-            if (evaluationsChargees === totalTextes) {
-              // Recalculer les stats après avoir chargé toutes les évaluations
-              this.calculateRealStats();
-            }
+            this.calculateRealStats();
           },
           error: (error) => {
-            evaluationsChargees++;
-            if (evaluationsChargees === totalTextes) {
-              this.calculateRealStats();
-            }
+            console.warn('Impossible de charger les évaluations pour le texte', texte.id);
+            this.calculateRealStats();
           }
         });
       }
@@ -759,8 +754,6 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     if (!contenu) return 0;
     return contenu.split('\n').filter(line => line.trim().length > 0).length;
   }
-  
-
   
   async downloadCertificatPDF(cert: any) {
     const element = document.getElementById('cert-' + cert.id);
@@ -1288,8 +1281,9 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
       if (texte.corrections && texte.corrections.length > 0) {
         // Utiliser les vraies évaluations des correcteurs
         texte.corrections.forEach((correction: any) => {
-          if (correction.note && !isNaN(correction.note)) {
-            totalNotes += parseFloat(correction.note);
+          const note = correction.note_totale || correction.note;
+          if (note && !isNaN(note)) {
+            totalNotes += parseFloat(note);
             nombreEvaluations++;
           }
         });
@@ -1300,6 +1294,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
       }
     });
     
+
     return nombreEvaluations > 0 ? totalNotes / nombreEvaluations : null;
   }
   
@@ -1333,7 +1328,8 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     this.cp2iApi.getUserTexts().subscribe({
       next: (data) => {
         this.mesSoumissions = data.textes || [];
-    
+        
+
         
         // Filtrer pour ne garder que le texte du participant connecté
         this.mesSoumissions = this.mesSoumissions.slice(0, 1);
@@ -1493,7 +1489,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   
   // Vérifier si la période de soumission est clôturée
   isSubmissionPeriodClosed(): boolean {
-    return true; // Soumissions fermées
+    return false; // Soumissions ouvertes
   }
   
   // Fermer le modal de clôture des soumissions
@@ -1538,8 +1534,11 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     
     this.closeSubmissionClosedModal();
   }
-
-
-
+  
+  getCorrectionsForTexte(texte: any) {
+    // Retourner toutes les corrections disponibles pour ce texte
+    // même s'il n'y en a qu'une ou deux
+    return texte.corrections || [];
+  }
 
 }

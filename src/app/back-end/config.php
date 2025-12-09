@@ -49,19 +49,8 @@ function getDB() {
         );
         return $pdo;
     } catch (PDOException $e) {
-        // Log l'erreur pour debug
-        error_log('Erreur DB: ' . $e->getMessage());
-        error_log('DSN: mysql:host=' . DB_HOST . ';dbname=' . DB_NAME);
-        error_log('User: ' . DB_USER);
-        
         http_response_code(500);
-        echo json_encode([
-            'error' => 'Erreur de connexion à la base de données',
-            'details' => $e->getMessage(),
-            'host' => DB_HOST,
-            'database' => DB_NAME,
-            'user' => DB_USER
-        ]);
+        echo json_encode(['error' => 'Erreur de connexion à la base de données']);
         exit;
     }
 }

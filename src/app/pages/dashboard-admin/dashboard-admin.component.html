@@ -2605,17 +2605,21 @@
             <h2><i class="fas fa-chart-bar"></i> Notes & Classement des Participants</h2>
             <p>Vue détaillée des évaluations et notes par participant</p>
           </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary" (click)="forceRefreshNotes()"><i class="fas fa-sync"></i> Recalculer notes</button>
+            <button class="btn btn-outline" (click)="exportParticipantsNotes()"><i class="fas fa-download"></i> Exporter notes</button>
+          </div>
         </div>
 
         <!-- Liste des participants avec leurs notes -->
         <div class="participants-notes-list">
-          <div class="participant-notes-card" *ngFor="let participant of participants; let i = index">
+          <div class="participant-notes-card" *ngFor="let participant of getAllUniqueParticipants(); let i = index">
             <div class="participant-header">
               <div class="participant-info">
                 <div class="participant-avatar">{{participant.prenom?.[0]}}{{participant.nom?.[0]}}</div>
                 <div class="participant-details">
                   <h4>{{participant.prenom}} {{participant.nom}}</h4>
-                  <span class="participant-email">{{participant.email}}</span>
+                  <span class="participant-email">{{participant.email || 'Email non disponible'}}</span>
                   <span class="participant-city">{{participant.ville || 'Ville non renseignée'}}</span>
                 </div>
               </div>
@@ -2705,6 +2709,7 @@
                         <span class="final-note-value" [class.excellent]="(getTextFinalNote(texte.id) || 0) >= 16" [class.good]="(getTextFinalNote(texte.id) || 0) >= 12 && (getTextFinalNote(texte.id) || 0) < 16" [class.average]="(getTextFinalNote(texte.id) || 0) >= 8 && (getTextFinalNote(texte.id) || 0) < 12" [class.poor]="(getTextFinalNote(texte.id) || 0) < 8">
                           {{(getTextFinalNote(texte.id) || 0) | number:'1.2-2'}}/20
                         </span>
+                        <small class="note-calculation">Moyenne calculée</small>
                       </div>
                     </div>
                     

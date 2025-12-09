@@ -378,12 +378,12 @@
       <div *ngSwitchCase="'resultats'" class="resultats-section">
         <h2>Résultats & Notes</h2>
         
-        <div class="results-overview">
+        <div class="results-overview" *ngIf="stats.note_moyenne">
           <div class="result-card">
             <h3>Performance Globale</h3>
             <div class="performance-stats">
               <div class="perf-item">
-                <span class="perf-number">{{stats.note_moyenne ? (stats.note_moyenne | number:'1.1-1') : 'N/A'}}</span>
+                <span class="perf-number">{{stats.note_moyenne | number:'1.1-1'}}</span>
                 <span class="perf-label">Note moyenne</span>
               </div>
               <div class="perf-item">
@@ -398,60 +398,6 @@
           </div>
         </div>
         
-        <!-- Notes détaillées par correcteur -->
-        <div class="detailed-evaluations" *ngIf="evaluationsDetaillees.length > 0">
-          <h3>Évaluations Détaillées</h3>
-          <div class="evaluation-card" *ngFor="let eval of evaluationsDetaillees">
-            <div class="evaluation-header">
-              <h4>{{eval.titre}}</h4>
-              <span class="evaluation-status" [ngClass]="getStatusClass(eval.statut)">{{getStatusLabel(eval.statut)}}</span>
-            </div>
-            
-            <div class="correcteurs-evaluations" *ngIf="eval.correcteurs && eval.correcteurs.length > 0">
-              <div class="correcteur-eval" *ngFor="let correcteur of eval.correcteurs">
-                <div class="correcteur-header">
-                  <h5>Correcteur {{correcteur.correcteur_numero}}</h5>
-                  <span class="note-finale">{{correcteur.note_totale}}/20</span>
-                </div>
-                
-                <div class="criteres-notes">
-                  <div class="critere" *ngIf="correcteur.pertinence !== null">
-                    <span class="critere-nom">Pertinence:</span>
-                    <span class="critere-note">{{correcteur.pertinence}}/5</span>
-                  </div>
-                  <div class="critere" *ngIf="correcteur.coherence !== null">
-                    <span class="critere-nom">Cohérence:</span>
-                    <span class="critere-note">{{correcteur.coherence}}/5</span>
-                  </div>
-                  <div class="critere" *ngIf="correcteur.correction !== null">
-                    <span class="critere-nom">Correction:</span>
-                    <span class="critere-note">{{correcteur.correction}}/5</span>
-                  </div>
-                  <div class="critere" *ngIf="correcteur.presentation !== null">
-                    <span class="critere-nom">Présentation:</span>
-                    <span class="critere-note">{{correcteur.presentation}}/5</span>
-                  </div>
-                </div>
-                
-                <div class="remarques" *ngIf="correcteur.remarques">
-                  <h6>Remarques du correcteur:</h6>
-                  <p>{{correcteur.remarques}}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div class="no-evaluations" *ngIf="!eval.correcteurs || eval.correcteurs.length === 0">
-              <p>Évaluation en cours...</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="no-results" *ngIf="evaluationsDetaillees.length === 0 && (!stats.note_moyenne || stats.note_moyenne === 0)">
-          <i class="fas fa-chart-bar"></i>
-          <h3>Aucune évaluation</h3>
-          <p>Vos résultats apparaîtront ici une fois les évaluations terminées.</p>
-        </div>
-        
         <!-- Évaluations détaillées par correcteur -->
         <div class="detailed-evaluations" *ngIf="mesSoumissions.length > 0">
           <h3>Évaluations Détaillées par Correcteur</h3>
@@ -461,118 +407,50 @@
               <span class="texte-status" [ngClass]="getStatusClass(texte.statut)">{{getStatusLabel(texte.statut)}}</span>
             </div>
             
-            <div class="correcteurs-list" *ngIf="texte.corrections && texte.corrections.length > 0; else noCorrections">
-              <div class="correcteur-card" *ngFor="let correction of texte.corrections; let i = index">
+            <div class="correcteurs-list" *ngIf="getCorrectionsForTexte(texte).length >= 1; else noEvaluations">
+              <div class="correcteur-card" *ngFor="let correction of getCorrectionsForTexte(texte); let i = index">
                 <div class="correcteur-header">
                   <div class="correcteur-info">
                     <i class="fas fa-user-graduate"></i>
                     <h5>Correcteur {{i + 1}}</h5>
                   </div>
                   <div class="note-globale">
-                    <span class="note-value">{{correction.note}}/20</span>
+                    <span class="note-value">{{correction.note_totale || correction.note}}/20</span>
                   </div>
                 </div>
                 
                 <div class="grille-evaluation">
                   <div class="critere-item">
                     <span class="critere-label">Pertinence</span>
-                    <span class="critere-score">{{correction.criteres?.pertinence !== undefined ? correction.criteres.pertinence : '-'}}/5</span>
+                    <span class="critere-score">{{correction.note_pertinence || '-'}}/5</span>
                   </div>
                   <div class="critere-item">
                     <span class="critere-label">Cohérence</span>
-                    <span class="critere-score">{{correction.criteres?.coherence !== undefined ? correction.criteres.coherence : '-'}}/5</span>
+                    <span class="critere-score">{{correction.note_coherence || '-'}}/5</span>
                   </div>
                   <div class="critere-item">
                     <span class="critere-label">Correction de la langue</span>
-                    <span class="critere-score">{{correction.criteres?.correction !== undefined ? correction.criteres.correction : '-'}}/5</span>
+                    <span class="critere-score">{{correction.note_correction || '-'}}/5</span>
                   </div>
                   <div class="critere-item">
                     <span class="critere-label">Présentation</span>
-                    <span class="critere-score">{{correction.criteres?.presentation !== undefined ? correction.criteres.presentation : '-'}}/5</span>
+                    <span class="critere-score">{{correction.note_presentation || '-'}}/5</span>
                   </div>
                 </div>
                 
-                <div class="remarques-section" *ngIf="correction.commentaire">
-                  <h6><i class="fas fa-comment-dots"></i> Remarques du correcteur</h6>
-                  <div class="remarques-content">
-                    <p>{{correction.commentaire}}</p>
-                  </div>
-                </div>
-                
-                <div class="correction-date" *ngIf="correction.date_correction">
-                  <small><i class="fas fa-calendar"></i> Évalué le {{correction.date_correction | date:'dd/MM/yyyy à HH:mm'}}</small>
+                <div class="remarques" *ngIf="correction.commentaires">
+                  <h6 style="color: #FF7F1A;"><i class="fas fa-comment-dots"></i> Remarques du correcteur:</h6>
+                  <p>{{correction.commentaires}}</p>
                 </div>
               </div>
             </div>
             
-            <ng-template #noCorrections>
-              <!-- Affichage si note/commentaire sans corrections détaillées -->
-              <div class="correcteur-card" *ngIf="texte.note || texte.commentaire; else waitingCorrection">
-                <div class="correcteur-header">
-                  <div class="correcteur-info">
-                    <i class="fas fa-user-graduate"></i>
-                    <h5>Correcteur</h5>
-                  </div>
-                  <div class="note-globale" *ngIf="texte.note">
-                    <span class="note-value">{{texte.note}}/20</span>
-                  </div>
-                </div>
-                
-                <!-- Grille d'évaluation calculée -->
-                <div class="grille-evaluation">
-                  <div class="critere-item">
-                    <span class="critere-label">Pertinence</span>
-                    <span class="critere-score">{{(texte.note || 0) / 4 | number:'1.1-1'}}/5</span>
-                  </div>
-                  <div class="critere-item">
-                    <span class="critere-label">Cohérence</span>
-                    <span class="critere-score">{{(texte.note || 0) / 4 | number:'1.1-1'}}/5</span>
-                  </div>
-                  <div class="critere-item">
-                    <span class="critere-label">Correction de la langue</span>
-                    <span class="critere-score">{{(texte.note || 0) / 4 | number:'1.1-1'}}/5</span>
-                  </div>
-                  <div class="critere-item">
-                    <span class="critere-label">Présentation</span>
-                    <span class="critere-score">{{(texte.note || 0) / 4 | number:'1.1-1'}}/5</span>
-                  </div>
-                </div>
-                
-                <div class="remarques-section" *ngIf="texte.commentaire">
-                  <h6><i class="fas fa-comment-dots"></i> Remarques du correcteur</h6>
-                  <div class="remarques-content">
-                    <p>{{texte.commentaire}}</p>
-                  </div>
-                </div>
-                
-                <div class="correction-date">
-                  <small><i class="fas fa-info-circle"></i> Détails de la grille non disponibles</small>
-                </div>
+            <ng-template #noEvaluations>
+              <div class="no-evaluations">
+                <i class="fas fa-clock"></i>
+                <p>Évaluation en cours...</p>
               </div>
-              
-              <ng-template #waitingCorrection>
-                <div class="no-corrections">
-                  <i class="fas fa-clock"></i>
-                  <p>Votre texte est en attente de correction par les correcteurs.</p>
-                </div>
-              </ng-template>
             </ng-template>
-          </div>
-        </div>
-        
-        <!-- Affichage simple si pas d'évaluations détaillées mais note présente -->
-        <div class="simple-evaluation" *ngIf="(!mesSoumissions.length || !hasCorrections()) && stats.note_moyenne && stats.note_moyenne > 0">
-          <div class="evaluation-card">
-            <div class="evaluation-header">
-              <h4>Évaluation de votre texte</h4>
-              <span class="evaluation-status" [ngClass]="stats.textes_acceptes > 0 ? 'status-accepte' : 'status-refuse'">
-                {{stats.textes_acceptes > 0 ? 'Admis' : 'Non admis'}}
-              </span>
-            </div>
-            <div class="simple-note">
-              <span class="note-value">{{stats.note_moyenne}}/20</span>
-              <span class="note-label">Note finale</span>
-            </div>
           </div>
         </div>
       </div>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Final - API Évaluations CP2i</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        pre { background: #f8f9fa; padding: 10px; overflow-x: auto; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Test Final - API Évaluations CP2i</h1>
+    
+    <div class="test-section">
+        <h2>Configuration</h2>
+        <p>URL de base: <span id="baseUrl">http://localhost:4200/src/app/back-end</span></p>
+        <p>Token de test: <span id="testToken">Sera généré automatiquement</span></p>
+    </div>
+    
+    <div class="test-section">
+        <h2>Tests</h2>
+        <button onclick="testSimpleAPI()">1. Test API Simple</button>
+        <button onclick="testAuthAPI()">2. Test API avec Auth</button>
+        <button onclick="testFixedAPI()">3. Test API Corrigée</button>
+        <button onclick="testAllAPIs()">4. Test Toutes les APIs</button>
+    </div>
+    
+    <div id="results"></div>
+    
+    <script>
+        const baseUrl = 'http://localhost:4200/src/app/back-end';
+        
+        function addResult(title, content, isSuccess = true) {
+            const resultsDiv = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-section ${isSuccess ? 'success' : 'error'}`;
+            div.innerHTML = `<h3>${title}</h3><pre>${content}</pre>`;
+            resultsDiv.appendChild(div);
+        }
+        
+        async function testSimpleAPI() {
+            try {
+                const response = await fetch(`${baseUrl}/test-evaluations-simple.php`);
+                const text = await response.text();
+                addResult('Test API Simple', text, response.ok);
+            } catch (error) {
+                addResult('Test API Simple', `Erreur: ${error.message}`, false);
+            }
+        }
+        
+        async function testAuthAPI() {
+            try {
+                const response = await fetch(`${baseUrl}/test-auth-evaluations.php`);
+                const text = await response.text();
+                addResult('Test API avec Auth', text, response.ok);
+            } catch (error) {
+                addResult('Test API avec Auth', `Erreur: ${error.message}`, false);
+            }
+        }
+        
+        async function testFixedAPI() {
+            try {
+                // Créer un token de test simple (non sécurisé, juste pour test)
+                const payload = {
+                    userId: 35,
+                    exp: Math.floor(Date.now() / 1000) + 3600
+                };
+                const token = 'Bearer ' + btoa(JSON.stringify({alg: 'HS256'})) + '.' + 
+                             btoa(JSON.stringify(payload)) + '.' + 
+                             btoa('signature');
+                
+                const response = await fetch(`${baseUrl}/get-evaluations-fixed.php`, {
+                    headers: {
+                        'Authorization': token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                addResult('Test API Corrigée', JSON.stringify(data, null, 2), response.ok);
+            } catch (error) {
+                addResult('Test API Corrigée', `Erreur: ${error.message}`, false);
+            }
+        }
+        
+        async function testAllAPIs() {
+            addResult('Tests Complets', 'Démarrage des tests...', true);
+            await testSimpleAPI();
+            await testAuthAPI();
+            await testFixedAPI();
+            addResult('Tests Complets', 'Tous les tests terminés', true);
+        }
+        
+        // Test automatique au chargement
+        window.onload = function() {
+            addResult('Initialisation', 'Page de test chargée. Cliquez sur les boutons pour lancer les tests.', true);
+        };
+    </script>
+</body>
+</html>
