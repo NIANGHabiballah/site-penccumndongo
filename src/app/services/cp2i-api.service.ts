@@ -369,6 +369,11 @@ export class Cp2iApiService {
   }
 
   getDetailedEvaluations(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/get-evaluations-fixed-positioning.php`, { headers: this.getHeaders() });
+  }
+
+  // Méthode de fallback pour l'ancienne API
+  getDetailedEvaluationsLegacy(): Observable<any> {
     return this.http.get(`${this.baseUrl}/evaluations-mouhamadou.php`);
   }
 

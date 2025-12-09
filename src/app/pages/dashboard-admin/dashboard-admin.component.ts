@@ -3763,103 +3763,26 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.participantDetailsVisible[index] = !this.participantDetailsVisible[index];
   }
   
-  // Méthodes pour le tableau de délibération
+  // Méthodes pour le tableau de délibération - UTILISE LES MÊMES DONNÉES QUE NOTES & CLASSEMENT
   getDeliberationParticipants(): any[] {
-    // Obtenir tous les participants uniques avec leurs notes
-    const participantsMap = new Map<string, any>();
-    
-    // Parcourir tous les utilisateurs participants
-    this.participants.forEach(participant => {
-      const key = `${participant.prenom?.trim()}_${participant.nom?.trim()}`;
-      if (!participantsMap.has(key)) {
+    // Utiliser EXACTEMENT les mêmes données que la section Notes & Classement
+    return this.getFilteredParticipantsNotes()
+      .map((participant, index) => {
         // Chercher les infos complètes dans allAccounts
         const fullInfo = this.allAccounts.find(account => 
           account.prenom?.trim() === participant.prenom?.trim() && 
           account.nom?.trim() === participant.nom?.trim()
         );
         
-        participantsMap.set(key, {
-          prenom: participant.prenom,
-          nom: participant.nom,
-          email: fullInfo?.email || participant.email,
-          ville: fullInfo?.ville || participant.ville || 'Non renseignée',
-          telephone: fullInfo?.telephone || participant.telephone,
-          whatsapp: fullInfo?.whatsapp || participant.whatsapp,
-          textes: [],
-          note_moyenne: null
-        });
-      }
-    });
-    
-    // Ajouter les textes et calculer les notes
-    this.textes.forEach(texte => {
-      const key = `${texte.prenom?.trim()}_${texte.nom?.trim()}`;
-      let participant = participantsMap.get(key);
-      
-      if (!participant) {
-        // Créer le participant s'il n'existe pas (cas où il a soumis un texte mais n'est pas dans users)
-        const fullInfo = this.allAccounts.find(account => 
-          account.prenom?.trim() === texte.prenom?.trim() && 
-          account.nom?.trim() === texte.nom?.trim()
-        );
-        
-        participant = {
-          prenom: texte.prenom,
-          nom: texte.nom,
+        return {
+          ...participant,
           email: fullInfo?.email || 'Email non disponible',
           ville: fullInfo?.ville || 'Non renseignée',
           telephone: fullInfo?.telephone,
           whatsapp: fullInfo?.whatsapp,
-          textes: [],
-          note_moyenne: null
+          isTop5: index < 5
         };
-        participantsMap.set(key, participant);
-      }
-      
-      participant.textes.push(texte);
-    });
-    
-    // Calculer les notes moyennes avec débogage
-    Array.from(participantsMap.values()).forEach(participant => {
-      const noteMoyenne = this.getParticipantAverageNote(participant.prenom, participant.nom);
-      participant.note_moyenne = noteMoyenne;
-      
-      // Debug pour les participants sans notes
-      if (!noteMoyenne) {
-        console.log(`Participant sans note: ${participant.prenom} ${participant.nom}`);
-        console.log('Textes:', participant.textes.map((t: any) => ({ titre: t.titre, note: t.note, statut: t.statut })));
-      }
-    });
-    
-    // Trier tous les participants (avec et sans notes)
-    const allParticipants = Array.from(participantsMap.values())
-      .sort((a, b) => {
-        // Les participants avec notes en premier, triés par note décroissante
-        if (a.note_moyenne && b.note_moyenne) {
-          return b.note_moyenne - a.note_moyenne;
-        }
-        if (a.note_moyenne && !b.note_moyenne) {
-          return -1; // a avant b
-        }
-        if (!a.note_moyenne && b.note_moyenne) {
-          return 1; // b avant a
-        }
-        // Si aucun n'a de note, trier par nom
-        return `${a.prenom} ${a.nom}`.localeCompare(`${b.prenom} ${b.nom}`);
       });
-    
-    // Marquer les 5 premiers avec notes comme finalistes
-    let finalistCount = 0;
-    allParticipants.forEach((participant, index) => {
-      if (participant.note_moyenne && finalistCount < 5) {
-        participant.isTop5 = true;
-        finalistCount++;
-      } else {
-        participant.isTop5 = false;
-      }
-    });
-    
-    return allParticipants;
   }
   
   getParticipantMainTheme(participant: any): string {
@@ -3909,23 +3832,75 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   getQualifiedCount(): number {
-    return this.getDeliberationParticipants().filter(p => p.note_moyenne >= 10).length;
+    // Utiliser les mêmes données filtrées que Notes & Classement
+    return this.getFilteredParticipantsNotes().filter(p => p.note_moyenne && p.note_moyenne >= 10).length;
   }
   
   getGeneralAverage(): string {
-    const participants = this.getDeliberationParticipants();
+    // Utiliser les mêmes données filtrées que Notes & Classement
+    const participants = this.getFilteredParticipantsNotes();
     if (participants.length === 0) return 'N/A';
     
-    const total = participants.reduce((sum, p) => sum + (p.note_moyenne || 0), 0);
-    const average = total / participants.length;
+    const validNotes = participants.filter(p => p.note_moyenne !== null && p.note_moyenne !== undefined);
+    if (validNotes.length === 0) return 'N/A';
+    
+    const total = validNotes.reduce((sum, p) => sum + p.note_moyenne, 0);
+    const average = total / validNotes.length;
     return average.toFixed(2);
   }
   
   refreshDeliberationData(): void {
     this.showToast('Actualisation des données de délibération...', 'success');
+    // Recharger spécifiquement les données détaillées des notes (même source que Notes & Classement)
+    this.loadDetailedNotesForAllParticipants();
     this.loadData();
     setTimeout(() => {
       this.showToast('Données actualisées avec succès', 'success');
+      // Forcer la détection des changements pour synchroniser l'affichage
+      this.cdr.detectChanges();
+    }, 2000);
+  }
+  
+  // Méthode pour s'assurer que le tableau de délibération utilise exactement les mêmes données
+  getDeliberationDataConsistency(): boolean {
+    const notesData = this.getFilteredParticipantsNotes();
+    const deliberationData = this.getDeliberationParticipants();
+    
+    // Vérifier que les deux sources ont le même nombre de participants
+    if (notesData.length !== deliberationData.length) {
+      console.warn('Incohérence détectée: nombre de participants différent');
+      return false;
+    }
+    
+    // Vérifier que les notes moyennes sont identiques
+    for (let i = 0; i < notesData.length; i++) {
+      const noteParticipant = notesData[i];
+      const deliberationParticipant = deliberationData[i];
+      
+      if (noteParticipant.note_moyenne !== deliberationParticipant.note_moyenne) {
+        console.warn(`Incohérence détectée pour ${noteParticipant.prenom} ${noteParticipant.nom}`);
+        return false;
+      }
+    }
+    
+    return true;
+  }
+  
+  // Méthode pour vérifier et corriger la synchronisation entre Notes & Classement et Délibération
+  syncDeliberationWithNotes(): void {
+    this.showToast('Synchronisation en cours...', 'success');
+    
+    // Forcer le rechargement des données détaillées
+    this.loadDetailedNotesForAllParticipants();
+    
+    setTimeout(() => {
+      const isConsistent = this.getDeliberationDataConsistency();
+      if (isConsistent) {
+        this.showToast('Synchronisation réussie - Données cohérentes', 'success');
+      } else {
+        this.showToast('Attention: Incohérence détectée après synchronisation', 'error');
+      }
+      this.cdr.detectChanges();
     }, 1500);
   }
   
@@ -3967,7 +3942,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   exportDeliberationCSV(): void {
-    const participants = this.getDeliberationParticipants();
+    // Utiliser les mêmes données que Notes & Classement
+    const participants = this.getFilteredParticipantsNotes();
     const headers = ['Rang', 'Prénom', 'Nom', 'Adresse/Ville', 'Thème principal', 'Langue', 'Moyenne', 'Statut'];
     const rows = participants.map((participant, index) => [
       index + 1,
