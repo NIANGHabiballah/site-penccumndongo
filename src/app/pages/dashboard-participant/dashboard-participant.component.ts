@@ -1351,9 +1351,13 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   }
   
   hasThreeCorrections(): boolean {
-    // Pour le moment, retourner false pour tous les participants
-    // jusqu'à ce qu'ils aient effectivement 3 corrections complètes
-    return false;
+    // Vérifier si le participant a au moins une évaluation complète
+    return this.mesSoumissions.some(texte => {
+      // Si le texte a une note finale ou des corrections
+      return (texte.note && texte.note > 0) || 
+             (texte.corrections && texte.corrections.length > 0) ||
+             (texte.statut === 'accepte' || texte.statut === 'refuse');
+    });
   }
 
   canModifyText(texte: any): { canModify: boolean, reason: string } {
