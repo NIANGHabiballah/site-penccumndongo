@@ -567,7 +567,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
         // Certificat de participation par défaut
         this.certificats.push({
           id: 1,
-          titre: 'Certificat de Participation',
+          titre: 'Attestation de Participation',
           description: 'Attestation officielle de participation au concours CP2i 2025',
           type: 'participation',
           date: new Date()
@@ -755,44 +755,109 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     return contenu.split('\n').filter(line => line.trim().length > 0).length;
   }
   
-  async downloadCertificatPDF(cert: any) {
+  async downloadCertificate(cert: any) {
+    // Capturer exactement l'élément affiché dans le dashboard
     const element = document.getElementById('cert-' + cert.id);
     if (!element) {
-      this.downloadCertificatFallback(cert);
+      this.showToast('Erreur: élément certificat introuvable', 'error');
       return;
     }
     
     try {
+      // Attendre que toutes les images soient chargées
+      await this.waitForImagesToLoad(element);
+      
+      // Importer les librairies nécessaires
       const html2canvas = (await import('html2canvas')).default;
       const { jsPDF } = await import('jspdf');
       
+      // Capturer l'élément complet avec footer
       const canvas = await html2canvas(element, {
-        scale: 4,
+        scale: 2,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
         logging: false,
-        imageTimeout: 0
+        imageTimeout: 10000,
+        width: element.offsetWidth,
+        height: element.offsetHeight,
+        scrollX: 0,
+        scrollY: 0,
+        onclone: (clonedDoc) => {
+          // Forcer les styles des images dans le document cloné
+          const clonedImages = clonedDoc.querySelectorAll('.logo-img, .cachet-img, .signature-img');
+          clonedImages.forEach((img: any) => {
+            img.style.objectFit = 'contain';
+            img.style.objectPosition = 'center';
+            if (img.classList.contains('logo-img')) {
+              img.style.width = '100px';
+              img.style.height = '100px';
+            }
+            if (img.classList.contains('cachet-img') || img.classList.contains('signature-img')) {
+              img.style.maxWidth = '200px';
+              img.style.maxHeight = '140px';
+            }
+          });
+        }
       });
       
-      const imgData = canvas.toDataURL('image/png');
+      // Créer le PDF en format A4 paysage
       const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
-        format: 'a4'
+        format: 'a4',
+        compress: true
       });
       
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
+      // Dimensions A4 paysage : 297mm x 210mm
+      const pdfWidth = 297;
+      const pdfHeight = 210;
       
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Certificat_CP2i_${this.currentUser?.nom}_${this.currentUser?.prenom}.pdf`);
+      // Convertir le canvas en image haute qualité
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
       
-      this.showToast('Certificat PDF téléchargé avec succès', 'success');
+      // Ajouter l'image au PDF en respectant les dimensions A4
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, '', 'FAST');
+      
+      // Télécharger le fichier
+      const fileName = `Attestation_CP2i_${this.currentUser?.prenom}_${this.currentUser?.nom}.pdf`;
+      pdf.save(fileName);
+      
+      this.showToast('Attestation PDF téléchargée avec succès', 'success');
     } catch (error) {
-      console.error('Erreur génération PDF:', error);
-      this.downloadCertificatFallback(cert);
+      console.error('Erreur lors du téléchargement:', error);
+      this.showToast('Erreur lors du téléchargement de l\'attestation', 'error');
     }
+  }
+  
+  private waitForImagesToLoad(element: HTMLElement): Promise<void> {
+    return new Promise((resolve) => {
+      const images = element.querySelectorAll('img');
+      let loadedCount = 0;
+      const totalImages = images.length;
+      
+      if (totalImages === 0) {
+        resolve();
+        return;
+      }
+      
+      const checkComplete = () => {
+        loadedCount++;
+        if (loadedCount === totalImages) {
+          // Attendre un peu plus pour s'assurer que le rendu est terminé
+          setTimeout(resolve, 500);
+        }
+      };
+      
+      images.forEach((img: HTMLImageElement) => {
+        if (img.complete) {
+          checkComplete();
+        } else {
+          img.onload = checkComplete;
+          img.onerror = checkComplete; // Continuer même si une image échoue
+        }
+      });
+    });
   }
   
   downloadCertificatFallback(cert: any) {
@@ -821,69 +886,97 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
           <style>
             @page { size: A4 landscape; margin: 0; }
             body { margin: 0; padding: 0; font-family: 'Georgia', serif; background: white; }
-            .certificat-digital { width: 297mm; height: 210mm; margin: 0; background: white; position: relative; }
-            .cert-header { background: linear-gradient(135deg, #0380C2 0%, #001B36 100%); color: white; padding: 2rem; display: flex; justify-content: space-between; align-items: center; height: 120px; }
-            .cert-organization { font-size: 1.8rem; margin: 0; font-weight: 900; color: #FFD700; letter-spacing: 1px; }
-            .cert-main-title { font-size: 2.2rem; margin: 0.5rem 0 0 0; font-weight: 900; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); color: #0380C2; }
-            .cert-subtitle { font-size: 1.3rem; margin: 0.5rem 0; font-weight: 600; }
-            .cert-edition { font-size: 1rem; margin: 0; opacity: 0.9; }
-            .cert-body { padding: 3rem 2rem; text-align: center; background: linear-gradient(135deg, #ffffff, #f8f9fa); }
-            .cert-decoration-line { height: 3px; background: linear-gradient(90deg, transparent, #FF7F1A, transparent); margin: 1rem auto; width: 200px; }
-            .cert-intro { font-size: 1.1rem; color: #6c757d; margin: 0 0 1rem 0; font-style: italic; }
-            .cert-participant { margin: 2rem 0; padding: 1.5rem; background: linear-gradient(135deg, #fff3e0, #ffebcc); border-radius: 12px; border: 3px solid #FF7F1A; }
-            .participant-name { font-size: 2.5rem; color: #FF7F1A; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
-            .cert-text { font-size: 1.2rem; line-height: 1.6; color: #2c3e50; margin: 1.5rem 0; font-weight: 500; }
-            .cert-performance { margin: 1rem 0; padding: 1rem; background: #e8f5e8; border-radius: 8px; border-left: 4px solid #28a745; }
-            .cert-ranking { margin: 0; font-size: 1.1rem; color: #2c3e50; font-weight: 700; }
-            .cert-footer { background: #f8f9fa; padding: 1rem 2rem; border-top: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; }
-            .cert-date { text-align: left; }
-            .cert-date p { margin: 0.25rem 0; color: #495057; font-weight: 600; }
-            .cert-location { font-style: italic; color: #6c757d; }
-            .cert-signature { text-align: right; }
-            .signature-name { font-weight: 700; color: #2c3e50; margin: 0; }
-            .signature-title { color: #6c757d; margin: 0; font-size: 0.9rem; font-style: italic; }
-            .cert-verification { text-align: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #dee2e6; }
-            .verification-code { font-family: 'Courier New', monospace; font-size: 0.9rem; color: #495057; font-weight: 600; }
+            .certificat-modern { width: 297mm; height: 210mm; margin: 0; background: white; position: relative; }
+            .cert-modern-header { background: linear-gradient(135deg, #0380C2 0%, #001B36 100%); color: white; padding: 2rem; display: flex; justify-content: space-between; align-items: center; height: 120px; }
+            .brand-logo { width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; }
+            .logo-img { width: 100px; height: 100px; object-fit: contain; object-position: center; filter: brightness(0) invert(1); max-width: 100px; max-height: 100px; }
+            .brand-info { text-align: center; flex: 1; }
+            .brand-info h1 { font-size: 1.8rem; margin: 0; font-weight: 900; color: #FFD700; letter-spacing: 1px; }
+            .brand-info p { font-size: 1.3rem; margin: 0.5rem 0; font-weight: 600; }
+            .cert-badge { width: 60px; height: 60px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0380C2; font-size: 1.5rem; }
+            .cert-modern-body { padding: 3rem 2rem; text-align: center; background: linear-gradient(135deg, #ffffff, #f8f9fa); }
+            .cert-title h2 { font-size: 2.2rem; margin: 0.5rem 0 0 0; font-weight: 900; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); color: #0380C2; }
+            .title-underline { height: 3px; background: linear-gradient(90deg, transparent, #FF7F1A, transparent); margin: 1rem auto; width: 200px; }
+            .participant-label { font-size: 1.1rem; color: #6c757d; margin: 0 0 1rem 0; font-style: italic; }
+            .cert-participant-modern { margin: 2rem 0; padding: 1.5rem; background: linear-gradient(135deg, #fff3e0, #ffebcc); border-radius: 12px; border: 3px solid #FF7F1A; }
+            .participant-name-modern { font-size: 2.5rem; color: #FF7F1A; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+            .achievement-text { font-size: 1.2rem; line-height: 1.6; color: #2c3e50; margin: 1.5rem 0; font-weight: 500; }
+            .performance-stats { display: flex; justify-content: center; gap: 2rem; margin: 1rem 0; }
+            .stat-item { text-align: center; }
+            .stat-value { display: block; font-size: 1.5rem; font-weight: 900; color: #0380C2; }
+            .stat-label { font-size: 0.9rem; color: #6c757d; }
+            .cert-modern-footer { background: #f8f9fa; padding: 1rem 2rem; border-top: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; }
+            .footer-left { text-align: left; }
+            .cert-date-modern { margin: 0.25rem 0; color: #495057; font-weight: 600; }
+            .cert-location-modern { font-style: italic; color: #6c757d; }
+            .footer-center { text-align: center; flex: 1; }
+            .code-label { font-size: 0.8rem; color: #6c757d; margin: 0; }
+            .code-value { font-family: 'Courier New', monospace; font-size: 0.85rem; color: #495057; font-weight: 600; margin: 0; }
+            .footer-right { text-align: right; }
+            .signature-text { font-weight: 700 !important; color: #2c3e50 !important; margin: 20px 0 0.1rem 0 !important; text-align: center !important; font-size: 0.85rem !important; }
+            .signature-container { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 5px; }
+            .signature-container { position: relative; display: inline-block; width: 180px; height: 120px; }
+            .signature-img { max-width: 200px !important; max-height: 140px !important; object-fit: contain !important; position: absolute !important; top: 0px !important; left: 70% !important; transform: translateX(-50%) !important; z-index: 2 !important; }
+            .cachet-img { max-width: 200px !important; max-height: 140px !important; object-fit: contain !important; position: absolute !important; top: 5px !important; left: 70% !important; transform: translateX(-50%) !important; opacity: 0.9 !important; z-index: 1 !important; }
           </style>
         </head>
         <body>
-          <div class="certificat-digital">
-            <div class="cert-header">
-              <div style="width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;"><div style="width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; color: #0380C2; filter: brightness(0) invert(1);">PN</div></div>
-              <div style="text-align: center; flex: 1;">
-                <div class="cert-organization">PENCCUM NDONGO</div>
-                <h2 class="cert-subtitle">Concours de Poésie Inédit & Innovant</h2>
-                <h3 class="cert-edition">Troisième Édition</h3>
+          <div class="certificat-modern">
+            <div class="cert-modern-header">
+              <div class="brand-logo">
+                <img src="/logocertif.png" alt="Logo Penccum Ndongo" class="logo-img">
               </div>
-              <div style="width: 60px; height: 60px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0380C2; font-size: 1.5rem;">🏆</div>
-            </div>
-            <div class="cert-body">
-              <div class="cert-decoration-line"></div>
-              <p class="cert-intro">Décerné à</p>
-              <div class="cert-participant">
-                <div class="participant-name">${this.currentUser?.prenom} ${this.currentUser?.nom}</div>
+              <div class="brand-info">
+                <h1>PENCCUM NDONGO</h1>
+                <p>Concours de Poésie Inédit & Innovant</p>
+                <p><strong>Troisième Édition</strong></p>
               </div>
-              <p class="cert-text">
-                Pour sa participation à la 3e édition du Concours de Poésie Inédit & Innovant (CP2i).
-              </p>
-              ${classementText ? `<div class="cert-performance"><p class="cert-ranking">${classementText}</p></div>` : ''}
-              <div class="cert-decoration-line"></div>
-            </div>
-            <div class="cert-footer">
-              <div class="cert-date">
-                <p>Délivré le ${this.getCurrentDate()}</p>
-                <p class="cert-location">Dakar, Sénégal</p>
-              </div>
-              <div style="text-align: center; flex: 1;">
-                <p style="font-family: 'Courier New', monospace; font-size: 0.85rem; color: #495057; font-weight: 600; margin: 0;">Code : CP2i-${this.currentUser?.id}-${this.getCurrentYear()}</p>
-              </div>
-              <div class="cert-signature">
-                <p class="signature-name">Direction Penccum Ndongo</p>
-                <p class="signature-title">Organisateur CP2i</p>
+              <div class="cert-badge">
+                🏆
               </div>
             </div>
-            <div class="cert-verification">
-              <p class="verification-code">Code de vérification : CP2i-${this.currentUser?.id}-${this.getCurrentYear()}</p>
+            <div class="cert-modern-body">
+              <div class="cert-title">
+                <h2>ATTESTATION DE PARTICIPATION</h2>
+                <div class="title-underline"></div>
+              </div>
+              <div class="cert-participant-modern">
+                <p class="participant-label">Décerné à</p>
+                <h3 class="participant-name-modern">${this.currentUser?.prenom} ${this.currentUser?.nom}</h3>
+              </div>
+              <div class="cert-achievement">
+                <p class="achievement-text">
+                  Pour sa participation à la 3e édition du Concours de Poésie Inédit & Innovant (CP2i).
+                </p>
+                <div class="performance-stats">
+                  ${this.stats.note_moyenne ? `<div class="stat-item"><span class="stat-value">${this.stats.note_moyenne.toFixed(1)}</span><span class="stat-label">Note / 20</span></div>` : ''}
+                  ${this.classement?.position ? `<div class="stat-item"><span class="stat-value">${this.classement.position}${this.getOrdinalSuffix(this.classement.position)}</span><span class="stat-label">Classement</span></div>` : ''}
+                  <div class="stat-item"><span class="stat-value">2025</span><span class="stat-label">Édition</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="cert-modern-footer">
+              <div class="footer-left">
+                <p class="cert-date-modern">${this.getCurrentDate()}</p>
+                <p class="cert-location-modern">Dakar, Sénégal</p>
+              </div>
+              <div class="footer-center">
+                <div class="cert-verification">
+                  <div class="cert-code-unique">
+                    <p class="code-label">Code de vérification unique :</p>
+                    <p class="code-value">${this.generateUniqueCode()}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="footer-right">
+                <div class="signature-modern">
+                  <p class="signature-text">Direction Penccum Ndongo</p>
+                  <div class="signature-container">
+                    <img src="/cachetpn.png" alt="Cachet Penccum Ndongo" class="cachet-img">
+                    <img src="/signaturethn.png" alt="Signature" class="signature-img">
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </body>

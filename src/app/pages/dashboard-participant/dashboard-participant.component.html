@@ -700,7 +700,7 @@
                 <!-- Header moderne -->
                 <div class="cert-modern-header">
                   <div class="brand-logo">
-                    <img src="logoft.png" alt="Logo Penccum Ndongo" class="logo-img">
+                    <img src="/logocertif.png" alt="Logo Penccum Ndongo" class="logo-img">
                   </div>
                   <div class="brand-info">
                     <h1>PENCCUM NDONGO</h1>
@@ -717,7 +717,7 @@
                 <!-- Contenu principal -->
                 <div class="cert-modern-body">
                   <div class="cert-title">
-                    <h2>CERTIFICAT DE PARTICIPATION</h2>
+                    <h2>ATTESTATION DE PARTICIPATION</h2>
                     <div class="title-underline"></div>
                   </div>
                   
@@ -768,8 +768,8 @@
                     <div class="signature-modern">
                       <p class="signature-text">Direction Penccum Ndongo</p>
                       <div class="signature-container">
-                        <img src="cachetpn.png" alt="Cachet Penccum Ndongo" class="cachet-img">
-                        <img src="signaturethn.png" alt="Signature" class="signature-img">
+                        <img src="/cachetpn.png" alt="Cachet Penccum Ndongo" class="cachet-img">
+                        <img src="/signaturethn.png" alt="Signature" class="signature-img">
                       </div>
                     </div>
                   </div>
@@ -781,7 +781,7 @@
               <h4>{{cert.titre}}</h4>
               <p>{{cert.description}}</p>
               <div class="cert-buttons">
-                <button class="btn btn-primary" (click)="downloadCertificatPDF(cert)">
+                <button class="btn btn-primary" (click)="downloadCertificate(cert)">
                   <i class="fas fa-download"></i> Télécharger PDF
                 </button>
                 <button class="btn btn-outline" (click)="previewCertificat(cert)">
@@ -978,7 +978,7 @@
         <!-- Header moderne -->
         <div class="cert-modern-header">
           <div class="brand-logo">
-            <img src="logoft.png" alt="Logo Penccum Ndongo" class="logo-img">
+            <img src="/logocertif.png" alt="Logo Penccum Ndongo" class="logo-img">
           </div>
           <div class="brand-info">
             <h1>PENCCUM NDONGO</h1>
@@ -1046,8 +1046,8 @@
             <div class="signature-modern">
               <p class="signature-text">Direction Penccum Ndongo</p>
               <div class="signature-container">
-                <img src="signaturethn.png" alt="Signature" class="signature-img">
-                <img src="cachetpn.png" alt="Cachet Penccum Ndongo" class="cachet-img">
+                <img src="/signaturethn.png" alt="Signature" class="signature-img">
+                <img src="/cachetpn.png" alt="Cachet Penccum Ndongo" class="cachet-img">
               </div>
             </div>
           </div>
@@ -1055,7 +1055,7 @@
       </div>
     </div>
     <div class="preview-actions">
-      <button class="btn btn-primary" (click)="downloadCertificatPDF(selectedCertificat)">
+      <button class="btn btn-primary" (click)="downloadCertificate(selectedCertificat)">
         <i class="fas fa-download"></i> Télécharger PDF
       </button>
       <button class="btn btn-secondary" (click)="closeCertificatPreview()">
