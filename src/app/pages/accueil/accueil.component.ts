@@ -213,6 +213,17 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
   // --- Actualités ---
   articles: Article[] = [
     {
+      id: 18,
+      title: "Joyeux Noël 2024 !",
+      excerpt: "L'équipe de Penccum Ndongo vous souhaite un Joyeux Noël rempli de joie, de paix et de bonheur. Que cette période de fêtes vous apporte chaleur humaine et moments précieux en famille. Merci pour votre confiance et votre fidélité tout au long de cette année. Nous vous souhaitons de merveilleuses fêtes de fin d'année ! 🎄✨",
+      image: "noelpenccummdongo.jpg",
+      date: new Date('2024-12-24'),
+      author: "Penccum Ndongo",
+      category: "VOEUX",
+      linkedinUrl: "https://www.linkedin.com/posts/penccum-ndongo_joyeuxnoaebl-penccumndongo-activity-7409733588213997568-Z22U?utm_source=share&utm_medium=member_ios&rcm=ACoAADqQAssBElpPsDolAtxkZ86cX_61QT4D7ZA",
+      featured: true
+    },
+    {
       id: 17,
       title: "Comment s'inscrire et soumettre votre texte sur la plateforme CP2i ?",
       excerpt: "Pour vous accompagner dans votre participation à la troisième édition du Concours de Poésie Inédit & Innovant (CP2i), organisé par Penccum Ndongo, nous avons préparé une courte vidéo explicative pour vous guider étape par étape : ➜ Création de compte / Inscription ➜ Connexion à la plateforme ➜ Soumission d'un nouveau texte. Merci de la regarder attentivement et de la partager avec tous les participants.",

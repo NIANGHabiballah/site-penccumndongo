@@ -2174,13 +2174,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   getTopParticipants() {
-    // Utiliser l'API de classement pour obtenir les vraies notes moyennes
-    if (!this.classementData || this.classementData.length === 0) {
-      this.loadClassement();
-      return [];
-    }
-    
-    return this.classementData.slice(0, 5);
+    // Utiliser directement les données filtrées pour la cohérence
+    return this.getFilteredParticipantsNotes().slice(0, 5);
   }
   
   classementData: any[] = [];
@@ -3902,6 +3897,91 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       }
       this.cdr.detectChanges();
     }, 1500);
+  }
+  
+  downloadTop5Finalistes(): void {
+    // Créer un tableau temporaire avec seulement le top 5
+    const top5 = this.getFilteredParticipantsNotes().slice(0, 5);
+    
+    const tableHTML = `
+      <div style="padding: 30px; font-family: 'Times New Roman', serif; background: white; width: 100%;">
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #2c3e50; padding-bottom: 20px;">
+          <h1 style="margin: 0 0 8px 0; color: #2c3e50; font-size: 22px; font-weight: bold; letter-spacing: 1px;">CONCOURS DE POÉSIE INÉDIT & INNOVANT (CP2i) - 2025</h1>
+          <h2 style="margin: 0 0 8px 0; color: #FF7F1A; font-size: 18px; font-weight: bold;">TABLEAU DE DÉLIBÉRATION OFFICIEL</h2>
+          <p style="margin: 0; color: #7f8c8d; font-size: 14px; font-style: italic;">Classement des participants par note moyenne décroissante</p>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <thead>
+            <tr style="background: #007bff; color: white;">
+              <th style="padding: 15px 8px; border: 1px solid #0056b3; text-align: center; font-weight: bold; font-size: 14px;">Rang</th>
+              <th style="padding: 15px 8px; border: 1px solid #0056b3; font-weight: bold; font-size: 14px;">Prénom</th>
+              <th style="padding: 15px 8px; border: 1px solid #0056b3; font-weight: bold; font-size: 14px;">Nom</th>
+              <th style="padding: 15px 8px; border: 1px solid #0056b3; font-weight: bold; font-size: 14px;">Adresse/Ville</th>
+              <th style="padding: 15px 8px; border: 1px solid #0056b3; font-weight: bold; font-size: 14px;">Thème principal</th>
+              <th style="padding: 15px 8px; border: 1px solid #0056b3; font-weight: bold; font-size: 14px;">Langue</th>
+              <th style="padding: 15px 8px; border: 1px solid #0056b3; text-align: center; font-weight: bold; font-size: 14px;">Moyenne</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${top5.map((p, i) => {
+              const fullInfo = this.allAccounts.find(account => 
+                account.prenom?.trim() === p.prenom?.trim() && 
+                account.nom?.trim() === p.nom?.trim()
+              );
+              const bgColor = i % 2 === 0 ? '#f8f9fa' : 'white';
+              const rankColor = i === 0 ? '#f39c12' : i === 1 ? '#95a5a6' : i === 2 ? '#d35400' : '#3498db';
+              return `
+              <tr style="background: ${bgColor}; border-left: 4px solid ${rankColor};">
+                <td style="padding: 12px 8px; border: 1px solid #ddd; text-align: center; font-weight: bold; font-size: 16px; color: ${rankColor};">${i + 1}</td>
+                <td style="padding: 12px 8px; border: 1px solid #ddd; font-weight: 500;">${p.prenom}</td>
+                <td style="padding: 12px 8px; border: 1px solid #ddd; font-weight: 500;">${p.nom}</td>
+                <td style="padding: 12px 8px; border: 1px solid #ddd;">${fullInfo?.ville || 'Non renseignée'}</td>
+                <td style="padding: 12px 8px; border: 1px solid #ddd;">${this.getParticipantMainTheme(p)}</td>
+                <td style="padding: 12px 8px; border: 1px solid #ddd; font-weight: 500;">${this.getParticipantMainLanguage(p)}</td>
+                <td style="padding: 12px 8px; border: 1px solid #ddd; text-align: center; font-weight: bold; font-size: 16px; color: #27ae60;">${p.note_moyenne?.toFixed(2)}/20</td>
+              </tr>
+            `;
+            }).join('')}
+          </tbody>
+        </table>
+        <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 2px solid #ecf0f1;">
+          <p style="margin: 0; color: #7f8c8d; font-size: 12px; font-style: italic;">Document généré le ${new Date().toLocaleDateString('fr-FR')} - CP2i 2025</p>
+        </div>
+      </div>
+    `;
+    
+    // Créer un élément temporaire
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = tableHTML;
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    document.body.appendChild(tempDiv);
+    
+    // Capturer avec html2canvas
+    import('html2canvas').then(html2canvas => {
+      html2canvas.default(tempDiv, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        allowTaint: true,
+        width: 1200,
+        height: 600
+      }).then(canvas => {
+        // Supprimer l'élément temporaire
+        document.body.removeChild(tempDiv);
+        
+        // Télécharger l'image
+        const link = document.createElement('a');
+        link.download = `top5-finalistes-cp2i-${new Date().toISOString().split('T')[0]}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        
+        this.showToast('Top 5 finalistes téléchargé avec succès', 'success');
+      }).catch(error => {
+        document.body.removeChild(tempDiv);
+        this.showToast('Erreur lors de la capture', 'error');
+      });
+    });
   }
   
   downloadDeliberationTable(): void {
