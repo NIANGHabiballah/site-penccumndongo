@@ -225,6 +225,15 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   private subscriptions: Subscription[] = [];
 
+  // Système de sélection des finalistes
+  finalistesSelection = {
+    totalFinalistes: 5,
+    selectionActive: false,
+    finalistes: [] as any[],
+    repartitionLangues: {} as any
+  };
+  showFinalistesModal = false;
+
   constructor(
     private cp2iApi: Cp2iApiService,
     private router: Router,
@@ -813,18 +822,14 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
 
   generateCSV(): string {
-    const headers = ['Prénom', 'Nom', 'Email', 'Rôle', 'Téléphone', 'WhatsApp', 'Ville', 'Textes', 'Note moyenne', 'Inscription'];
+    const headers = ['Prénom', 'Nom', 'Téléphone', 'Email', 'WhatsApp', 'Ville'];
     const rows = this.filteredUsers.map(user => [
       user.prenom,
       user.nom,
-      user.email,
-      user.role,
       user.telephone || '',
+      user.email,
       user.whatsapp || '',
-      user.ville || '',
-      user.nb_textes || 0,
-      user.note_moyenne || '',
-      new Date(user.created_at).toLocaleDateString()
+      user.ville || ''
     ]);
     
     return [headers, ...rows].map(row => row.join(',')).join('\n');
@@ -895,18 +900,14 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
 
   generateAccountsCSV(): string {
-    const headers = ['Email', 'Mot de passe', 'Prénom', 'Nom', 'Téléphone', 'WhatsApp', 'Ville', 'Rôle', 'Statut', 'Inscription'];
+    const headers = ['Prénom', 'Nom', 'Téléphone', 'Email', 'WhatsApp', 'Ville'];
     const rows = this.filteredAccounts.map(account => [
-      account.email,
-      account.mot_de_passe_clair || 'Non disponible',
       account.prenom,
       account.nom,
       account.telephone || '',
+      account.email,
       account.whatsapp || '',
-      account.ville || '',
-      account.role,
-      account.email_verified ? 'Vérifié' : 'En attente',
-      new Date(account.created_at).toLocaleDateString()
+      account.ville || ''
     ]);
     
     return [headers, ...rows].map(row => row.join(',')).join('\n');
@@ -2712,120 +2713,9 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     return countries.size;
   }
   
-  // Système de sélection des finalistes
-  finalistesSelection = {
-    totalFinalistes: 5,
-    selectionActive: false,
-    finalistes: [] as any[],
-    repartitionLangues: {} as any
-  };
-  showFinalistesModal = false;
 
-  // Sélection équitable des finalistes avec représentation proportionnelle
-  selectFinalistes() {
-    const textesEvalues = this.textes.filter(t => t.note && t.note > 0 && (t.statut === 'accepte' || t.statut === 'refuse'));
-    
-    if (textesEvalues.length === 0) {
-      this.showToast('Aucun texte évalué disponible pour la sélection', 'error');
-      return;
-    }
 
-    // Calculer la répartition par langue
-    const statsLangues = this.getLanguageStats();
-    const totalTextes = textesEvalues.length;
-    
-    // Répartition proportionnelle des 5 places
-    const repartition = {
-      francais: Math.round((statsLangues.francais / 100) * this.finalistesSelection.totalFinalistes),
-      wolof: Math.round((statsLangues.wolof / 100) * this.finalistesSelection.totalFinalistes),
-      anglais: Math.round((statsLangues.anglais / 100) * this.finalistesSelection.totalFinalistes),
-      arabe: Math.round((statsLangues.arabe / 100) * this.finalistesSelection.totalFinalistes)
-    };
 
-    // Ajuster pour avoir exactement 5 finalistes
-    let totalRepartition = Object.values(repartition).reduce((sum, val) => sum + val, 0);
-    if (totalRepartition < this.finalistesSelection.totalFinalistes) {
-      // Ajouter les places manquantes à la langue la plus représentée
-      const langueDominante = Object.keys(repartition).reduce((a, b) => 
-        repartition[a as keyof typeof repartition] > repartition[b as keyof typeof repartition] ? a : b
-      );
-      repartition[langueDominante as keyof typeof repartition] += (this.finalistesSelection.totalFinalistes - totalRepartition);
-    } else if (totalRepartition > this.finalistesSelection.totalFinalistes) {
-      // Retirer les places en trop de la langue la plus représentée
-      const langueDominante = Object.keys(repartition).reduce((a, b) => 
-        repartition[a as keyof typeof repartition] > repartition[b as keyof typeof repartition] ? a : b
-      );
-      repartition[langueDominante as keyof typeof repartition] -= (totalRepartition - this.finalistesSelection.totalFinalistes);
-    }
-
-    // Sélectionner les meilleurs textes par langue
-    const finalistes: any[] = [];
-    
-    Object.keys(repartition).forEach(langue => {
-      const nbPlaces = repartition[langue as keyof typeof repartition];
-      if (nbPlaces > 0) {
-        const textesLangue = textesEvalues
-          .filter(t => t.langue?.toLowerCase() === langue.toLowerCase() || 
-                      (langue === 'francais' && t.langue?.toLowerCase() === 'français'))
-          .sort((a, b) => parseFloat(b.note) - parseFloat(a.note))
-          .slice(0, nbPlaces);
-        
-        finalistes.push(...textesLangue.map(t => ({
-          ...t,
-          langue_selection: langue,
-          rang_langue: textesLangue.indexOf(t) + 1
-        })));
-      }
-    });
-
-    // Trier les finalistes par note décroissante
-    finalistes.sort((a, b) => parseFloat(b.note) - parseFloat(a.note));
-
-    this.finalistesSelection.finalistes = finalistes;
-    this.finalistesSelection.repartitionLangues = repartition;
-    this.finalistesSelection.selectionActive = true;
-    
-    this.showFinalistesModal = true;
-    this.logAdminAction('selection_finalistes', `Sélection de ${finalistes.length} finalistes avec répartition proportionnelle`);
-  }
-
-  closeFinalistesModal() {
-    this.showFinalistesModal = false;
-  }
-
-  getCurrentDate(): string {
-    return new Date().toLocaleDateString();
-  }
-
-  exportFinalistes() {
-    if (this.finalistesSelection.finalistes.length === 0) {
-      this.showToast('Aucun finaliste sélectionné', 'error');
-      return;
-    }
-
-    const headers = ['Rang', 'Titre', 'Auteur', 'Langue', 'Note', 'Thème', 'Rang dans la langue', 'Date soumission'];
-    const rows = this.finalistesSelection.finalistes.map((finaliste, index) => [
-      index + 1,
-      finaliste.titre,
-      `${finaliste.prenom} ${finaliste.nom}`,
-      finaliste.langue,
-      finaliste.note + '/20',
-      this.getThemeLabel(finaliste.theme),
-      finaliste.rang_langue,
-      new Date(finaliste.created_at).toLocaleDateString()
-    ]);
-    
-    const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `finalistes_cp2i_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-    
-    this.showToast('Liste des finalistes exportée avec succès', 'success');
-  }
 
   // Statistiques prédictives
   getPredictedFinalParticipants(): number {
@@ -3758,282 +3648,98 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.participantDetailsVisible[index] = !this.participantDetailsVisible[index];
   }
   
-  // Méthodes pour le tableau de délibération - UTILISE LES MÊMES DONNÉES QUE NOTES & CLASSEMENT
-  getDeliberationParticipants(): any[] {
-    // Utiliser EXACTEMENT les mêmes données que la section Notes & Classement
-    return this.getFilteredParticipantsNotes()
-      .map((participant, index) => {
-        // Chercher les infos complètes dans allAccounts
-        const fullInfo = this.allAccounts.find(account => 
-          account.prenom?.trim() === participant.prenom?.trim() && 
-          account.nom?.trim() === participant.nom?.trim()
-        );
-        
-        return {
-          ...participant,
-          email: fullInfo?.email || 'Email non disponible',
-          ville: fullInfo?.ville || 'Non renseignée',
-          telephone: fullInfo?.telephone,
-          whatsapp: fullInfo?.whatsapp,
-          isTop5: index < 5
-        };
-      });
-  }
-  
-  getParticipantMainTheme(participant: any): string {
-    if (!participant.textes || participant.textes.length === 0) return 'Aucun';
+  // Sélection équitable des finalistes avec représentation proportionnelle
+  selectFinalistes() {
+    const textesEvalues = this.textes.filter(t => t.note && t.note > 0 && (t.statut === 'accepte' || t.statut === 'refuse'));
     
-    // Compter les thèmes
-    const themeCount: { [key: string]: number } = {};
-    participant.textes.forEach((texte: any) => {
-      const theme = texte.theme || 'non_specifie';
-      themeCount[theme] = (themeCount[theme] || 0) + 1;
-    });
-    
-    // Trouver le thème le plus fréquent
-    const mainTheme = Object.keys(themeCount).reduce((a, b) => 
-      themeCount[a] > themeCount[b] ? a : b
-    );
-    
-    return this.getThemeLabel(mainTheme);
-  }
-  
-  getParticipantMainLanguage(participant: any): string {
-    if (!participant.textes || participant.textes.length === 0) return 'Aucune';
-    
-    // Compter les langues
-    const langueCount: { [key: string]: number } = {};
-    participant.textes.forEach((texte: any) => {
-      const langue = texte.langue || 'non_specifie';
-      langueCount[langue] = (langueCount[langue] || 0) + 1;
-    });
-    
-    // Trouver la langue la plus fréquente
-    const mainLangue = Object.keys(langueCount).reduce((a, b) => 
-      langueCount[a] > langueCount[b] ? a : b
-    );
-    
-    return mainLangue.charAt(0).toUpperCase() + mainLangue.slice(1);
-  }
-  
-  getCurrentDateTime(): string {
-    return new Date().toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
-  
-  getQualifiedCount(): number {
-    // Utiliser les mêmes données filtrées que Notes & Classement
-    return this.getFilteredParticipantsNotes().filter(p => p.note_moyenne && p.note_moyenne >= 10).length;
-  }
-  
-  getGeneralAverage(): string {
-    // Utiliser les mêmes données filtrées que Notes & Classement
-    const participants = this.getFilteredParticipantsNotes();
-    if (participants.length === 0) return 'N/A';
-    
-    const validNotes = participants.filter(p => p.note_moyenne !== null && p.note_moyenne !== undefined);
-    if (validNotes.length === 0) return 'N/A';
-    
-    const total = validNotes.reduce((sum, p) => sum + p.note_moyenne, 0);
-    const average = total / validNotes.length;
-    return average.toFixed(2);
-  }
-  
-  refreshDeliberationData(): void {
-    this.showToast('Actualisation des données de délibération...', 'success');
-    // Recharger spécifiquement les données détaillées des notes (même source que Notes & Classement)
-    this.loadDetailedNotesForAllParticipants();
-    this.loadData();
-    setTimeout(() => {
-      this.showToast('Données actualisées avec succès', 'success');
-      // Forcer la détection des changements pour synchroniser l'affichage
-      this.cdr.detectChanges();
-    }, 2000);
-  }
-  
-  // Méthode pour s'assurer que le tableau de délibération utilise exactement les mêmes données
-  getDeliberationDataConsistency(): boolean {
-    const notesData = this.getFilteredParticipantsNotes();
-    const deliberationData = this.getDeliberationParticipants();
-    
-    // Vérifier que les deux sources ont le même nombre de participants
-    if (notesData.length !== deliberationData.length) {
-      console.warn('Incohérence détectée: nombre de participants différent');
-      return false;
-    }
-    
-    // Vérifier que les notes moyennes sont identiques
-    for (let i = 0; i < notesData.length; i++) {
-      const noteParticipant = notesData[i];
-      const deliberationParticipant = deliberationData[i];
-      
-      if (noteParticipant.note_moyenne !== deliberationParticipant.note_moyenne) {
-        console.warn(`Incohérence détectée pour ${noteParticipant.prenom} ${noteParticipant.nom}`);
-        return false;
-      }
-    }
-    
-    return true;
-  }
-  
-  // Méthode pour vérifier et corriger la synchronisation entre Notes & Classement et Délibération
-  syncDeliberationWithNotes(): void {
-    this.showToast('Synchronisation en cours...', 'success');
-    
-    // Forcer le rechargement des données détaillées
-    this.loadDetailedNotesForAllParticipants();
-    
-    setTimeout(() => {
-      const isConsistent = this.getDeliberationDataConsistency();
-      if (isConsistent) {
-        this.showToast('Synchronisation réussie - Données cohérentes', 'success');
-      } else {
-        this.showToast('Attention: Incohérence détectée après synchronisation', 'error');
-      }
-      this.cdr.detectChanges();
-    }, 1500);
-  }
-  
-  downloadTop5Finalistes(): void {
-    // Créer un tableau temporaire avec seulement le top 5
-    const top5 = this.getFilteredParticipantsNotes().slice(0, 5);
-    
-    const tableHTML = `
-      <div style="padding: 30px; font-family: 'Times New Roman', serif; background: white; width: 100%;">
-        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #2c3e50; padding-bottom: 20px;">
-          <h1 style="margin: 0 0 8px 0; color: #2c3e50; font-size: 22px; font-weight: bold; letter-spacing: 1px;">CONCOURS DE POÉSIE INÉDIT & INNOVANT (CP2i) - 2025</h1>
-          <h2 style="margin: 0 0 8px 0; color: #FF7F1A; font-size: 18px; font-weight: bold;">TABLEAU DE DÉLIBÉRATION OFFICIEL</h2>
-          <p style="margin: 0; color: #7f8c8d; font-size: 14px; font-style: italic;">Classement des participants par note moyenne décroissante</p>
-        </div>
-        <table style="width: 100%; border-collapse: collapse; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-          <thead>
-            <tr style="background: #007bff; color: white;">
-              <th style="padding: 15px 8px; border: 1px solid #0056b3; text-align: center; font-weight: bold; font-size: 14px;">Rang</th>
-              <th style="padding: 15px 8px; border: 1px solid #0056b3; font-weight: bold; font-size: 14px;">Prénom</th>
-              <th style="padding: 15px 8px; border: 1px solid #0056b3; font-weight: bold; font-size: 14px;">Nom</th>
-              <th style="padding: 15px 8px; border: 1px solid #0056b3; font-weight: bold; font-size: 14px;">Adresse/Ville</th>
-              <th style="padding: 15px 8px; border: 1px solid #0056b3; font-weight: bold; font-size: 14px;">Thème principal</th>
-              <th style="padding: 15px 8px; border: 1px solid #0056b3; font-weight: bold; font-size: 14px;">Langue</th>
-              <th style="padding: 15px 8px; border: 1px solid #0056b3; text-align: center; font-weight: bold; font-size: 14px;">Moyenne</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${top5.map((p, i) => {
-              const fullInfo = this.allAccounts.find(account => 
-                account.prenom?.trim() === p.prenom?.trim() && 
-                account.nom?.trim() === p.nom?.trim()
-              );
-              const bgColor = i % 2 === 0 ? '#f8f9fa' : 'white';
-              const rankColor = i === 0 ? '#f39c12' : i === 1 ? '#95a5a6' : i === 2 ? '#d35400' : '#3498db';
-              return `
-              <tr style="background: ${bgColor}; border-left: 4px solid ${rankColor};">
-                <td style="padding: 12px 8px; border: 1px solid #ddd; text-align: center; font-weight: bold; font-size: 16px; color: ${rankColor};">${i + 1}</td>
-                <td style="padding: 12px 8px; border: 1px solid #ddd; font-weight: 500;">${p.prenom}</td>
-                <td style="padding: 12px 8px; border: 1px solid #ddd; font-weight: 500;">${p.nom}</td>
-                <td style="padding: 12px 8px; border: 1px solid #ddd;">${fullInfo?.ville || 'Non renseignée'}</td>
-                <td style="padding: 12px 8px; border: 1px solid #ddd;">${this.getParticipantMainTheme(p)}</td>
-                <td style="padding: 12px 8px; border: 1px solid #ddd; font-weight: 500;">${this.getParticipantMainLanguage(p)}</td>
-                <td style="padding: 12px 8px; border: 1px solid #ddd; text-align: center; font-weight: bold; font-size: 16px; color: #27ae60;">${p.note_moyenne?.toFixed(2)}/20</td>
-              </tr>
-            `;
-            }).join('')}
-          </tbody>
-        </table>
-        <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 2px solid #ecf0f1;">
-          <p style="margin: 0; color: #7f8c8d; font-size: 12px; font-style: italic;">Document généré le ${new Date().toLocaleDateString('fr-FR')} - CP2i 2025</p>
-        </div>
-      </div>
-    `;
-    
-    // Créer un élément temporaire
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = tableHTML;
-    tempDiv.style.position = 'absolute';
-    tempDiv.style.left = '-9999px';
-    document.body.appendChild(tempDiv);
-    
-    // Capturer avec html2canvas
-    import('html2canvas').then(html2canvas => {
-      html2canvas.default(tempDiv, {
-        scale: 2,
-        backgroundColor: '#ffffff',
-        useCORS: true,
-        allowTaint: true,
-        width: 1200,
-        height: 600
-      }).then(canvas => {
-        // Supprimer l'élément temporaire
-        document.body.removeChild(tempDiv);
-        
-        // Télécharger l'image
-        const link = document.createElement('a');
-        link.download = `top5-finalistes-cp2i-${new Date().toISOString().split('T')[0]}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        
-        this.showToast('Top 5 finalistes téléchargé avec succès', 'success');
-      }).catch(error => {
-        document.body.removeChild(tempDiv);
-        this.showToast('Erreur lors de la capture', 'error');
-      });
-    });
-  }
-  
-  downloadDeliberationTable(): void {
-    // Utiliser html2canvas pour capturer le tableau
-    const element = document.getElementById('deliberation-table-export');
-    if (!element) {
-      this.showToast('Erreur: Tableau non trouvé', 'error');
+    if (textesEvalues.length === 0) {
+      this.showToast('Aucun texte évalué disponible pour la sélection', 'error');
       return;
     }
+
+    // Calculer la répartition par langue
+    const statsLangues = this.getLanguageStats();
+    const totalTextes = textesEvalues.length;
     
-    // Import dynamique de html2canvas
-    import('html2canvas').then(html2canvas => {
-      html2canvas.default(element, {
-        scale: 2,
-        backgroundColor: '#ffffff',
-        useCORS: true,
-        allowTaint: true,
-        width: element.scrollWidth,
-        height: element.scrollHeight
-      }).then(canvas => {
-        // Créer le lien de téléchargement
-        const link = document.createElement('a');
-        link.download = `tableau-deliberation-cp2i-${new Date().toISOString().split('T')[0]}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
+    // Répartition proportionnelle des 5 places
+    const repartition = {
+      francais: Math.round((statsLangues.francais / 100) * this.finalistesSelection.totalFinalistes),
+      wolof: Math.round((statsLangues.wolof / 100) * this.finalistesSelection.totalFinalistes),
+      anglais: Math.round((statsLangues.anglais / 100) * this.finalistesSelection.totalFinalistes),
+      arabe: Math.round((statsLangues.arabe / 100) * this.finalistesSelection.totalFinalistes)
+    };
+
+    // Ajuster pour avoir exactement 5 finalistes
+    let totalRepartition = Object.values(repartition).reduce((sum, val) => sum + val, 0);
+    if (totalRepartition < this.finalistesSelection.totalFinalistes) {
+      // Ajouter les places manquantes à la langue la plus représentée
+      const langueDominante = Object.keys(repartition).reduce((a, b) => 
+        repartition[a as keyof typeof repartition] > repartition[b as keyof typeof repartition] ? a : b
+      );
+      repartition[langueDominante as keyof typeof repartition] += (this.finalistesSelection.totalFinalistes - totalRepartition);
+    } else if (totalRepartition > this.finalistesSelection.totalFinalistes) {
+      // Retirer les places en trop de la langue la plus représentée
+      const langueDominante = Object.keys(repartition).reduce((a, b) => 
+        repartition[a as keyof typeof repartition] > repartition[b as keyof typeof repartition] ? a : b
+      );
+      repartition[langueDominante as keyof typeof repartition] -= (totalRepartition - this.finalistesSelection.totalFinalistes);
+    }
+
+    // Sélectionner les meilleurs textes par langue
+    const finalistes: any[] = [];
+    
+    Object.keys(repartition).forEach(langue => {
+      const nbPlaces = repartition[langue as keyof typeof repartition];
+      if (nbPlaces > 0) {
+        const textesLangue = textesEvalues
+          .filter(t => t.langue?.toLowerCase() === langue.toLowerCase() || 
+                      (langue === 'francais' && t.langue?.toLowerCase() === 'français'))
+          .sort((a, b) => parseFloat(b.note) - parseFloat(a.note))
+          .slice(0, nbPlaces);
         
-        this.showToast('Tableau téléchargé avec succès', 'success');
-        this.logAdminAction('export_deliberation', 'Téléchargement du tableau de délibération en image');
-      }).catch(error => {
-        console.error('Erreur capture:', error);
-        this.showToast('Erreur lors de la capture du tableau', 'error');
-      });
-    }).catch(error => {
-      console.error('Erreur import html2canvas:', error);
-      // Fallback: export CSV
-      this.exportDeliberationCSV();
+        finalistes.push(...textesLangue.map(t => ({
+          ...t,
+          langue_selection: langue,
+          rang_langue: textesLangue.indexOf(t) + 1
+        })));
+      }
     });
+
+    // Trier les finalistes par note décroissante
+    finalistes.sort((a, b) => parseFloat(b.note) - parseFloat(a.note));
+
+    this.finalistesSelection.finalistes = finalistes;
+    this.finalistesSelection.repartitionLangues = repartition;
+    this.finalistesSelection.selectionActive = true;
+    
+    this.showFinalistesModal = true;
+    this.logAdminAction('selection_finalistes', `Sélection de ${finalistes.length} finalistes avec répartition proportionnelle`);
   }
-  
-  exportDeliberationCSV(): void {
-    // Utiliser les mêmes données que Notes & Classement
-    const participants = this.getFilteredParticipantsNotes();
-    const headers = ['Rang', 'Prénom', 'Nom', 'Adresse/Ville', 'Thème principal', 'Langue', 'Moyenne', 'Statut'];
-    const rows = participants.map((participant, index) => [
+
+  closeFinalistesModal() {
+    this.showFinalistesModal = false;
+  }
+
+  getCurrentDate(): string {
+    return new Date().toLocaleDateString();
+  }
+
+  exportFinalistes() {
+    if (this.finalistesSelection.finalistes.length === 0) {
+      this.showToast('Aucun finaliste sélectionné', 'error');
+      return;
+    }
+
+    const headers = ['Rang', 'Titre', 'Auteur', 'Langue', 'Note', 'Thème', 'Rang dans la langue', 'Date soumission'];
+    const rows = this.finalistesSelection.finalistes.map((finaliste, index) => [
       index + 1,
-      participant.prenom,
-      participant.nom,
-      participant.ville || 'Non renseignée',
-      this.getParticipantMainTheme(participant),
-      this.getParticipantMainLanguage(participant),
-      participant.note_moyenne ? participant.note_moyenne.toFixed(2) + '/20' : 'N/A',
-      participant.note_moyenne >= 10 ? 'Admis' : 'Non admis'
+      finaliste.titre,
+      `${finaliste.prenom} ${finaliste.nom}`,
+      finaliste.langue,
+      finaliste.note + '/20',
+      this.getThemeLabel(finaliste.theme),
+      finaliste.rang_langue,
+      new Date(finaliste.created_at).toLocaleDateString()
     ]);
     
     const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
@@ -4041,11 +3747,145 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `tableau-deliberation-cp2i-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `finalistes_cp2i_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
     
-    this.showToast('Tableau exporté en CSV', 'success');
+    this.showToast('Liste des finalistes exportée avec succès', 'success');
   }
+
+  // Méthodes pour la liste des participants avec soumissions
+  getParticipantsWithSubmissionsData(): any[] {
+    const participantsMap = new Map<string, any>();
+    
+    // Créer une map des participants depuis les textes soumis UNIQUEMENT
+    this.textes.forEach(texte => {
+      const key = `${texte.prenom?.trim()}_${texte.nom?.trim()}`;
+      if (!participantsMap.has(key)) {
+        // Chercher les infos complètes dans allAccounts ou users
+        const fullInfo = this.allAccounts.find(account => 
+          account.prenom?.trim() === texte.prenom?.trim() && 
+          account.nom?.trim() === texte.nom?.trim()
+        ) || this.users.find(user => 
+          user.prenom?.trim() === texte.prenom?.trim() && 
+          user.nom?.trim() === texte.nom?.trim()
+        );
+        
+        participantsMap.set(key, {
+          prenom: texte.prenom,
+          nom: texte.nom,
+          email: fullInfo?.email || 'Email non disponible',
+          telephone: fullInfo?.telephone || '',
+          whatsapp: fullInfo?.whatsapp || '',
+          ville: fullInfo?.ville || '',
+          created_at: fullInfo?.created_at || texte.created_at,
+          nb_textes: 0,
+          note_moyenne: null
+        });
+      }
+      
+      // Compter les textes
+      const participant = participantsMap.get(key);
+      participant.nb_textes++;
+    });
+    
+    // Calculer les notes moyennes et filtrer seulement ceux qui ont des notes
+    const participantsWithNotes = Array.from(participantsMap.values()).filter(participant => {
+      const noteMoyenne = this.getParticipantAverageNote(participant.prenom, participant.nom);
+      participant.note_moyenne = noteMoyenne;
+      // Retourner seulement les participants qui ont soumis ET qui ont des notes
+      return participant.nb_textes > 0 && (noteMoyenne !== null && noteMoyenne > 0);
+    });
+    
+    // Trier par note décroissante puis par nom
+    return participantsWithNotes.sort((a, b) => {
+      if (b.note_moyenne !== a.note_moyenne) {
+        return (b.note_moyenne || 0) - (a.note_moyenne || 0);
+      }
+      return `${a.prenom} ${a.nom}`.localeCompare(`${b.prenom} ${b.nom}`);
+    });
+  }
+
+  getAverageNoteAllParticipants(): string {
+    const participants = this.getParticipantsWithSubmissionsData();
+    if (participants.length === 0) return 'N/A';
+    
+    const totalNotes = participants.reduce((sum, p) => sum + (p.note_moyenne || 0), 0);
+    const moyenne = totalNotes / participants.length;
+    return moyenne.toFixed(1) + '/20';
+  }
+
+  exportParticipantsWithSubmissions() {
+    const participants = this.getParticipantsWithSubmissionsData();
+    
+    if (participants.length === 0) {
+      this.showToast('Aucun participant avec soumission et note trouvé', 'error');
+      return;
+    }
+
+    // Créer un contenu CSV simplifié
+    const headers = [
+      'Prénom', 
+      'Nom', 
+      'Téléphone', 
+      'Email', 
+      'WhatsApp', 
+      'Ville'
+    ];
+    
+    const rows = participants.map(participant => [
+      participant.prenom || '',
+      participant.nom || '',
+      participant.telephone || '',
+      participant.email || '',
+      participant.whatsapp || '',
+      participant.ville || ''
+    ]);
+    
+    // Ajouter un en-tête informatif
+    const csvHeader = [
+      '# LISTE DES PARTICIPANTS CP2i 2025 - COORDONNÉES COMPLÈTES',
+      `# Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}`,
+      `# Total: ${participants.length} participants avec soumissions et notes`,
+      '# ',
+      headers.join(';')
+    ];
+    
+    const csvRows = rows.map(row => row.join(';'));
+    const csvContent = [...csvHeader, ...csvRows].join('\n');
+    
+    // Créer le fichier avec BOM pour Excel
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { 
+      type: 'text/csv;charset=utf-8;' 
+    });
+    
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `CP2i_2025_Coordonnees_Participants_${new Date().toISOString().split('T')[0]}.csv`;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    // Notification améliorée avec plus de visibilité
+    this.showToast(`✓ FICHIER TÉLÉCHARGÉ ! ${participants.length} coordonnées exportées dans vos téléchargements`, 'success');
+    
+    // Afficher une deuxième notification après 2 secondes
+    setTimeout(() => {
+      this.showToast(`📁 Fichier: CP2i_2025_Coordonnees_Participants_${new Date().toISOString().split('T')[0]}.csv`, 'success');
+    }, 2000);
+    
+    // Log de l'action
+    this.logAdminAction('export_participants', `Export coordonnées de ${participants.length} participants avec soumissions`);
+  }
+  
+
+  
+
+  
+
 
 }

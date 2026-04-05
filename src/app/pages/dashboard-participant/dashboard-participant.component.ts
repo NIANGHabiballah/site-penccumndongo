@@ -756,7 +756,6 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   }
   
   async downloadCertificate(cert: any) {
-    // Capturer exactement l'élément affiché dans le dashboard
     const element = document.getElementById('cert-' + cert.id);
     if (!element) {
       this.showToast('Erreur: élément certificat introuvable', 'error');
@@ -764,69 +763,62 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     }
     
     try {
-      // Attendre que toutes les images soient chargées
       await this.waitForImagesToLoad(element);
       
-      // Importer les librairies nécessaires
       const html2canvas = (await import('html2canvas')).default;
       const { jsPDF } = await import('jspdf');
       
-      // Capturer l'élément complet avec footer
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
-        logging: false,
-        imageTimeout: 10000,
-        width: element.offsetWidth,
-        height: element.offsetHeight,
-        scrollX: 0,
-        scrollY: 0,
         onclone: (clonedDoc) => {
-          // Forcer les styles des images dans le document cloné
-          const clonedImages = clonedDoc.querySelectorAll('.logo-img, .cachet-img, .signature-img');
-          clonedImages.forEach((img: any) => {
-            img.style.objectFit = 'contain';
-            img.style.objectPosition = 'center';
-            if (img.classList.contains('logo-img')) {
-              img.style.width = '100px';
-              img.style.height = '100px';
-            }
-            if (img.classList.contains('cachet-img') || img.classList.contains('signature-img')) {
-              img.style.maxWidth = '200px';
-              img.style.maxHeight = '140px';
-            }
-          });
+          const logoImg = clonedDoc.querySelector('.logo-img') as HTMLImageElement;
+          if (logoImg) {
+            logoImg.style.width = '100px';
+            logoImg.style.height = '100px';
+            logoImg.style.objectFit = 'contain';
+          }
+          
+          const cachetImg = clonedDoc.querySelector('.cachet-img') as HTMLImageElement;
+          if (cachetImg) {
+            cachetImg.style.position = 'absolute';
+            cachetImg.style.top = '5px';
+            cachetImg.style.left = '70%';
+            cachetImg.style.transform = 'translateX(-50%)';
+            cachetImg.style.maxWidth = '200px';
+            cachetImg.style.zIndex = '1';
+          }
+          
+          const signatureImg = clonedDoc.querySelector('.signature-img') as HTMLImageElement;
+          if (signatureImg) {
+            signatureImg.style.position = 'absolute';
+            signatureImg.style.top = '0px';
+            signatureImg.style.left = '70%';
+            signatureImg.style.transform = 'translateX(-50%)';
+            signatureImg.style.maxWidth = '350px';
+            signatureImg.style.zIndex = '2';
+          }
         }
       });
       
-      // Créer le PDF en format A4 paysage
       const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
-        format: 'a4',
-        compress: true
+        format: 'a4'
       });
       
-      // Dimensions A4 paysage : 297mm x 210mm
-      const pdfWidth = 297;
-      const pdfHeight = 210;
-      
-      // Convertir le canvas en image haute qualité
       const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210);
       
-      // Ajouter l'image au PDF en respectant les dimensions A4
-      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, '', 'FAST');
-      
-      // Télécharger le fichier
       const fileName = `Attestation_CP2i_${this.currentUser?.prenom}_${this.currentUser?.nom}.pdf`;
       pdf.save(fileName);
       
       this.showToast('Attestation PDF téléchargée avec succès', 'success');
     } catch (error) {
-      console.error('Erreur lors du téléchargement:', error);
-      this.showToast('Erreur lors du téléchargement de l\'attestation', 'error');
+      console.error('Erreur:', error);
+      this.showToast('Erreur lors du téléchargement', 'error');
     }
   }
   

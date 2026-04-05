@@ -102,13 +102,15 @@
 }
 
 .logo-img {
-  width: 100px;
-  height: 100px;
-  object-fit: contain;
-  object-position: center;
+  width: 100px !important;
+  height: 100px !important;
+  object-fit: contain !important;
+  object-position: center !important;
   filter: brightness(0) invert(1);
-  max-width: 100px;
-  max-height: 100px;
+  max-width: 100px !important;
+  max-height: 100px !important;
+  aspect-ratio: 1/1 !important;
+  display: block !important;
 }
 
 .cert-badge .badge-circle {
@@ -280,6 +282,8 @@
   left: 70% !important;
   transform: translateX(-50%) !important;
   z-index: 2 !important;
+  width: auto !important;
+  height: auto !important;
 }
 
 .cachet-img {
@@ -293,6 +297,8 @@
   transform: translateX(-50%) !important;
   opacity: 0.9 !important;
   z-index: 1 !important;
+  width: auto !important;
+  height: auto !important;
 }
 
 .signature-text {
@@ -575,6 +581,43 @@
   border-top: 1px solid #e9ecef;
   background: #f8f9fa;
   justify-content: center;
+}
+
+/* Styles spécifiques pour la génération PDF */
+.pdf-export .logo-img {
+  width: 100px !important;
+  height: 100px !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  aspect-ratio: 1/1 !important;
+  display: block !important;
+}
+
+.pdf-export .signature-img {
+  max-width: 350px !important;
+  max-height: 140px !important;
+  object-fit: contain !important;
+  position: absolute !important;
+  top: 0px !important;
+  left: 70% !important;
+  transform: translateX(-50%) !important;
+  z-index: 2 !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+.pdf-export .cachet-img {
+  max-width: 200px !important;
+  max-height: 200px !important;
+  object-fit: contain !important;
+  position: absolute !important;
+  top: 5px !important;
+  left: 70% !important;
+  transform: translateX(-50%) !important;
+  opacity: 0.9 !important;
+  z-index: 1 !important;
+  width: auto !important;
+  height: auto !important;
 }
 
 /* Responsive */

@@ -213,6 +213,28 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
   // --- Actualités ---
   articles: Article[] = [
     {
+      id: 20,
+      title: "Joyeuses Pâques 2026 !",
+      excerpt: "L'équipe de Penccum Ndongo vous souhaite de Joyeuses Pâques remplies de joie, d'espoir et de renouveau. Que cette période de résurrection vous apporte paix, bonheur et bénédictions. Passez de merveilleuses fêtes pascales en famille !",
+      image: "paques.jpg",
+      date: new Date('2026-04-05'),
+      author: "Penccum Ndongo",
+      category: "VOEUX",
+      linkedinUrl: "https://www.facebook.com/penccumndongo",
+      featured: true
+    },
+    {
+      id: 19,
+      title: "Deweunaty ! Excellente fête de Korité 2026",
+      excerpt: "Deweunaty ! Qu'Allah accepte toutes nos prières et nous accorde Sa grâce. Paix et bénédictions à vous et à vos proches. Excellente fête de Korité à tous. #penccumndongo #korite2026",
+      image: "korite.jpg",
+      date: new Date('2026-03-23'),
+      author: "Penccum Ndongo",
+      category: "VOEUX",
+      linkedinUrl: "https://www.facebook.com/share/p/1B4v6i2n4J/",
+      featured: true
+    },
+    {
       id: 18,
       title: "Joyeux Noël 2024 !",
       excerpt: "L'équipe de Penccum Ndongo vous souhaite un Joyeux Noël rempli de joie, de paix et de bonheur. Que cette période de fêtes vous apporte chaleur humaine et moments précieux en famille. Merci pour votre confiance et votre fidélité tout au long de cette année. Nous vous souhaitons de merveilleuses fêtes de fin d'année ! 🎄✨",
@@ -706,7 +728,13 @@ stopAutoSlide() {
 
 onImageError(event: Event) {
   const img = event.target as HTMLImageElement;
-  img.src = 'default-avatar.jpg';
+  console.error('Erreur de chargement d\'image:', img.src);
+  // Pour les témoignages, utiliser une image par défaut
+  if (img.src.includes('.enc') || img.classList.contains('testimonial-image')) {
+    img.src = 'default-avatar.jpg';
+  }
+  // Ne pas remplacer les images d'actualités par une image de fallback
+  // Laisser l'image cassée pour identifier le problème
 }
 
 // Ajoute aussi la méthode pour démarrer le défilement automatique si besoin

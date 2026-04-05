@@ -259,7 +259,7 @@
         
         <!-- Image de l'article -->
         <div class="card-image">
-          <img [src]="article.image" [alt]="article.title" loading="lazy">
+          <img [src]="article.image" [alt]="article.title" loading="lazy" (error)="onImageError($event)">
           <div class="image-overlay">
             <div class="category-badge" [ngClass]="article.category.toLowerCase()">
               {{ article.category }}

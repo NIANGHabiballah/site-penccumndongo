@@ -60,12 +60,17 @@
       <div class="nav-item" [class.active]="currentView === 'parametres'" (click)="setCurrentView('parametres')">
         <i class="fas fa-cog"></i> Paramètres
       </div>
+
+      <div class="nav-item" [class.active]="currentView === 'participants-soumissions'" (click)="setCurrentView('participants-soumissions')">
+        <i class="fas fa-list-alt"></i> Liste Participants
+      </div>
       <div class="nav-item" [class.active]="currentView === 'finalistes'" (click)="setCurrentView('finalistes')">
         <i class="fas fa-trophy"></i> Sélection Finalistes
       </div>
       <div class="nav-item" [class.active]="currentView === 'authenticity'" (click)="setCurrentView('authenticity')">
         <i class="fas fa-shield-alt"></i> Vérification Authenticité
       </div>
+
       <div class="nav-item" (click)="logout()">
         <i class="fas fa-sign-out-alt"></i> Déconnexion
       </div>
@@ -383,61 +388,38 @@
         </div>
 
         <!-- Tableau des utilisateurs -->
-        <div class="scroll-hint">
-          <i class="fas fa-arrows-alt-h"></i>
-          <span>Faites glisser pour voir toutes les colonnes</span>
-        </div>
         <div class="users-table-container">
           <table class="users-table">
             <thead>
               <tr>
-                <th>Utilisateur</th>
+                <th>Prénom</th>
+                <th>Nom</th>
                 <th>Téléphone</th>
+                <th>Email</th>
                 <th>WhatsApp</th>
                 <th>Ville</th>
-                <th>Rôle</th>
-                <th>Statut</th>
-                <th>Textes</th>
-                <th>Note moy.</th>
-                <th>Inscription</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let user of filteredUsers" class="user-row">
-                <td class="user-cell">
-                  <div class="user-profile">
-                    <div class="user-avatar-small">{{user.prenom?.[0]}}{{user.nom?.[0]}}</div>
-                    <div class="user-details">
-                      <strong>{{user.prenom}} {{user.nom}}</strong>
-                      <span>{{user.email}}</span>
-                    </div>
-                  </div>
+                <td>
+                  <strong>{{user.prenom}}</strong>
+                </td>
+                <td>
+                  <strong>{{user.nom}}</strong>
                 </td>
                 <td>
                   <span class="phone-text">{{user.telephone || '-'}}</span>
+                </td>
+                <td>
+                  <span class="email-text">{{user.email}}</span>
                 </td>
                 <td>
                   <span class="whatsapp-text">{{user.whatsapp || '-'}}</span>
                 </td>
                 <td>
                   <span class="city-text">{{user.ville || '-'}}</span>
-                </td>
-                <td>
-                  <span class="role-badge role-{{user.role}}">{{user.role | titlecase}}</span>
-                </td>
-                <td>
-                  <span class="status-badge status-active">Actif</span>
-                </td>
-                <td class="text-center">
-                  <span class="stat-number">{{user.nb_textes || 0}}</span>
-                </td>
-                <td class="text-center">
-                  <span class="note-badge" *ngIf="user.note_moyenne">{{user.note_moyenne | number:'1.1-1'}}/20</span>
-                  <span class="no-data" *ngIf="!user.note_moyenne">-</span>
-                </td>
-                <td>
-                  <span class="date-text">{{user.created_at | date:'dd/MM/yyyy'}}</span>
                 </td>
                 <td>
                   <div class="action-buttons">
@@ -455,21 +437,23 @@
         <div class="users-mobile">
           <div class="mobile-user-card" *ngFor="let user of filteredUsers">
             <div class="mobile-user-header">
-              <div class="user-avatar-small">{{user.prenom?.[0]}}{{user.nom?.[0]}}</div>
               <div class="mobile-user-info">
                 <strong>{{user.prenom}} {{user.nom}}</strong>
                 <span>{{user.email}}</span>
               </div>
-              <span class="role-badge role-{{user.role}}">{{user.role | titlecase}}</span>
             </div>
-            <div class="mobile-user-stats">
-              <div class="mobile-stat">
-                <span class="mobile-stat-label">Textes</span>
-                <span class="mobile-stat-value">{{user.nb_textes || 0}}</span>
+            <div class="mobile-user-details">
+              <div class="mobile-detail">
+                <span class="mobile-detail-label">Téléphone:</span>
+                <span class="mobile-detail-value">{{user.telephone || '-'}}</span>
               </div>
-              <div class="mobile-stat">
-                <span class="mobile-stat-label">Note moy.</span>
-                <span class="mobile-stat-value">{{user.note_moyenne ? (user.note_moyenne | number:'1.1-1') + '/20' : '-'}}</span>
+              <div class="mobile-detail">
+                <span class="mobile-detail-label">WhatsApp:</span>
+                <span class="mobile-detail-value">{{user.whatsapp || '-'}}</span>
+              </div>
+              <div class="mobile-detail">
+                <span class="mobile-detail-label">Ville:</span>
+                <span class="mobile-detail-value">{{user.ville || '-'}}</span>
               </div>
             </div>
             <div class="mobile-actions">
@@ -961,35 +945,27 @@
         </div>
 
         <!-- Tableau des comptes -->
-        <div class="scroll-hint">
-          <i class="fas fa-arrows-alt-h"></i>
-          <span>Faites glisser pour voir toutes les colonnes</span>
-        </div>
         <div class="accounts-table-container">
           <table class="accounts-table">
             <thead>
               <tr>
-                <th>Utilisateur</th>
+                <th>Prénom</th>
+                <th>Nom</th>
                 <th>Email</th>
                 <th>Téléphone</th>
                 <th>WhatsApp</th>
                 <th>Ville</th>
                 <th>Mot de passe</th>
-                <th>Rôle</th>
-                <th>Statut</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let account of filteredAccounts" class="account-row">
                 <td>
-                  <div class="user-profile">
-                    <div class="user-avatar-small">{{account.prenom?.[0]}}{{account.nom?.[0]}}</div>
-                    <div class="user-details">
-                      <strong>{{account.prenom}} {{account.nom}}</strong>
-                      <span>Inscrit le {{account.created_at | date:'dd/MM/yyyy'}}</span>
-                    </div>
-                  </div>
+                  <strong>{{account.prenom}}</strong>
+                </td>
+                <td>
+                  <strong>{{account.nom}}</strong>
                 </td>
                 <td>{{account.email}}</td>
                 <td>
@@ -1013,14 +989,6 @@
                       <i class="fas fa-eye"></i>
                     </button>
                   </div>
-                </td>
-                <td>
-                  <span class="role-badge role-{{account.role}}">{{account.role | titlecase}}</span>
-                </td>
-                <td>
-                  <span class="status-badge" [class.status-verified]="account.email_verified" [class.status-pending]="!account.email_verified">
-                    {{account.email_verified ? 'Vérifié' : 'En attente'}}
-                  </span>
                 </td>
                 <td>
                   <div class="account-actions">
@@ -1969,143 +1937,7 @@
           </div>
         </div>
 
-        <!-- Tableau de délibération - Top Participants -->
-        <div class="deliberation-table" [class.hidden]="!isStatsVisible('performance')">
-          <div class="panel">
-            <div class="panel-header">
-              <div class="header-title">
-                <h3><i class="fas fa-trophy"></i> Top Participants - Tableau de Délibération</h3>
-                <p>Classement officiel pour la délibération du jury</p>
-              </div>
-              <div class="header-actions">
-                <button class="btn btn-secondary" (click)="forceRefreshNotes()" title="Recalculer toutes les notes">
-                  <i class="fas fa-calculator"></i> Recalculer notes
-                </button>
-                <button class="btn btn-success" (click)="downloadTop5Finalistes()" title="Télécharger Top 5 en image">
-                  <i class="fas fa-trophy"></i> Top 5 Finalistes
-                </button>
-                <button class="btn btn-primary" (click)="downloadDeliberationTable()" title="Télécharger tableau complet">
-                  <i class="fas fa-download"></i> Tableau complet
-                </button>
-                <button class="btn btn-outline" (click)="refreshDeliberationData()" title="Actualiser les données">
-                  <i class="fas fa-sync"></i> Actualiser
-                </button>
-              </div>
-            </div>
-            <div class="panel-content">
-              <div class="deliberation-info">
-                <div class="info-badge">
-                  <i class="fas fa-users"></i>
-                  <span>{{getDeliberationParticipants().length}} participants classés</span>
-                </div>
-                <div class="info-badge">
-                  <i class="fas fa-calendar"></i>
-                  <span>Données du {{getCurrentDateTime()}}</span>
-                </div>
-                <div class="info-badge" *ngIf="getParticipantsWithoutNotes() > 0" style="background: linear-gradient(135deg, #fff3cd, #ffeaa7); color: #856404;">
-                  <i class="fas fa-exclamation-triangle"></i>
-                  <span>{{getParticipantsWithoutNotes()}} participants sans notes</span>
-                </div>
-              </div>
-              
-              <div class="deliberation-table-container" id="deliberation-table-export">
-                <div class="table-header">
-                  <h2>CONCOURS DE POÉSIE INÉDIT & INNOVANT (CP2i) - 2025</h2>
-                  <h3>TABLEAU DE DÉLIBÉRATION OFFICIEL</h3>
-                  <p>Classement des participants par note moyenne décroissante</p>
-                </div>
-                
-                <table class="deliberation-table-main">
-                  <thead>
-                    <tr>
-                      <th class="col-rank">Rang</th>
-                      <th class="col-name">Prénom</th>
-                      <th class="col-name">Nom</th>
-                      <th class="col-address">Adresse/Ville</th>
-                      <th class="col-theme">Thème principal</th>
-                      <th class="col-language">Langue</th>
-                      <th class="col-average">Moyenne</th>
-                      <th class="col-status">Statut</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let participant of getDeliberationParticipants(); let i = index" 
-                        [class.top-5]="i < 5" 
-                        [class.top-10]="i < 10"
-                        [class.finalist]="i < 5">
-                      <td class="col-rank">
-                        <div class="rank-display">
-                          <span class="rank-number">{{i + 1}}</span>
-                          <i class="fas fa-medal" *ngIf="i === 0" style="color: #FFD700;"></i>
-                          <i class="fas fa-medal" *ngIf="i === 1" style="color: #C0C0C0;"></i>
-                          <i class="fas fa-medal" *ngIf="i === 2" style="color: #CD7F32;"></i>
-                          <i class="fas fa-medal" *ngIf="i === 3" style="color: #6f42c1;"></i>
-                          <i class="fas fa-medal" *ngIf="i === 4" style="color: #28a745;"></i>
-                        </div>
-                      </td>
-                      <td class="col-name">{{participant.prenom}}</td>
-                      <td class="col-name">{{participant.nom}}</td>
-                      <td class="col-address">{{participant.ville || 'Non renseignée'}}</td>
-                      <td class="col-theme">{{getParticipantMainTheme(participant)}}</td>
-                      <td class="col-language">{{getParticipantMainLanguage(participant)}}</td>
-                      <td class="col-average">
-                        <span class="average-score" 
-                              [class.excellent]="participant.note_moyenne && participant.note_moyenne >= 16" 
-                              [class.good]="participant.note_moyenne && participant.note_moyenne >= 12 && participant.note_moyenne < 16"
-                              [class.average]="participant.note_moyenne && participant.note_moyenne >= 8 && participant.note_moyenne < 12"
-                              [class.poor]="participant.note_moyenne && participant.note_moyenne < 8"
-                              [class.no-note]="!participant.note_moyenne">
-                          <span *ngIf="participant.note_moyenne; else noNoteTemplate">
-                            {{participant.note_moyenne | number:'1.2-2'}}/20
-                          </span>
-                          <ng-template #noNoteTemplate>
-                            <span class="no-note-text">En attente</span>
-                          </ng-template>
-                        </span>
-                        <button class="debug-btn" 
-                                (click)="debugParticipantNotes(participant.prenom, participant.nom)"
-                                title="Déboguer les notes"
-                                style="margin-left: 5px; font-size: 10px; padding: 2px 4px;">
-                          <i class="fas fa-bug"></i>
-                        </button>
-                      </td>
-                      <td class="col-status">
-                        <span class="status-badge" 
-                              [class.qualified]="participant.note_moyenne && participant.note_moyenne >= 10" 
-                              [class.not-qualified]="participant.note_moyenne && participant.note_moyenne < 10"
-                              [class.pending]="!participant.note_moyenne">
-                          <span *ngIf="participant.note_moyenne; else pendingStatusTemplate">
-                            {{participant.note_moyenne >= 10 ? 'Admis' : 'Non admis'}}
-                          </span>
-                          <ng-template #pendingStatusTemplate>
-                            En attente d'évaluation
-                          </ng-template>
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-                
-                <div class="table-footer">
-                  <div class="footer-info">
-                    <p><strong>Critères d'évaluation :</strong> Pertinence (5pts), Cohérence (5pts), Correction de la langue (5pts), Présentation (5pts)</p>
-                    <p><strong>Seuil d'admission :</strong> 10/20 | <strong>Date de délibération :</strong> {{getCurrentDateTime()}}</p>
-                  </div>
-                  <div class="footer-stats">
-                    <div class="stat-item">
-                      <span class="stat-label">Participants admis :</span>
-                      <span class="stat-value">{{getQualifiedCount()}}</span>
-                    </div>
-                    <div class="stat-item">
-                      <span class="stat-label">Note moyenne générale :</span>
-                      <span class="stat-value">{{getGeneralAverage()}}/20</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+
       </div>
 
       <!-- Messages -->
@@ -2562,6 +2394,106 @@
       <!-- Chat Support -->
       <div *ngSwitchCase="'chat-support'" class="chat-support-section">
         <app-admin-chat></app-admin-chat>
+      </div>
+
+
+
+
+
+      <!-- Liste des Participants avec Soumissions -->
+      <div *ngSwitchCase="'participants-soumissions'" class="participants-soumissions-management">
+        <div class="participants-header">
+          <div class="header-content">
+            <h2><i class="fas fa-list-alt"></i> Participants avec Soumissions</h2>
+            <p>{{getParticipantsWithSubmissionsData().length}} participants ont soumis et été évalués</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-success btn-large" (click)="exportParticipantsWithSubmissions()">
+              <i class="fas fa-download"></i> Télécharger Liste Excel
+            </button>
+          </div>
+        </div>
+
+        <!-- Statistiques rapides -->
+        <div class="participants-stats">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-content">
+              <h3>{{getParticipantsWithSubmissionsData().length}}</h3>
+              <p>Participants actifs</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+            <div class="stat-content">
+              <h3>{{textes.length}}</h3>
+              <p>Textes soumis</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-star"></i></div>
+            <div class="stat-content">
+              <h3>{{getAverageNoteAllParticipants()}}</h3>
+              <p>Note moyenne générale</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tableau des participants -->
+        <div class="participants-table-container">
+          <table class="participants-table">
+            <thead>
+              <tr>
+                <th>Prénom</th>
+                <th>Nom</th>
+                <th>Téléphone</th>
+                <th>Email</th>
+                <th>WhatsApp</th>
+                <th>Ville</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let participant of getParticipantsWithSubmissionsData()" class="participant-row">
+                <td>
+                  <strong>{{participant.prenom}}</strong>
+                </td>
+                <td>
+                  <strong>{{participant.nom}}</strong>
+                </td>
+                <td>{{participant.telephone || 'Non renseigné'}}</td>
+                <td>{{participant.email}}</td>
+                <td>{{participant.whatsapp || 'Non renseigné'}}</td>
+                <td>{{participant.ville || 'Non renseignée'}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Vue mobile -->
+        <div class="participants-mobile">
+          <div class="mobile-participant-card" *ngFor="let participant of getParticipantsWithSubmissionsData()">
+            <div class="mobile-participant-header">
+              <div class="mobile-participant-info">
+                <strong>{{participant.prenom}} {{participant.nom}}</strong>
+                <span>{{participant.email}}</span>
+              </div>
+            </div>
+            <div class="mobile-participant-details">
+              <div class="detail-row">
+                <span class="label">Téléphone:</span>
+                <span class="value">{{participant.telephone || 'Non renseigné'}}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">WhatsApp:</span>
+                <span class="value">{{participant.whatsapp || 'Non renseigné'}}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Ville:</span>
+                <span class="value">{{participant.ville || 'Non renseignée'}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Sélection des Finalistes -->
