@@ -2,7 +2,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { ServicesComponent } from './pages/services/services.component';
 import { PortfolioComponent } from './pages/portfolio/portfolio.component';
 import { TestimonialsComponent } from './pages/testimonials/testimonials.component';
-import { NewsComponent } from './pages/news/news.component';
 
 import { AproposComponent } from './pages/apropos/apropos.component';
 import { AccueilComponent } from './pages/accueil/accueil.component';
@@ -48,7 +47,6 @@ export const routes: Routes = [
   { path: 'services', component: ServicesComponent },
   { path: 'portfolio', component: PortfolioComponent },
   { path: 'testimonials', component: TestimonialsComponent },
-  { path: 'news', component: NewsComponent },
 
   { path: 'devis', component: DevisComponent, canActivate: [SecurityGuard] },
 

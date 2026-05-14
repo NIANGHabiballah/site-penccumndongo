@@ -14,7 +14,7 @@
     <div class="hero-content">
       <div class="badge-new">
         <span class="pulse"></span>
-        Cohorte 2 - Décembre
+        Cohorte 3 - Juin 2026
       </div>
       
       <h1 class="hero-title">
@@ -59,7 +59,7 @@
       <div class="countdown-wrapper">
         <p class="countdown-label">
           <span class="date-line">Inscriptions ouvertes jusqu'au</span>
-          <span class="date-line">29 novembre 2025</span>
+          <span class="date-line">13 juin 2026</span>
         </p>
         <div class="countdown">
           <div class="countdown-item">
@@ -103,8 +103,8 @@
         </div>
         
         <h2 class="promo-title">
-          Une formation qui fait la 
-          <span class="promo-highlight">différence</span>
+          Formation Cohorte 3 :
+          <span class="promo-highlight">15 juin - 17 juillet 2026</span>
         </h2>
         
         <p class="promo-subtitle">
@@ -115,7 +115,7 @@
         <div class="promo-features">
           <div class="promo-feature">
             <span class="promo-feature-icon">✓</span>
-            <span>Formation intensive de 4 semaines</span>
+            <span>Formation intensive de 1 mois</span>
           </div>
           <div class="promo-feature">
             <span class="promo-feature-icon">✓</span>
@@ -146,8 +146,8 @@
      <div class="promo-image-container" @scaleIn>
       <div class="promo-image-wrapper">
 
-        <img src="FormationInfographieCohorte2_Decembre.jpg" 
-            alt="Affiche Formation Infographie Cohorte 2 - PENCCUM NDONGO" 
+        <img src="Cohorte3_Formation_Infographie.jpg" 
+            alt="Affiche Formation Infographie Cohorte 3 - PENCCUM NDONGO" 
             class="formation-poster"
             loading="lazy">
       </div>
@@ -173,11 +173,11 @@
         <div class="success-content">
           <div class="success-header">
             <i class="fas fa-star success-star"></i>
-            <h3>Cohorte 1 : Mission Accomplie !</h3>
+            <h3>Cohortes 1 & 2 : Missions Accomplies !</h3>
             <i class="fas fa-star success-star"></i>
           </div>
           <p class="success-description">
-            <strong>Nos participants</strong> viennent de transformer leur passion en compétences professionnelles. 
+            <strong>Nos participants des deux premières cohortes</strong> ont transformé leur passion en compétences professionnelles. 
             Ils maîtrisent désormais <strong>Photoshop, Illustrator, Canva Pro</strong> et ont créé leur portfolio.
           </p>
           <div class="success-stats">
@@ -203,7 +203,7 @@
               Formation Terminée avec Succès
             </span>
             <p class="success-motivation">
-              <strong>Vous voulez faire partie de la deuxième cohorte de designers que le marché attend ?</strong>
+              <strong>Vous voulez faire partie de la troisième cohorte de designers que le marché attend ?</strong>
             </p>
             <button class="btn-join-cohorte" (click)="scrollToForm()">
               <i class="fas fa-user-plus"></i>
@@ -300,7 +300,7 @@
     <div class="container">
       <div class="section-header" @fadeIn>
         <h2 class="section-title">Choisissez Votre Format</h2>
-        <p class="section-subtitle">Deux options flexibles adaptées à vos besoins</p>
+        <p class="section-subtitle">Une formation qui fait la différence adaptée à vos besoins</p>
       </div>
       
       <div class="format-cards">
@@ -319,12 +319,12 @@
           <h3>Formation en Ligne</h3>
           <div class="format-price">
             <span class="currency">FCFA</span>
-            <span class="amount">30.000</span>
+            <span class="amount">25.000</span>
           </div>
           <ul class="format-features">
             <li><i>✓</i> 1 mois de formation</li>
             <li><i>✓</i> Lundi - Vendredi</li>
-            <li><i>✓</i> 20h00 - 22h00 GMT</li>
+            <li><i>✓</i> 20h00 - 22h00</li>
             <li><i>✓</i> Sessions enregistrées</li>
             <li><i>✓</i> Support 24/7</li>
             <li><i>✓</i> Paiement en 2 tranches</li>
@@ -478,7 +478,7 @@
     <div class="container">
       <div class="section-header" @fadeIn>
         <h2 class="section-title">Inscription à la Formation</h2>
-        <p class="section-subtitle">Places limitées - Inscrivez-vous avant le 29 novembre 2025</p>
+        <p class="section-subtitle">Places limitées - Inscrivez-vous avant le 13 juin 2026</p>
       </div>
       <div class="form-card card-shadow animated-fade-in">
         <h3 class="form-main-title">Formulaire d'inscription</h3>
@@ -577,7 +577,7 @@
                     formControlName="format"
                     class="form-control"
                     [class.error]="inscriptionForm.get('format')?.touched && inscriptionForm.get('format')?.invalid">
-              <option value="online">En ligne (30.000 FCFA)</option>
+              <option value="online">En ligne (25.000 FCFA)</option>
               <!-- <option value="presential">Présentiel (150.000 FCFA)</option> -->
             </select>
             <span class="error-message" *ngIf="inscriptionForm.get('format')?.touched && inscriptionForm.get('format')?.invalid">

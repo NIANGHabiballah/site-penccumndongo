@@ -213,6 +213,17 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
   // --- Actualités ---
   articles: Article[] = [
     {
+      id: 21,
+      title: "Fête du Travail 2026",
+      excerpt: "Le travail construit, l'engagement élève.\n\nBonne fête à celles et ceux qui créent, innovent et font avancer le monde.",
+      image: "fete_du_travail2026_penccum_ndongo.jpg",
+      date: new Date('2026-05-01'),
+      author: "Penccum Ndongo",
+      category: "VOEUX",
+      linkedinUrl: "https://www.facebook.com/penccumndongo",
+      featured: true
+    },
+    {
       id: 20,
       title: "Joyeuses Pâques 2026 !",
       excerpt: "L'équipe de Penccum Ndongo vous souhaite de Joyeuses Pâques remplies de joie, d'espoir et de renouveau. Que cette période de résurrection vous apporte paix, bonheur et bénédictions. Passez de merveilleuses fêtes pascales en famille !",

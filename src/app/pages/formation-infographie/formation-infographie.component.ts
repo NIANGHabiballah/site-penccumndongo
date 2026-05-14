@@ -223,7 +223,7 @@ export class FormationInfographieComponent implements OnInit {
     }
 
   startCountdown(): void {
-    const deadline = new Date('2025-11-29T23:59:59').getTime();
+    const deadline = new Date('2026-06-13T23:59:59').getTime();
     
     setInterval(() => {
       const now = new Date().getTime();
@@ -256,9 +256,9 @@ export class FormationInfographieComponent implements OnInit {
     // Track Facebook Pixel InitiateCheckout event
     if (typeof (window as any).fbq !== 'undefined') {
       (window as any).fbq('track', 'InitiateCheckout', {
-        content_name: 'Formation Infographie Cohorte 2',
+        content_name: 'Formation Infographie Cohorte 3',
         content_category: 'Formation',
-        value: 30000,
+        value: 25000,
         currency: 'XOF'
       });
     }
@@ -305,9 +305,9 @@ export class FormationInfographieComponent implements OnInit {
             // Track Facebook Pixel Lead event
             if (typeof (window as any).fbq !== 'undefined') {
               (window as any).fbq('track', 'Lead', {
-                content_name: 'Formation Infographie Cohorte 2',
+                content_name: 'Formation Infographie Cohorte 3',
                 content_category: 'Formation',
-                value: 30000,
+                value: 25000,
                 currency: 'XOF'
               });
             }
