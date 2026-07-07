@@ -109,7 +109,7 @@ try {
 
 // Envoyer l'email de confirmation avec template HTML
 $to = $data['email'];
-$subject = "Inscription confirmée - Formation Infographie Cohorte 2";
+$subject = "Inscription confirmée - Formation Infographie Cohorte 3";
 
 $htmlMessage = "
 <!DOCTYPE html>
@@ -143,15 +143,15 @@ $htmlMessage = "
         </div>
         <div class='content'>
             <h2>Bonjour {$data['firstName']} {$data['lastName']},</h2>
-            <p>Félicitations ! Votre inscription à la Formation Infographie Cohorte 2 a été confirmée.</p>
+            <p>Félicitations ! Votre inscription à la Formation Infographie Cohorte 3 a été confirmée.</p>
             
             <div class='payment-info'>
                 <h3><i class='fas fa-money-bill-wave'></i> ÉTAPE SUIVANTE - PAIEMENT</h3>
                 <p>Pour finaliser votre inscription, vous devez effectuer le paiement de votre première tranche :</p>
                 <ul>
-                    <li><strong>Montant :</strong> 15 000 FCFA (première tranche)</li>
-                    <li><strong>Date limite :</strong> 29 novembre 2025</li>
-                    <li><strong>Deuxième tranche :</strong> 15 000 FCFA (à payer à la fin de la formation avant la délivrance des attestations)</li>
+                    <li><strong>Montant :</strong> 12 500 FCFA (première tranche)</li>
+                    <li><strong>Date limite :</strong> 13 juin 2026</li>
+                    <li><strong>Deuxième tranche :</strong> 12 500 FCFA (à payer à la fin de la formation avant la délivrance des attestations)</li>
                 </ul>
                 
                 <h4><i class='fas fa-credit-card'></i> Moyens de paiement :</h4>
@@ -163,9 +163,9 @@ $htmlMessage = "
                 
                 <p><strong><i class='fas fa-exclamation-triangle'></i> Important :</strong> Envoyez-nous une capture d'écran de votre paiement par WhatsApp pour confirmation.</p>
                 
-                <a href='https://wa.me/221776290639?text=Bonjour%20PENCCUM%20NDONGO,%20je%20viens%20de%20finaliser%20mon%20inscription%20%C3%A0%20la%20Formation%20Infographie%20Cohorte%202.%20Je%20vous%20envoie%20ma%20capture%20d%27%C3%A9cran%20de%20paiement%20de%20la%20premi%C3%A8re%20tranche%20(15%20000%20FCFA)%20pour%20validation.%20Merci.' class='btn' style='color: white !important; text-decoration: none !important; background-color: #FF7F32 !important;'><i class='fab fa-whatsapp' style='color: white !important;'></i> <span style='color: white !important; font-weight: bold;'>Envoyer capture de paiement</span></a>
+                <a href='https://wa.me/221776290639?text=Bonjour%20PENCCUM%20NDONGO,%20je%20viens%20de%20finaliser%20mon%20inscription%20%C3%A0%20la%20Formation%20Infographie%20Cohorte%203.%20Je%20vous%20envoie%20ma%20capture%20d%27%C3%A9cran%20de%20paiement%20de%20la%20premi%C3%A8re%20tranche%20(12%20500%20FCFA)%20pour%20validation.%20Merci.' class='btn' style='color: white !important; text-decoration: none !important; background-color: #FF7F32 !important;'><i class='fab fa-whatsapp' style='color: white !important;'></i> <span style='color: white !important; font-weight: bold;'>Envoyer capture de paiement</span></a>
                 
-                <a href='https://chat.whatsapp.com/I8O4QfOZ7CgIhvZS88VjVd' class='btn' style='background-color: #10b981 !important; margin-top: 10px; display: block; color: white !important; font-weight: bold; text-decoration: none !important;'><i class='fas fa-users' style='color: white !important;'></i> <span style='color: white !important; font-weight: bold;'>Rejoindre le groupe Formation Infographie</span></a>
+                <a href='https://chat.whatsapp.com/H2HX0arxjCA70EgrcbRWUG' class='btn' style='background-color: #10b981 !important; margin-top: 10px; display: block; color: white !important; font-weight: bold; text-decoration: none !important;'><i class='fas fa-users' style='color: white !important;'></i> <span style='color: white !important; font-weight: bold;'>Rejoindre le groupe Penc'Boost</span></a>
             </div>
             
             <p>Cordialement,<br><strong>L'équipe PENCCUM NDONGO</strong></p>

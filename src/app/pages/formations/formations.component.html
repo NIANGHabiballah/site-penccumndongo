@@ -7,12 +7,16 @@
     <div class="hero-content">
       <div class="hero-badge">
         <i class="fas fa-graduation-cap"></i>
-        <span>Formations</span>
+        <span>Formations Professionnelles</span>
       </div>
       <h1 class="hero-title">Penc'Boost</h1>
       <p class="hero-subtitle">
-        Formations Professionnelles d'Excellence - Développez vos compétences, boostez votre avenir !
+        Développez vos compétences, boostez votre avenir — 2ème Édition · Juillet 2026
       </p>
+      <button class="hero-cta-btn" (click)="openInscriptionModal()">
+        <i class="fas fa-rocket"></i>
+        S'inscrire maintenant
+      </button>
     </div>
   </section>
 
@@ -24,400 +28,689 @@
           <img src="penccboost.png" alt="Logo Penc'Boost" class="presentation-logo" />
         </div>
         <h2 class="section-title">Le Programme Penc'Boost</h2>
-        <p class="section-subtitle">Un programme de formations professionnelles révolutionnaire conçu par Penccum Ndongo</p>
+        <p class="section-subtitle">Un programme de formations professionnelles <strong>gratuit</strong> conçu par Penccum Ndongo, accessible, interactif et orienté résultats</p>
       </div>
       <div class="presentation-content">
         <div class="presentation-text">
-          <p class="lead">Spécialement dédié aux jeunes, professionnels et porteurs de projets ambitieux.</p>
-          <p>Nos modules courts, pratiques et impactants couvrent tous les domaines essentiels : leadership, technologie, digital, design, artisanat créatif, et bien plus encore. Chaque formation est conçue pour vous donner des compétences immédiatement applicables dans votre parcours professionnel.</p>
-        
-        <div class="stats-grid">
-          <div class="stat-item">
-            <div class="stat-number">500+</div>
-            <div class="stat-label">Participants formés</div>
+          <p class="lead">Spécialement dédié aux jeunes, professionnels et porteurs de projets désireux de renforcer leurs compétences pratiques.</p>
+          <p>À travers une approche accessible, interactive et orientée résultats, PENC'BOOST ambitionne de créer un cadre d'apprentissage dynamique pour stimuler l'autonomie, l'employabilité et l'esprit entrepreneurial.</p>
+
+          <div class="bilan-card">
+            <p>Après le succès de notre 1ère édition — <strong>500 participants</strong>, <strong>99,2% de taux de présence</strong> et des retours unanimement positifs — Penc'Boost revient en <strong>juillet 2026</strong>, plus complet que jamais.</p>
           </div>
-          <div class="stat-item">
-            <div class="stat-number">7</div>
-            <div class="stat-label">Axes stratégiques</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number">95%</div>
-            <div class="stat-label">Taux de satisfaction</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="presentation-visual">
-        <div class="visual-card">
-          <i class="fas fa-graduation-cap"></i>
-          <h3>Formation d'Excellence</h3>
-          <p>Des modules conçus par des experts reconnus dans leurs domaines</p>
-        </div>
-        <div class="visual-card">
-          <i class="fas fa-users"></i>
-          <h3>Communauté Active</h3>
-          <p>Rejoignez un réseau de professionnels engagés et ambitieux</p>
-        </div>
-        <div class="visual-card">
-          <i class="fas fa-certificate"></i>
-          <h3>Certification Reconnue</h3>
-          <p>Obtenez des certifications valorisées sur le marché du travail</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- Nos 7 axes stratégiques -->
-<section class="axes-section">
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-title">Nos 7 Axes Stratégiques</h2>
-      <p class="section-subtitle">Des domaines d'expertise soigneusement sélectionnés pour répondre aux besoins du marché</p>
-    </div>
-    
-    <div class="axes-grid">
-      <div class="axe-card" data-aos="fade-up" data-aos-delay="100">
-        <div class="axe-icon">
-          <i class="fas fa-user-graduate"></i>
-        </div>
-        <h3>Leadership & Développement Personnel</h3>
-        <p>Développez votre potentiel de leader et renforcez vos compétences interpersonnelles pour exceller dans votre carrière.</p>
-        <ul class="axe-topics">
-          <li>Management d'équipe</li>
-          <li>Communication efficace</li>
-          <li>Gestion du stress</li>
-          <li>Prise de décision</li>
-        </ul>
-      </div>
-
-      <div class="axe-card" data-aos="fade-up" data-aos-delay="200">
-        <div class="axe-icon">
-          <i class="fas fa-palette"></i>
-        </div>
-        <h3>Création Graphique & Design Visuel</h3>
-        <p>Maîtrisez les outils et techniques du design moderne pour créer des visuels impactants et professionnels.</p>
-        <ul class="axe-topics">
-          <li>Adobe Creative Suite</li>
-          <li>UI/UX Design</li>
-          <li>Branding & Identité visuelle</li>
-          <li>Design thinking</li>
-        </ul>
-      </div>
-
-      <div class="axe-card" data-aos="fade-up" data-aos-delay="300">
-        <div class="axe-icon">
-          <i class="fas fa-code"></i>
-        </div>
-        <h3>Tech & Développement</h3>
-        <p>Plongez dans l'univers de la programmation et du développement web avec les technologies les plus demandées.</p>
-        <ul class="axe-topics">
-          <li>Développement Web (HTML, CSS, JS)</li>
-          <li>Frameworks modernes</li>
-          <li>Bases de données</li>
-          <li>DevOps & Déploiement</li>
-        </ul>
-      </div>
-
-      <div class="axe-card" data-aos="fade-up" data-aos-delay="400">
-        <div class="axe-icon">
-          <i class="fas fa-bullhorn"></i>
-        </div>
-        <h3>Marketing Digital & Présence en Ligne</h3>
-        <p>Apprenez à développer une stratégie digitale efficace et à optimiser votre présence sur les réseaux sociaux.</p>
-        <ul class="axe-topics">
-          <li>SEO & Référencement</li>
-          <li>Social Media Marketing</li>
-          <li>Google Ads & Facebook Ads</li>
-          <li>Analytics & Mesure ROI</li>
-        </ul>
-      </div>
-
-      <div class="axe-card" data-aos="fade-up" data-aos-delay="500">
-        <div class="axe-icon">
-          <i class="fas fa-briefcase"></i>
-        </div>
-        <h3>Insertion Professionnelle & Employabilité</h3>
-        <p>Optimisez votre recherche d'emploi et développez les compétences essentielles pour réussir en entreprise.</p>
-        <ul class="axe-topics">
-          <li>Techniques de recherche d'emploi</li>
-          <li>Préparation aux entretiens</li>
-          <li>Personal branding</li>
-          <li>Networking professionnel</li>
-        </ul>
-      </div>
-
-      <div class="axe-card" data-aos="fade-up" data-aos-delay="600">
-        <div class="axe-icon">
-          <i class="fas fa-heart-pulse"></i>
-        </div>
-        <h3>Santé & Bien-être au Travail</h3>
-        <p>Apprenez à maintenir un équilibre vie professionnelle/personnelle et à préserver votre bien-être au travail.</p>
-        <ul class="axe-topics">
-          <li>Gestion du stress</li>
-          <li>Équilibre vie pro/perso</li>
-          <li>Productivité & Organisation</li>
-          <li>Mindfulness au travail</li>
-        </ul>
-      </div>
-
-      <div class="axe-card" data-aos="fade-up" data-aos-delay="700">
-        <div class="axe-icon">
-          <i class="fas fa-feather-pointed"></i>
-        </div>
-        <h3>Création Artistique & Expression Poétique</h3>
-        <p>Explorez votre créativité et développez vos talents artistiques pour enrichir votre expression personnelle.</p>
-        <ul class="axe-topics">
-          <li>Écriture créative</li>
-          <li>Arts visuels</li>
-          <li>Performance artistique</li>
-          <li>Storytelling</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Pourquoi choisir Penc'Boost -->
-<section class="why-choose-section">
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-title">Pourquoi Choisir Penc'Boost ?</h2>
-      <p class="section-subtitle">Une approche unique qui fait la différence</p>
-    </div>
-    
-    <div class="benefits-grid">
-      <div class="benefit-item">
-        <div class="benefit-icon">
-          <i class="fas fa-chalkboard-teacher"></i>
-        </div>
-        <h3>Formateurs Experts</h3>
-        <p>Modules animés par des professionnels reconnus avec une expérience terrain solide</p>
-      </div>
-
-      <div class="benefit-item">
-        <div class="benefit-icon">
-          <i class="fas fa-hands-helping"></i>
-        </div>
-        <h3>Approche Pratique</h3>
-        <p>Formation axée sur l'action avec des projets concrets et des mises en situation réelles</p>
-      </div>
-
-      <div class="benefit-item">
-        <div class="benefit-icon">
-          <i class="fas fa-network-wired"></i>
-        </div>
-        <h3>Réseau Professionnel</h3>
-        <p>Intégrez une communauté de bénéficiaires engagés et créez des connexions durables</p>
-      </div>
-
-      <div class="benefit-item">
-        <div class="benefit-icon">
-          <i class="fas fa-cogs"></i>
-        </div>
-        <h3>Programme Adaptable</h3>
-        <p>Formations modulaires adaptées à vos besoins spécifiques et à votre rythme</p>
-      </div>
-
-      <div class="benefit-item">
-        <div class="benefit-icon">
-          <i class="fas fa-laptop"></i>
-        </div>
-        <h3>Format Hybride</h3>
-        <p>Combinez le meilleur du présentiel et du digital pour une expérience optimale</p>
-      </div>
-
-      <div class="benefit-item">
-        <div class="benefit-icon">
-          <i class="fas fa-medal"></i>
-        </div>
-        <h3>Suivi Personnalisé</h3>
-        <p>Accompagnement individuel pour maximiser votre progression et atteindre vos objectifs</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Informations pratiques -->
-<section class="info-section">
-  <div class="container">
-    <div class="info-content">
-      <div class="info-main">
-        <h2 class="section-title">Informations Pratiques</h2>
-        
-        <div class="info-grid">
-          <div class="info-card">
-            <div class="info-icon">
-              <i class="fas fa-calendar-alt"></i>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-number">500+</div>
+              <div class="stat-label">Inscriptions 1ère édition</div>
             </div>
-            <h3>Prochaine Session</h3>
-            <p><strong>Juillet 2025</strong></p>
-            <p>Pendant les vacances scolaires pour une disponibilité maximale</p>
-          </div>
-
-          <div class="info-card">
-            <div class="info-icon">
-              <i class="fas fa-laptop-house"></i>
+            <div class="stat-item">
+              <div class="stat-number">99,2%</div>
+              <div class="stat-label">Taux de présence</div>
             </div>
-            <h3>Format</h3>
-            <p><strong>Hybride</strong></p>
-            <p>Combinaison de sessions en ligne et en présentiel à Dakar</p>
-          </div>
-
-          <div class="info-card">
-            <div class="info-icon">
-              <i class="fas fa-users"></i>
+            <div class="stat-item">
+              <div class="stat-number">7</div>
+              <div class="stat-label">Modules de formation</div>
             </div>
-            <h3>Public Cible</h3>
-            <p><strong>Tous profils</strong></p>
-            <p>Étudiants, jeunes entrepreneurs, professionnels, associations</p>
           </div>
+        </div>
 
-          <div class="info-card">
-            <div class="info-icon">
-              <i class="fas fa-clock"></i>
+        <div class="presentation-visual">
+          <div class="visual-card">
+            <i class="fas fa-graduation-cap"></i>
+            <h3>Formation d'Excellence</h3>
+            <p>Modules animés par des coachs experts reconnus dans leurs domaines</p>
+          </div>
+          <div class="visual-card">
+            <i class="fas fa-laptop"></i>
+            <h3>100% En Ligne</h3>
+            <p>Sessions via Google Meet, accessibles depuis partout en Afrique</p>
+          </div>
+          <div class="visual-card">
+            <i class="fas fa-certificate"></i>
+            <h3>Attestation Offerte</h3>
+            <p>Attestation de participation remise à chaque bénéficiaire</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Programme des 7 modules -->
+  <section class="axes-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Programme des 7 Modules</h2>
+        <p class="section-subtitle">Semaine du 20 au 26 juillet 2026 · Un module par jour · 18h00–20h00 sur Google Meet</p>
+      </div>
+
+      <div class="axes-grid">
+
+        <!-- Module 1 -->
+        <div class="axe-card">
+          <div class="module-meta">
+            <span class="module-day">Lundi 20 juillet · 18h–20h</span>
+          </div>
+          <div class="axe-icon">
+            <i class="fas fa-user-graduate"></i>
+          </div>
+          <h3>Module 1 – Leadership & Développement Personnel</h3>
+          <p class="coach-info">M. Madiop DIOP<br><span class="coach-desc">Juriste, doctorant, chercheur en droit international public</span></p>
+          <ul class="axe-topics">
+            <li>Connaissance de soi</li>
+            <li>Communication interpersonnelle et écoute active</li>
+            <li>Gestion du temps et des priorités</li>
+            <li>Prise de décision et résolution de problèmes</li>
+            <li>Gestion du stress et intelligence émotionnelle</li>
+            <li>Prise de parole et affirmation de soi</li>
+          </ul>
+        </div>
+
+        <!-- Module 2 -->
+        <div class="axe-card">
+          <div class="module-meta">
+            <span class="module-day">Mardi 21 juillet · 18h–20h</span>
+          </div>
+          <div class="axe-icon">
+            <i class="fas fa-palette"></i>
+          </div>
+          <h3>Module 2 – Design Graphique</h3>
+          <p class="coach-info">Moustapha NIANG dit MTN<br><span class="coach-desc">Graphic designer manager, Motion designer 2D, formateur</span></p>
+          <ul class="axe-topics">
+            <li>Bases du design : composition, couleur, typographie</li>
+            <li>Adobe Photoshop (retouche image, calques, montage)</li>
+            <li>Adobe Illustrator (vectoriel, logos, pictogrammes)</li>
+            <li>Création d'une identité visuelle simple</li>
+          </ul>
+        </div>
+
+        <!-- Module 3 -->
+        <div class="axe-card">
+          <div class="module-meta">
+            <span class="module-day">Mercredi 22 juillet · 18h–20h</span>
+          </div>
+          <div class="axe-icon">
+            <i class="fas fa-robot"></i>
+          </div>
+          <h3>Module 3 – Compétences Numériques & Intelligence Artificielle</h3>
+          <p class="coach-info">Serigne Fallou NDIAYE<br><span class="coach-desc">Lead developer chez Baamtu Technologies, Consultant IT</span></p>
+          <ul class="axe-topics">
+            <li>Sécurité numérique et cybersécurité de base</li>
+            <li>Rôle et limites de l'IA</li>
+            <li>Éthique de l'IA : biais, vie privée, usage responsable</li>
+            <li>Panorama des outils IA (chatbots, génération texte/image)</li>
+            <li>Utilisation pratique d'outils d'IA générative</li>
+          </ul>
+        </div>
+
+        <!-- Module 4 -->
+        <div class="axe-card">
+          <div class="module-meta">
+            <span class="module-day">Jeudi 23 juillet · 18h–20h</span>
+          </div>
+          <div class="axe-icon">
+            <i class="fas fa-bullhorn"></i>
+          </div>
+          <h3>Module 4 – Marketing Digital</h3>
+          <p class="coach-info">Mme Mary Dembele SY</p>
+          <ul class="axe-topics">
+            <li>Fondamentaux du marketing digital</li>
+            <li>SEO : référencement naturel, mots-clés</li>
+            <li>Réseaux sociaux : stratégie de contenu, community management</li>
+            <li>Google Ads et Meta Ads (Facebook/Instagram)</li>
+            <li>Email marketing : campagnes, segmentation</li>
+            <li>Analytics : Google Analytics, statistiques réseaux</li>
+            <li>Mini-campagne pratique en fin de module</li>
+          </ul>
+        </div>
+
+        <!-- Module 5 -->
+        <div class="axe-card">
+          <div class="module-meta">
+            <span class="module-day">Vendredi 24 juillet · 16h–18h</span>
+          </div>
+          <div class="axe-icon">
+            <i class="fas fa-briefcase"></i>
+          </div>
+          <h3>Module 5 – Employabilité, Entrepreneuriat & Insertion Professionnelle</h3>
+          <p class="coach-info">M. Mamadou DIOP<br><span class="coach-desc">Doctorant en Gestion, Responsable pédagogie ENO Mékhé (UN-CHK)</span></p>
+          <ul class="axe-topics">
+            <li>Rédaction de CV et lettre de motivation</li>
+            <li>Préparation à l'entretien d'embauche</li>
+            <li>Recherche d'emploi (canaux, LinkedIn)</li>
+            <li>Compétences transversales attendues par les employeurs</li>
+            <li>Transition formation-emploi (stage, alternance)</li>
+            <li>Droits et démarches administratives liées à l'emploi</li>
+          </ul>
+        </div>
+
+        <!-- Module 6 -->
+        <div class="axe-card">
+          <div class="module-meta">
+            <span class="module-day">Samedi 25 juillet · 10h–12h</span>
+          </div>
+          <div class="axe-icon">
+            <i class="fas fa-desktop"></i>
+          </div>
+          <h3>Module 6 – Initiation à la Bureautique & Informatique</h3>
+          <p class="coach-info">M. DABO<br><span class="coach-desc">Informaticien, Coach, Fondateur de Home School</span></p>
+          <ul class="axe-topics">
+            <li>Environnement Windows, fichiers, dossiers</li>
+            <li>Word : mise en forme, tableaux, publipostage</li>
+            <li>Excel : formules, graphiques, tableaux croisés dynamiques</li>
+            <li>PowerPoint : diapositives, transitions</li>
+            <li>Travail collaboratif en ligne (Drive/SharePoint)</li>
+          </ul>
+        </div>
+
+        <!-- Module 7 -->
+        <div class="axe-card">
+          <div class="module-meta">
+            <span class="module-day">Dimanche 26 juillet · 10h–12h</span>
+          </div>
+          <div class="axe-icon">
+            <i class="fas fa-feather-pointed"></i>
+          </div>
+          <h3>Module 7 – Poésie & Arts Visuels</h3>
+          <p class="coach-info">M. Alboury LOUM<br><span class="coach-desc">Professeur en Arts Visuels à l'ENAMC</span></p>
+          <ul class="axe-topics">
+            <li>Techniques d'écriture poétique et slam</li>
+            <li>Prise de parole en public (respiration, voix, articulation)</li>
+            <li>Présence scénique et gestuelle</li>
+            <li>Gestion du trac et de l'émotion sur scène</li>
+            <li>Mémorisation et interprétation</li>
+            <li>Improvisation et interaction avec le public</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Témoignages participants -->
+  <section class="temoignages-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Ce que disent nos participants</h2>
+        <p class="section-subtitle">Retours de la 1ère édition · Juillet 2025</p>
+      </div>
+      <div class="temoignages-grid">
+        <div class="temoignage-card">
+          <span class="temoignage-module">Leadership & Développement Personnel</span>
+          <p>« Le contenu du cours était très enrichissant et bien structuré. J'ai particulièrement apprécié l'interaction avec le formateur. Ce cours m'a permis de mieux comprendre l'importance d'avoir la confiance en soi. »</p>
+          <span class="temoignage-auteur">N'diaye Tacko</span>
+        </div>
+        <div class="temoignage-card">
+          <span class="temoignage-module">Leadership & Développement Personnel</span>
+          <p>« Ce cours a été très bénéfique pour moi, très intéressant, et monsieur Madiop a été pertinent, merci. »</p>
+          <span class="temoignage-auteur">Aby Bâ</span>
+        </div>
+        <div class="temoignage-card">
+          <span class="temoignage-module">Création graphique & Design visuel</span>
+          <p>« Ce cours m'a permis de comprendre beaucoup de choses sur la création et le design visuel, avec l'aide de quelques applications comme Photoshop. »</p>
+          <span class="temoignage-auteur">Khadidja Tine</span>
+        </div>
+        <div class="temoignage-card">
+          <span class="temoignage-module">Tech & Développement</span>
+          <p>« C'était une très belle prestation franchement. »</p>
+          <span class="temoignage-auteur">Hassanatou Diallo</span>
+        </div>
+        <div class="temoignage-card">
+          <span class="temoignage-module">Marketing digital & Présence en ligne</span>
+          <p>« Cela nous a permis d'avoir plus d'informations par rapport au Marketing Digital, qui est un domaine qui nous intéresse et dans lequel nous nous formons actuellement. »</p>
+          <span class="temoignage-auteur">Baïdy Sall</span>
+        </div>
+        <div class="temoignage-card">
+          <span class="temoignage-module">Insertion professionnelle & Employabilité</span>
+          <p>« Cours très riche en enseignement, qui nous permet de connaître le comportement d'un chercheur d'emploi et comment rédiger un bon CV et une bonne lettre de motivation. »</p>
+          <span class="temoignage-auteur">Diop Khorédia</span>
+        </div>
+        <div class="temoignage-card">
+          <span class="temoignage-module">Santé & Bien-être au travail</span>
+          <p>« Vraiment, ce fut un plaisir d'assister à ce module, c'est hyper intéressant, je pense que ça fera beaucoup de bien. »</p>
+          <span class="temoignage-auteur">Serigne Moustapha Niang</span>
+        </div>
+        <div class="temoignage-card">
+          <span class="temoignage-module">Création artistique & Expression poétique</span>
+          <p>« Cela nous a permis de réviser nos cours de versification et de nous "booster" à donner plus d'importance à l'écriture. Merci pour tout, toutes les séances ont été très enrichissantes. »</p>
+          <span class="temoignage-auteur">Baïdy Sall</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modalités pratiques -->
+  <section class="why-choose-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Modalités Pratiques</h2>
+        <p class="section-subtitle">Tout ce qu'il faut savoir pour participer</p>
+      </div>
+
+      <div class="benefits-grid">
+        <div class="benefit-item">
+          <div class="benefit-icon">
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+          <h3>Dates</h3>
+          <p>Du lundi 20 au dimanche 26 juillet 2026 — pendant les vacances scolaires</p>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">
+            <i class="fas fa-video"></i>
+          </div>
+          <h3>Format</h3>
+          <p>100% en ligne via Google Meet — accessible depuis partout</p>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <h3>Durée</h3>
+          <p>2h par module · 1 module par jour · 7 jours consécutifs</p>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <h3>Public Cible</h3>
+          <p>Étudiants, jeunes entrepreneurs, professionnels, associations</p>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">
+            <i class="fas fa-certificate"></i>
+          </div>
+          <h3>Bonus</h3>
+          <p>Attestation de participation remise à chaque bénéficiaire</p>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">
+            <i class="fas fa-tag"></i>
+          </div>
+          <h3>Inscription</h3>
+          <p>Gratuite — Places limitées</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Points clés -->
+  <section class="points-cles-section">
+    <div class="container">
+      <div class="points-cles-grid">
+        <div class="point-cle">
+          <div class="point-icon"><i class="fas fa-tag"></i></div>
+          <div class="point-text">
+            <strong>100% Gratuit</strong>
+            <span>Aucun frais d'inscription</span>
+          </div>
+        </div>
+        <div class="point-cle">
+          <div class="point-icon"><i class="fas fa-laptop"></i></div>
+          <div class="point-text">
+            <strong>100% En ligne</strong>
+            <span>Via Google Meet, depuis partout</span>
+          </div>
+        </div>
+        <div class="point-cle">
+          <div class="point-icon"><i class="fas fa-users"></i></div>
+          <div class="point-text">
+            <strong>Places limitées</strong>
+            <span>100 inscrits maximum par module</span>
+          </div>
+        </div>
+        <div class="point-cle">
+          <div class="point-icon"><i class="fas fa-certificate"></i></div>
+          <div class="point-text">
+            <strong>Attestation offerte</strong>
+            <span>Remise à chaque participant</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Questions fréquentes</h2>
+        <p class="section-subtitle">Les réponses aux questions les plus posées</p>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item" *ngFor="let faq of faqs; let i = index" [class.open]="openFaq === i" (click)="toggleFaq(i)">
+          <div class="faq-question">
+            <span>{{ faq.question }}</span>
+            <i class="fas" [class.fa-plus]="openFaq !== i" [class.fa-minus]="openFaq === i"></i>
+          </div>
+          <div class="faq-answer" *ngIf="openFaq === i">
+            <p>{{ faq.answer }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Informations pratiques + CTA -->
+  <section class="info-section">
+    <div class="container">
+      <div class="info-content">
+        <div class="info-main">
+          <h2 class="section-title">Prêt à Booster Votre Avenir ?</h2>
+          <p style="color: var(--text-light); font-size: 1.1rem; margin-bottom: 2rem; line-height: 1.7;">
+            Rejoignez la 2ème promotion PENC'BOOST et donnez une nouvelle dimension à votre parcours professionnel. En combinant compétences techniques, développement personnel, expression artistique et outils digitaux, ce programme offre une opportunité unique de se former de manière concrète, dynamique et inspirante.
+          </p>
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="info-icon"><i class="fas fa-calendar"></i></div>
+              <h3>Démarrage</h3>
+              <p><strong>Lundi 20 juillet 2026</strong></p>
+              <p>Pendant les vacances scolaires</p>
             </div>
-            <h3>Durée</h3>
-            <p><strong>Modules flexibles</strong></p>
-            <p>De 2 jours à 2 semaines selon le programme choisi</p>
+            <div class="info-card">
+              <div class="info-icon"><i class="fas fa-globe"></i></div>
+              <h3>Plateforme</h3>
+              <p><strong>Google Meet</strong></p>
+              <p>Lien envoyé après inscription</p>
+            </div>
+            <div class="info-card">
+              <div class="info-icon"><i class="fas fa-language"></i></div>
+              <h3>Langue</h3>
+              <p><strong>Français</strong></p>
+              <p>Ouvert à tous les Africains</p>
+            </div>
+            <div class="info-card">
+              <div class="info-icon"><i class="fas fa-money-bill-wave"></i></div>
+              <h3>Coût</h3>
+              <p><strong>Gratuit</strong></p>
+              <p>Inscription libre et ouverte</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="cta-section">
+          <div class="cta-card">
+            <h3>Je m'inscris à Penc'Boost 2026</h3>
+            <p>Rejoignez la prochaine promotion et transformez votre avenir professionnel.</p>
+            <button class="cta-btn primary" (click)="openInscriptionModal()">
+              <i class="fas fa-rocket"></i>
+              S'inscrire maintenant
+            </button>
+            <p class="cta-note">Inscription gratuite · Places limitées</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal d'inscription -->
+  <div class="modal-backdrop" *ngIf="showInscriptionModal" (click)="closeInscriptionModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeInscriptionModal()">&times;</button>
+
+      <div class="modal-header">
+        <div class="modal-badge">Inscription Gratuite</div>
+        <h2 style="color: var(--primary-blue) !important;">Penc'Boost 2026</h2>
+        <p>Semaine du 20 au 26 juillet 2026 &middot; Google Meet</p>
+      </div>
+
+      <!-- Intro -->
+      <div class="modal-intro">
+        <p>PENC'BOOST est un programme de formations professionnelles <strong>100% gratuit</strong>, ouvert à tous. Places limitées — inscrivez-vous rapidement pour garantir votre place. Vos données personnelles restent <strong>strictement confidentielles</strong> et ne seront utilisées qu'à des fins organisationnelles.</p>
+      </div>
+
+      <div *ngIf="successMsg" class="success-message">
+        <i class="fas fa-check-circle"></i> {{ successMsg }}
+      </div>
+      <div *ngIf="errorMsg" class="error-message">
+        <i class="fas fa-exclamation-triangle"></i> {{ errorMsg }}
+      </div>
+
+      <!-- Barre de progression -->
+      <div class="stepper">
+        <div class="stepper-bar">
+          <div class="stepper-fill" [style.width.%]="(currentStep / totalSteps) * 100"></div>
+        </div>
+        <div class="stepper-steps">
+          <div *ngFor="let label of stepLabels; let i = index" class="stepper-step" [class.active]="currentStep === i + 1" [class.done]="currentStep > i + 1">
+            <div class="stepper-dot">{{ currentStep > i + 1 ? '✓' : i + 1 }}</div>
+            <span>{{ label }}</span>
           </div>
         </div>
       </div>
 
-      <div class="cta-section">
-        <div class="cta-card">
-          <h3>Prêt à Booster Votre Carrière ?</h3>
-          <p>Rejoignez la prochaine promotion Penc'Boost et donnez une nouvelle dimension à votre parcours professionnel.</p>
-          <button class="cta-btn primary" (click)="openInscriptionModal()">
-            <i class="fas fa-rocket"></i>
-            Je m'inscris maintenant
+      <form [formGroup]="inscriptionForm" (ngSubmit)="submitInscription()" class="inscription-form">
+
+        <!-- Section 1 : Choix du module -->
+        <div class="form-section-block" *ngIf="currentStep === 1">
+          <div class="form-section-title">
+            <span class="section-num">1</span> Choix du module
+          </div>
+          <p class="section-hint">Sélectionnez un seul module &middot; Places limitées</p>
+          <div class="modules-list">
+            <label *ngFor="let module of modulesList" class="module-item" [class.complet]="module.complet">
+              <input type="radio" formControlName="module" [value]="module.value" [disabled]="module.complet">
+              <div class="module-item-content">
+                <div class="module-item-top">
+                  <span class="module-item-name">{{ module.label }}</span>
+                  <span class="module-places complet" *ngIf="module.complet">Complet</span>
+                  <span class="module-places urgent" *ngIf="!module.complet && (module.total - module.inscrits) < 10">
+                    ⚠ {{ module.total - module.inscrits }} place{{ (module.total - module.inscrits) > 1 ? 's' : '' }} restante{{ (module.total - module.inscrits) > 1 ? 's' : '' }}
+                  </span>
+                </div>
+                <span class="module-item-date">{{ module.date }}</span>
+              </div>
+            </label>
+          </div>
+          <div class="error" *ngIf="inscriptionForm.get('module')?.invalid && inscriptionForm.get('module')?.touched">
+            Veuillez choisir un module.
+          </div>
+        </div>
+
+        <!-- Section 2 : Informations personnelles -->
+        <div class="form-section-block" *ngIf="currentStep === 2">
+          <div class="form-section-title">
+            <span class="section-num">2</span> Informations personnelles
+          </div>
+
+          <div class="form-group">
+            <label>Nom complet <span class="req">*</span></label>
+            <input formControlName="nom" type="text" placeholder="Ex : Fatou Diallo">
+            <div class="error" *ngIf="inscriptionForm.get('nom')?.invalid && inscriptionForm.get('nom')?.touched">Le nom est requis.</div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Sexe <span class="req">*</span></label>
+              <div class="custom-select" [class.open]="openDropdown === 'sexe'" (click)="toggleDropdown('sexe', $event)">
+                <div class="custom-select-trigger">
+                  <span [class.placeholder]="!inscriptionForm.get('sexe')?.value">{{ inscriptionForm.get('sexe')?.value || 'Choisir' }}</span>
+                  <i class="fas fa-chevron-down"></i>
+                </div>
+                <ul class="custom-select-options" *ngIf="openDropdown === 'sexe'">
+                  <li *ngFor="let o of ['Homme','Femme','Préfère ne pas préciser']" (click)="selectOption('sexe', o, $event)" [class.selected]="inscriptionForm.get('sexe')?.value === o">{{ o }}</li>
+                </ul>
+              </div>
+              <div class="error" *ngIf="inscriptionForm.get('sexe')?.invalid && inscriptionForm.get('sexe')?.touched">Requis.</div>
+            </div>
+            <div class="form-group">
+              <label>Tranche d'âge <span class="req">*</span></label>
+              <div class="custom-select" [class.open]="openDropdown === 'trancheAge'" (click)="toggleDropdown('trancheAge', $event)">
+                <div class="custom-select-trigger">
+                  <span [class.placeholder]="!inscriptionForm.get('trancheAge')?.value">{{ inscriptionForm.get('trancheAge')?.value || 'Choisir' }}</span>
+                  <i class="fas fa-chevron-down"></i>
+                </div>
+                <ul class="custom-select-options" *ngIf="openDropdown === 'trancheAge'">
+                  <li *ngFor="let o of ['18–24 ans','25–34 ans','35–44 ans','45 ans et plus']" (click)="selectOption('trancheAge', o, $event)" [class.selected]="inscriptionForm.get('trancheAge')?.value === o">{{ o }}</li>
+                </ul>
+              </div>
+              <div class="error" *ngIf="inscriptionForm.get('trancheAge')?.invalid && inscriptionForm.get('trancheAge')?.touched">Requis.</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Adresse e-mail <span class="req">*</span></label>
+              <input formControlName="email" type="email" placeholder="exemple@mail.com">
+              <div class="error" *ngIf="inscriptionForm.get('email')?.invalid && inscriptionForm.get('email')?.touched">Email valide requis.</div>
+            </div>
+            <div class="form-group">
+              <label>Téléphone principal <span class="req">*</span></label>
+              <input formControlName="telephone" type="tel" placeholder="+221 77 000 00 00">
+              <div class="error" *ngIf="inscriptionForm.get('telephone')?.invalid && inscriptionForm.get('telephone')?.touched">Requis.</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>WhatsApp <span class="optional">(si différent)</span></label>
+              <input formControlName="whatsapp" type="tel" placeholder="+221 77 000 00 00">
+            </div>
+            <div class="form-group">
+              <label>Ville de résidence <span class="req">*</span></label>
+              <input formControlName="ville" type="text" placeholder="Ex : Dakar">
+              <div class="error" *ngIf="inscriptionForm.get('ville')?.invalid && inscriptionForm.get('ville')?.touched">Requis.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3 : Profil & Parcours -->
+        <div class="form-section-block" *ngIf="currentStep === 3">
+          <div class="form-section-title">
+            <span class="section-num">3</span> Profil & Parcours
+          </div>
+
+          <div class="form-group">
+            <label>Statut actuel <span class="req">*</span></label>
+            <div class="custom-select" [class.open]="openDropdown === 'statut'" (click)="toggleDropdown('statut', $event)">
+              <div class="custom-select-trigger">
+                <span [class.placeholder]="!inscriptionForm.get('statut')?.value">{{ inscriptionForm.get('statut')?.value || 'Choisir' }}</span>
+                <i class="fas fa-chevron-down"></i>
+              </div>
+              <ul class="custom-select-options" *ngIf="openDropdown === 'statut'">
+                <li *ngFor="let o of ['Élève','Étudiant(e)','En recherche d\'emploi','Salarié(e)','Entrepreneur(e)','Freelance','Autre']" (click)="selectOption('statut', o, $event); onStatutChange({target:{value:o}})" [class.selected]="inscriptionForm.get('statut')?.value === o">{{ o }}</li>
+              </ul>
+            </div>
+            <div class="error" *ngIf="inscriptionForm.get('statut')?.invalid && inscriptionForm.get('statut')?.touched">Requis.</div>
+          </div>
+          <div class="form-group" *ngIf="showAutreStatut">
+            <label>Précisez votre statut <span class="req">*</span></label>
+            <input formControlName="autreStatut" type="text" placeholder="Votre statut">
+          </div>
+
+          <div class="form-group">
+            <label>Dernier diplôme <span class="req">*</span></label>
+            <div class="custom-select" [class.open]="openDropdown === 'diplome'" (click)="toggleDropdown('diplome', $event)">
+              <div class="custom-select-trigger">
+                <span [class.placeholder]="!inscriptionForm.get('diplome')?.value">{{ inscriptionForm.get('diplome')?.value || 'Choisir' }}</span>
+                <i class="fas fa-chevron-down"></i>
+              </div>
+              <ul class="custom-select-options" *ngIf="openDropdown === 'diplome'">
+                <li *ngFor="let o of ['Aucun diplôme','BFEM / Brevet','Baccalauréat','BTS / DUT','Licence','Master','Doctorat','Autre']" (click)="selectOption('diplome', o, $event); onDiplomeChange({target:{value:o}})" [class.selected]="inscriptionForm.get('diplome')?.value === o">{{ o }}</li>
+              </ul>
+            </div>
+            <div class="error" *ngIf="inscriptionForm.get('diplome')?.invalid && inscriptionForm.get('diplome')?.touched">Requis.</div>
+          </div>
+          <div class="form-group" *ngIf="showAutreDiplome">
+            <label>Précisez <span class="req">*</span></label>
+            <input formControlName="autreDiplome" type="text" placeholder="Votre diplôme">
+          </div>
+
+          <div class="form-group autocomplete-group">
+            <label>Établissement fréquenté <span class="optional">(facultatif)</span></label>
+            <input formControlName="etablissement" type="text" placeholder="Ex : UCAD, UGB, ISM..."
+              (input)="onEtablissementInput($event)"
+              (blur)="hideEtablissementSuggestions()"
+              autocomplete="off">
+            <ul class="autocomplete-list" *ngIf="etablissementSuggestions.length > 0">
+              <li *ngFor="let s of etablissementSuggestions" (mousedown)="selectEtablissement(s)">{{ s }}</li>
+            </ul>
+          </div>
+
+          <div class="form-group">
+            <label>Domaine d'étude ou secteur d'activité <span class="optional">(facultatif)</span></label>
+            <input formControlName="domaine" type="text" placeholder="Ex : Informatique, Commerce, Santé...">
+          </div>
+        </div>
+
+        <!-- Section 4 : Participation -->
+        <div class="form-section-block" *ngIf="currentStep === 4">
+          <div class="form-section-title">
+            <span class="section-num">4</span> Participation
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Avez-vous participé à une édition précédente de PENC'BOOST ? <span class="req">*</span></label>
+              <div class="toggle-group">
+                <button type="button" class="toggle-btn" [class.active]="inscriptionForm.get('ancienParticipant')?.value === 'oui'" (click)="inscriptionForm.get('ancienParticipant')?.setValue('oui')">Oui</button>
+                <button type="button" class="toggle-btn" [class.active]="inscriptionForm.get('ancienParticipant')?.value === 'non'" (click)="inscriptionForm.get('ancienParticipant')?.setValue('non')">Non</button>
+              </div>
+              <div class="error" *ngIf="inscriptionForm.get('ancienParticipant')?.invalid && inscriptionForm.get('ancienParticipant')?.touched">Requis.</div>
+            </div>
+            <div class="form-group">
+              <label>Souhaitez-vous être informé(e) des futurs programmes ? <span class="req">*</span></label>
+              <div class="toggle-group">
+                <button type="button" class="toggle-btn" [class.active]="inscriptionForm.get('newsletter')?.value === 'oui'" (click)="inscriptionForm.get('newsletter')?.setValue('oui')">Oui</button>
+                <button type="button" class="toggle-btn" [class.active]="inscriptionForm.get('newsletter')?.value === 'non'" (click)="inscriptionForm.get('newsletter')?.setValue('non')">Non</button>
+              </div>
+              <div class="error" *ngIf="inscriptionForm.get('newsletter')?.invalid && inscriptionForm.get('newsletter')?.touched">Requis.</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Comment avez-vous connu PENC'BOOST ? <span class="req">*</span></label>
+            <div class="custom-select" [class.open]="openDropdown === 'source'" (click)="toggleDropdown('source', $event)">
+              <div class="custom-select-trigger">
+                <span [class.placeholder]="!inscriptionForm.get('source')?.value">{{ inscriptionForm.get('source')?.value || 'Choisir' }}</span>
+                <i class="fas fa-chevron-down"></i>
+              </div>
+              <ul class="custom-select-options" *ngIf="openDropdown === 'source'">
+                <li *ngFor="let o of ['Facebook','Instagram','LinkedIn','TikTok','WhatsApp','Bouche à oreille','Autre']" (click)="selectOption('source', o, $event); onSourceChange({target:{value:o}})" [class.selected]="inscriptionForm.get('source')?.value === o">{{ o }}</li>
+              </ul>
+            </div>
+            <div class="error" *ngIf="inscriptionForm.get('source')?.invalid && inscriptionForm.get('source')?.touched">Requis.</div>
+          </div>
+          <div class="form-group" *ngIf="showAutreSource">
+            <label>Précisez <span class="req">*</span></label>
+            <input formControlName="autreSource" type="text" placeholder="Comment avez-vous connu le programme ?">
+          </div>
+
+          <div class="form-group">
+            <label>Motivation <span class="optional">(facultatif)</span></label>
+            <textarea formControlName="motivation" rows="3" placeholder="Parlez-nous de vos objectifs..."></textarea>
+          </div>
+
+          <!-- Consentements -->
+          <div class="consentements">
+            <label class="consent-item">
+              <input type="checkbox" formControlName="consentDonnees">
+              <span>J'accepte l'utilisation de mes données personnelles dans le cadre de ce programme <span class="req">*</span></span>
+            </label>
+            <div class="error" *ngIf="inscriptionForm.get('consentDonnees')?.invalid && inscriptionForm.get('consentDonnees')?.touched">Requis.</div>
+            <label class="consent-item">
+              <input type="checkbox" formControlName="consentParticipation">
+              <span>Je m'engage à participer activement à la session choisie <span class="req">*</span></span>
+            </label>
+            <div class="error" *ngIf="inscriptionForm.get('consentParticipation')?.invalid && inscriptionForm.get('consentParticipation')?.touched">Requis.</div>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="step-nav">
+          <button type="button" class="btn-prev" *ngIf="currentStep > 1" (click)="prevStep()">
+            <i class="fas fa-arrow-left"></i> Précédent
           </button>
-          <p class="cta-note">Places limitées - Inscription gratuite</p>
+          <button type="button" class="btn-next" *ngIf="currentStep < totalSteps" (click)="nextStep()">
+            Suivant <i class="fas fa-arrow-right"></i>
+          </button>
+          <button type="submit" class="submit-btn" *ngIf="currentStep === totalSteps" [disabled]="inscriptionForm.invalid">
+            <i class="fas fa-paper-plane"></i> Envoyer mon inscription
+          </button>
         </div>
-      </div>
+      </form>
     </div>
   </div>
-</section>
-
-<!-- Modal d'inscription -->
-<div class="modal-backdrop" *ngIf="showInscriptionModal" (click)="closeInscriptionModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <button class="modal-close" (click)="closeInscriptionModal()">&times;</button>
-    <div class="modal-header">
-      <h2>Inscription Penc'Boost</h2>
-      <p>Rejoignez la prochaine promotion et transformez votre avenir professionnel</p>
-    </div>
-
-    <div *ngIf="successMsg" class="success-message">
-      <i class="fas fa-check-circle"></i>
-      {{ successMsg }}
-    </div>
-    <div *ngIf="errorMsg" class="error-message">
-      <i class="fas fa-exclamation-triangle"></i>
-      {{ errorMsg }}
-    </div>
-
-    <form [formGroup]="inscriptionForm" (ngSubmit)="submitInscription()" class="inscription-form">
-      <div class="form-row">
-        <div class="form-group">
-          <input formControlName="nom" type="text" placeholder="Nom complet *" required>
-          <div class="error" *ngIf="inscriptionForm.get('nom')?.invalid && inscriptionForm.get('nom')?.touched">
-            Le nom est requis.
-          </div>
-        </div>
-
-        <div class="form-group">
-          <input formControlName="prenom" type="text" placeholder="Prénom *" required>
-          <div class="error" *ngIf="inscriptionForm.get('prenom')?.invalid && inscriptionForm.get('prenom')?.touched">
-            Le prénom est requis.
-          </div>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <input formControlName="dateNaissance" type="date" placeholder="Date de naissance *" required>
-          <div class="error" *ngIf="inscriptionForm.get('dateNaissance')?.invalid && inscriptionForm.get('dateNaissance')?.touched">
-            La date de naissance est requise.
-          </div>
-        </div>
-
-        <div class="form-group">
-          <input formControlName="email" type="email" placeholder="Adresse email *" required>
-          <div class="error" *ngIf="inscriptionForm.get('email')?.invalid && inscriptionForm.get('email')?.touched">
-            Une adresse email valide est requise.
-          </div>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <input formControlName="telephone" type="tel" placeholder="Téléphone *" required>
-          <div class="error" *ngIf="inscriptionForm.get('telephone')?.invalid && inscriptionForm.get('telephone')?.touched">
-            Le téléphone est requis.
-          </div>
-        </div>
-
-        <div class="form-group">
-          <input formControlName="ville" type="text" placeholder="Ville *" required>
-          <div class="error" *ngIf="inscriptionForm.get('ville')?.invalid && inscriptionForm.get('ville')?.touched">
-            La ville est requise.
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <input formControlName="adresse" type="text" placeholder="Adresse complète *" required>
-        <div class="error" *ngIf="inscriptionForm.get('adresse')?.invalid && inscriptionForm.get('adresse')?.touched">
-          L'adresse est requise.
-        </div>
-      </div>
-
-      <div class="form-group">
-        <select formControlName="niveauEtudes" required>
-          <option value="" disabled selected hidden>Niveau d'études *</option>
-          <option>Collège</option>
-          <option>Lycée</option>
-          <option>Baccalauréat</option>
-          <option>BTS / DUT</option>
-          <option>Licence</option>
-          <option>Master</option>
-          <option>Doctorat</option>
-          <option>Autre</option>
-        </select>
-        <div class="error" *ngIf="inscriptionForm.get('niveauEtudes')?.invalid && inscriptionForm.get('niveauEtudes')?.touched">
-          Le niveau d'études est requis.
-        </div>
-      </div>
-
-      <div class="form-section">
-        <label class="form-section-title">Modules/axes souhaités * :</label>
-        <div class="checkbox-grid">
-          <label *ngFor="let axe of axesList" class="checkbox-item">
-            <input type="checkbox"
-                  [value]="axe"
-                  (change)="onAxeChange($event)"
-                  [checked]="inscriptionForm.value.axes.includes(axe)">
-            <span class="checkmark"></span>
-            {{ axe }}
-          </label>
-        </div>
-        <div class="error" *ngIf="inscriptionForm.get('axes')?.invalid && inscriptionForm.get('axes')?.touched">
-          Veuillez sélectionner au moins un axe.
-        </div>
-      </div>
-
-      <div class="form-group">
-        <textarea formControlName="motivation" rows="4" placeholder="Parlez-nous de votre motivation et de vos objectifs (facultatif)"></textarea>
-      </div>
-
-      <button type="submit" class="submit-btn" [disabled]="inscriptionForm.invalid">
-        <i class="fas fa-paper-plane"></i>
-        Envoyer mon inscription
-      </button>
-    </form>
-  </div>
-</div>
 
 </div>
 
@@ -427,10 +720,10 @@
     <div class="partnership-content">
       <div class="partnership-text">
         <h3>Vous souhaitez devenir formateur ou partenaire ?</h3>
-        <p>Rejoignez notre réseau d'experts et contribuez à l'excellence de nos formations. Nous recherchons des professionnels passionnés pour co-construire des sessions innovantes et soutenir notre mission.</p>
+        <p>Penccum Ndongo ouvre ce programme à toute structure, organisme ou formateur souhaitant intervenir dans l'un des axes thématiques, collaborer pour soutenir l'initiative (sponsoring, logistique, visibilité) ou co-construire des sessions selon les besoins d'un groupe cible spécifique.</p>
       </div>
       <div class="partnership-cta">
-        <a href="mailto:pencc.penccumndongo&#64;gmail.com?subject=Proposition de Collaboration Penc'Boost" class="partnership-btn">
+        <a href="mailto:pencc.penccumndongo@gmail.com?subject=Proposition de Collaboration Penc'Boost" class="partnership-btn">
           <i class="fas fa-handshake"></i>
           Proposer une collaboration
         </a>

@@ -2522,6 +2522,7 @@
   box-shadow: 0 20px 60px rgba(0, 133, 202, 0.15);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   transform-style: preserve-3d;
+  cursor: pointer;
 }
 
 .promo-image-wrapper::before {
@@ -3177,5 +3178,240 @@
   .btn-join-cohorte {
     padding: 14px 24px;
     font-size: 1rem;
+  }
+}
+
+/* Styles pour l'affiche cliquable et la lightbox */
+.clickable-poster {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.promo-image-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.promo-image-wrapper:hover .clickable-poster {
+  transform: scale(1.05);
+}
+
+.zoom-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+  border-radius: var(--border-radius);
+  color: white;
+  font-weight: 600;
+}
+
+.promo-image-wrapper:hover .zoom-overlay {
+  opacity: 1;
+}
+
+.zoom-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+  animation: zoom-pulse 2s ease-in-out infinite;
+}
+
+@keyframes zoom-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.zoom-text {
+  font-size: 1rem;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+/* Lightbox pour l'affiche */
+.poster-lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  padding: 20px;
+}
+
+.poster-lightbox-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10002;
+}
+
+.lightbox-close:hover {
+  background: rgba(255, 0, 0, 0.8);
+  transform: scale(1.1);
+}
+
+.lightbox-download {
+  position: absolute;
+  top: 15px;
+  right: 80px; /* Augmentation significative de l'espacement */
+  background: rgba(0, 133, 202, 0.8);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10002;
+}
+
+.lightbox-download:hover {
+  background: rgba(0, 133, 202, 1);
+  transform: scale(1.1);
+}
+
+/* Responsive pour les icônes de la lightbox */
+@media (max-width: 768px) {
+  .lightbox-close,
+  .lightbox-download {
+    width: 45px;
+    height: 45px;
+    top: 10px;
+  }
+  
+  .lightbox-close {
+    right: 10px;
+  }
+  
+  .lightbox-download {
+    right: 75px; /* Espacement adapté pour tablette */
+  }
+}
+
+@media (max-width: 480px) {
+  .lightbox-close,
+  .lightbox-download {
+    width: 50px;
+    height: 50px;
+    font-size: 18px;
+    top: 8px;
+  }
+  
+  .lightbox-close {
+    right: 8px;
+  }
+  
+  .lightbox-download {
+    right: 85px; /* Encore plus d'espace sur mobile */
+  }
+}
+
+@media (max-width: 360px) {
+  .lightbox-download {
+    right: 90px; /* Espacement maximum pour très petits écrans */
+  }
+}
+
+.lightbox-poster {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-width: 800px;
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+.lightbox-caption {
+  padding: 20px;
+  text-align: center;
+  background: white;
+}
+
+.lightbox-caption h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0085CA;
+  margin-bottom: 8px;
+}
+
+.lightbox-caption p {
+  font-size: 1rem;
+  color: #666;
+  margin: 0;
+}
+
+/* Responsive pour la lightbox */
+@media (max-width: 768px) {
+  .poster-lightbox-overlay {
+    padding: 10px;
+  }
+  
+  .poster-lightbox-content {
+    max-width: 95vw;
+    max-height: 95vh;
+  }
+  
+  .lightbox-poster {
+    max-height: 70vh;
+  }
+  
+  .lightbox-caption {
+    padding: 15px;
+  }
+  
+  .lightbox-caption h3 {
+    font-size: 1.2rem;
+  }
+  
+  .lightbox-caption p {
+    font-size: 0.9rem;
+  }
+  
+  .zoom-text {
+    font-size: 0.9rem;
+  }
+  
+  .zoom-icon {
+    font-size: 1.5rem;
   }
 }

@@ -144,12 +144,15 @@
       </div>
       
      <div class="promo-image-container" @scaleIn>
-      <div class="promo-image-wrapper">
-
+      <div class="promo-image-wrapper" (click)="openPosterLightbox()">
         <img src="Cohorte3_Formation_Infographie.jpg" 
             alt="Affiche Formation Infographie Cohorte 3 - PENCCUM NDONGO" 
-            class="formation-poster"
+            class="formation-poster clickable-poster"
             loading="lazy">
+        <div class="zoom-overlay">
+          <i class="zoom-icon">🔍</i>
+          <span class="zoom-text">Cliquer pour agrandir</span>
+        </div>
       </div>
     </div>
     </div>
@@ -783,6 +786,23 @@
       <p class="modal-note">
         Vous serez informé en priorité des nouvelles sessions de formation.
       </p>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox pour l'affiche -->
+<div class="poster-lightbox-overlay" *ngIf="showPosterLightbox" (click)="closePosterLightbox()" @fadeIn>
+  <div class="poster-lightbox-content" (click)="$event.stopPropagation()" @scaleIn>
+    <button class="lightbox-close" (click)="closePosterLightbox()">×</button>
+    <button class="lightbox-download" (click)="downloadPoster()" title="Télécharger l'affiche">
+      <i class="fas fa-download"></i>
+    </button>
+    <img src="Cohorte3_Formation_Infographie.jpg" 
+         alt="Affiche Formation Infographie Cohorte 3 - PENCCUM NDONGO" 
+         class="lightbox-poster">
+    <div class="lightbox-caption">
+      <h3>Formation Infographie - Cohorte 3</h3>
+      <p>Du 15 juin au 17 juillet 2026 • 25.000 FCFA • 100% en ligne</p>
     </div>
   </div>
 </div>

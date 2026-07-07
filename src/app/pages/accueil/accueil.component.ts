@@ -213,6 +213,17 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
   // --- Actualités ---
   articles: Article[] = [
     {
+      id: 22,
+      title: "Joyeuse fête de Tabaski 2026 !",
+      excerpt: "Aïd Moubarak ! À l'occasion de cette fête bénie de Tabaski, l'équipe de Penccum Ndongo vous souhaite une excellente fête remplie de joie, de partage et de bénédictions. Que cette célébration vous apporte paix, bonheur et prospérité. Taqabal Allah minna wa minkoum ! #tabaski2026 #penccumndongo #aidmoubarak",
+      image: "Korite_2026.jpg",
+      date: new Date('2026-05-27'),
+      author: "Penccum Ndongo",
+      category: "VOEUX",
+      linkedinUrl: "https://www.facebook.com/penccumndongo",
+      featured: true
+    },
+    {
       id: 21,
       title: "Fête du Travail 2026",
       excerpt: "Le travail construit, l'engagement élève.\n\nBonne fête à celles et ceux qui créent, innovent et font avancer le monde.",

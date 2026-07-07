@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { trigger, state, style, transition, animate } from '@angular/animations';
@@ -89,6 +89,7 @@ export class FormationInfographieComponent implements OnInit {
   countdown: any = {};
   inscriptionsClosed = false; // Inscriptions clôturées
   showClosedModal = false;
+  showPosterLightbox = false;
   
   modules: FormationModule[] = [
     {
@@ -361,8 +362,8 @@ export class FormationInfographieComponent implements OnInit {
   }
 
   downloadBrochure(): void {
-    // Implémenter le téléchargement de la brochure
-    window.open('https://penccumndongo.com/Programme_Formation_INFOGRAPHIE.pdf', '_blank');
+    // Télécharger la brochure de la Cohorte 3
+    window.open('https://penccumndongo.com/Programme_Formation_INFOGRAPHIE_Cohorte3_PenccumNdongo.pdf', '_blank');
   }
 
   closeModal(): void {
@@ -385,6 +386,43 @@ export class FormationInfographieComponent implements OnInit {
 
   scrollToBottom() {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+
+  openPosterLightbox(): void {
+    console.log('Ouverture de la lightbox');
+    this.showPosterLightbox = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closePosterLightbox(): void {
+    console.log('Fermeture de la lightbox');
+    this.showPosterLightbox = false;
+    document.body.style.overflow = 'auto';
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscapeKey(event: KeyboardEvent): void {
+    if (this.showPosterLightbox) {
+      this.closePosterLightbox();
+    }
+  }
+
+  downloadPoster(): void {
+    console.log('Téléchargement de l\'affiche');
+    
+    // Créer un lien de téléchargement
+    const link = document.createElement('a');
+    link.href = 'Cohorte3_Formation_Infographie.jpg';
+    link.download = 'Formation_Infographie_Cohorte3_PENCCUM_NDONGO.jpg';
+    link.target = '_blank';
+    
+    // Ajouter le lien au DOM, cliquer dessus, puis le supprimer
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Optionnel : fermer la lightbox après téléchargement
+    // this.closePosterLightbox();
   }
 
 
