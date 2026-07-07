@@ -83,7 +83,7 @@ export class FormationsComponent implements OnInit {
     },
     {
       question: 'Peut-on participer depuis n\'importe quel pays ?',
-      answer: 'Oui, le programme est 100% en ligne et ouvert à tous les Africains. Vous pouvez participer depuis n\'importe quel pays, tant que vous avez une connexion internet.'
+      answer: 'Oui, le programme est 100% en ligne et ouvert à tous les pays de l\'Afrique. Vous pouvez participer depuis n\'importe quel pays, tant que vous avez une connexion internet.'
     },
     {
       question: 'Reçoit-on une attestation ?',
@@ -104,25 +104,12 @@ export class FormationsComponent implements OnInit {
     { value: 'design', label: 'Design Graphique', date: 'Mardi 21 juillet · 18h–20h', inscrits: 0, total: 100, complet: false },
     { value: 'numerique-ia', label: 'Compétences Numériques & IA', date: 'Mercredi 22 juillet · 18h–20h', inscrits: 0, total: 100, complet: false },
     { value: 'marketing', label: 'Marketing Digital', date: 'Jeudi 23 juillet · 18h–20h', inscrits: 0, total: 100, complet: false },
-    { value: 'employabilite', label: 'Employabilité, Entrepreneuriat & Insertion Pro.', date: 'Vendredi 24 juillet · 16h–18h', inscrits: 0, total: 100, complet: false },
+    { value: 'employabilite', label: 'Employabilité, Entrepreneuriat & Insertion Professionnelle', date: 'Vendredi 24 juillet · 16h–18h', inscrits: 0, total: 100, complet: false },
     { value: 'bureautique', label: 'Initiation à la Bureautique & Informatique', date: 'Samedi 25 juillet · 10h–12h', inscrits: 0, total: 100, complet: false },
     { value: 'poesie', label: 'Poésie & Arts Visuels', date: 'Dimanche 26 juillet · 10h–12h', inscrits: 0, total: 100, complet: false },
   ];
 
-  getProgressColor(inscrits: number, total: number): string {
-    const pct = inscrits / total * 100;
-    if (pct >= 100) return '#dc3545';
-    if (pct >= 75) return '#fd7e14';
-    return '#28a745';
-  }
-
-  getProgressLabel(inscrits: number, total: number, complet: boolean): string {
-    if (complet) return 'Complet';
-    const restants = total - inscrits;
-    return restants + ' place' + (restants > 1 ? 's' : '') + ' restante' + (restants > 1 ? 's' : '');
-  }
-
-  constructor(private fb: FormBuilder, private http: HttpClient) {
+constructor(private fb: FormBuilder, private http: HttpClient) {
     this.inscriptionForm = this.fb.group({
       // Section 1
       module: ['', Validators.required],
@@ -297,6 +284,9 @@ export class FormationsComponent implements OnInit {
             this.successMsg = res.message;
             this.errorMsg = '';
             this.inscriptionForm.reset();
+            setTimeout(() => {
+              document.querySelector('.modal-content')?.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 50);
           } else {
             this.errorMsg = res.message;
           }

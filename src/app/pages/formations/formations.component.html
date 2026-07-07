@@ -335,40 +335,6 @@
   </section>
 
   <!-- Points clés -->
-  <section class="points-cles-section">
-    <div class="container">
-      <div class="points-cles-grid">
-        <div class="point-cle">
-          <div class="point-icon"><i class="fas fa-tag"></i></div>
-          <div class="point-text">
-            <strong>100% Gratuit</strong>
-            <span>Aucun frais d'inscription</span>
-          </div>
-        </div>
-        <div class="point-cle">
-          <div class="point-icon"><i class="fas fa-laptop"></i></div>
-          <div class="point-text">
-            <strong>100% En ligne</strong>
-            <span>Via Google Meet, depuis partout</span>
-          </div>
-        </div>
-        <div class="point-cle">
-          <div class="point-icon"><i class="fas fa-users"></i></div>
-          <div class="point-text">
-            <strong>Places limitées</strong>
-            <span>100 inscrits maximum par module</span>
-          </div>
-        </div>
-        <div class="point-cle">
-          <div class="point-icon"><i class="fas fa-certificate"></i></div>
-          <div class="point-text">
-            <strong>Attestation offerte</strong>
-            <span>Remise à chaque participant</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- FAQ -->
   <section class="faq-section">
@@ -417,7 +383,7 @@
               <div class="info-icon"><i class="fas fa-language"></i></div>
               <h3>Langue</h3>
               <p><strong>Français</strong></p>
-              <p>Ouvert à tous les Africains</p>
+              <p>Ouvert à tous les pays de l'Afrique</p>
             </div>
             <div class="info-card">
               <div class="info-icon"><i class="fas fa-money-bill-wave"></i></div>
@@ -445,8 +411,16 @@
 
   <!-- Modal d'inscription -->
   <div class="modal-backdrop" *ngIf="showInscriptionModal" (click)="closeInscriptionModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-content" (click)="$event.stopPropagation()" [style.overflow-y]="successMsg ? 'hidden' : 'auto'">
       <button class="modal-close" (click)="closeInscriptionModal()">&times;</button>
+
+      <!-- Popup succès -->
+      <div class="success-popup" *ngIf="successMsg" (click)="$event.stopPropagation()">
+        <div class="success-popup-icon"><i class="fas fa-check-circle"></i></div>
+        <h3>Inscription confirmée !</h3>
+        <p>{{ successMsg }}</p>
+        <button class="success-popup-btn" (click)="closeInscriptionModal()">Fermer</button>
+      </div>
 
       <div class="modal-header">
         <div class="modal-badge">Inscription Gratuite</div>
@@ -459,9 +433,6 @@
         <p>PENC'BOOST est un programme de formations professionnelles <strong>100% gratuit</strong>, ouvert à tous. Places limitées — inscrivez-vous rapidement pour garantir votre place. Vos données personnelles restent <strong>strictement confidentielles</strong> et ne seront utilisées qu'à des fins organisationnelles.</p>
       </div>
 
-      <div *ngIf="successMsg" class="success-message">
-        <i class="fas fa-check-circle"></i> {{ successMsg }}
-      </div>
       <div *ngIf="errorMsg" class="error-message">
         <i class="fas fa-exclamation-triangle"></i> {{ errorMsg }}
       </div>
@@ -528,7 +499,7 @@
                   <i class="fas fa-chevron-down"></i>
                 </div>
                 <ul class="custom-select-options" *ngIf="openDropdown === 'sexe'">
-                  <li *ngFor="let o of ['Homme','Femme','Préfère ne pas préciser']" (click)="selectOption('sexe', o, $event)" [class.selected]="inscriptionForm.get('sexe')?.value === o">{{ o }}</li>
+                  <li *ngFor="let o of ['Homme','Femme']" (click)="selectOption('sexe', o, $event)" [class.selected]="inscriptionForm.get('sexe')?.value === o">{{ o }}</li>
                 </ul>
               </div>
               <div class="error" *ngIf="inscriptionForm.get('sexe')?.invalid && inscriptionForm.get('sexe')?.touched">Requis.</div>
@@ -714,20 +685,3 @@
 
 </div>
 
-<!-- Section partenariat -->
-<section class="partnership-section">
-  <div class="container">
-    <div class="partnership-content">
-      <div class="partnership-text">
-        <h3>Vous souhaitez devenir formateur ou partenaire ?</h3>
-        <p>Penccum Ndongo ouvre ce programme à toute structure, organisme ou formateur souhaitant intervenir dans l'un des axes thématiques, collaborer pour soutenir l'initiative (sponsoring, logistique, visibilité) ou co-construire des sessions selon les besoins d'un groupe cible spécifique.</p>
-      </div>
-      <div class="partnership-cta">
-        <a href="mailto:pencc.penccumndongo@gmail.com?subject=Proposition de Collaboration Penc'Boost" class="partnership-btn">
-          <i class="fas fa-handshake"></i>
-          Proposer une collaboration
-        </a>
-      </div>
-    </div>
-  </div>
-</section>

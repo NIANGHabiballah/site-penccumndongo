@@ -44,6 +44,11 @@ if (!$module || !$nom || !$sexe || !$tranche_age || !$email || !$telephone || !$
     exit;
 }
 
+if (!in_array($sexe, ['Homme', 'Femme'])) {
+    echo json_encode(['success' => false, 'message' => 'Valeur invalide pour le champ Sexe.']);
+    exit;
+}
+
 try {
     $pdo = new PDO(
         'mysql:host=localhost;dbname=u122559880_form_contact;charset=utf8',

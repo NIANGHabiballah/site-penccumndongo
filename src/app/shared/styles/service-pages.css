@@ -19,13 +19,13 @@
 .service-page .hero-section {
   position: relative !important;
   overflow: hidden !important;
-  min-height: 50vh !important;
-  max-height: 50vh !important;
-  height: 50vh !important;
+  min-height: unset !important;
+  max-height: unset !important;
+  height: auto !important;
   display: flex !important;
   align-items: center !important;
   background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 100%) !important;
-  padding: 4rem 0 !important;
+  padding: 3rem 0 !important;
 }
 
 .service-page .hero-section::before {
@@ -370,6 +370,13 @@
 
 /* Responsive amélioré - Centrage mobile */
 @media (max-width: 768px) {
+  .service-page .hero-section {
+    min-height: unset !important;
+    max-height: unset !important;
+    height: auto !important;
+    padding: 2rem 0 !important;
+  }
+
   .service-page .hero-title {
     font-size: clamp(2rem, 8vw, 3rem);
     text-align: center !important;
@@ -412,6 +419,13 @@
 }
 
 @media (max-width: 480px) {
+  .service-page .hero-section {
+    min-height: unset !important;
+    max-height: unset !important;
+    height: auto !important;
+    padding: 1.5rem 0 !important;
+  }
+
   .service-page .hero-content {
     padding: 1rem;
     text-align: center !important;
