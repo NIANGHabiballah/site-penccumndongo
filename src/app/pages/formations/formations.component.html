@@ -419,6 +419,27 @@
         <div class="success-popup-icon"><i class="fas fa-check-circle"></i></div>
         <h3>Inscription confirmée !</h3>
         <p>{{ successMsg }}</p>
+
+        <div class="whatsapp-invite-card">
+          <div class="whatsapp-invite-left">
+            <div class="whatsapp-invite-badge">
+              <i class="fab fa-whatsapp"></i>
+            </div>
+            <div class="whatsapp-invite-text">
+              <strong>Rejoignez le groupe WhatsApp</strong>
+              <span>Restez informé(e) de toutes les actualités du programme</span>
+            </div>
+          </div>
+          <a href="https://chat.whatsapp.com/H2HX0arxjCA70EgrcbRWUG?mode=gi_t" target="_blank" class="whatsapp-join-btn">
+            <i class="fab fa-whatsapp"></i> Rejoindre
+          </a>
+        </div>
+
+        <div class="qr-section">
+          <p class="qr-label">Ou scannez le QR code</p>
+          <img src="pencboostwhatsapp.png" alt="QR Code WhatsApp Penc'Boost" class="qr-code-img" />
+        </div>
+
         <button class="success-popup-btn" (click)="closeInscriptionModal()">Fermer</button>
       </div>
 
