@@ -1,0 +1,849 @@
+<div class="af-root">
+
+  <!-- ══════════════════════════════════════════════════════════════
+       ÉCRAN DE CONNEXION
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="af-login" *ngIf="!authenticated">
+    <div class="login-card">
+      <div class="login-logo">
+        <img src="penccboost.png" alt="Penc'Boost" onerror="this.style.display='none'">
+      </div>
+      <h2>Espace Admin Formations</h2>
+      <p class="login-sub">Penccum Ndongo · Accès restreint</p>
+
+      <div class="login-error" *ngIf="loginError">
+        <i class="fas fa-exclamation-circle"></i> {{ loginError }}
+      </div>
+
+      <div class="login-field">
+        <label>Email administrateur</label>
+        <input type="email" [(ngModel)]="loginForm.email" placeholder="admin@penccumndongo.com" (keyup.enter)="login()">
+      </div>
+      <div class="login-field">
+        <label>Mot de passe</label>
+        <input type="password" [(ngModel)]="loginForm.password" placeholder="••••••••" (keyup.enter)="login()">
+      </div>
+      <button class="login-btn" (click)="login()">
+        <i class="fas fa-sign-in-alt"></i> Se connecter
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       INTERFACE PRINCIPALE
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="af-app" *ngIf="authenticated" [class.sidebar-collapsed]="!sidebarOpen">
+
+    <!-- ── Sidebar ── -->
+    <aside class="af-sidebar" [class.open]="sidebarOpen">
+      <div class="sidebar-brand">
+        <img src="penccboost.png" alt="Logo" onerror="this.style.display='none'">
+        <span>Admin Formations</span>
+        <button class="sidebar-toggle" (click)="sidebarOpen = !sidebarOpen" title="Masquer le menu">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </div>
+
+      <!-- Menu Penc'Boost -->
+      <div class="sidebar-group" *ngIf="programme === 'pencboost' || programme === ''">
+        <div class="sidebar-group-title" *ngIf="programme === 'pencboost'">
+          <i class="fas fa-rocket"></i> Penc'Boost
+        </div>
+        <ng-container *ngIf="programme === 'pencboost'">
+          <button class="sidebar-item" [class.active]="section === 'pencboost-stats'" (click)="setSection('pencboost-stats')">
+            <i class="fas fa-chart-bar"></i> Tableau de bord
+          </button>
+          <button class="sidebar-item" [class.active]="section === 'pencboost-inscrits'" (click)="setSection('pencboost-inscrits')">
+            <i class="fas fa-users"></i> Inscriptions
+          </button>
+          <button class="sidebar-item" [class.active]="section === 'pencboost-presences'" (click)="setSection('pencboost-presences')">
+            <i class="fas fa-clipboard-check"></i> Présences
+          </button>
+          <button class="sidebar-item" [class.active]="section === 'pencboost-liens'" (click)="setSection('pencboost-liens')">
+            <i class="fas fa-link"></i> Liens présence
+          </button>
+          <button class="sidebar-item" [class.active]="section === 'pencboost-rapport'" (click)="setSection('pencboost-rapport')">
+            <i class="fas fa-file-alt"></i> Rapport
+          </button>
+        </ng-container>
+      </div>
+
+      <!-- Menu Infographie -->
+      <div class="sidebar-group" *ngIf="programme === 'infographie'">
+        <div class="sidebar-group-title">
+          <i class="fas fa-palette"></i> Infographie
+        </div>
+        <button class="sidebar-item" [class.active]="section === 'infographie-stats'" (click)="setSection('infographie-stats')">
+          <i class="fas fa-chart-bar"></i> Tableau de bord
+        </button>
+        <button class="sidebar-item" [class.active]="section === 'infographie-inscrits'" (click)="setSection('infographie-inscrits')">
+          <i class="fas fa-users"></i> Inscriptions
+        </button>
+      </div>
+
+      <!-- Changer de programme -->
+      <div class="sidebar-switch" *ngIf="programme !== ''">
+        <button (click)="programme = ''; section = 'accueil'">
+          <i class="fas fa-exchange-alt"></i> Changer de programme
+        </button>
+      </div>
+
+      <!-- Paramètres (toujours visible) -->
+      <div class="sidebar-group" *ngIf="programme !== ''">
+        <button class="sidebar-item" [class.active]="section === 'parametres'" (click)="setSection('parametres')">
+          <i class="fas fa-cog"></i> Paramètres
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" (click)="logout()">
+          <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </button>
+      </div>
+    </aside>
+
+    <!-- Bouton réouvrir sidebar quand fermée -->
+    <button class="sidebar-reopen" *ngIf="!sidebarOpen" (click)="sidebarOpen = true" title="Afficher le menu">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- ── Contenu principal ── -->
+    <main class="af-main">
+
+      <!-- ── ACCUEIL : choix du programme ── -->
+      <div class="af-section" *ngIf="section === 'accueil'">
+        <div class="page-header">
+          <h1>Bienvenue, Admin</h1>
+          <p>Choisissez le programme à gérer</p>
+        </div>
+
+        <div class="programme-cards">
+          <div class="programme-card pencboost" (click)="choisirProgramme('pencboost')">
+            <div class="prog-icon"><i class="fas fa-rocket"></i></div>
+            <div class="prog-info">
+              <h3>Penc'Boost</h3>
+              <p>Programme de formations gratuites · 7 modules · Juillet 2026</p>
+              <div class="prog-tags">
+                <span>Inscriptions</span>
+                <span>Présences</span>
+                <span>Statistiques</span>
+                <span>Liens</span>
+              </div>
+            </div>
+            <i class="fas fa-arrow-right prog-arrow"></i>
+          </div>
+
+          <div class="programme-card infographie" (click)="choisirProgramme('infographie')">
+            <div class="prog-icon"><i class="fas fa-palette"></i></div>
+            <div class="prog-info">
+              <h3>Formation Infographie</h3>
+              <p>Formation professionnelle payante · Cohorte 3 · Juin–Juillet 2026</p>
+              <div class="prog-tags">
+                <span>Inscriptions</span>
+                <span>Statistiques</span>
+              </div>
+            </div>
+            <i class="fas fa-arrow-right prog-arrow"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════
+           PENC'BOOST — TABLEAU DE BORD
+      ══════════════════════════════════════════════════════════ -->
+      <div class="af-section" *ngIf="section === 'pencboost-stats'">
+        <div class="page-header">
+          <h1><i class="fas fa-chart-bar"></i> Tableau de bord Penc'Boost</h1>
+          <button class="btn-refresh" (click)="loadPencboostStats()">
+            <i class="fas fa-sync-alt"></i> Actualiser
+          </button>
+        </div>
+
+        <div class="loading-state" *ngIf="pbLoading">
+          <i class="fas fa-spinner fa-spin"></i> Chargement...
+        </div>
+
+        <ng-container *ngIf="!pbLoading && pbStats">
+          <!-- KPIs globaux -->
+          <div class="kpi-grid">
+            <div class="kpi-card blue">
+              <div class="kpi-icon"><i class="fas fa-users"></i></div>
+              <div class="kpi-data">
+                <span class="kpi-value">{{ pbStats.total_inscrits }}</span>
+                <span class="kpi-label">Total inscrits</span>
+              </div>
+            </div>
+            <div class="kpi-card green">
+              <div class="kpi-icon"><i class="fas fa-clipboard-check"></i></div>
+              <div class="kpi-data">
+                <span class="kpi-value">{{ pbStats.total_presences }}</span>
+                <span class="kpi-label">Présences enregistrées</span>
+              </div>
+            </div>
+            <div class="kpi-card orange">
+              <div class="kpi-icon"><i class="fas fa-percent"></i></div>
+              <div class="kpi-data">
+                <span class="kpi-value">{{ getTauxGlobal() }}%</span>
+                <span class="kpi-label">Taux de présence global</span>
+              </div>
+            </div>
+            <div class="kpi-card purple">
+              <div class="kpi-icon"><i class="fas fa-layer-group"></i></div>
+              <div class="kpi-data">
+                <span class="kpi-value">7</span>
+                <span class="kpi-label">Modules au programme</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tableau par module -->
+          <div class="data-card">
+            <div class="data-card-header">
+              <h3><i class="fas fa-table"></i> Suivi par module</h3>
+              <div class="stats-filters">
+                <select [(ngModel)]="pbModuleFilter">
+                  <option value="">Tous les modules</option>
+                  <option *ngFor="let m of modules" [value]="m.value">{{ m.label }}</option>
+                </select>
+                <div class="sort-controls">
+                  <span class="sort-label">Trier par :</span>
+                  <button class="sort-btn" [class.active]="pbSortField === 'inscrits'" (click)="toggleSort('inscrits')">
+                    Inscrits <i class="fas" [class.fa-sort-up]="pbSortField === 'inscrits' && pbSortDir === 'asc'" [class.fa-sort-down]="pbSortField === 'inscrits' && pbSortDir === 'desc'" [class.fa-sort]="pbSortField !== 'inscrits'"></i>
+                  </button>
+                  <button class="sort-btn" [class.active]="pbSortField === 'presences'" (click)="toggleSort('presences')">
+                    Présences <i class="fas" [class.fa-sort-up]="pbSortField === 'presences' && pbSortDir === 'asc'" [class.fa-sort-down]="pbSortField === 'presences' && pbSortDir === 'desc'" [class.fa-sort]="pbSortField !== 'presences'"></i>
+                  </button>
+                  <button class="sort-btn" [class.active]="pbSortField === 'taux'" (click)="toggleSort('taux')">
+                    Taux <i class="fas" [class.fa-sort-up]="pbSortField === 'taux' && pbSortDir === 'asc'" [class.fa-sort-down]="pbSortField === 'taux' && pbSortDir === 'desc'" [class.fa-sort]="pbSortField !== 'taux'"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="af-table">
+                <thead>
+                  <tr>
+                    <th>Module</th>
+                    <th>Date</th>
+                    <th (click)="toggleSort('inscrits')" class="th-sortable">Inscrits <i class="fas" [class.fa-sort-up]="pbSortField === 'inscrits' && pbSortDir === 'asc'" [class.fa-sort-down]="pbSortField === 'inscrits' && pbSortDir === 'desc'" [class.fa-sort]="pbSortField !== 'inscrits'"></i></th>
+                    <th (click)="toggleSort('presences')" class="th-sortable">Présences <i class="fas" [class.fa-sort-up]="pbSortField === 'presences' && pbSortDir === 'asc'" [class.fa-sort-down]="pbSortField === 'presences' && pbSortDir === 'desc'" [class.fa-sort]="pbSortField !== 'presences'"></i></th>
+                    <th (click)="toggleSort('taux')" class="th-sortable">Taux <i class="fas" [class.fa-sort-up]="pbSortField === 'taux' && pbSortDir === 'asc'" [class.fa-sort-down]="pbSortField === 'taux' && pbSortDir === 'desc'" [class.fa-sort]="pbSortField !== 'taux'"></i></th>
+                    <th>Progression</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let m of sortedModules" [hidden]="pbModuleFilter && m.value !== pbModuleFilter">
+                    <td>
+                      <div class="module-cell">
+                        <span class="module-dot" [style.background]="m.color"></span>
+                        <span>{{ m.label }}</span>
+                      </div>
+                    </td>
+                    <td class="text-muted">{{ m.date }}</td>
+                    <td><strong>{{ getInscritsPourModule(m.value) }}</strong></td>
+                    <td><strong>{{ getPresencesPourModule(m.value) }}</strong></td>
+                    <td>
+                      <span class="taux-badge" [class.taux-high]="getTauxPresence(m.value) >= 70" [class.taux-mid]="getTauxPresence(m.value) >= 40 && getTauxPresence(m.value) < 70" [class.taux-low]="getTauxPresence(m.value) < 40">
+                        {{ getTauxPresence(m.value) }}%
+                      </span>
+                    </td>
+                    <td>
+                      <div class="progress-bar-wrap">
+                        <div class="progress-bar-fill" [style.width.%]="getTauxPresence(m.value)" [style.background]="m.color"></div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════
+           PENC'BOOST — INSCRIPTIONS
+      ══════════════════════════════════════════════════════════ -->
+      <div class="af-section" *ngIf="section === 'pencboost-inscrits'">
+        <div class="page-header">
+          <h1><i class="fas fa-users"></i> Inscriptions Penc'Boost</h1>
+          <button class="btn-export" (click)="exportCSV('inscrits', pbModuleFilter)">
+            <i class="fas fa-download"></i> Exporter CSV
+          </button>
+        </div>
+
+        <!-- Filtres -->
+        <div class="filters-bar">
+          <select [(ngModel)]="pbModuleFilter" (change)="loadPencboostInscrits()">
+            <option value="">Tous les modules</option>
+            <option *ngFor="let m of modules" [value]="m.value">{{ m.label }}</option>
+          </select>
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" [(ngModel)]="pbSearch" (input)="loadPencboostInscrits()" placeholder="Rechercher nom, email...">
+          </div>
+        </div>
+
+        <div class="loading-state" *ngIf="pbLoading"><i class="fas fa-spinner fa-spin"></i> Chargement...</div>
+
+        <ng-container *ngIf="!pbLoading">
+
+          <!-- Stats inscrits -->
+          <div class="inscrits-stats-grid">
+            <!-- Par sexe -->
+            <div class="stat-mini-card">
+              <div class="stat-mini-title"><i class="fas fa-venus-mars"></i> Sexe</div>
+              <div class="stat-mini-rows">
+                <div class="stat-mini-row">
+                  <span>Hommes</span>
+                  <span class="stat-mini-val blue">{{ getStatCount('sexe','Homme') }}</span>
+                </div>
+                <div class="stat-mini-row">
+                  <span>Femmes</span>
+                  <span class="stat-mini-val pink">{{ getStatCount('sexe','Femme') }}</span>
+                </div>
+              </div>
+            </div>
+            <!-- Par statut -->
+            <div class="stat-mini-card">
+              <div class="stat-mini-title"><i class="fas fa-briefcase"></i> Statut</div>
+              <div class="stat-mini-rows">
+                <div class="stat-mini-row"><span>Étudiant(e)</span><span class="stat-mini-val blue">{{ getStatCount('statut','Étudiant(e)') }}</span></div>
+                <div class="stat-mini-row"><span>En recherche</span><span class="stat-mini-val orange">{{ getStatCount('statut','En recherche d\'emploi') }}</span></div>
+                <div class="stat-mini-row"><span>Salarié(e)</span><span class="stat-mini-val green">{{ getStatCount('statut','Salarié(e)') }}</span></div>
+                <div class="stat-mini-row"><span>Entrepreneur</span><span class="stat-mini-val purple">{{ getStatCount('statut','Entrepreneur(e)') }}</span></div>
+              </div>
+            </div>
+            <!-- Top villes -->
+            <div class="stat-mini-card">
+              <div class="stat-mini-title"><i class="fas fa-map-marker-alt"></i> Top 5 villes</div>
+              <div class="stat-mini-rows">
+                <div class="stat-mini-row" *ngFor="let v of getTopVilles()">
+                  <span>{{ v.ville }}</span>
+                  <span class="stat-mini-val blue">{{ v.count }}</span>
+                </div>
+              </div>
+            </div>
+            <!-- Ancien participant -->
+            <div class="stat-mini-card">
+              <div class="stat-mini-title"><i class="fas fa-history"></i> Ancien participant</div>
+              <div class="stat-mini-rows">
+                <div class="stat-mini-row"><span>Oui</span><span class="stat-mini-val green">{{ getStatCount('ancien_participant','Oui') }}</span></div>
+                <div class="stat-mini-row"><span>Non</span><span class="stat-mini-val blue">{{ getStatCount('ancien_participant','Non') }}</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="data-card">
+            <div class="data-card-header">
+              <h3>{{ filteredInscrits.length }} inscrit(s)</h3>
+            </div>
+            <div class="table-wrap">
+              <table class="af-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Tél / WhatsApp</th>
+                    <th>Module</th>
+                    <th>Ville</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let i of filteredInscrits; let idx = index">
+                    <td class="text-muted">{{ idx + 1 }}</td>
+                    <td><strong>{{ i.nom }}</strong></td>
+                    <td class="text-muted">{{ i.email }}</td>
+                    <td>
+                      <div class="phone-cell">
+                        <span>{{ i.telephone }}</span>
+                        <a *ngIf="i.whatsapp || i.telephone" [href]="getWhatsappLink(i.whatsapp || i.telephone)" target="_blank" class="wa-link" title="Envoyer un message WhatsApp">
+                          <i class="fab fa-whatsapp"></i>
+                        </a>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="module-tag" [style.background]="getModuleColor(i.module) + '20'" [style.color]="getModuleColor(i.module)">
+                        {{ getModuleLabel(i.module) }}
+                      </span>
+                    </td>
+                    <td>{{ i.ville }}</td>
+                    <td>{{ i.statut }}</td>
+                    <td class="text-muted date-cell">{{ formatDate(i.date_inscription) }}</td>
+                  </tr>
+                  <tr *ngIf="filteredInscrits.length === 0">
+                    <td colspan="8" class="empty-row">Aucun inscrit trouvé</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════
+           PENC'BOOST — PRÉSENCES
+      ══════════════════════════════════════════════════════════ -->
+      <div class="af-section" *ngIf="section === 'pencboost-presences'">
+        <div class="page-header">
+          <h1><i class="fas fa-clipboard-check"></i> Présences Penc'Boost</h1>
+          <div class="header-actions">
+            <button class="btn-export" (click)="exportCSV('presences', pbModuleFilter)">
+              <i class="fas fa-download"></i> Exporter CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="filters-bar">
+          <select [(ngModel)]="pbModuleFilter" (change)="loadPencboostPresences()">
+            <option value="">Tous les modules</option>
+            <option *ngFor="let m of modules" [value]="m.value">{{ m.label }}</option>
+          </select>
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" [(ngModel)]="pbSearch" (input)="loadPencboostPresences()" placeholder="Rechercher...">
+          </div>
+        </div>
+
+        <div class="loading-state" *ngIf="pbLoading"><i class="fas fa-spinner fa-spin"></i> Chargement...</div>
+
+        <div class="data-card" *ngIf="!pbLoading">
+          <div class="data-card-header">
+            <h3>{{ filteredPresences.length }} présence(s) enregistrée(s)</h3>
+          </div>
+          <div class="table-wrap">
+            <table class="af-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nom & Prénom</th>
+                  <th>Email</th>
+                  <th>Téléphone</th>
+                  <th>Module</th>
+                  <th>Heure</th>
+                  <th>Statut</th>
+                  <th>Observations</th>
+                  <th>Enregistré le</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let p of filteredPresences; let idx = index">
+                  <td class="text-muted">{{ idx + 1 }}</td>
+                  <td><strong>{{ p.nom_prenom }}</strong></td>
+                  <td class="text-muted">{{ p.email }}</td>
+                  <td>{{ p.telephone }}</td>
+                  <td>
+                    <span class="module-tag" [style.background]="getModuleColor(p.module) + '20'" [style.color]="getModuleColor(p.module)">
+                      {{ getModuleLabel(p.module) }}
+                    </span>
+                  </td>
+                  <td><strong>{{ p.heure_arrivee }}</strong></td>
+                  <td>
+                    <span class="statut-badge" [class.present]="p.statut_presence === 'present'" [class.retard]="p.statut_presence === 'retard'">
+                      <i class="fas" [class.fa-check]="p.statut_presence === 'present'" [class.fa-clock]="p.statut_presence === 'retard'"></i>
+                      {{ p.statut_presence === 'present' ? 'Présent(e)' : 'En retard' }}
+                    </span>
+                  </td>
+                  <td class="text-muted obs-cell">{{ p.observations || '—' }}</td>
+                  <td class="text-muted">{{ formatDate(p.created_at) }}</td>
+                </tr>
+                <tr *ngIf="filteredPresences.length === 0">
+                  <td colspan="9" class="empty-row">Aucune présence enregistrée</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════
+           PENC'BOOST — LIENS DE PRÉSENCE
+      ══════════════════════════════════════════════════════════ -->
+      <div class="af-section" *ngIf="section === 'pencboost-liens'">
+        <div class="page-header">
+          <h1><i class="fas fa-link"></i> Liens de présence</h1>
+          <p class="page-sub">Partagez le lien correspondant à chaque session via WhatsApp ou email.</p>
+        </div>
+
+        <div class="liens-grid">
+          <div class="lien-card" *ngFor="let m of modules">
+            <div class="lien-card-header" [style.background]="m.color">
+              <i class="fas" [ngClass]="m.icon"></i>
+              <div>
+                <strong>{{ m.label }}</strong>
+                <span>{{ m.date }}</span>
+              </div>
+            </div>
+            <div class="lien-card-body">
+              <div class="lien-url">
+                <code>{{ getLienPresence(m.value) }}</code>
+              </div>
+              <div class="lien-actions">
+                <button class="btn-copy" (click)="copierLien(m.value)">
+                  <i class="fas fa-copy"></i> Copier
+                </button>
+                <a [href]="'https://wa.me/?text=' + encodeURIComponent('📋 Formulaire de présence – ' + m.label + ' (Penc\'Boost 2026)\n\n' + getLienPresence(m.value))"
+                   target="_blank" class="btn-whatsapp">
+                  <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+                <a [href]="getLienPresence(m.value)" target="_blank" class="btn-preview">
+                  <i class="fas fa-eye"></i> Aperçu
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════
+           PENC'BOOST — RAPPORT
+      ══════════════════════════════════════════════════════════ -->
+      <div class="af-section" *ngIf="section === 'pencboost-rapport'">
+        <div class="page-header">
+          <h1><i class="fas fa-file-alt"></i> Rapport Penc'Boost 2026</h1>
+          <button class="btn-refresh" (click)="setSection('pencboost-rapport')">
+            <i class="fas fa-sync-alt"></i> Actualiser
+          </button>
+        </div>
+
+        <div class="loading-state" *ngIf="pbLoading"><i class="fas fa-spinner fa-spin"></i> Chargement...</div>
+
+        <ng-container *ngIf="!pbLoading">
+
+          <!-- KPIs globaux -->
+          <div class="kpi-grid">
+            <div class="kpi-card blue">
+              <div class="kpi-icon"><i class="fas fa-users"></i></div>
+              <div class="kpi-data">
+                <span class="kpi-value">{{ pbInscrits.length }}</span>
+                <span class="kpi-label">Total inscrits</span>
+              </div>
+            </div>
+            <div class="kpi-card green">
+              <div class="kpi-icon"><i class="fas fa-clipboard-check"></i></div>
+              <div class="kpi-data">
+                <span class="kpi-value">{{ pbStats?.total_presences || 0 }}</span>
+                <span class="kpi-label">Présences enregistrées</span>
+              </div>
+            </div>
+            <div class="kpi-card orange">
+              <div class="kpi-icon"><i class="fas fa-percent"></i></div>
+              <div class="kpi-data">
+                <span class="kpi-value">{{ getTauxGlobal() }}%</span>
+                <span class="kpi-label">Taux de présence global</span>
+              </div>
+            </div>
+            <div class="kpi-card purple">
+              <div class="kpi-icon"><i class="fas fa-venus-mars"></i></div>
+              <div class="kpi-data">
+                <span class="kpi-value">{{ getStatCount('sexe','Homme') }} H / {{ getStatCount('sexe','Femme') }} F</span>
+                <span class="kpi-label">Répartition genre</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ligne 1 : Par module + Par sexe -->
+          <div class="rapport-grid-2">
+
+            <!-- Par module -->
+            <div class="data-card">
+              <div class="data-card-header"><h3><i class="fas fa-layer-group"></i> Inscrits & présences par module</h3></div>
+              <div class="table-wrap">
+                <table class="af-table">
+                  <thead><tr><th>Module</th><th>Inscrits</th><th>Présences</th><th>Taux</th><th>Progression</th></tr></thead>
+                  <tbody>
+                    <tr *ngFor="let r of getModuleInscritsRapport()">
+                      <td>
+                        <div class="module-cell">
+                          <span class="module-dot" [style.background]="r.module.color"></span>
+                          <span>{{ r.module.label }}</span>
+                        </div>
+                      </td>
+                      <td><strong>{{ r.inscrits }}</strong></td>
+                      <td><strong>{{ r.presences }}</strong></td>
+                      <td>
+                        <span class="taux-badge" [class.taux-high]="r.taux>=70" [class.taux-mid]="r.taux>=40&&r.taux<70" [class.taux-low]="r.taux<40">
+                          {{ r.taux }}%
+                        </span>
+                      </td>
+                      <td>
+                        <div class="progress-bar-wrap">
+                          <div class="progress-bar-fill" [style.width.%]="r.taux" [style.background]="r.module.color"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Par sexe -->
+            <div class="data-card">
+              <div class="data-card-header"><h3><i class="fas fa-venus-mars"></i> Répartition par genre</h3></div>
+              <div class="rapport-stat-body">
+                <div class="rapport-stat-row" *ngFor="let s of getStatCountAll('sexe')">
+                  <span class="rapport-stat-label">{{ s.value }}</span>
+                  <div class="rapport-bar-wrap">
+                    <div class="rapport-bar-fill" [style.width.%]="getPourcentage(s.count)" style="background:#0380C2"></div>
+                  </div>
+                  <span class="rapport-stat-num">{{ s.count }} <small>({{ getPourcentage(s.count) }}%)</small></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ligne 2 : Statut + Tranche d'âge -->
+          <div class="rapport-grid-2">
+            <div class="data-card">
+              <div class="data-card-header"><h3><i class="fas fa-briefcase"></i> Statut professionnel</h3></div>
+              <div class="rapport-stat-body">
+                <div class="rapport-stat-row" *ngFor="let s of getStatCountAll('statut')">
+                  <span class="rapport-stat-label">{{ s.value }}</span>
+                  <div class="rapport-bar-wrap">
+                    <div class="rapport-bar-fill" [style.width.%]="getPourcentage(s.count)" style="background:#10B981"></div>
+                  </div>
+                  <span class="rapport-stat-num">{{ s.count }} <small>({{ getPourcentage(s.count) }}%)</small></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="data-card">
+              <div class="data-card-header"><h3><i class="fas fa-birthday-cake"></i> Tranche d'âge</h3></div>
+              <div class="rapport-stat-body">
+                <div class="rapport-stat-row" *ngFor="let s of getStatCountAll('tranche_age')">
+                  <span class="rapport-stat-label">{{ s.value }}</span>
+                  <div class="rapport-bar-wrap">
+                    <div class="rapport-bar-fill" [style.width.%]="getPourcentage(s.count)" style="background:#8B5CF6"></div>
+                  </div>
+                  <span class="rapport-stat-num">{{ s.count }} <small>({{ getPourcentage(s.count) }}%)</small></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ligne 3 : Diplôme + Source -->
+          <div class="rapport-grid-2">
+            <div class="data-card">
+              <div class="data-card-header"><h3><i class="fas fa-graduation-cap"></i> Niveau de diplôme</h3></div>
+              <div class="rapport-stat-body">
+                <div class="rapport-stat-row" *ngFor="let s of getStatCountAll('diplome')">
+                  <span class="rapport-stat-label">{{ s.value }}</span>
+                  <div class="rapport-bar-wrap">
+                    <div class="rapport-bar-fill" [style.width.%]="getPourcentage(s.count)" style="background:#F59E0B"></div>
+                  </div>
+                  <span class="rapport-stat-num">{{ s.count }} <small>({{ getPourcentage(s.count) }}%)</small></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="data-card">
+              <div class="data-card-header"><h3><i class="fas fa-bullhorn"></i> Source de découverte</h3></div>
+              <div class="rapport-stat-body">
+                <div class="rapport-stat-row" *ngFor="let s of getStatCountAll('source')">
+                  <span class="rapport-stat-label">{{ s.value }}</span>
+                  <div class="rapport-bar-wrap">
+                    <div class="rapport-bar-fill" [style.width.%]="getPourcentage(s.count)" style="background:#EF4444"></div>
+                  </div>
+                  <span class="rapport-stat-num">{{ s.count }} <small>({{ getPourcentage(s.count) }}%)</small></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ligne 4 : Villes + Ancien participant -->
+          <div class="rapport-grid-2">
+            <div class="data-card">
+              <div class="data-card-header"><h3><i class="fas fa-map-marker-alt"></i> Répartition géographique</h3></div>
+              <div class="rapport-stat-body">
+                <div class="rapport-stat-row" *ngFor="let v of getTopVillesAll()">
+                  <span class="rapport-stat-label">{{ v.ville }}</span>
+                  <div class="rapport-bar-wrap">
+                    <div class="rapport-bar-fill" [style.width.%]="getPourcentage(v.count)" style="background:#06B6D4"></div>
+                  </div>
+                  <span class="rapport-stat-num">{{ v.count }} <small>({{ getPourcentage(v.count) }}%)</small></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="data-card">
+              <div class="data-card-header"><h3><i class="fas fa-history"></i> Fidélité & Newsletter</h3></div>
+              <div class="rapport-stat-body">
+                <div class="rapport-stat-label" style="font-weight:700;margin-bottom:0.5rem;font-size:0.8rem;color:#888">ANCIEN PARTICIPANT</div>
+                <div class="rapport-stat-row" *ngFor="let s of getStatCountAll('ancien_participant')">
+                  <span class="rapport-stat-label">{{ s.value }}</span>
+                  <div class="rapport-bar-wrap">
+                    <div class="rapport-bar-fill" [style.width.%]="getPourcentage(s.count)" style="background:#FF7F1A"></div>
+                  </div>
+                  <span class="rapport-stat-num">{{ s.count }} <small>({{ getPourcentage(s.count) }}%)</small></span>
+                </div>
+                <div class="rapport-stat-label" style="font-weight:700;margin:1rem 0 0.5rem;font-size:0.8rem;color:#888">NEWSLETTER</div>
+                <div class="rapport-stat-row" *ngFor="let s of getStatCountAll('newsletter')">
+                  <span class="rapport-stat-label">{{ s.value }}</span>
+                  <div class="rapport-bar-wrap">
+                    <div class="rapport-bar-fill" [style.width.%]="getPourcentage(s.count)" style="background:#10B981"></div>
+                  </div>
+                  <span class="rapport-stat-num">{{ s.count }} <small>({{ getPourcentage(s.count) }}%)</small></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </ng-container>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════
+           INFOGRAPHIE — TABLEAU DE BORD
+      ══════════════════════════════════════════════════════════ -->
+      <div class="af-section" *ngIf="section === 'infographie-stats'">
+        <div class="page-header">
+          <h1><i class="fas fa-palette"></i> Formation Infographie · Cohorte 3</h1>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card blue">
+            <div class="kpi-icon"><i class="fas fa-users"></i></div>
+            <div class="kpi-data">
+              <span class="kpi-value">{{ infInscrits.length }}</span>
+              <span class="kpi-label">Inscrits</span>
+            </div>
+          </div>
+          <div class="kpi-card green">
+            <div class="kpi-icon"><i class="fas fa-laptop"></i></div>
+            <div class="kpi-data">
+              <span class="kpi-value">En ligne</span>
+              <span class="kpi-label">Format</span>
+            </div>
+          </div>
+          <div class="kpi-card orange">
+            <div class="kpi-icon"><i class="fas fa-calendar"></i></div>
+            <div class="kpi-data">
+              <span class="kpi-value">15 juin</span>
+              <span class="kpi-label">Démarrage</span>
+            </div>
+          </div>
+          <div class="kpi-card purple">
+            <div class="kpi-icon"><i class="fas fa-money-bill"></i></div>
+            <div class="kpi-data">
+              <span class="kpi-value">25 000 F</span>
+              <span class="kpi-label">Tarif</span>
+            </div>
+          </div>
+        </div>
+        <div class="info-banner">
+          <i class="fas fa-info-circle"></i>
+          Consultez la section <strong>Inscriptions</strong> pour voir la liste complète des inscrits à la formation infographie.
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════
+           PARAMÈTRES — CHANGEMENT MOT DE PASSE
+      ══════════════════════════════════════════════════════════ -->
+      <div class="af-section" *ngIf="section === 'parametres'">
+        <div class="page-header">
+          <h1><i class="fas fa-cog"></i> Paramètres</h1>
+        </div>
+
+        <div class="settings-grid">
+
+          <!-- Changer mot de passe -->
+          <div class="data-card settings-card">
+            <div class="data-card-header">
+              <h3><i class="fas fa-lock"></i> Changer le mot de passe</h3>
+            </div>
+            <div class="settings-body">
+              <div class="pw-error" *ngIf="pwError">
+                <i class="fas fa-exclamation-circle"></i> {{ pwError }}
+              </div>
+              <div class="pw-success" *ngIf="pwSuccess">
+                <i class="fas fa-check-circle"></i> {{ pwSuccess }}
+              </div>
+              <div class="field">
+                <label>Mot de passe actuel</label>
+                <input type="password" [(ngModel)]="pwForm.current" placeholder="••••••••">
+              </div>
+              <div class="field">
+                <label>Nouveau mot de passe</label>
+                <input type="password" [(ngModel)]="pwForm.newPw" placeholder="Min. 8 caractères">
+              </div>
+              <div class="field">
+                <label>Confirmer le nouveau mot de passe</label>
+                <input type="password" [(ngModel)]="pwForm.confirm" placeholder="Répétez le mot de passe">
+              </div>
+              <button class="btn-save-pw" (click)="changerMotDePasse()">
+                <i class="fas fa-save"></i> Enregistrer le nouveau mot de passe
+              </button>
+            </div>
+          </div>
+
+          <!-- Liens présence rapide -->
+          <div class="data-card settings-card">
+            <div class="data-card-header">
+              <h3><i class="fas fa-link"></i> Accès rapide aux formulaires de présence</h3>
+            </div>
+            <div class="settings-body">
+              <p class="settings-hint">Cliquez sur un module pour ouvrir son formulaire de présence dans un nouvel onglet.</p>
+              <div class="quick-links">
+                <a *ngFor="let m of modules" [href]="getLienPresence(m.value)" target="_blank" class="quick-link-item" [style.border-left-color]="m.color">
+                  <i class="fas" [ngClass]="m.icon" [style.color]="m.color"></i>
+                  <div>
+                    <strong>{{ m.label }}</strong>
+                    <span>{{ m.date }}</span>
+                  </div>
+                  <i class="fas fa-external-link-alt ext-icon"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════
+           INFOGRAPHIE — INSCRIPTIONS
+      ══════════════════════════════════════════════════════════ -->
+      <div class="af-section" *ngIf="section === 'infographie-inscrits'">
+        <div class="page-header">
+          <h1><i class="fas fa-users"></i> Inscriptions Infographie</h1>
+        </div>
+        <div class="loading-state" *ngIf="infLoading"><i class="fas fa-spinner fa-spin"></i> Chargement...</div>
+        <div class="data-card" *ngIf="!infLoading">
+          <div class="data-card-header">
+            <h3>{{ infInscrits.length }} inscrit(s)</h3>
+          </div>
+          <div class="table-wrap">
+            <table class="af-table">
+              <thead>
+                <tr>
+                  <th>#</th><th>Prénom</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Format</th><th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let i of infInscrits; let idx = index">
+                  <td class="text-muted">{{ idx + 1 }}</td>
+                  <td>{{ i.firstName || i.prenom }}</td>
+                  <td><strong>{{ i.lastName || i.nom }}</strong></td>
+                  <td class="text-muted">{{ i.email }}</td>
+                  <td>{{ i.phone || i.telephone }}</td>
+                  <td>{{ i.format || 'En ligne' }}</td>
+                  <td class="text-muted">{{ formatDate(i.created_at || i.date_inscription || i.date) }}</td>
+                </tr>
+                <tr *ngIf="infInscrits.length === 0">
+                  <td colspan="7" class="empty-row">Aucun inscrit trouvé</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ── Toast ── -->
+  <div class="af-toast" [class.show]="showToast" [class.success]="toastType === 'success'" [class.error]="toastType === 'error'">
+    <i class="fas" [class.fa-check-circle]="toastType === 'success'" [class.fa-exclamation-circle]="toastType === 'error'"></i>
+    {{ toastMsg }}
+  </div>
+
+</div>

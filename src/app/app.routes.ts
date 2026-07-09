@@ -39,6 +39,8 @@ import { ChangePasswordComponent } from './pages/change-password/change-password
 import { ChatSupportComponent } from './pages/chat-support/chat-support.component';
 import { AdminChatComponent } from './pages/admin-chat/admin-chat.component';
 import { VerifyCertificateComponent } from './pages/verify-certificate/verify-certificate.component';
+import { PresencePencboostComponent } from './pages/presence-pencboost/presence-pencboost.component';
+import { AdminFormationsComponent } from './pages/admin-formations/admin-formations.component';
 
 export const routes: Routes = [
   { path: '', component: AccueilComponent },
@@ -99,6 +101,12 @@ export const routes: Routes = [
   
   // Route de vérification de certificats
   { path: 'verify', component: VerifyCertificateComponent },
+
+  // Formulaire de présence Penc'Boost (lien public par module)
+  { path: 'presence/:module', component: PresencePencboostComponent },
+
+  // Interface admin formations (Penc'Boost + Infographie)
+  { path: 'admin-formations', component: AdminFormationsComponent },
   
   // Routes de récupération de mot de passe
   { path: 'forgot-password', component: ChangePasswordComponent },

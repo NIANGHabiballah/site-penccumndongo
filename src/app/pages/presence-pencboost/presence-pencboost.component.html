@@ -1,0 +1,169 @@
+<div class="presence-page">
+
+  <!-- Module invalide -->
+  <div class="invalid-module" *ngIf="!moduleValide">
+    <div class="invalid-card">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h2>Lien invalide</h2>
+      <p>Ce lien de présence ne correspond à aucun module Penc'Boost. Contactez l'organisateur.</p>
+    </div>
+  </div>
+
+  <!-- Formulaire -->
+  <div class="presence-wrapper" *ngIf="moduleValide">
+
+    <!-- Header -->
+    <div class="presence-header">
+      <div class="header-logo">
+        <img src="penccboost.png" alt="Penc'Boost" class="logo-img" />
+      </div>
+      <div class="module-badge">
+        <i class="fas" [ngClass]="moduleIcon"></i>
+        <span>{{ moduleLabel }}</span>
+      </div>
+      <h1>Feuille de Présence</h1>
+      <p class="module-date">
+        <i class="fas fa-calendar-alt"></i> {{ moduleDate }}
+      </p>
+      <p class="header-notice">
+        Merci de remplir ce formulaire <strong>dès le début de la session</strong>.<br>
+        Votre présence est indispensable pour l'obtention de votre attestation.
+      </p>
+    </div>
+
+    <!-- Succès -->
+    <div class="success-card" *ngIf="successMsg">
+      <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+      <h3>Présence enregistrée !</h3>
+      <p>{{ successMsg }}</p>
+      <p class="success-sub">Bonne session et bon apprentissage 🎓</p>
+    </div>
+
+    <!-- Formulaire -->
+    <form [formGroup]="form" (ngSubmit)="submit()" class="presence-form" *ngIf="!successMsg">
+
+<!-- Section 1 : Identité -->
+      <div class="form-section">
+        <div class="section-title">
+          <span class="num">1</span> Informations personnelles
+        </div>
+
+        <div class="field">
+          <label>Nom & Prénom <span class="req">*</span></label>
+          <input formControlName="nom_prenom" type="text" placeholder="Ex : Fatou Diallo">
+          <div class="field-error" *ngIf="form.get('nom_prenom')?.invalid && form.get('nom_prenom')?.touched">
+            Nom et prénom requis (min. 3 caractères).
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Adresse email <span class="req">*</span></label>
+            <input formControlName="email" type="email" placeholder="votre@email.com">
+            <div class="field-error" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+              Email valide requis.
+            </div>
+          </div>
+          <div class="field">
+            <label>Téléphone / WhatsApp <span class="req">*</span></label>
+            <input formControlName="telephone" type="tel" placeholder="+221 77 000 00 00">
+            <div class="field-error" *ngIf="form.get('telephone')?.invalid && form.get('telephone')?.touched">
+              Numéro requis.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2 : Présence -->
+      <div class="form-section">
+        <div class="section-title">
+          <span class="num">2</span> Détails de présence
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Heure d'arrivée <span class="req">*</span></label>
+            <div class="heure-input-group">
+              <input formControlName="heure_arrivee" type="time">
+              <button type="button" class="btn-now" (click)="remplirHeure()" title="Heure actuelle">
+                <i class="fas fa-clock"></i> Maintenant
+              </button>
+            </div>
+            <div class="field-error" *ngIf="form.get('heure_arrivee')?.invalid && form.get('heure_arrivee')?.touched">
+              Heure d'arrivée requise.
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Statut de présence <span class="req">*</span></label>
+            <div class="statut-group">
+              <label class="statut-option" [class.active]="form.get('statut_presence')?.value === 'present'">
+                <input type="radio" formControlName="statut_presence" value="present">
+                <i class="fas fa-check-circle"></i> Présent(e)
+              </label>
+              <label class="statut-option retard" [class.active]="form.get('statut_presence')?.value === 'retard'">
+                <input type="radio" formControlName="statut_presence" value="retard">
+                <i class="fas fa-clock"></i> En retard
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3 : Appréciation -->
+      <div class="form-section">
+        <div class="section-title">
+          <span class="num">3</span> Votre appréciation
+        </div>
+
+        <div class="field">
+          <label>Note globale de la session <span class="optional">(facultatif)</span></label>
+          <div class="stars-group">
+            <button type="button" class="star-btn" *ngFor="let s of [1,2,3,4,5]"
+              [class.active]="form.get('note')?.value >= s"
+              (click)="form.get('note')?.setValue(s)">
+              <i class="fas fa-star"></i>
+            </button>
+            <span class="star-label" *ngIf="form.get('note')?.value">
+              {{ ['','Insuffisant','Passable','Bien','Très bien','Excellent !'][form.get('note')?.value] }}
+            </span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Témoignage / Commentaire <span class="optional">(facultatif)</span></label>
+          <textarea formControlName="observations" rows="3"
+            placeholder="Qu'avez-vous apprécié dans cette session ? Qu'est-ce qui vous a le plus marqué ?"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Suggestions d'amélioration <span class="optional">(facultatif)</span></label>
+          <textarea formControlName="suggestions" rows="2"
+            placeholder="Des idées pour améliorer les prochaines sessions ?"></textarea>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="error-submit" *ngIf="errorMsg" id="error-submit">
+        <i class="fas fa-exclamation-circle"></i> {{ errorMsg }}
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="loading">
+        <span *ngIf="!loading"><i class="fas fa-paper-plane"></i> Enregistrer ma présence</span>
+        <span *ngIf="loading"><i class="fas fa-spinner fa-spin"></i> Enregistrement...</span>
+      </button>
+
+      <p class="privacy-note">
+        <i class="fas fa-lock"></i>
+        Vos données sont utilisées uniquement dans le cadre du programme Penc'Boost.
+      </p>
+    </form>
+
+    <!-- Footer -->
+    <div class="presence-footer">
+      <img src="logo.png" alt="Penccum Ndongo" class="footer-logo" onerror="this.style.display='none'">
+      <span>© Penccum Ndongo · Penc'Boost 2026</span>
+    </div>
+
+  </div>
+</div>

@@ -22,7 +22,7 @@ export class AppComponent implements OnInit {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
-      this.isDashboardRoute = event.url.includes('dashboard') || event.url.includes('auth');
+      this.isDashboardRoute = event.url.includes('dashboard') || event.url.includes('auth') || event.url.includes('admin-formations') || event.url.includes('presence/');
       this.updateCanonicalUrl(event.url);
     });
   }
