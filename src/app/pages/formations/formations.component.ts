@@ -102,14 +102,66 @@ export class FormationsComponent implements OnInit {
   modulesList = [
     { value: 'leadership', label: 'Leadership & Développement Personnel', date: 'Lundi 20 juillet · 18h–20h', inscrits: 0, total: 100, complet: false },
     { value: 'design', label: 'Design Graphique', date: 'Mardi 21 juillet · 18h–20h', inscrits: 0, total: 100, complet: false },
-    { value: 'numerique-ia', label: 'Compétences Numériques & IA', date: 'Mercredi 22 juillet · 18h–20h', inscrits: 0, total: 100, complet: false },
-    { value: 'marketing', label: 'Marketing Digital', date: 'Jeudi 23 juillet · 18h–20h', inscrits: 0, total: 100, complet: false },
+    { value: 'marketing', label: 'Marketing Digital', date: 'Mercredi 22 juillet · 20h–22h', inscrits: 0, total: 100, complet: false },
+    { value: 'numerique-ia', label: 'Compétences Numériques & IA', date: 'Jeudi 23 juillet · 18h–20h', inscrits: 0, total: 100, complet: false },
     { value: 'employabilite', label: 'Employabilité, Entrepreneuriat & Insertion Professionnelle', date: 'Vendredi 24 juillet · 16h–18h', inscrits: 0, total: 100, complet: false },
     { value: 'bureautique', label: 'Initiation à la Bureautique & Informatique', date: 'Samedi 25 juillet · 10h–12h', inscrits: 0, total: 100, complet: false },
     { value: 'poesie', label: 'Poésie & Arts Visuels', date: 'Dimanche 26 juillet · 10h–12h', inscrits: 0, total: 100, complet: false },
   ];
 
-constructor(private fb: FormBuilder, private http: HttpClient) {
+  posters = [
+    { src: 'pencboost2026Post1.jpg', alt: 'Penc’Boost 2026 - Affiche 1' },
+    { src: 'pencboost2026Post2.jpg', alt: 'Penc’Boost 2026 - Affiche 2' },
+    { src: 'pencboost2026Post3.jpg', alt: 'Penc’Boost 2026 - Affiche 3' },
+  ];
+
+  activeSlide = 0;
+  private slideInterval: any;
+  lightboxOpen = false;
+  lightboxIndex = 0;
+
+  startAutoSlide() {
+    this.slideInterval = setInterval(() => this.nextSlide(), 3500);
+  }
+
+  stopAutoSlide() {
+    clearInterval(this.slideInterval);
+  }
+
+  nextSlide() {
+    this.activeSlide = (this.activeSlide + 1) % this.posters.length;
+  }
+
+  prevSlide() {
+    this.activeSlide = (this.activeSlide - 1 + this.posters.length) % this.posters.length;
+  }
+
+  goToSlide(i: number) {
+    this.activeSlide = i;
+  }
+
+  openLightbox(i: number) {
+    this.lightboxIndex = i;
+    this.lightboxOpen = true;
+    this.stopAutoSlide();
+  }
+
+  closeLightbox() {
+    this.lightboxOpen = false;
+    this.startAutoSlide();
+  }
+
+  lightboxNext(e: Event) {
+    e.stopPropagation();
+    this.lightboxIndex = (this.lightboxIndex + 1) % this.posters.length;
+  }
+
+  lightboxPrev(e: Event) {
+    e.stopPropagation();
+    this.lightboxIndex = (this.lightboxIndex - 1 + this.posters.length) % this.posters.length;
+  }
+
+  constructor(private fb: FormBuilder, private http: HttpClient) {
     this.inscriptionForm = this.fb.group({
       // Section 1
       module: ['', Validators.required],
@@ -142,6 +194,7 @@ constructor(private fb: FormBuilder, private http: HttpClient) {
   ngOnInit() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     this.loadPlaces();
+    this.startAutoSlide();
   }
 
   loadPlaces() {

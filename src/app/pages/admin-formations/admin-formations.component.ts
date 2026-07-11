@@ -310,6 +310,22 @@ export class AdminFormationsComponent implements OnInit {
     this.pwForm = { current: '', newPw: '', confirm: '' };
   }
 
+  supprimerPresence(id: number) {
+    if (!confirm('Supprimer cette présence ? Cette action est irréversible.')) return;
+    this.http.delete<any>(`${this.BASE}/presence-pencboost.php?admin_key=${this.ADMIN_KEY}&id=${id}`)
+      .subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.pbPresences = this.pbPresences.filter(p => p.id !== id);
+            this.toast('Présence supprimée', 'success');
+          } else {
+            this.toast(res.message || 'Erreur suppression', 'error');
+          }
+        },
+        error: () => this.toast('Erreur suppression', 'error')
+      });
+  }
+
   toast(msg: string, type: 'success' | 'error') {
     this.toastMsg = msg;
     this.toastType = type;

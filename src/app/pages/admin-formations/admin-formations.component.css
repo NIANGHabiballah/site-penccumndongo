@@ -531,6 +531,21 @@
 }
 .btn-copy    { background: #f0f4f8; color: #555; }
 .btn-copy:hover { background: #e2e8f0; }
+.btn-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+.btn-delete:hover { background: #dc2626; color: white; }
 .btn-whatsapp { background: #25D366; color: white; }
 .btn-whatsapp:hover { background: #1da851; }
 .btn-preview  { background: #0380C2; color: white; }

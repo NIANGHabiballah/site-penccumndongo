@@ -426,6 +426,7 @@
                   <th>Statut</th>
                   <th>Observations</th>
                   <th>Enregistré le</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -448,9 +449,11 @@
                   </td>
                   <td class="text-muted obs-cell">{{ p.observations || '—' }}</td>
                   <td class="text-muted">{{ formatDate(p.created_at) }}</td>
-                </tr>
-                <tr *ngIf="filteredPresences.length === 0">
-                  <td colspan="9" class="empty-row">Aucune présence enregistrée</td>
+                  <td>
+                    <button class="btn-delete" (click)="supprimerPresence(p.id)" title="Supprimer">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
                 </tr>
               </tbody>
             </table>

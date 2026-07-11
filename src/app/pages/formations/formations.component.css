@@ -1908,3 +1908,203 @@ body .hero-section {
     flex-shrink: 0 !important;
   }
 }
+
+/* ===== GALERIE AFFICHES ===== */
+.galerie-section {
+  padding: 6rem 0 4rem;
+  background: var(--dark-blue);
+  overflow: hidden;
+}
+
+.galerie-section .section-title {
+  color: var(--white) !important;
+}
+
+.galerie-section .section-title::after {
+  background: var(--primary-orange) !important;
+}
+
+.galerie-section .section-subtitle {
+  color: rgba(255,255,255,0.6);
+}
+
+.galerie-carousel {
+  position: relative;
+  max-width: 700px;
+  margin: 0 auto;
+  overflow: hidden;
+  padding-bottom: 3.5rem;
+}
+
+.galerie-track {
+  display: flex;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.galerie-slide {
+  min-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.galerie-img {
+  width: 100%;
+  max-width: 660px;
+  height: auto;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  cursor: zoom-in;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: block;
+}
+
+.galerie-img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+}
+
+.galerie-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-60%);
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  z-index: 10;
+  font-size: 0.9rem;
+}
+
+.galerie-btn:hover {
+  background: var(--primary-orange);
+  border-color: var(--primary-orange);
+  transform: translateY(-60%) scale(1.1);
+}
+
+.galerie-btn.prev { left: 8px; }
+.galerie-btn.next { right: 8px; }
+
+.galerie-dots {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.galerie-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.galerie-dot.active {
+  background: var(--primary-orange);
+  width: 24px;
+  border-radius: 4px;
+}
+
+/* ===== LIGHTBOX ===== */
+.lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.95);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 90vh;
+  border-radius: 12px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+  animation: zoomIn 0.25s ease;
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.lightbox-close {
+  position: fixed;
+  top: 20px;
+  right: 25px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  font-size: 1.8rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.lightbox-close:hover {
+  background: var(--primary-orange);
+  border-color: var(--primary-orange);
+}
+
+.lightbox-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.lightbox-nav:hover {
+  background: var(--primary-orange);
+  border-color: var(--primary-orange);
+}
+
+.lightbox-nav.prev { left: 20px; }
+.lightbox-nav.next { right: 20px; }
+
+@media (max-width: 768px) {
+  .galerie-carousel { max-width: 100%; }
+  .galerie-img { max-width: 100%; }
+  .galerie-btn.prev { left: 4px; }
+  .galerie-btn.next { right: 4px; }
+  .lightbox-nav.prev { left: 8px; }
+  .lightbox-nav.next { right: 8px; }
+  .lightbox-img { max-width: 95vw; max-height: 80vh; }
+}

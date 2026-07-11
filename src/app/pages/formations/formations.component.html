@@ -124,15 +124,35 @@
           </ul>
         </div>
 
+        <!-- Module 4 -->
+        <div class="axe-card">
+          <div class="module-meta">
+            <span class="module-day">Mercredi 22 juillet · 20h–22h</span>
+          </div>
+          <div class="axe-icon">
+            <i class="fas fa-bullhorn"></i>
+          </div>
+          <h3>Module 3 – Marketing Digital</h3>
+          <p class="coach-info">M. Omar NDIAYE<br><span class="coach-desc">Directeur de BEBA EMPIRE · Coach & formateur en marketing digital, conférencier</span></p>
+          <ul class="axe-topics">
+            <li>Fondamentaux du marketing digital</li>
+            <li>SEO : référencement naturel, mots-clés</li>
+            <li>Réseaux sociaux : stratégie de contenu, community management</li>
+            <li>Google Ads et Meta Ads (Facebook/Instagram)</li>
+            <li>Analytics : Google Analytics, statistiques réseaux</li>
+            <li>Mini-campagne pratique en fin de module</li>
+          </ul>
+        </div>
+
         <!-- Module 3 -->
         <div class="axe-card">
           <div class="module-meta">
-            <span class="module-day">Mercredi 22 juillet · 18h–20h</span>
+            <span class="module-day">Jeudi 23 juillet · 18h–20h</span>
           </div>
           <div class="axe-icon">
             <i class="fas fa-robot"></i>
           </div>
-          <h3>Module 3 – Compétences Numériques & Intelligence Artificielle</h3>
+          <h3>Module 4 – Compétences Numériques & Intelligence Artificielle</h3>
           <p class="coach-info">Serigne Fallou NDIAYE<br><span class="coach-desc">Lead developer chez Baamtu Technologies, Consultant IT</span></p>
           <ul class="axe-topics">
             <li>Sécurité numérique et cybersécurité de base</li>
@@ -140,27 +160,6 @@
             <li>Éthique de l'IA : biais, vie privée, usage responsable</li>
             <li>Panorama des outils IA (chatbots, génération texte/image)</li>
             <li>Utilisation pratique d'outils d'IA générative</li>
-          </ul>
-        </div>
-
-        <!-- Module 4 -->
-        <div class="axe-card">
-          <div class="module-meta">
-            <span class="module-day">Jeudi 23 juillet · 18h–20h</span>
-          </div>
-          <div class="axe-icon">
-            <i class="fas fa-bullhorn"></i>
-          </div>
-          <h3>Module 4 – Marketing Digital</h3>
-          <p class="coach-info">Mme Mary Dembele SY</p>
-          <ul class="axe-topics">
-            <li>Fondamentaux du marketing digital</li>
-            <li>SEO : référencement naturel, mots-clés</li>
-            <li>Réseaux sociaux : stratégie de contenu, community management</li>
-            <li>Google Ads et Meta Ads (Facebook/Instagram)</li>
-            <li>Email marketing : campagnes, segmentation</li>
-            <li>Analytics : Google Analytics, statistiques réseaux</li>
-            <li>Mini-campagne pratique en fin de module</li>
           </ul>
         </div>
 
@@ -193,7 +192,7 @@
             <i class="fas fa-desktop"></i>
           </div>
           <h3>Module 6 – Initiation à la Bureautique & Informatique</h3>
-          <p class="coach-info">M. DABO<br><span class="coach-desc">Informaticien, Coach, Fondateur de Home School</span></p>
+          <p class="coach-info">M. DABO<br><span class="coach-desc">Fondateur et CEO Home School · Formateur en informatique</span></p>
           <ul class="axe-topics">
             <li>Environnement Windows, fichiers, dossiers</li>
             <li>Word : mise en forme, tableaux, publipostage</li>
@@ -212,20 +211,54 @@
             <i class="fas fa-feather-pointed"></i>
           </div>
           <h3>Module 7 – Poésie & Arts Visuels</h3>
-          <p class="coach-info">M. Alboury LOUM<br><span class="coach-desc">Professeur en Arts Visuels à l'ENAMC</span></p>
+          <p class="coach-info">M. Alboury LOUM<br><span class="coach-desc">Professeur d'éducation artistique · Écrivain, poète & romancier</span></p>
           <ul class="axe-topics">
-            <li>Techniques d'écriture poétique et slam</li>
-            <li>Prise de parole en public (respiration, voix, articulation)</li>
-            <li>Présence scénique et gestuelle</li>
-            <li>Gestion du trac et de l'émotion sur scène</li>
-            <li>Mémorisation et interprétation</li>
-            <li>Improvisation et interaction avec le public</li>
+            <li>Fondamentaux de l'écriture poétique (rythme, image, figures de style)</li>
+            <li>Créativité artistique : cultiver et exprimer son univers personnel</li>
+            <li>Méthodologie de structuration d'une œuvre littéraire (roman ou recueil)</li>
+            <li>Du manuscrit à la publication : le parcours concret d'un auteur</li>
+            <li>Rédaction guidée d'un premier texte poétique</li>
+            <li>Préparation au Concours de Poésie Inédit & Innovant (CP2i)</li>
           </ul>
         </div>
 
       </div>
     </div>
   </section>
+
+  <!-- Galerie Affiches -->
+  <section class="galerie-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Découvrez Penc’Boost 2026</h2>
+        <p class="section-subtitle">Penc’Boost 2ème Édition · Juillet 2026</p>
+      </div>
+    </div>
+    <div class="galerie-carousel">
+      <div class="galerie-track" [style.transform]="'translateX(-' + (activeSlide * 100) + '%)'">
+        <div class="galerie-slide" *ngFor="let poster of posters; let i = index" [class.active]="activeSlide === i">
+          <img [src]="poster.src" [alt]="poster.alt" class="galerie-img" (click)="openLightbox(i)" />
+        </div>
+      </div>
+      <button class="galerie-btn prev" (click)="prevSlide()">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="galerie-btn next" (click)="nextSlide()">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+      <div class="galerie-dots">
+        <span *ngFor="let poster of posters; let i = index" class="galerie-dot" [class.active]="activeSlide === i" (click)="goToSlide(i)"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lightbox -->
+  <div class="lightbox-backdrop" *ngIf="lightboxOpen" (click)="closeLightbox()">
+    <button class="lightbox-close" (click)="closeLightbox()">&times;</button>
+    <button class="lightbox-nav prev" (click)="lightboxPrev($event)"><i class="fas fa-chevron-left"></i></button>
+    <img [src]="posters[lightboxIndex].src" [alt]="posters[lightboxIndex].alt" class="lightbox-img" (click)="$event.stopPropagation()" />
+    <button class="lightbox-nav next" (click)="lightboxNext($event)"><i class="fas fa-chevron-right"></i></button>
+  </div>
 
   <!-- Témoignages participants -->
   <section class="temoignages-section">
