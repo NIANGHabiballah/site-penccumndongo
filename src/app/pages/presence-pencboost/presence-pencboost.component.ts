@@ -23,7 +23,7 @@ export class PresencePencboostComponent implements OnInit {
 
   readonly modules: Record<string, { label: string; date: string; icon: string }> = {
     'leadership':    { label: 'Leadership & Développement Personnel', date: 'Lundi 20 juillet 2026 · 18h–20h', icon: 'fa-user-graduate' },
-    'design':        { label: 'Design Graphique',                      date: 'Mardi 21 juillet 2026 · 18h–20h', icon: 'fa-palette' },
+    'design':        { label: 'Design Graphique',                      date: 'Mardi 21 juillet 2026 · 19h–21h', icon: 'fa-palette' },
     'numerique-ia':  { label: 'Compétences Numériques & IA',           date: 'Mercredi 22 juillet 2026 · 18h–20h', icon: 'fa-robot' },
     'marketing':     { label: 'Marketing Digital',                     date: 'Jeudi 23 juillet 2026 · 18h–20h', icon: 'fa-bullhorn' },
     'employabilite': { label: 'Employabilité & Insertion Pro.',        date: 'Vendredi 24 juillet 2026 · 16h–18h', icon: 'fa-briefcase' },

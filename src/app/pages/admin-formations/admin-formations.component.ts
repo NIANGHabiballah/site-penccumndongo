@@ -60,7 +60,7 @@ export class AdminFormationsComponent implements OnInit {
 
   readonly modules = [
     { value: 'leadership',    label: 'Leadership & Développement Personnel', date: 'Lun 20 juil · 18h–20h', icon: 'fa-user-graduate',  color: '#0380C2' },
-    { value: 'design',        label: 'Design Graphique',                      date: 'Mar 21 juil · 18h–20h', icon: 'fa-palette',        color: '#8B5CF6' },
+    { value: 'design',        label: 'Design Graphique',                      date: 'Mar 21 juil · 19h–21h', icon: 'fa-palette',        color: '#8B5CF6' },
     { value: 'numerique-ia',  label: 'Compétences Numériques & IA',           date: 'Mer 22 juil · 18h–20h', icon: 'fa-robot',          color: '#06B6D4' },
     { value: 'marketing',     label: 'Marketing Digital',                     date: 'Jeu 23 juil · 18h–20h', icon: 'fa-bullhorn',       color: '#F59E0B' },
     { value: 'employabilite', label: 'Employabilité & Insertion Pro.',        date: 'Ven 24 juil · 16h–18h', icon: 'fa-briefcase',      color: '#10B981' },

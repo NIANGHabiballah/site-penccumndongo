@@ -101,7 +101,7 @@ export class FormationsComponent implements OnInit {
 
   modulesList = [
     { value: 'leadership', label: 'Leadership & Développement Personnel', date: 'Lundi 20 juillet · 18h–20h', inscrits: 0, total: 100, complet: false },
-    { value: 'design', label: 'Design Graphique', date: 'Mardi 21 juillet · 18h–20h', inscrits: 0, total: 100, complet: false },
+    { value: 'design', label: 'Design Graphique', date: 'Mardi 21 juillet · 19h–21h', inscrits: 0, total: 100, complet: false },
     { value: 'marketing', label: 'Marketing Digital', date: 'Mercredi 22 juillet · 20h–22h', inscrits: 0, total: 100, complet: false },
     { value: 'numerique-ia', label: 'Compétences Numériques & IA', date: 'Jeudi 23 juillet · 18h–20h', inscrits: 0, total: 100, complet: false },
     { value: 'employabilite', label: 'Employabilité, Entrepreneuriat & Insertion Professionnelle', date: 'Vendredi 24 juillet · 16h–18h', inscrits: 0, total: 100, complet: false },
@@ -113,12 +113,23 @@ export class FormationsComponent implements OnInit {
     { src: 'pencboost2026Post1.jpg', alt: 'Penc’Boost 2026 - Affiche 1' },
     { src: 'pencboost2026Post2.jpg', alt: 'Penc’Boost 2026 - Affiche 2' },
     { src: 'pencboost2026Post3.jpg', alt: 'Penc’Boost 2026 - Affiche 3' },
+    { src: 'pencboost2026Post4.jpg', alt: 'Module 1 – Leadership & Développement Personnel' },
+    { src: 'pencboost2026Post5.jpg', alt: 'Module 2 – Design Graphique' },
+    { src: 'pencboost2026Post6.jpg', alt: 'Module 3 – Marketing Digital' },
+    { src: 'pencboost2026Post7.jpg', alt: 'Module 4 – Compétences Numériques & IA' },
+    { src: 'pencboost2026Post8.jpg', alt: 'Module 5 – Employabilité, Entrepreneuriat & Insertion Professionnelle' },
+    { src: 'pencboost2026Post9.jpg', alt: 'Module 6 – Initiation à la Bureautique & Informatique' },
+    { src: 'pencboost2026Post10.jpg', alt: 'Module 7 – Poésie & Arts Visuels' },
   ];
 
   activeSlide = 0;
   private slideInterval: any;
   lightboxOpen = false;
   lightboxIndex = 0;
+
+  scrollToGalerie() {
+    document.getElementById('galerie-modules')?.scrollIntoView({ behavior: 'smooth' });
+  }
 
   startAutoSlide() {
     this.slideInterval = setInterval(() => this.nextSlide(), 3500);
