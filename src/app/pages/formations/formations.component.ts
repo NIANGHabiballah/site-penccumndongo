@@ -120,6 +120,7 @@ export class FormationsComponent implements OnInit {
     { src: 'pencboost2026Post8.jpg', alt: 'Module 5 – Employabilité, Entrepreneuriat & Insertion Professionnelle' },
     { src: 'pencboost2026Post9.jpg', alt: 'Module 6 – Initiation à la Bureautique & Informatique' },
     { src: 'pencboost2026Post10.jpg', alt: 'Module 7 – Poésie & Arts Visuels' },
+    { src: 'pencboost2026Post11.jpg', alt: "Penc'Boost 2026 - Clôture des inscriptions" },
   ];
 
   activeSlide = 0;
