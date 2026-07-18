@@ -57,11 +57,12 @@ try {
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
 
-    // Vérifier si l'email est déjà inscrit pour ce module
-    $check = $pdo->prepare("SELECT id FROM inscriptions_pencboost WHERE email = ? AND module = ?");
-    $check->execute([$email, $module]);
-    if ($check->fetch()) {
-        echo json_encode(['success' => false, 'message' => 'Vous êtes déjà inscrit(e) à ce module avec cet email.']);
+    // Vérifier si l'email est déjà inscrit (un seul module par participant)
+    $check = $pdo->prepare("SELECT id, module FROM inscriptions_pencboost WHERE email = ?");
+    $check->execute([$email]);
+    $existing = $check->fetch(PDO::FETCH_ASSOC);
+    if ($existing) {
+        echo json_encode(['success' => false, 'message' => 'Vous êtes déjà inscrit(e) au module "' . $existing['module'] . '" avec cet email. Un seul module par participant est autorisé.']);
         exit;
     }
 
@@ -81,5 +82,9 @@ try {
     echo json_encode(['success' => true, 'message' => 'Votre inscription a bien été enregistrée ! Vous recevrez les informations de connexion par email avant le début du programme.']);
 
 } catch (PDOException $e) {
-    echo json_encode(['success' => false, 'message' => 'Erreur serveur : ' . $e->getMessage()]);
+    if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+        echo json_encode(['success' => false, 'message' => 'Vous êtes déjà inscrit(e) avec cet email. Un seul module par participant est autorisé.']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Erreur serveur. Veuillez réessayer.']);
+    }
 }

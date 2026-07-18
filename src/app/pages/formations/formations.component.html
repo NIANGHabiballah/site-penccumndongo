@@ -496,10 +496,6 @@
         <p>PENC'BOOST est un programme de formations professionnelles <strong>100% gratuit</strong>, ouvert à tous. Places limitées — inscrivez-vous rapidement pour garantir votre place. Vos données personnelles restent <strong>strictement confidentielles</strong> et ne seront utilisées qu'à des fins organisationnelles.</p>
       </div>
 
-      <div *ngIf="errorMsg" class="error-message">
-        <i class="fas fa-exclamation-triangle"></i> {{ errorMsg }}
-      </div>
-
       <!-- Barre de progression -->
       <div class="stepper">
         <div class="stepper-bar">
@@ -738,9 +734,14 @@
           <button type="button" class="btn-next" *ngIf="currentStep < totalSteps" (click)="nextStep()">
             Suivant <i class="fas fa-arrow-right"></i>
           </button>
-          <button type="submit" class="submit-btn" *ngIf="currentStep === totalSteps" [disabled]="inscriptionForm.invalid">
-            <i class="fas fa-paper-plane"></i> Envoyer mon inscription
-          </button>
+          <div *ngIf="currentStep === totalSteps" class="submit-wrapper">
+            <button type="submit" class="submit-btn" [disabled]="inscriptionForm.invalid">
+              <i class="fas fa-paper-plane"></i> Envoyer mon inscription
+            </button>
+            <div *ngIf="errorMsg" class="error-message">
+              <i class="fas fa-exclamation-triangle"></i> {{ errorMsg }}
+            </div>
+          </div>
         </div>
       </form>
     </div>

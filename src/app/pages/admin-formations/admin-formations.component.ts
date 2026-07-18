@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
-type Section = 'accueil' | 'pencboost-stats' | 'pencboost-inscrits' | 'pencboost-presences' | 'pencboost-liens' | 'pencboost-rapport' | 'infographie-stats' | 'infographie-inscrits' | 'parametres';
+type Section = 'accueil' | 'pencboost-stats' | 'pencboost-inscrits' | 'pencboost-presences' | 'pencboost-liens' | 'pencboost-rapport' | 'pencboost-emails' | 'infographie-stats' | 'infographie-inscrits' | 'parametres';
 
 @Component({
   selector: 'app-admin-formations',
@@ -46,6 +46,16 @@ export class AdminFormationsComponent implements OnInit {
   pwForm = { current: '', newPw: '', confirm: '' };
   pwError = '';
   pwSuccess = '';
+
+  // ── Emails ───────────────────────────────────────────────────────────────
+  emailInscrits: any[] = [];
+  emailModuleFilter = '';
+  emailSelection: Set<number> = new Set();
+  emailSujet = '';
+  emailCorps = '';
+  emailLoading = false;
+  emailSending = false;
+  emailResult: { envoyes: number; echecs: string[]; message: string } | null = null;
 
   // ── UI ──────────────────────────────────────────────────────────────────
   sidebarOpen = true;
@@ -109,6 +119,7 @@ export class AdminFormationsComponent implements OnInit {
     if (s === 'pencboost-inscrits')  this.loadPencboostInscrits();
     if (s === 'pencboost-presences') this.loadPencboostPresences();
     if (s === 'pencboost-rapport')   { this.loadPencboostStats(); this.loadPencboostInscrits(); }
+    if (s === 'pencboost-emails')    this.loadEmailInscrits();
     if (s === 'infographie-inscrits') this.loadInfographieInscrits();
   }
 
@@ -175,6 +186,66 @@ export class AdminFormationsComponent implements OnInit {
         next: (res) => { this.pbPresences = res.presences || []; this.pbLoading = false; },
         error: () => { this.pbLoading = false; this.toast('Erreur chargement présences', 'error'); }
       });
+  }
+
+  // ── Emails ───────────────────────────────────────────────────────────────
+  loadEmailInscrits() {
+    this.emailLoading = true;
+    this.emailSelection.clear();
+    const params = new URLSearchParams({ action: 'inscrits', admin_key: this.ADMIN_KEY });
+    if (this.emailModuleFilter) params.set('module', this.emailModuleFilter);
+    this.http.get<any>(`${this.BASE}/send-pencboost-email.php?${params}`)
+      .subscribe({
+        next: (res) => { this.emailInscrits = res.inscrits || []; this.emailLoading = false; },
+        error: () => { this.emailLoading = false; this.toast('Erreur chargement inscrits', 'error'); }
+      });
+  }
+
+  toggleEmailSelection(id: number) {
+    if (this.emailSelection.has(id)) this.emailSelection.delete(id);
+    else this.emailSelection.add(id);
+  }
+
+  selectAllEmails() {
+    if (this.emailSelection.size === this.emailInscrits.length) {
+      this.emailSelection.clear();
+    } else {
+      this.emailInscrits.forEach(i => this.emailSelection.add(i.id));
+    }
+  }
+
+  get emailDestinataires() {
+    return this.emailInscrits.filter(i => this.emailSelection.has(i.id));
+  }
+
+  envoyerEmails() {
+    if (!this.emailSujet.trim() || !this.emailCorps.trim()) {
+      this.toast('Sujet et message sont obligatoires', 'error'); return;
+    }
+    if (this.emailDestinataires.length === 0) {
+      this.toast('Sélectionnez au moins un destinataire', 'error'); return;
+    }
+    this.emailSending = true;
+    this.emailResult = null;
+    const payload = {
+      sujet: this.emailSujet,
+      corps: this.emailCorps,
+      destinataires: this.emailDestinataires.map(i => ({ nom: i.nom, email: i.email, module: i.module }))
+    };
+    this.http.post<any>(`${this.BASE}/send-pencboost-email.php?action=envoyer&admin_key=${this.ADMIN_KEY}`, payload)
+      .subscribe({
+        next: (res) => {
+          this.emailSending = false;
+          this.emailResult = res;
+          if (res.envoyes > 0) this.toast(`${res.envoyes} email(s) envoyé(s) !`, 'success');
+          else this.toast('Aucun email envoyé', 'error');
+        },
+        error: () => { this.emailSending = false; this.toast('Erreur envoi', 'error'); }
+      });
+  }
+
+  insertVariable(v: string) {
+    this.emailCorps += v;
   }
 
   // ── Infographie : Inscrits ────────────────────────────────────────────────
@@ -331,6 +402,43 @@ export class AdminFormationsComponent implements OnInit {
     this.toastType = type;
     this.showToast = true;
     setTimeout(() => this.showToast = false, 3500);
+  }
+
+  get echecsStr(): string {
+    return this.emailResult?.echecs?.join(', ') ?? '';
+  }
+
+  get emailResultMessage(): string {
+    return this.emailResult?.message ?? '';
+  }
+
+  private resolveVars(text: string, inscrit: any): string {
+    const modulesInfo: Record<string, { label: string; date: string }> = {
+      'leadership':    { label: 'Leadership & Développement Personnel', date: 'Lundi 20 juillet 2026 · 18h–20h' },
+      'design':        { label: 'Design Graphique',                      date: 'Mardi 21 juillet 2026 · 19h–21h' },
+      'numerique-ia':  { label: 'Compétences Numériques & IA',           date: 'Mercredi 22 juillet 2026 · 18h–20h' },
+      'marketing':     { label: 'Marketing Digital',                     date: 'Jeudi 23 juillet 2026 · 18h–20h' },
+      'employabilite': { label: 'Employabilité, Entrepreneuriat & Insertion Pro.', date: 'Vendredi 24 juillet 2026 · 16h–18h' },
+      'bureautique':   { label: 'Initiation à la Bureautique & Informatique', date: 'Samedi 25 juillet 2026 · 10h–12h' },
+      'poesie':        { label: 'Poésie & Arts Visuels',                 date: 'Dimanche 26 juillet 2026 · 10h–12h' },
+    };
+    const info = modulesInfo[inscrit.module] ?? { label: inscrit.module, date: '' };
+    return text
+      .replace(/\{nom\}/g, inscrit.nom)
+      .replace(/\{email\}/g, inscrit.email)
+      .replace(/\{module\}/g, info.label)
+      .replace(/\{date_module\}/g, info.date)
+      .replace(/\{lien_presence\}/g, 'https://penccumndongo.com/presence/' + inscrit.module);
+  }
+
+  get previewSujet(): string {
+    if (!this.emailInscrits.length) return this.emailSujet;
+    return this.resolveVars(this.emailSujet, this.emailInscrits[0]);
+  }
+
+  get previewCorps(): string {
+    if (!this.emailInscrits.length) return this.emailCorps;
+    return this.resolveVars(this.emailCorps, this.emailInscrits[0]);
   }
 
   get filteredInscrits() {

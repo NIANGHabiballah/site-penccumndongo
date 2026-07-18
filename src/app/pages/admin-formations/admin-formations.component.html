@@ -65,6 +65,9 @@
           <button class="sidebar-item" [class.active]="section === 'pencboost-rapport'" (click)="setSection('pencboost-rapport')">
             <i class="fas fa-file-alt"></i> Rapport
           </button>
+          <button class="sidebar-item" [class.active]="section === 'pencboost-emails'" (click)="setSection('pencboost-emails')">
+            <i class="fas fa-envelope"></i> Envoyer des emails
+          </button>
         </ng-container>
       </div>
 
@@ -458,6 +461,102 @@
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════
+           PENC'BOOST — EMAILS
+      ══════════════════════════════════════════════════════════ -->
+      <div class="af-section" *ngIf="section === 'pencboost-emails'">
+        <div class="page-header">
+          <h1><i class="fas fa-envelope"></i> Envoyer des emails aux inscrits</h1>
+        </div>
+
+        <div class="email-layout">
+
+          <!-- Colonne gauche : sélection destinataires -->
+          <div class="email-col-left">
+            <div class="data-card">
+              <div class="data-card-header">
+                <h3><i class="fas fa-users"></i> Destinataires</h3>
+                <span class="email-count-badge">{{ emailSelection.size }} sélectionné(s)</span>
+              </div>
+              <div class="email-filters">
+                <select [(ngModel)]="emailModuleFilter" (change)="loadEmailInscrits()">
+                  <option value="">Tous les modules</option>
+                  <option *ngFor="let m of modules" [value]="m.value">{{ m.label }}</option>
+                </select>
+                <button class="btn-select-all" (click)="selectAllEmails()">
+                  <i class="fas" [class.fa-check-square]="emailSelection.size === emailInscrits.length && emailInscrits.length > 0" [class.fa-square]="emailSelection.size !== emailInscrits.length || emailInscrits.length === 0"></i>
+                  {{ emailSelection.size === emailInscrits.length && emailInscrits.length > 0 ? 'Tout désélectionner' : 'Tout sélectionner' }}
+                </button>
+              </div>
+              <div class="loading-state" *ngIf="emailLoading"><i class="fas fa-spinner fa-spin"></i> Chargement...</div>
+              <div class="email-list" *ngIf="!emailLoading">
+                <div class="email-item" *ngFor="let i of emailInscrits" [class.selected]="emailSelection.has(i.id)" (click)="toggleEmailSelection(i.id)">
+                  <input type="checkbox" [checked]="emailSelection.has(i.id)" (click)="$event.stopPropagation()" (change)="toggleEmailSelection(i.id)">
+                  <div class="email-item-info">
+                    <strong>{{ i.nom }}</strong>
+                    <span>{{ i.email }}</span>
+                    <span class="module-tag" [style.background]="getModuleColor(i.module) + '20'" [style.color]="getModuleColor(i.module)">{{ getModuleLabel(i.module) }}</span>
+                  </div>
+                </div>
+                <div class="empty-row" *ngIf="emailInscrits.length === 0">Aucun inscrit trouvé</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Colonne droite : rédaction -->
+          <div class="email-col-right">
+            <div class="data-card">
+              <div class="data-card-header">
+                <h3><i class="fas fa-pen"></i> Rédiger le message</h3>
+              </div>
+              <div class="email-compose">
+
+                <div class="field">
+                  <label>Sujet de l'email</label>
+                  <input type="text" [(ngModel)]="emailSujet" placeholder="Ex: Informations pour votre session - Module Design Graphique">
+                </div>
+
+                <div class="field">
+                  <label>Corps du message</label>
+                  <textarea [(ngModel)]="emailCorps" rows="10" placeholder="Bonjour,
+
+Voici les informations pour votre session.
+
+Lien Google Meet : [coller ici]
+
+Cordialement,
+L'équipe Penccum Ndongo"></textarea>
+                </div>
+
+                <!-- Aperçu -->
+                <div class="email-preview" *ngIf="emailCorps && emailInscrits.length > 0">
+                  <div class="email-preview-header">
+                    <i class="fas fa-eye"></i> Aperçu — tel que reçu par <strong>{{ emailInscrits[0].nom }}</strong>
+                  </div>
+                  <div class="email-preview-sujet"><strong>Sujet :</strong> {{ previewSujet }}</div>
+                  <div class="email-preview-body">{{ previewCorps }}</div>
+                </div>
+
+                <!-- Résultat envoi -->
+                <div class="email-result success" *ngIf="emailResult && emailResult.envoyes > 0">
+                  <i class="fas fa-check-circle"></i> {{ emailResultMessage }}
+                </div>
+                <div class="email-result error" *ngIf="emailResult && emailResult.echecs.length > 0">
+                  <i class="fas fa-exclamation-circle"></i> Échecs : {{ echecsStr }}
+                </div>
+
+                <button class="btn-send-email" (click)="envoyerEmails()" [disabled]="emailSending || emailDestinataires.length === 0">
+                  <i class="fas" [class.fa-paper-plane]="!emailSending" [class.fa-spinner]="emailSending" [class.fa-spin]="emailSending"></i>
+                  {{ emailSending ? 'Envoi en cours...' : 'Envoyer \u00e0 ' + emailDestinataires.length + ' destinataire(s)' }}
+                </button>
+
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
