@@ -35,8 +35,9 @@ function sendEmailViaSMTP($to, $subject, $htmlMessage, $fromName = 'PENCCUM NDON
         return true;
         
     } catch (Exception $e) {
-        error_log("Erreur SMTP: " . $mail->ErrorInfo);
-        return false;
+        $errorDetail = $mail->ErrorInfo;
+        error_log("Erreur SMTP [{$to}]: " . $errorDetail);
+        return $errorDetail;
     }
 }
 

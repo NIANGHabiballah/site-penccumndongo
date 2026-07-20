@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
-type Section = 'accueil' | 'pencboost-stats' | 'pencboost-inscrits' | 'pencboost-presences' | 'pencboost-liens' | 'pencboost-rapport' | 'pencboost-emails' | 'infographie-stats' | 'infographie-inscrits' | 'parametres';
+type Section = 'accueil' | 'pencboost-stats' | 'pencboost-inscrits' | 'pencboost-presences' | 'pencboost-liens' | 'pencboost-rapport' | 'pencboost-emails' | 'pencboost-echecs' | 'infographie-stats' | 'infographie-inscrits' | 'parametres';
 
 @Component({
   selector: 'app-admin-formations',
@@ -71,12 +71,76 @@ export class AdminFormationsComponent implements OnInit {
   readonly modules = [
     { value: 'leadership',    label: 'Leadership & Développement Personnel', date: 'Lun 20 juil · 18h–20h', icon: 'fa-user-graduate',  color: '#0380C2' },
     { value: 'design',        label: 'Design Graphique',                      date: 'Mar 21 juil · 19h–21h', icon: 'fa-palette',        color: '#8B5CF6' },
-    { value: 'numerique-ia',  label: 'Compétences Numériques & IA',           date: 'Mer 22 juil · 18h–20h', icon: 'fa-robot',          color: '#06B6D4' },
-    { value: 'marketing',     label: 'Marketing Digital',                     date: 'Jeu 23 juil · 18h–20h', icon: 'fa-bullhorn',       color: '#F59E0B' },
+    { value: 'marketing',     label: 'Marketing Digital',                     date: 'Mer 22 juil · 20h–22h', icon: 'fa-bullhorn',       color: '#F59E0B' },
+    { value: 'numerique-ia',  label: 'Compétences Numériques & IA',           date: 'Jeu 23 juil · 18h–20h', icon: 'fa-robot',          color: '#06B6D4' },
     { value: 'employabilite', label: 'Employabilité & Insertion Pro.',        date: 'Ven 24 juil · 16h–18h', icon: 'fa-briefcase',      color: '#10B981' },
     { value: 'bureautique',   label: 'Bureautique & Informatique',            date: 'Sam 25 juil · 10h–12h', icon: 'fa-desktop',        color: '#EF4444' },
     { value: 'poesie',        label: 'Poésie & Arts Visuels',                 date: 'Dim 26 juil · 10h–12h', icon: 'fa-feather-pointed', color: '#FF7F1A' },
   ];
+
+  // ── Liens Google Meet ───────────────────────────────────────────────────
+  meetLinks: Record<string, string> = {
+    'leadership':    'https://meet.google.com/kpn-pojf-vaw',
+    'design':        'https://meet.google.com/odw-xyfq-ebw',
+    'marketing':     'https://meet.google.com/bsd-rymt-raq',
+    'numerique-ia':  'https://meet.google.com/hhb-zczs-cah',
+    'employabilite': 'https://meet.google.com/kpn-fgyi-fta',
+    'bureautique':   'https://meet.google.com/ncu-sbnt-vev',
+    'poesie':        'https://meet.google.com/xru-zdad-nyd',
+  };
+  meetSaved = false;
+
+  saveMeetLinks() {
+    localStorage.setItem('pencboost_meet_links', JSON.stringify(this.meetLinks));
+    this.meetSaved = true;
+    setTimeout(() => this.meetSaved = false, 2500);
+    this.toast('Liens Meet sauvegardés !', 'success');
+  }
+
+  loadMeetLinks() {
+    const saved = localStorage.getItem('pencboost_meet_links');
+    if (saved) this.meetLinks = { ...this.meetLinks, ...JSON.parse(saved) };
+  }
+
+  copyMeetLink(value: string) {
+    const link = this.meetLinks[value];
+    if (!link) { this.toast('Aucun lien enregistré pour ce module', 'error'); return; }
+    navigator.clipboard.writeText(link).then(() => this.toast('Lien Meet copié !', 'success'));
+  }
+
+  // ── Emails en échec ──────────────────────────────────────────────────────
+  emailEchecs: { module: string; emails: string[] }[] = [
+    { module: 'marketing',    emails: ['na4085131tou@gmail.com','diopndella189@gmail.com','astoumoubayam@gmail.com','noubasratoynansthelin@gmail.com','kouyateoumoudili@gmail.com','ousmaneciss03@gmail.com','thiamrama766@gmail.com','salifkourouma001@gmail.com','dionesaliou150296@gmail.com','mansalysaly06@gmail.com','sambademed@gmail.com','sowsams98@gmail.com','sirebadji@gmail.com','azzubair160@gmail.com'] },
+    { module: 'numerique-ia', emails: ['syllababacar364@gmail.com','medounendao093@gmail.com','mouhamadoumoustaphasy95@gmail.com','Mouhamadoumorgueye05@gmail.com','mgaye6650@gmail.com','diop1995.moussa@gmail.com','diouf.ngor67@gmail.com','nicolassambou772@gmail.com','bingueltakourou@gmail.com','oumoukhairydjighaly@gmail.com','odienta.ml@ieng-group.com','osow6112@gmail.com','almakhtoumee@gmail.com','soumarof@gmail.com','papeamethsall19@gmail.com','pape.dieng@unchk.edu.sn','baramba2003@gmail.com','ababacarsadikhdiene980@gmail.com','kourasy94@gmail.com','serignediengfallou@gmail.com','ssaliou.naing@etu.ussein.edu.sn','seydingom2@gmail.com','ftchatchibaou@gmail.com','tba849324@gmail.com'] },
+    { module: 'bureautique',  emails: ['ndeyebineta49@gmail.com','diedhioundeyemansata@gmail.com','noumoudiawo@gmail.com','awdioumar941@gmail.com','ousmanepene2324@gmail.com','makhtars056@gmail.com','pape@gmail.com','kebasadio92@gmail.com','seydoun02@gmail.com','siraoualy10@gmail.com','soukeynagaye91@gmail.com'] },
+  ];
+
+  selectionnerEchecs(moduleValue: string) {
+    const echecEntry = this.emailEchecs.find(e => e.module === moduleValue);
+    if (!echecEntry) { this.toast('Aucun échec enregistré pour ce module', 'error'); return; }
+
+    // Filtrer les inscrits dont l'email est dans la liste des échecs
+    this.emailModuleFilter = moduleValue;
+    this.loadEmailInscrits();
+
+    // Attendre le chargement puis sélectionner
+    setTimeout(() => {
+      this.emailSelection.clear();
+    const echecEmails = echecEntry.emails.map(e => e.toLowerCase());
+      this.emailInscrits
+        .filter(i => echecEmails.includes(i.email.toLowerCase()))
+        .forEach(i => this.emailSelection.add(i.id));
+      this.toast(`${this.emailSelection.size} échec(s) sélectionné(s) pour ${this.getModuleLabel(moduleValue)}`, 'success');
+    }, 1200);
+
+    this.setSection('pencboost-emails');
+  }
+
+  supprimerEchec(moduleValue: string, email: string) {
+    const entry = this.emailEchecs.find(e => e.module === moduleValue);
+    if (entry) entry.emails = entry.emails.filter(e => e !== email);
+  }
+
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -85,6 +149,7 @@ export class AdminFormationsComponent implements OnInit {
     if (saved === 'true') this.authenticated = true;
     const savedPw = sessionStorage.getItem('admin_formations_pw');
     if (savedPw) this.ADMIN_PASSWORD = savedPw;
+    this.loadMeetLinks();
   }
 
   // ── Auth ──────────────────────────────────────────────────────────────────
@@ -416,8 +481,8 @@ export class AdminFormationsComponent implements OnInit {
     const modulesInfo: Record<string, { label: string; date: string }> = {
       'leadership':    { label: 'Leadership & Développement Personnel', date: 'Lundi 20 juillet 2026 · 18h–20h' },
       'design':        { label: 'Design Graphique',                      date: 'Mardi 21 juillet 2026 · 19h–21h' },
-      'numerique-ia':  { label: 'Compétences Numériques & IA',           date: 'Mercredi 22 juillet 2026 · 18h–20h' },
-      'marketing':     { label: 'Marketing Digital',                     date: 'Jeudi 23 juillet 2026 · 18h–20h' },
+      'marketing':     { label: 'Marketing Digital',                     date: 'Mercredi 22 juillet 2026 · 20h–22h' },
+      'numerique-ia':  { label: 'Compétences Numériques & IA',           date: 'Jeudi 23 juillet 2026 · 18h–20h' },
       'employabilite': { label: 'Employabilité, Entrepreneuriat & Insertion Pro.', date: 'Vendredi 24 juillet 2026 · 16h–18h' },
       'bureautique':   { label: 'Initiation à la Bureautique & Informatique', date: 'Samedi 25 juillet 2026 · 10h–12h' },
       'poesie':        { label: 'Poésie & Arts Visuels',                 date: 'Dimanche 26 juillet 2026 · 10h–12h' },

@@ -1044,3 +1044,60 @@
   .kpi-grid { grid-template-columns: 1fr; }
   .af-main { padding: 0.75rem; }
 }
+
+/* ── Liens Meet ── */
+.meet-links-list { display: flex; flex-direction: column; gap: 0.85rem; }
+.meet-link-row { display: flex; flex-direction: column; gap: 0.4rem; }
+.meet-link-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1a2332;
+}
+.meet-link-label small { color: #888; font-weight: 400; font-size: 0.75rem; }
+.meet-link-input {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.meet-link-input input {
+  flex: 1;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  background: #f8f9fa;
+  transition: border-color 0.2s;
+}
+.meet-link-input input:focus { border-color: #0380C2; background: white; }
+
+/* ── Emails en échec ── */
+.echecs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+.echecs-list {
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.echec-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.83rem;
+  color: #444;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+.echec-item span { flex: 1; word-break: break-all; }
+.echecs-actions { padding: 1rem 1.5rem; border-top: 1px solid #f0f0f0; }
+.email-count-badge.error { background: #EF4444; }

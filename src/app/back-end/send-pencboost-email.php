@@ -63,8 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'envoyer') {
     $modules_info = [
         'leadership'    => ['label' => 'Leadership & Développement Personnel', 'date' => 'Lundi 20 juillet 2026 · 18h–20h'],
         'design'        => ['label' => 'Design Graphique',                      'date' => 'Mardi 21 juillet 2026 · 19h–21h'],
-        'numerique-ia'  => ['label' => 'Compétences Numériques & IA',           'date' => 'Mercredi 22 juillet 2026 · 18h–20h'],
-        'marketing'     => ['label' => 'Marketing Digital',                     'date' => 'Jeudi 23 juillet 2026 · 18h–20h'],
+        'marketing'     => ['label' => 'Marketing Digital',                     'date' => 'Mercredi 22 juillet 2026 · 20h–22h'],
+        'numerique-ia'  => ['label' => 'Compétences Numériques & IA',           'date' => 'Jeudi 23 juillet 2026 · 18h–20h'],
         'employabilite' => ['label' => 'Employabilité, Entrepreneuriat & Insertion Pro.', 'date' => 'Vendredi 24 juillet 2026 · 16h–18h'],
         'bureautique'   => ['label' => 'Initiation à la Bureautique & Informatique', 'date' => 'Samedi 25 juillet 2026 · 10h–12h'],
         'poesie'        => ['label' => 'Poésie & Arts Visuels',                 'date' => 'Dimanche 26 juillet 2026 · 10h–12h'],
@@ -125,18 +125,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'envoyer') {
       <div style='white-space:pre-line;font-family:Arial,sans-serif;font-size:0.95rem;line-height:1.7;'>" . htmlspecialchars($corps_final) . "</div>
     </div>
     <div class='footer'>
-      <p>© Penccum Ndongo · Penc'Boost 2026 · <a href='https://penccumndongo.com'>penccumndongo.com</a></p>
-      <p>📧 pencc.penccumndongo@gmail.com · 📞 +221 76 841 54 14</p>
+      <p style='margin:0 0 6px;font-size:0.82rem;color:#555;'>© Penccum Ndongo · Penc'Boost 2026 · <a href='https://penccumndongo.com' style='color:#0380C2;text-decoration:none;'>penccumndongo.com</a></p>
+      <p style='margin:0 0 14px;font-size:0.78rem;color:#888;'>📧 pencc.penccumndongo@gmail.com &nbsp;·&nbsp; 📞 +221 76 841 54 14</p>
+      <table cellpadding='0' cellspacing='0' border='0' style='margin:0 auto 10px;'>
+        <tr>
+          <td style='padding:0 5px;'>
+            <a href='https://www.facebook.com/share/1Ce2vCmuuV/?mibextid=wwXIfr' target='_blank' style='display:inline-block;width:36px;height:36px;background:#1877F2;border-radius:50%;text-align:center;line-height:36px;text-decoration:none;font-size:16px;color:white;'>F</a>
+          </td>
+          <td style='padding:0 5px;'>
+            <a href='https://www.instagram.com/penccumndongo?igsh=MXIzZ2FremxqeG9xdg%3D%3D&utm_source=qr' target='_blank' style='display:inline-block;width:36px;height:36px;background:radial-gradient(circle at 30% 107%,#fdf497 0%,#fd5949 45%,#d6249f 60%,#285AEB 90%);border-radius:50%;text-align:center;line-height:36px;text-decoration:none;font-size:15px;color:white;'>I</a>
+          </td>
+          <td style='padding:0 5px;'>
+            <a href='https://x.com/penccumndongo?s=21' target='_blank' style='display:inline-block;width:36px;height:36px;background:#000000;border-radius:50%;text-align:center;line-height:36px;text-decoration:none;font-size:14px;color:white;font-weight:bold;'>X</a>
+          </td>
+          <td style='padding:0 5px;'>
+            <a href='https://www.linkedin.com/company/penccum-ndongo/' target='_blank' style='display:inline-block;width:36px;height:36px;background:#0A66C2;border-radius:50%;text-align:center;line-height:36px;text-decoration:none;font-size:14px;color:white;font-weight:bold;'>in</a>
+          </td>
+          <td style='padding:0 5px;'>
+            <a href='https://www.tiktok.com/@penccum.ndongo?_t=ZM-8xRXEUCzSdC&_r=1' target='_blank' style='display:inline-block;width:36px;height:36px;background:#010101;border-radius:50%;text-align:center;line-height:36px;text-decoration:none;font-size:13px;color:white;font-weight:bold;'>T</a>
+          </td>
+          <td style='padding:0 5px;'>
+            <a href='https://www.youtube.com/@PENCCUMNDONGO' target='_blank' style='display:inline-block;width:36px;height:36px;background:#FF0000;border-radius:50%;text-align:center;line-height:36px;text-decoration:none;font-size:15px;color:white;font-weight:bold;'>Y</a>
+          </td>
+          <td style='padding:0 5px;'>
+            <a href='https://chat.whatsapp.com/H2HX0arxjCA70EgrcbRWUG?mode=gi_t' target='_blank' style='display:inline-block;width:36px;height:36px;background:#25D366;border-radius:50%;text-align:center;line-height:36px;text-decoration:none;font-size:13px;color:white;font-weight:bold;'>Wts</a>
+          </td>
+        </tr>
+      </table>
+      <p style='margin:6px 0 0;font-size:0.72rem;color:#aaa;'>Rejoignez notre communauté Penc'Boost sur WhatsApp</p>
     </div>
   </div>
 </body>
 </html>";
 
         $ok = sendEmailViaSMTP($email, $sujet_final, $html, "Penccum Ndongo · Penc'Boost");
-        if ($ok) {
+        if ($ok === true) {
             $envoyes++;
         } else {
-            $echecs[] = $email;
+            $echecs[] = ['email' => $email, 'erreur' => $ok];
         }
     }
 

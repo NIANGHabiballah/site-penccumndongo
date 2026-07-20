@@ -68,6 +68,9 @@
           <button class="sidebar-item" [class.active]="section === 'pencboost-emails'" (click)="setSection('pencboost-emails')">
             <i class="fas fa-envelope"></i> Envoyer des emails
           </button>
+          <button class="sidebar-item" [class.active]="section === 'pencboost-echecs'" (click)="setSection('pencboost-echecs')">
+            <i class="fas fa-exclamation-triangle"></i> Emails en échec
+          </button>
         </ng-container>
       </div>
 
@@ -561,6 +564,45 @@ L'équipe Penccum Ndongo"></textarea>
       </div>
 
       <!-- ══════════════════════════════════════════════════════════
+           PENC'BOOST — EMAILS EN ÉCHEC
+      ══════════════════════════════════════════════════════════ -->
+      <div class="af-section" *ngIf="section === 'pencboost-echecs'">
+        <div class="page-header">
+          <h1><i class="fas fa-exclamation-triangle"></i> Emails en échec</h1>
+          <p class="page-sub">Sélectionnez un module pour renvoyer les emails qui ont échoué.</p>
+        </div>
+
+        <div class="echecs-grid">
+          <div class="data-card" *ngFor="let entry of emailEchecs">
+            <div class="data-card-header">
+              <h3>
+                <span class="module-dot" [style.background]="getModuleColor(entry.module)"></span>
+                {{ getModuleLabel(entry.module) }}
+              </h3>
+              <span class="email-count-badge error">{{ entry.emails.length }} échec(s)</span>
+            </div>
+            <div class="echecs-list">
+              <div class="echec-item" *ngFor="let email of entry.emails">
+                <i class="fas fa-times-circle" style="color:#EF4444"></i>
+                <span>{{ email }}</span>
+                <button class="btn-delete" (click)="supprimerEchec(entry.module, email)" title="Retirer de la liste">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+              <div class="empty-row" *ngIf="entry.emails.length === 0">
+                <i class="fas fa-check-circle" style="color:#10B981"></i> Aucun échec
+              </div>
+            </div>
+            <div class="echecs-actions">
+              <button class="btn-send-email" (click)="selectionnerEchecs(entry.module)" [disabled]="entry.emails.length === 0">
+                <i class="fas fa-paper-plane"></i> Sélectionner & renvoyer ({{ entry.emails.length }})
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════
            PENC'BOOST — LIENS DE PRÉSENCE
       ══════════════════════════════════════════════════════════ -->
       <div class="af-section" *ngIf="section === 'pencboost-liens'">
@@ -874,6 +916,34 @@ L'équipe Penccum Ndongo"></textarea>
               </div>
               <button class="btn-save-pw" (click)="changerMotDePasse()">
                 <i class="fas fa-save"></i> Enregistrer le nouveau mot de passe
+              </button>
+            </div>
+          </div>
+
+          <!-- Liens Google Meet -->
+          <div class="data-card settings-card">
+            <div class="data-card-header">
+              <h3><i class="fas fa-video"></i> Liens Google Meet par module</h3>
+            </div>
+            <div class="settings-body">
+              <p class="settings-hint">Enregistrez les liens Meet de chaque module. Ils seront sauvegardés localement.</p>
+              <div class="meet-links-list">
+                <div class="meet-link-row" *ngFor="let m of modules">
+                  <div class="meet-link-label">
+                    <span class="module-dot" [style.background]="m.color"></span>
+                    <span>{{ m.label }}</span>
+                    <small class="text-muted">{{ m.date }}</small>
+                  </div>
+                  <div class="meet-link-input">
+                    <input type="text" [(ngModel)]="meetLinks[m.value]" placeholder="https://meet.google.com/...">
+                    <button class="btn-copy" (click)="copyMeetLink(m.value)" title="Copier le lien">
+                      <i class="fas fa-copy"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <button class="btn-save-pw" (click)="saveMeetLinks()">
+                <i class="fas fa-save"></i> Sauvegarder les liens Meet
               </button>
             </div>
           </div>
