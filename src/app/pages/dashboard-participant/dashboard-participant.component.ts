@@ -72,7 +72,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   themesParLangue = {
     francais: [
       { code: 'mots_silence', nom: 'Les mots du silence' },
-      { code: 'taaru_senegal', nom: 'Taaru Sénégal' },
+      { code: 'taaru_senegal', nom: 'La beauté du Sénégal' },
       { code: 'flicage_couple', nom: 'Le flicage au sein du couple' },
       { code: 'pression_sociale', nom: 'Pression sociale et influence ruineuse' }
     ],
@@ -90,8 +90,8 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     ],
     arabe: [
       { code: 'mots_silence', nom: 'كلمات الصمت' },
-      { code: 'taaru_senegal', nom: 'تارو السنغال' },
-      { code: 'flicage_couple', nom: 'المراقبة داخل الزوجين' },
+      { code: 'taaru_senegal', nom: 'جمال السنغال' },
+      { code: 'flicage_couple', nom: 'المراقبة المفرطة داخل العلاقة الزوجية' },
       { code: 'pression_sociale', nom: 'الضغط الاجتماعي والتأثير المدمر' }
     ]
   };
@@ -136,9 +136,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
         keywords: ['Silence', 'Introspection', 'Émotion', 'Langage', 'Intériorité']
       },
       {
-        title: '2. Taaru Sénégal',
-        icon: 'fas fa-globe-africa',
-        description: 'Célébrez la beauté, la culture et l\'identité du Sénégal à travers la poésie.',
+        title: '2. La beauté du Sénégal',
         keywords: ['Sénégal', 'Identité', 'Culture', 'Fierté', 'Héritage']
       },
       {
@@ -214,13 +212,13 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
         keywords: ['الصمت', 'التأمل', 'العاطفة', 'اللغة', 'الداخل']
       },
       {
-        title: '2. تارو السنغال',
+        title: '2. جمال السنغال',
         icon: 'fas fa-globe-africa',
         description: 'احتفل بجمال وثقافة وهوية السنغال من خلال الشعر',
         keywords: ['السنغال', 'الهوية', 'الثقافة', 'الفخر', 'التراث']
       },
       {
-        title: '3. المراقبة داخل الزوجين',
+        title: '3. المراقبة المفرطة داخل العلاقة الزوجية',
         icon: 'fas fa-heart-broken',
         description: 'استجوب المراقبة والسيطرة والثقة في العلاقات العاطفية',
         keywords: ['السيطرة', 'الثقة', 'الحرية', 'الزوجان', 'الاحترام']
