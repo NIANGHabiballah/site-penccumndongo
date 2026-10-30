@@ -34,9 +34,26 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
           </div>
           <h1>Inscription</h1>
           <p>Rejoignez la communauté panafricaine CP2i</p>
+          <div class="already-account-banner">
+            <i class="fas fa-info-circle"></i>
+            Vous avez déjà un compte ?
+            <a routerLink="/auth/login" class="already-account-link">Connectez-vous ici</a>
+          </div>
         </div>
-        
-        <form (ngSubmit)="register()">
+
+        <!-- BLOCAGE INSCRIPTION -->
+        <div *ngIf="inscriptionFermee" class="inscription-fermee">
+          <div class="fermee-icon"><i class="fas fa-lock"></i></div>
+          <h2>Inscriptions non ouvertes</h2>
+          <p>Les inscriptions au <strong>Concours CP2i 2026</strong> ouvriront officiellement le :</p>
+          <div class="fermee-date">02 Novembre 2026</div>
+          <p class="fermee-sub">Revenez à cette date pour vous inscrire. En attendant, suivez-nous sur nos réseaux sociaux !</p>
+          <a routerLink="/auth/login" class="btn-login-fermee">
+            <i class="fas fa-sign-in-alt"></i> Déjà inscrit ? Se connecter
+          </a>
+        </div>
+
+        <form *ngIf="!inscriptionFermee" (ngSubmit)="register()">
           <div class="input-group">
             <label class="field-label">Prénom et nom de famille *</label>
             <div class="input-wrapper" [class.error]="fieldErrors.nomComplet">
@@ -140,6 +157,9 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
           <div *ngIf="errorMessage" class="error-alert">
             <i class="fas fa-exclamation-circle"></i>
             <span>{{ errorMessage }}</span>
+            <a *ngIf="emailDejaUtilise" (click)="goToLogin()" class="login-redirect-link">
+              <i class="fas fa-sign-in-alt"></i> Se connecter maintenant
+            </a>
           </div>
           
           <div *ngIf="successMessage" class="success-alert">
@@ -519,9 +539,111 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
       font-size: 0.9rem;
     }
     
-    .auth-btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
+    .inscription-fermee {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+    
+    .fermee-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      color: white;
+      font-size: 2rem;
+    }
+    
+    .inscription-fermee h2 {
+      font-size: 1.6rem;
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+    
+    .inscription-fermee p {
+      color: #7f8c8d;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+    
+    .fermee-date {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #f39c12;
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+      border-radius: 12px;
+      padding: 0.75rem 2rem;
+      display: inline-block;
+      margin: 1rem 0;
+    }
+    
+    .fermee-sub {
+      font-size: 0.9rem;
+      color: #95a5a6;
+      margin-bottom: 1.5rem;
+    }
+    
+    .btn-login-fermee {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, #f39c12, #e67e22);
+      color: white;
+      padding: 0.9rem 2rem;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+    
+    .btn-login-fermee:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(243,156,18,0.3);
+    }
+    
+    .already-account-banner {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      color: #856404;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .already-account-link {
+      color: #f39c12;
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    
+    .already-account-link:hover {
+      color: #e67e22;
+    }
+    
+    .login-redirect-link {
+      display: block;
+      margin-top: 0.5rem;
+      color: #c33;
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    
+    .login-redirect-link:hover {
+      color: #a00;
     }
     
     @media (max-width: 768px) {
@@ -555,6 +677,12 @@ export class RegisterComponent {
   successMessage = '';
   isLoading = false;
   fieldErrors: any = {};
+  emailDejaUtilise = false;
+
+  readonly ouvertureInscription = new Date('2026-11-02');
+  get inscriptionFermee(): boolean {
+    return new Date() < this.ouvertureInscription;
+  }
 
   constructor(
     private router: Router,
@@ -569,6 +697,7 @@ export class RegisterComponent {
     this.errorMessage = '';
     this.successMessage = '';
     this.fieldErrors = {};
+    this.emailDejaUtilise = false;
     
     // Validation détaillée de chaque champ
     let hasErrors = false;
@@ -673,6 +802,8 @@ export class RegisterComponent {
           
           if (serverError.includes('email') && serverError.includes('utilisé')) {
             this.fieldErrors.email = 'Cette adresse email est déjà utilisée';
+            this.emailDejaUtilise = true;
+            this.errorMessage = 'Vous avez déjà un compte. Connectez-vous directement !';
           } else if (serverError.includes('email')) {
             this.fieldErrors.email = 'Problème avec l\'adresse email';
           } else if (serverError.includes('téléphone') || serverError.includes('telephone')) {

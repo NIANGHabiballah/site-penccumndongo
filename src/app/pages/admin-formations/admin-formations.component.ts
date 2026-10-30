@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
-type Section = 'accueil' | 'pencboost-stats' | 'pencboost-inscrits' | 'pencboost-presences' | 'pencboost-liens' | 'pencboost-rapport' | 'pencboost-emails' | 'pencboost-echecs' | 'infographie-stats' | 'infographie-inscrits' | 'parametres';
+type Section = 'accueil' | 'pencboost-stats' | 'pencboost-inscrits' | 'pencboost-presences' | 'pencboost-liens' | 'pencboost-rapport' | 'pencboost-emails' | 'pencboost-echecs' | 'pencboost-emails-gmail' | 'infographie-stats' | 'infographie-inscrits' | 'parametres';
 
 @Component({
   selector: 'app-admin-formations',
@@ -185,6 +185,7 @@ export class AdminFormationsComponent implements OnInit {
     if (s === 'pencboost-presences') this.loadPencboostPresences();
     if (s === 'pencboost-rapport')   { this.loadPencboostStats(); this.loadPencboostInscrits(); }
     if (s === 'pencboost-emails')    this.loadEmailInscrits();
+    if (s === 'pencboost-emails-gmail') { this.loadPencboostInscrits(); }
     if (s === 'infographie-inscrits') this.loadInfographieInscrits();
   }
 
@@ -467,6 +468,23 @@ export class AdminFormationsComponent implements OnInit {
     this.toastType = type;
     this.showToast = true;
     setTimeout(() => this.showToast = false, 3500);
+  }
+
+  getEmailsParModule(): { module: any; emails: string[] }[] {
+    return this.modules.map(m => ({
+      module: m,
+      emails: this.pbInscrits.filter(i => i.module === m.value).map(i => i.email).filter(Boolean)
+    })).filter(e => e.emails.length > 0);
+  }
+
+  ouvrirGmail(emails: string[], sujet = '') {
+    const to = emails.join(',');
+    const url = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(to)}&su=${encodeURIComponent(sujet)}`;
+    window.open(url, '_blank');
+  }
+
+  copierEmails(emails: string[]) {
+    navigator.clipboard.writeText(emails.join(', ')).then(() => this.toast('Emails copiés !', 'success'));
   }
 
   get echecsStr(): string {

@@ -68,6 +68,9 @@
           <button class="sidebar-item" [class.active]="section === 'pencboost-emails'" (click)="setSection('pencboost-emails')">
             <i class="fas fa-envelope"></i> Envoyer des emails
           </button>
+          <button class="sidebar-item" [class.active]="section === 'pencboost-emails-gmail'" (click)="setSection('pencboost-emails-gmail')">
+            <i class="fab fa-google"></i> Emails par module
+          </button>
           <button class="sidebar-item" [class.active]="section === 'pencboost-echecs'" (click)="setSection('pencboost-echecs')">
             <i class="fas fa-exclamation-triangle"></i> Emails en échec
           </button>
@@ -600,6 +603,49 @@ L'équipe Penccum Ndongo"></textarea>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════
+           PENC'BOOST — EMAILS PAR MODULE (GMAIL)
+      ══════════════════════════════════════════════════════════ -->
+      <div class="af-section" *ngIf="section === 'pencboost-emails-gmail'">
+        <div class="page-header">
+          <h1><i class="fab fa-google"></i> Emails par module</h1>
+          <p class="page-sub">Copiez les adresses ou ouvrez Gmail directement avec les destinataires pré-remplis.</p>
+        </div>
+
+        <div class="loading-state" *ngIf="pbLoading"><i class="fas fa-spinner fa-spin"></i> Chargement...</div>
+
+        <ng-container *ngIf="!pbLoading">
+          <div class="gmail-modules-grid">
+            <div class="data-card" *ngFor="let entry of getEmailsParModule()">
+              <div class="data-card-header">
+                <h3>
+                  <span class="module-dot" [style.background]="entry.module.color"></span>
+                  {{ entry.module.label }}
+                </h3>
+                <span class="email-count-badge">{{ entry.emails.length }} inscrit(s)</span>
+              </div>
+              <div class="gmail-emails-list">
+                <div class="gmail-email-item" *ngFor="let email of entry.emails">
+                  <i class="fas fa-envelope" style="color:#adb5bd;font-size:0.75rem"></i>
+                  <span>{{ email }}</span>
+                </div>
+              </div>
+              <div class="gmail-actions">
+                <button class="btn-copy" (click)="copierEmails(entry.emails)">
+                  <i class="fas fa-copy"></i> Copier tous les emails
+                </button>
+                <button class="btn-gmail" (click)="ouvrirGmail(entry.emails, 'Penc\'Boost 2026 · ' + entry.module.label)">
+                  <i class="fab fa-google"></i> Ouvrir dans Gmail
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="empty-row" *ngIf="getEmailsParModule().length === 0">
+            Aucun inscrit trouvé. <button class="btn-refresh" (click)="loadPencboostInscrits()"><i class="fas fa-sync-alt"></i> Charger</button>
+          </div>
+        </ng-container>
       </div>
 
       <!-- ══════════════════════════════════════════════════════════

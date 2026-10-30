@@ -79,14 +79,14 @@ import { ApiService } from '../../services/api.service';
             </ul>
           </section>
 
-          <section class="reglement-section nouveautes" *ngIf="reglements.nouveautes_2025">
+          <section class="reglement-section nouveautes" *ngIf="reglements.nouveautes_2026">
             <h2><i class="fas fa-star"></i> NOUVEAUTÉS {{reglements.annee}}</h2>
             <ul>
-              <li><strong>Nouveaux thèmes :</strong> {{reglements.nouveautes_2025.themes_officiels}}</li>
-              <li><strong>Limite augmentée :</strong> {{reglements.nouveautes_2025.limite_vers_augmentee}}</li>
-              <li><strong>Période prolongée :</strong> {{reglements.nouveautes_2025.periode_prolongee}}</li>
-              <li><strong>Plateforme numérique :</strong> {{reglements.nouveautes_2025.plateforme_numerique}}</li>
-              <li><strong>Suivi en temps réel :</strong> {{reglements.nouveautes_2025.suivi_temps_reel}}</li>
+              <li><strong>Nouveaux thèmes :</strong> {{reglements.nouveautes_2026.themes_officiels}}</li>
+              <li><strong>Limite augmentée :</strong> {{reglements.nouveautes_2026.limite_vers_augmentee}}</li>
+              <li><strong>Période prolongée :</strong> {{reglements.nouveautes_2026.periode_prolongee}}</li>
+              <li><strong>Plateforme numérique :</strong> {{reglements.nouveautes_2026.plateforme_numerique}}</li>
+              <li><strong>Suivi en temps réel :</strong> {{reglements.nouveautes_2026.suivi_temps_reel}}</li>
             </ul>
           </section>
 
@@ -104,7 +104,7 @@ import { ApiService } from '../../services/api.service';
                 <span class="partenaire-nom">{{partenaire.nom}}</span>
               </div>
             </div>
-            <p class="remerciements">Nous remercions chaleureusement nos partenaires pour leur soutien dans la réalisation de cette troisième édition du Concours de Poésie Inédit & Innovant (CP2i).</p>
+            <p class="remerciements">Nous remercions chaleureusement nos partenaires pour leur soutien dans la réalisation de cette quatrième édition du Concours de Poésie Inédit & Innovant (CP2i).</p>
           </section>
 
           <section class="reglement-section contact">
@@ -540,18 +540,18 @@ export class ReglementsComponent implements OnInit {
   ngOnInit() {
     // Données statiques en cas d'erreur API
     this.reglements = {
-      edition: '3ème',
-      annee: '2025',
+      edition: '4ème',
+      annee: '2026',
       organisation: {
-        description: 'La 3ème édition du Concours de Poésie Inédit et Innovant (CP2i) est organisée par Penccum Ndongo, une agence de marketing et de communication digitale qui propose des solutions numériques et l\'accompagnement des initiatives culturelles et créatives.',
+        description: 'La 4ème édition du Concours de Poésie Inédit et Innovant (CP2i) est organisée par Penccum Ndongo, une agence de marketing et de communication digitale qui propose des solutions numériques et l\'accompagnement des initiatives culturelles et créatives.',
         objectif: 'Cette année, le CP2i vise à offrir une plateforme d\'expression aux poètes, jeunes et confirmés, pour explorer et partager leur vision sur des thématiques d\'actualité.'
       },
       participation: {
         ouverture: 'Le concours est ouvert à toute personne résidant au Sénégal et à l\'international.',
-        periode_inscription: 'du 3 au 23 novembre 2025',
-        date_limite_soumission: '23 novembre 2025 à 23h59',
+        periode_inscription: 'du 02 au 23 novembre 2026',
+        date_limite_soumission: '23 novembre 2026 à 23h59',
         langues: ['français', 'wolof', 'anglais', 'arabe'],
-        themes: ['Patriotisme', 'Justice et dignité', 'Beauté Africaine', 'Jeunesse responsable', 'Sous l\'emprise des écrans']
+        themes: ['Les mots du silence', 'Taaru Sénégal', 'Le flicage au sein du couple', 'Pression sociale et influence ruineuse']
       },
       soumission: {
         format: 'Un seul poème par participant en format numérique',
@@ -577,10 +577,10 @@ export class ReglementsComponent implements OnInit {
         fraude: 'Toute tentative de fraude entraînera l\'\u00e9limination immédiate du participant concerné',
         acceptation: 'La participation au concours implique l\'acceptation pleine et entière de ce règlement'
       },
-      nouveautes_2025: {
-        themes_officiels: 'Patriotisme, Justice et dignité, Beauté Africaine, Jeunesse responsable, Sous l\'emprise des écrans',
-        limite_vers_augmentee: '40 vers (au lieu de 30)',
-        periode_prolongee: 'Inscriptions prolongées jusqu\'au 31 janvier',
+      nouveautes_2026: {
+        themes_officiels: 'Les mots du silence, Taaru Sénégal, Le flicage au sein du couple, Pression sociale et influence ruineuse',
+        limite_vers_augmentee: '40 vers maximum',
+        periode_prolongee: 'Inscriptions du 02 au 23 novembre 2026',
         plateforme_numerique: 'Soumission entièrement numérique via le site web',
         suivi_temps_reel: 'Suivi en temps réel du statut de participation'
       },

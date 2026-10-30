@@ -1101,3 +1101,51 @@
 .echec-item span { flex: 1; word-break: break-all; }
 .echecs-actions { padding: 1rem 1.5rem; border-top: 1px solid #f0f0f0; }
 .email-count-badge.error { background: #EF4444; }
+
+/* ── Emails par module (Gmail) ── */
+.gmail-modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+.gmail-emails-list {
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.gmail-email-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: #555;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+.gmail-email-item span { word-break: break-all; }
+.gmail-actions {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.btn-gmail {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: all 0.2s;
+  background: #EA4335;
+  color: white;
+}
+.btn-gmail:hover { background: #c5221f; }

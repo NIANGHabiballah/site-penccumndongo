@@ -151,22 +151,22 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   // Gestion des paramètres
   currentSettingsTab = 'concours';
-  // Dates officielles du concours CP2i 2025
+  // Dates officielles du concours CP2i 2026 — 4ème édition
   concoursSchedule = {
-    inscription_debut: '2025-11-03',
-    inscription_fin: '2025-11-23',
-    correction_debut: '2025-11-24',
-    correction_fin: '2025-11-30',
-    correction_prolongement: '2025-12-03',
-    deliberation: '2025-12-10',
-    ceremonie_remise: '2026-01-10'
+    inscription_debut: '2026-11-02',
+    inscription_fin: '2026-11-23',
+    correction_debut: '2026-11-24',
+    correction_fin: '2026-11-30',
+    correction_prolongement: '2026-12-10',
+    deliberation: '2026-12-15',
+    ceremonie_remise: '2027-01-15'
   };
   
   settings = {
-    start_date: '2025-11-03',
-    end_date: '2025-11-23',
-    evaluation_deadline: '2025-12-03',
-    results_date: '2025-12-10',
+    start_date: '2026-11-02',
+    end_date: '2026-11-23',
+    evaluation_deadline: '2026-12-10',
+    results_date: '2026-12-15',
     max_verses: 50,
     max_texts_per_user: 3,
     min_text_length: 100,
@@ -1708,6 +1708,11 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   getThemeLabel(theme: string): string {
     const themes = {
+      'mots_silence': 'Les mots du silence',
+      'taaru_senegal': 'Taaru Sénégal',
+      'flicage_couple': 'Le flicage au sein du couple',
+      'pression_sociale': 'Pression sociale et influence ruineuse',
+      // Anciens thèmes (3ème édition) conservés pour l'historique
       'patriotisme': 'Patriotisme',
       'justice_dignite': 'Justice et dignité',
       'beaute_africaine': 'Beauté Africaine',
@@ -2738,14 +2743,14 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   private getDaysFromStart(): number {
-    const startDate = new Date('2025-11-03');
+    const startDate = new Date('2026-11-02');
     const today = new Date();
     return Math.max(1, Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
   }
   
   private getTotalDays(): number {
-    const startDate = new Date('2025-11-03');
-    const endDate = new Date('2025-11-23');
+    const startDate = new Date('2026-11-02');
+    const endDate = new Date('2026-11-23');
     return Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
   }
 
@@ -3844,7 +3849,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     
     // Ajouter un en-tête informatif
     const csvHeader = [
-      '# LISTE DES PARTICIPANTS CP2i 2025 - COORDONNÉES COMPLÈTES',
+      '# LISTE DES PARTICIPANTS CP2i 2026 - COORDONNÉES COMPLÈTES',
       `# Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}`,
       `# Total: ${participants.length} participants avec soumissions et notes`,
       '# ',
@@ -3863,7 +3868,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `CP2i_2025_Coordonnees_Participants_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `CP2i_2026_Coordonnees_Participants_${new Date().toISOString().split('T')[0]}.csv`;
     a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
@@ -3875,7 +3880,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     
     // Afficher une deuxième notification après 2 secondes
     setTimeout(() => {
-      this.showToast(`📁 Fichier: CP2i_2025_Coordonnees_Participants_${new Date().toISOString().split('T')[0]}.csv`, 'success');
+      this.showToast(`📁 Fichier: CP2i_2026_Coordonnees_Participants_${new Date().toISOString().split('T')[0]}.csv`, 'success');
     }, 2000);
     
     // Log de l'action

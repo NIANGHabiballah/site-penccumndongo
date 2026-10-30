@@ -1,4 +1,26 @@
 <div class="dashboard" [class.sidebar-collapsed]="desktopMenuHidden">
+
+  <!-- ===== ÉCRAN DE SÉLECTION D'ÉDITION ===== -->
+  <div class="edition-selector-overlay" *ngIf="showEditionSelector">
+    <div class="edition-selector-card">
+      <div class="edition-selector-header">
+        <h2>CP2i</h2>
+        <p>Concours de Poésie Inédit &amp; Innovant</p>
+      </div>
+      <h3>Choisissez une édition</h3>
+      <p class="edition-selector-sub">Bienvenue, <strong>{{currentUser?.prenom}}</strong> ! Vous avez participé à plusieurs éditions.</p>
+      <div class="edition-cards">
+        <div class="edition-card" *ngFor="let ed of editions" (click)="selectEdition(ed)">
+          <div class="edition-card-badge" [class.active]="ed.is_active">{{ed.is_active ? 'En cours' : 'Archivée'}}</div>
+          <div class="edition-card-numero">{{ed.numero}}<sup>{{ed.numero === 1 ? 'ère' : 'ème'}}</sup></div>
+          <div class="edition-card-label">{{ed.label}}</div>
+          <div class="edition-card-arrow"><i class="fas fa-arrow-right"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard principal (masqué pendant la sélection) -->
   <!-- Sidebar -->
   <!-- Overlay pour fermer le menu -->
   <div class="mobile-overlay" *ngIf="mobileMenuOpen" (click)="toggleMobileMenu()"></div>
@@ -18,6 +40,25 @@
     </div>
     
     <div class="nav-menu">
+      <!-- Switcher d'édition (visible seulement si plusieurs éditions) -->
+      <div class="edition-switcher" *ngIf="editions.length > 1">
+        <span class="edition-switcher-label"><i class="fas fa-layer-group"></i> Édition :</span>
+        <div class="edition-switcher-btns">
+          <button *ngFor="let ed of editions"
+            [class.active]="ed.id === editionActive?.id"
+            (click)="switchEdition(ed)">
+            {{ed.numero}}<sup>{{ed.numero === 1 ? 'ère' : 'ème'}}</sup>
+            <span *ngIf="ed.is_active" class="dot-active"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Badge édition archivée -->
+      <div class="edition-archive-banner" *ngIf="isEditionArchivee()">
+        <i class="fas fa-archive"></i>
+        Vous consultez l'<strong>{{editionActive?.label}}</strong> — lecture seule pour les textes soumis.
+      </div>
+
       <div class="nav-item" [class.active]="currentView === 'accueil'" (click)="setCurrentView('accueil'); $event.preventDefault(); $event.stopPropagation()">
         <i class="fas fa-home"></i>
         <span>Accueil</span>
@@ -83,7 +124,7 @@
     <header class="header">
       <div class="welcome">
         <h1>Bienvenue, {{currentUser?.prenom}} !</h1>
-        <p>Tableau de bord - CP2i Édition 2025</p>
+        <p>Tableau de bord - CP2i {{editionActive?.label || 'Édition 2026'}}</p>
       </div>
       <div class="header-actions">
         <button class="btn btn-outline btn-compact" (click)="setCurrentView('messages')">
@@ -468,9 +509,9 @@
         <div class="themes-header">
           <h2>
             <i class="fas fa-lightbulb"></i>
-            Thèmes de cette 3e édition
+            Thèmes de cette 4ᵉ édition
           </h2>
-          <p class="themes-subtitle">Découvrez les 5 thèmes qui inspireront vos créations poétiques</p>
+          <p class="themes-subtitle">Découvrez les 4 thèmes qui inspireront vos créations poétiques</p>
         </div>
         
         <!-- Onglets de langues -->
@@ -565,7 +606,7 @@
               <p>Composez et soumettez votre poème en respectant les contraintes du concours.</p>
               <ul class="step-details">
                 <li>Cliquez sur <strong>"Soumettre un texte"</strong> dans le menu de gauche</li>
-                <li>Choisissez un des 5 thèmes proposés</li>
+                <li>Choisissez un des 4 thèmes proposés</li>
                 <li>Rédigez maximum 40 vers dans la langue de votre choix</li>
                 <li>Donnez un titre accrocheur et confirmez votre soumission</li>
               </ul>
@@ -728,7 +769,7 @@
                   
                   <div class="cert-achievement">
                     <p class="achievement-text">
-                      Pour sa participation à la 3e édition du Concours de Poésie Inédit & Innovant (CP2i).
+                      Pour sa participation à la 4ᵉ édition du Concours de Poésie Inédit & Innovant (CP2i).
                     </p>
                     
                     <div class="performance-stats">
@@ -741,7 +782,7 @@
                         <span class="stat-label">Classement</span>
                       </div>
                       <div class="stat-item">
-                        <span class="stat-value">2025</span>
+                        <span class="stat-value">2026</span>
                         <span class="stat-label">Édition</span>
                       </div>
                     </div>
@@ -839,7 +880,6 @@
     </div>
 
   </main>
-</div>
 
 <!-- Widget de chat support -->
 <app-chat-widget></app-chat-widget>
@@ -1006,7 +1046,7 @@
           
           <div class="cert-achievement">
             <p class="achievement-text">
-              Pour sa participation à la 3e édition du Concours de Poésie Inédit & Innovant (CP2i).
+              Pour sa participation à la 4ᵉ édition du Concours de Poésie Inédit & Innovant (CP2i).
             </p>
             
             <div class="performance-stats">
@@ -1019,7 +1059,7 @@
                 <span class="stat-label">Classement</span>
               </div>
               <div class="stat-item">
-                <span class="stat-value">2025</span>
+                <span class="stat-value">2026</span>
                 <span class="stat-label">Édition</span>
               </div>
             </div>
@@ -1128,4 +1168,5 @@
       </p>
     </div>
   </div>
+</div>
 </div>

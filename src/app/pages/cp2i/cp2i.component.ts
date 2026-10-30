@@ -56,7 +56,7 @@ export class Cp2iComponent implements OnInit {
   bookLightboxOpen = false;
   showGalleryModal = false;
   showClosedModal = false;
-  inscriptionsClosed = true;
+  inscriptionsClosed = false;
   
   // Index actuels
   currentBookImg = 0;
@@ -75,35 +75,31 @@ export class Cp2iComponent implements OnInit {
     { code: 'arabe', name: 'العربية', icon: 'fas fa-moon' }
   ];
 
-  // Thèmes multilingues
+  // Thèmes multilingues — 4ème édition 2026
   themesMultilingues = {
     francais: [
-      { title: 'Patriotisme', icon: 'fas fa-flag' },
-      { title: 'Justice et dignité', icon: 'fas fa-balance-scale' },
-      { title: 'Beauté Africaine', icon: 'fas fa-crown' },
-      { title: 'Jeunesse responsable', icon: 'fas fa-users' },
-      { title: 'Sous l\'emprise des écrans', icon: 'fas fa-mobile-alt' }
+      { title: 'Les mots du silence', icon: 'fas fa-moon' },
+      { title: 'Taaru Sénégal', icon: 'fas fa-globe-africa' },
+      { title: 'Le flicage au sein du couple', icon: 'fas fa-heart-broken' },
+      { title: 'Pression sociale et influence ruineuse', icon: 'fas fa-users' }
     ],
     wolof: [
-      { title: 'Bëgg sa réew', icon: 'fas fa-flag' },
-      { title: 'Yoon ak ngor', icon: 'fas fa-balance-scale' },
-      { title: 'Taaru jigeenu afrik', icon: 'fas fa-crown' },
-      { title: 'Xale yu am responsabilite', icon: 'fas fa-users' },
-      { title: 'Ci ndigalu ekraŋ yi', icon: 'fas fa-mobile-alt' }
+      { title: 'Baat yu dëkk ci xol', icon: 'fas fa-moon' },
+      { title: 'Taaru Sénégal', icon: 'fas fa-globe-africa' },
+      { title: 'Suqali ak kontrole ci kër ga', icon: 'fas fa-heart-broken' },
+      { title: 'Pression bu dëkk ak influence bu xaw', icon: 'fas fa-users' }
     ],
     anglais: [
-      { title: 'Patriotism', icon: 'fas fa-flag' },
-      { title: 'Justice and dignity', icon: 'fas fa-balance-scale' },
-      { title: 'African Beauty', icon: 'fas fa-crown' },
-      { title: 'Responsible Youth', icon: 'fas fa-users' },
-      { title: 'Under the grip of screens', icon: 'fas fa-mobile-alt' }
+      { title: 'The words of silence', icon: 'fas fa-moon' },
+      { title: 'Taaru Sénégal', icon: 'fas fa-globe-africa' },
+      { title: 'Surveillance within the couple', icon: 'fas fa-heart-broken' },
+      { title: 'Social pressure and ruinous influence', icon: 'fas fa-users' }
     ],
     arabe: [
-      { title: 'الوطنية', icon: 'fas fa-flag' },
-      { title: 'العدالة والكرامة', icon: 'fas fa-balance-scale' },
-      { title: 'الجمال الأفريقي', icon: 'fas fa-crown' },
-      { title: 'الشباب المسؤول', icon: 'fas fa-users' },
-      { title: 'تحت سيطرة الشاشات', icon: 'fas fa-mobile-alt' }
+      { title: 'كلمات الصمت', icon: 'fas fa-moon' },
+      { title: 'تارو السنغال', icon: 'fas fa-globe-africa' },
+      { title: 'المراقبة داخل الزوجين', icon: 'fas fa-heart-broken' },
+      { title: 'الضغط الاجتماعي والتأثير المدمر', icon: 'fas fa-users' }
     ]
   };
 
@@ -230,9 +226,9 @@ export class Cp2iComponent implements OnInit {
 
   // Countdown pour les inscriptions CP2i
   startCountdown(): void {
-    const deadline = new Date('2025-11-25T23:59:59').getTime();
+    const deadline = new Date('2026-11-23T23:59:59').getTime();
     
-    const nextEditionDeadline = new Date('2026-11-23T23:59:59').getTime();
+    const nextEditionDeadline = new Date('2027-11-23T23:59:59').getTime();
     
     setInterval(() => {
       const now = new Date().getTime();

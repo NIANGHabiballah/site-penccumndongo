@@ -13,10 +13,11 @@ switch ($method) {
         
     case 'GET':
         $user = verifyToken();
+        $editionId = isset($_GET['edition_id']) ? (int)$_GET['edition_id'] : null;
         if ($user['role'] === 'participant') {
-            getUserTexts($user['user_id']);
+            getUserTexts($user['user_id'], $editionId);
         } else {
-            getAllTexts();
+            getAllTexts($editionId);
         }
         break;
         
@@ -68,12 +69,22 @@ function submitText($data, $user) {
     // Debug: afficher les données reçues
     error_log("Theme reçu: " . $theme);
     
-    $stmt = $db->prepare("INSERT INTO cp2i_textes (user_id, titre, contenu, langue, theme, nb_vers, statut, created_at) VALUES (?, ?, ?, ?, ?, ?, 'en_attente', NOW())");
+    // Récupérer l'édition active si non fournie
+    // Pour les nouveaux textes, stocker le numéro de l'édition (ex: 4) pas l'id (ex: 2)
+    $editionNumero = $data['edition_id'] ?? null;
+    if (!$editionNumero) {
+        $stmtEd = $db->prepare("SELECT numero FROM cp2i_editions WHERE is_active = TRUE LIMIT 1");
+        $stmtEd->execute();
+        $activeEd = $stmtEd->fetch(PDO::FETCH_ASSOC);
+        $editionNumero = $activeEd ? (int)$activeEd['numero'] : 4;
+    }
+    $editionId = $editionNumero;
+
+    $stmt = $db->prepare("INSERT INTO cp2i_textes (user_id, titre, contenu, langue, theme, nb_vers, statut, edition_id, created_at) VALUES (?, ?, ?, ?, ?, ?, 'en_attente', ?, NOW())");
     
-    // Debug: vérifier les valeurs avant insertion
-    error_log("Valeurs: user_id={$user['user_id']}, titre=$titre, langue=$langue, theme=$theme, nb_vers=$verseCount");
+    error_log("Valeurs: user_id={$user['user_id']}, titre=$titre, langue=$langue, theme=$theme, nb_vers=$verseCount, edition_id=$editionId");
     
-    if ($stmt->execute([$user['user_id'], $titre, $contenu, $langue, $theme, $verseCount])) {
+    if ($stmt->execute([$user['user_id'], $titre, $contenu, $langue, $theme, $verseCount, $editionId])) {
         // Enregistrer la soumission dans l'historique
         logAction($user['user_id'], 'text_submission', "Soumission du texte: $titre");
         
@@ -88,40 +99,61 @@ function submitText($data, $user) {
     }
 }
 
-function getUserTexts($userId) {
+function getUserTexts($userId, $editionId = null) {
     $db = getDB();
-    
+
+    // Récupérer le numéro de l'édition active
+    $stmtEd = $db->prepare("SELECT numero FROM cp2i_editions WHERE is_active = TRUE LIMIT 1");
+    $stmtEd->execute();
+    $activeEd = $stmtEd->fetch(PDO::FETCH_ASSOC);
+    $activeEditionNum = $activeEd ? (int)$activeEd['numero'] : 4;
+
+    // edition_id reçu = numéro directement (3 ou 4), pas l'id de la table
+    $editionNumero = $editionId ? (int)$editionId : $activeEditionNum;
+
+    // Les textes stockent le numéro (3 ou 4) dans edition_id, pas l'id de la table
     $stmt = $db->prepare("
         SELECT 
-            t.id, t.titre, t.contenu, t.langue, t.theme, t.nb_vers, t.statut, t.note, t.commentaire, t.created_at,
+            t.id, t.titre, t.contenu, t.langue, t.theme, t.nb_vers, t.statut, t.note, t.commentaire, t.created_at, t.edition_id,
+            e.is_active as edition_active,
             CASE 
                 WHEN EXISTS(SELECT 1 FROM cp2i_affectations a WHERE a.texte_id = t.id) THEN 0
                 ELSE 1
             END as peut_modifier
-        FROM cp2i_textes t 
-        WHERE t.user_id = ? 
+        FROM cp2i_textes t
+        LEFT JOIN cp2i_editions e ON t.edition_id = e.numero
+        WHERE t.user_id = ? AND t.edition_id = ?
         ORDER BY t.created_at DESC
     ");
-    $stmt->execute([$userId]);
+    $stmt->execute([$userId, $editionNumero]);
     $textes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    echo json_encode(['textes' => $textes]);
+    echo json_encode(['textes' => $textes, 'edition_id' => $editionId]);
 }
 
-function getAllTexts() {
+function getAllTexts($editionId = null) {
     $db = getDB();
-    
+
+    $stmtEd = $db->prepare("SELECT numero FROM cp2i_editions WHERE is_active = TRUE LIMIT 1");
+    $stmtEd->execute();
+    $activeEd = $stmtEd->fetch(PDO::FETCH_ASSOC);
+    $activeEditionNum = $activeEd ? (int)$activeEd['numero'] : 4;
+
+    // edition_id reçu = numéro directement (3 ou 4), pas l'id de la table
+    $editionNumero = $editionId ? (int)$editionId : $activeEditionNum;
+
     $stmt = $db->prepare("
-        SELECT t.id, t.titre, t.contenu, t.langue, t.theme, t.nb_vers, t.statut, t.note, t.commentaire, t.created_at,
+        SELECT t.id, t.titre, t.contenu, t.langue, t.theme, t.nb_vers, t.statut, t.note, t.commentaire, t.created_at, t.edition_id,
                u.nom, u.prenom, u.email
         FROM cp2i_textes t 
-        JOIN cp2i_users u ON t.user_id = u.id 
+        JOIN cp2i_users u ON t.user_id = u.id
+        WHERE t.edition_id = ?
         ORDER BY t.created_at DESC
     ");
-    $stmt->execute();
+    $stmt->execute([$editionNumero]);
     $textes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    echo json_encode(['textes' => $textes]);
+    echo json_encode(['textes' => $textes, 'edition_id' => $editionId]);
 }
 
 function updateTextStatus($data) {

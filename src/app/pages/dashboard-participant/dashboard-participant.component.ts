@@ -36,6 +36,12 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   currentHistoryFilter = 'all';
   openFaq: number | null = null;
 
+  // Multi-éditions
+  editions: any[] = [];
+  editionActive: any = null;       // édition actuellement affichée dans le dashboard
+  editionCourante: any = null;     // édition officielle en cours (is_active = true)
+  showEditionSelector = false;     // afficher l'écran de sélection
+
   historique: any[] = [];
   certificats: any[] = [];
   classement: any = {};
@@ -62,35 +68,31 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     { code: 'arabe', nom: 'العربية' }
   ];
 
-  // Thèmes traduits par langue
+  // Thèmes traduits par langue — 4ème édition 2026
   themesParLangue = {
     francais: [
-      { code: 'patriotisme', nom: 'Patriotisme' },
-      { code: 'justice_dignite', nom: 'Justice et dignité' },
-      { code: 'beaute_africaine', nom: 'Beauté Africaine' },
-      { code: 'jeunesse_responsable', nom: 'Jeunesse responsable' },
-      { code: 'emprise_ecrans', nom: 'Sous l\'emprise des écrans' }
+      { code: 'mots_silence', nom: 'Les mots du silence' },
+      { code: 'taaru_senegal', nom: 'Taaru Sénégal' },
+      { code: 'flicage_couple', nom: 'Le flicage au sein du couple' },
+      { code: 'pression_sociale', nom: 'Pression sociale et influence ruineuse' }
     ],
     wolof: [
-      { code: 'patriotisme', nom: 'Bëgg sa réew' },
-      { code: 'justice_dignite', nom: 'Yoon ak ngor' },
-      { code: 'beaute_africaine', nom: 'Taaru jigeenu afrik' },
-      { code: 'jeunesse_responsable', nom: 'Xale yu am responsabilite' },
-      { code: 'emprise_ecrans', nom: 'Ci ndigalu ekraŋ yi' }
+      { code: 'mots_silence', nom: 'Baat yu dëkk ci xol' },
+      { code: 'taaru_senegal', nom: 'Taaru Sénégal' },
+      { code: 'flicage_couple', nom: 'Suqali ak kontrole ci kër ga' },
+      { code: 'pression_sociale', nom: 'Pression bu dëkk ak influence bu xaw' }
     ],
     anglais: [
-      { code: 'patriotisme', nom: 'Patriotism' },
-      { code: 'justice_dignite', nom: 'Justice and dignity' },
-      { code: 'beaute_africaine', nom: 'African Beauty' },
-      { code: 'jeunesse_responsable', nom: 'Responsible Youth' },
-      { code: 'emprise_ecrans', nom: 'Under the grip of screens' }
+      { code: 'mots_silence', nom: 'The words of silence' },
+      { code: 'taaru_senegal', nom: 'Taaru Sénégal' },
+      { code: 'flicage_couple', nom: 'Surveillance within the couple' },
+      { code: 'pression_sociale', nom: 'Social pressure and ruinous influence' }
     ],
     arabe: [
-      { code: 'patriotisme', nom: 'الوطنية' },
-      { code: 'justice_dignite', nom: 'العدالة والكرامة' },
-      { code: 'beaute_africaine', nom: 'الجمال الأفريقي' },
-      { code: 'jeunesse_responsable', nom: 'الشباب المسؤول' },
-      { code: 'emprise_ecrans', nom: 'تحت سيطرة الشاشات' }
+      { code: 'mots_silence', nom: 'كلمات الصمت' },
+      { code: 'taaru_senegal', nom: 'تارو السنغال' },
+      { code: 'flicage_couple', nom: 'المراقبة داخل الزوجين' },
+      { code: 'pression_sociale', nom: 'الضغط الاجتماعي والتأثير المدمر' }
     ]
   };
   isSubmitting = false;
@@ -109,149 +111,125 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   showCertificatPreview = false;
   selectedCertificat: any = null;
   
-  // Dates officielles du concours CP2i 2025
+  // Dates officielles du concours CP2i 2026 — 4ème édition
   concoursSchedule = {
-    inscription_debut: '2025-11-03',
-    inscription_fin: '2025-11-23', // Initialement jusqu'au 23 novembre
-    inscription_prolongee: '2025-11-25', // Prolongée jusqu'au 25 novembre
-    correction_debut: '2025-11-26',
-    correction_fin: '2025-12-03',
-    correction_prolongement: '2025-12-10',
-    deliberation: '2025-12-15',
-    ceremonie_remise: '2026-01-15'
+    inscription_debut: '2026-11-02',
+    inscription_fin: '2026-11-23',
+    inscription_prolongee: '2026-11-23',
+    correction_debut: '2026-11-24',
+    correction_fin: '2026-12-03',
+    correction_prolongement: '2026-12-10',
+    deliberation: '2026-12-15',
+    ceremonie_remise: '2027-01-15'
   };
   
   // Section thèmes
   selectedLanguage = 'francais';
   
-  // Thèmes détaillés par langue
+  // Thèmes détaillés par langue — 4ème édition 2026
   themesDetailles = {
     francais: [
       {
-        title: '1. Patriotisme',
-        icon: 'fas fa-flag',
-        description: 'Explorez l\'amour de la patrie, l\'attachement à son pays et la fierté nationale.',
-        keywords: ['Patrie', 'Nation', 'Fierté', 'Identité', 'Héritage']
+        title: '1. Les mots du silence',
+        icon: 'fas fa-moon',
+        description: 'Explorez ce que le silence dit, ressent et révèle dans nos vies et nos relations.',
+        keywords: ['Silence', 'Introspection', 'Émotion', 'Langage', 'Intériorité']
       },
       {
-        title: '2. Justice et dignité',
-        icon: 'fas fa-balance-scale',
-        description: 'Questionnez l\'équité, les droits humains et la quête de justice sociale.',
-        keywords: ['Équité', 'Droits', 'Justice', 'Respect', 'Humanité']
+        title: '2. Taaru Sénégal',
+        icon: 'fas fa-globe-africa',
+        description: 'Célébrez la beauté, la culture et l\'identité du Sénégal à travers la poésie.',
+        keywords: ['Sénégal', 'Identité', 'Culture', 'Fierté', 'Héritage']
       },
       {
-        title: '3. Beauté Africaine',
-        icon: 'fas fa-crown',
-        description: 'Célébrez la richesse culturelle, la diversité et l\'esthétique africaine.',
-        keywords: ['Culture', 'Tradition', 'Diversité', 'Art', 'Héritage']
+        title: '3. Le flicage au sein du couple',
+        icon: 'fas fa-heart-broken',
+        description: 'Interrogez la surveillance, le contrôle et la confiance dans les relations amoureuses.',
+        keywords: ['Contrôle', 'Confiance', 'Liberté', 'Couple', 'Respect']
       },
       {
-        title: '4. Jeunesse responsable',
+        title: '4. Pression sociale et influence ruineuse',
         icon: 'fas fa-users',
-        description: 'Réfléchissez sur le rôle et les responsabilités de la nouvelle génération.',
-        keywords: ['Avenir', 'Engagement', 'Leadership', 'Changement', 'Espoir']
-      },
-      {
-        title: '5. Sous l\'emprise des écrans',
-        icon: 'fas fa-mobile-alt',
-        description: 'Analysez l\'impact du numérique sur nos vies et nos relations humaines.',
-        keywords: ['Technologie', 'Dépendance', 'Connexion', 'Virtuel', 'Réalité']
+        description: 'Analysez les pressions du regard social et leurs effets destructeurs sur l\'individu.',
+        keywords: ['Société', 'Pression', 'Influence', 'Conformisme', 'Liberté']
       }
     ],
     wolof: [
       {
-        title: '1. Bëgg sa réew',
-        icon: 'fas fa-flag',
-        description: 'Xam-xam ci bëgg réew, jokko ak sa taaw ak ngor ci sa réew.',
-        keywords: ['Réew', 'Taaw', 'Ngor', 'Jikko', 'Aada']
+        title: '1. Baat yu dëkk ci xol',
+        icon: 'fas fa-moon',
+        description: 'Xam-xam ci li xol wax bu mu dem, bu mu seet ak bu mu yëgël.',
+        keywords: ['Xol', 'Baat', 'Dëkk', 'Xam-xam', 'Yëgël']
       },
       {
-        title: '2. Yoon ak ngor',
-        icon: 'fas fa-balance-scale',
-        description: 'Laaj ci yoon, sag ak ngor nët kë nët.',
-        keywords: ['Yoon', 'Sag', 'Ngor', 'Jub', 'Nët kë nët']
+        title: '2. Taaru Sénégal',
+        icon: 'fas fa-globe-africa',
+        description: 'Benn ci rafet, aada ak jikko yu Sénégal.',
+        keywords: ['Sénégal', 'Aada', 'Rafet', 'Taaw', 'Jikko']
       },
       {
-        title: '3. Taaru jigeenu afrik',
-        icon: 'fas fa-crown',
-        description: 'Benn ci rafet ak aada yu Afrik.',
-        keywords: ['Aada', 'Taaw', 'Rafet', 'Jigeenu', 'Afrik']
+        title: '3. Suqali ak kontrole ci kër ga',
+        icon: 'fas fa-heart-broken',
+        description: 'Laaj ci suqali, kontrole ak jëm ci kër ga.',
+        keywords: ['Kontrole', 'Jëm', 'Kër', 'Yëgël', 'Ngor']
       },
       {
-        title: '4. Xale yu am responsabilite',
+        title: '4. Pression bu dëkk ak influence bu xaw',
         icon: 'fas fa-users',
-        description: 'Xam-xam ci jokko xale yi ak seen responsabilite.',
-        keywords: ['Xale', 'Jokko', 'Responsabilite', 'Avenir', 'Liggey']
-      },
-      {
-        title: '5. Ci ndigalu ekraŋ yi',
-        icon: 'fas fa-mobile-alt',
-        description: 'Xam-xam ci jafe ekraŋ yi ci seen dundu.',
-        keywords: ['Ekraŋ', 'Teknoloji', 'Jokko', 'Dundu', 'Yaram']
+        description: 'Xam-xam ci jafe pression bu dëkk ak influence bu xaw ci nit.',
+        keywords: ['Pression', 'Influence', 'Dëkk', 'Nit', 'Xam-xam']
       }
     ],
     anglais: [
       {
-        title: '1. Patriotism',
-        icon: 'fas fa-flag',
-        description: 'Explore love for one\'s country, national pride and cultural identity.',
-        keywords: ['Country', 'Nation', 'Pride', 'Identity', 'Heritage']
+        title: '1. The words of silence',
+        icon: 'fas fa-moon',
+        description: 'Explore what silence says, feels and reveals in our lives and relationships.',
+        keywords: ['Silence', 'Introspection', 'Emotion', 'Language', 'Interiority']
       },
       {
-        title: '2. Justice and dignity',
-        icon: 'fas fa-balance-scale',
-        description: 'Question equity, human rights and the quest for social justice.',
-        keywords: ['Equity', 'Rights', 'Justice', 'Respect', 'Humanity']
+        title: '2. Taaru Sénégal',
+        icon: 'fas fa-globe-africa',
+        description: 'Celebrate the beauty, culture and identity of Senegal through poetry.',
+        keywords: ['Senegal', 'Identity', 'Culture', 'Pride', 'Heritage']
       },
       {
-        title: '3. African Beauty',
-        icon: 'fas fa-crown',
-        description: 'Celebrate cultural richness, diversity and African aesthetics.',
-        keywords: ['Culture', 'Tradition', 'Diversity', 'Art', 'Heritage']
+        title: '3. Surveillance within the couple',
+        icon: 'fas fa-heart-broken',
+        description: 'Question surveillance, control and trust in romantic relationships.',
+        keywords: ['Control', 'Trust', 'Freedom', 'Couple', 'Respect']
       },
       {
-        title: '4. Responsible Youth',
+        title: '4. Social pressure and ruinous influence',
         icon: 'fas fa-users',
-        description: 'Reflect on the role and responsibilities of the new generation.',
-        keywords: ['Future', 'Engagement', 'Leadership', 'Change', 'Hope']
-      },
-      {
-        title: '5. Under the grip of screens',
-        icon: 'fas fa-mobile-alt',
-        description: 'Analyze the impact of digital technology on our lives and relationships.',
-        keywords: ['Technology', 'Addiction', 'Connection', 'Virtual', 'Reality']
+        description: 'Analyze social pressures and their destructive effects on the individual.',
+        keywords: ['Society', 'Pressure', 'Influence', 'Conformism', 'Freedom']
       }
     ],
     arabe: [
       {
-        title: '1. الوطنية',
-        icon: 'fas fa-flag',
-        description: 'استكشف حب الوطن والفخر الوطني والهوية الثقافية',
-        keywords: ['الوطن', 'الأمة', 'الفخر', 'الهوية', 'التراث']
+        title: '1. كلمات الصمت',
+        icon: 'fas fa-moon',
+        description: 'استكشف ما يقوله الصمت ويشعر به ويكشفه في حياتنا وعلاقاتنا',
+        keywords: ['الصمت', 'التأمل', 'العاطفة', 'اللغة', 'الداخل']
       },
       {
-        title: '2. العدالة والكرامة',
-        icon: 'fas fa-balance-scale',
-        description: 'استجوب العدالة وحقوق الإنسان والبحث عن العدالة الاجتماعية',
-        keywords: ['العدالة', 'الحقوق', 'العدل', 'الاحترام', 'الإنسانية']
+        title: '2. تارو السنغال',
+        icon: 'fas fa-globe-africa',
+        description: 'احتفل بجمال وثقافة وهوية السنغال من خلال الشعر',
+        keywords: ['السنغال', 'الهوية', 'الثقافة', 'الفخر', 'التراث']
       },
       {
-        title: '3. الجمال الأفريقي',
-        icon: 'fas fa-crown',
-        description: 'احتفل بالثراء الثقافي والتنوع والجماليات الأفريقية',
-        keywords: ['الثقافة', 'التقليد', 'التنوع', 'الفن', 'التراث']
+        title: '3. المراقبة داخل الزوجين',
+        icon: 'fas fa-heart-broken',
+        description: 'استجوب المراقبة والسيطرة والثقة في العلاقات العاطفية',
+        keywords: ['السيطرة', 'الثقة', 'الحرية', 'الزوجان', 'الاحترام']
       },
       {
-        title: '4. الشباب المسؤول',
+        title: '4. الضغط الاجتماعي والتأثير المدمر',
         icon: 'fas fa-users',
-        description: 'تأمل في دور ومسؤوليات الجيل الجديد',
-        keywords: ['المستقبل', 'الالتزام', 'القيادة', 'التغيير', 'الأمل']
-      },
-      {
-        title: '5. تحت سيطرة الشاشات',
-        icon: 'fas fa-mobile-alt',
-        description: 'حلل تأثير التكنولوجيا الرقمية على حياتنا وعلاقاتنا',
-        keywords: ['التكنولوجيا', 'الإدمان', 'الاتصال', 'الافتراضي', 'الواقع']
+        description: 'حلل الضغوط الاجتماعية وآثارها المدمرة على الفرد',
+        keywords: ['المجتمع', 'الضغط', 'التأثير', 'الامتثال', 'الحرية']
       }
     ]
   };
@@ -291,7 +269,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     }
     
     this.currentUser = this.cp2iApi.getCurrentUser();
-    this.loadData();
+    this.loadEditions();
 
     
     // Initialiser le service de messages
@@ -301,6 +279,62 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     this.handleMobileLayout();
   }
   
+  loadEditions() {
+    this.cp2iApi.getEditions().subscribe({
+      next: (data) => {
+        if (data.success) {
+          this.editions = data.editions || [];
+          this.editionCourante = this.editions.find((e: any) => e.is_active) || this.editions[this.editions.length - 1];
+
+          // Si le participant a plusieurs éditions → afficher le sélecteur
+          // Si une seule édition (ou aucune) → aller directement au dashboard
+          if (this.editions.length > 1) {
+            this.showEditionSelector = true;
+          } else {
+            this.editionActive = this.editionCourante;
+            this.loadData();
+          }
+        } else {
+          // Fallback : édition active par défaut
+          this.editionActive = { id: 4, numero: 4, annee: 2026, label: '4ᵉ édition (2026)', is_active: true };
+          this.loadData();
+        }
+      },
+      error: () => {
+        this.editionActive = { id: 4, numero: 4, annee: 2026, label: '4ᵉ édition (2026)', is_active: true };
+        this.loadData();
+      }
+    });
+  }
+
+  selectEdition(edition: any) {
+    this.editionActive = edition;
+    this.showEditionSelector = false;
+    this.loadData();
+  }
+
+  switchEdition(edition: any) {
+    if (edition.id === this.editionActive?.id) return;
+    this.editionActive = edition;
+    this.currentView = 'accueil';
+    // Réinitialiser les données avant de recharger
+    this.mesSoumissions = [];
+    this.stats = {};
+    this.classement = {};
+    this.certificats = [];
+    this.historique = [];
+    this.loadData();
+  }
+
+  // Retourne la référence à passer à l'API (= numero, ex: 3 ou 4)
+  getEditionRef(): number | undefined {
+    return this.editionActive?.edition_ref ?? this.editionActive?.numero;
+  }
+
+  isEditionArchivee(): boolean {
+    return this.editionActive && !this.editionActive.is_active;
+  }
+
   handleMobileLayout() {
     if (typeof window !== 'undefined') {
       // Détecter si on est sur mobile
@@ -402,7 +436,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   async createValidCertificate(certIndex: number): Promise<string> {
     const certificateData = {
       participant_name: `${this.currentUser?.prenom} ${this.currentUser?.nom}`,
-      formation_title: 'Concours CP2i 2025',
+      formation_title: 'Concours CP2i 2026',
       certificate_id: `CP2i-${certIndex}-${this.currentUser?.id}`
     };
     
@@ -504,7 +538,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
       id: 'inscription',
       type: 'login',
       created_at: '2025-10-18T12:55:00.000Z',
-      details: { action: 'Inscription au concours CP2i 2025' }
+      details: { action: 'Inscription au concours CP2i 2026' }
     });
     
     // Charger les messages pour l'historique (asynchrone)
@@ -568,7 +602,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
         this.certificats.push({
           id: 1,
           titre: 'Attestation de Participation',
-          description: 'Attestation officielle de participation au concours CP2i 2025',
+          description: 'Attestation officielle de participation au concours CP2i 2026',
           type: 'participation',
           date: new Date()
         });
@@ -577,8 +611,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   }
   
   calculateDeadline() {
-    // Pour les participants, toujours afficher les jours restants pour soumettre (prolongé jusqu'au 25 novembre)
-    this.joursRestants = this.getJoursRestants(this.concoursSchedule.inscription_prolongee || this.concoursSchedule.inscription_fin);
+    this.joursRestants = this.getJoursRestants(this.concoursSchedule.inscription_fin);
   }
   
   isSubmissionPeriodActive(): boolean {
@@ -587,7 +620,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   
   getSubmissionStatus(): string {
     if (this.isSubmissionPeriodActive()) {
-      return this.joursRestants > 0 ? 'Prolongé jusqu\'au 25 novembre' : 'Dernier jour';
+      return this.joursRestants > 0 ? 'Ouvert jusqu\'au 23 novembre 2026' : 'Dernier jour';
     } else {
       return 'Soumissions clôturées';
     }
@@ -921,7 +954,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
               <div class="brand-info">
                 <h1>PENCCUM NDONGO</h1>
                 <p>Concours de Poésie Inédit & Innovant</p>
-                <p><strong>Troisième Édition</strong></p>
+                <p><strong>Quatrième Édition</strong></p>
               </div>
               <div class="cert-badge">
                 🏆
@@ -938,12 +971,12 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
               </div>
               <div class="cert-achievement">
                 <p class="achievement-text">
-                  Pour sa participation à la 3e édition du Concours de Poésie Inédit & Innovant (CP2i).
+                  Pour sa participation à la 4e édition du Concours de Poésie Inédit & Innovant (CP2i).
                 </p>
                 <div class="performance-stats">
                   ${this.stats.note_moyenne ? `<div class="stat-item"><span class="stat-value">${this.stats.note_moyenne.toFixed(1)}</span><span class="stat-label">Note / 20</span></div>` : ''}
                   ${this.classement?.position ? `<div class="stat-item"><span class="stat-value">${this.classement.position}${this.getOrdinalSuffix(this.classement.position)}</span><span class="stat-label">Classement</span></div>` : ''}
-                  <div class="stat-item"><span class="stat-value">2025</span><span class="stat-label">Édition</span></div>
+                  <div class="stat-item"><span class="stat-value">2026</span><span class="stat-label">Édition</span></div>
                 </div>
               </div>
             </div>
@@ -984,8 +1017,8 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   shareCertificat(cert: any) {
     if (navigator.share) {
       navigator.share({
-        title: 'Mon Certificat CP2i 2025',
-        text: `J'ai participé au Concours de Poésie CP2i 2025 !`,
+        title: 'Mon Certificat CP2i 2026',
+        text: `J'ai participé au Concours de Poésie CP2i 2026 !`,
         url: window.location.href
       });
     } else {
@@ -1016,7 +1049,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   
   generateCertificateHash(): string {
     // Générer un hash unique basé sur les données du participant
-    const data = `${this.currentUser?.id}-${this.stats.note_moyenne}-${this.getCurrentDate()}-CP2i2025`;
+    const data = `${this.currentUser?.id}-${this.stats.note_moyenne}-${this.getCurrentDate()}-CP2i2026`;
     return btoa(data).substring(0, 16);
   }
   
@@ -1063,6 +1096,11 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
 
 
   nouvellesoumission() {
+    // Bloquer si édition archivée
+    if (this.isEditionArchivee()) {
+      this.showToast('Les soumissions pour cette édition sont clôturées.', 'error');
+      return;
+    }
     // Vérifier si les soumissions sont clôturées
     if (this.isSubmissionPeriodClosed()) {
       this.showSubmissionClosedModal = true;
@@ -1192,7 +1230,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
         }
       });
     } else {
-      this.cp2iApi.submitText(texteData).subscribe({
+      this.cp2iApi.submitText(texteData, this.getEditionRef()).subscribe({
         next: (response) => {
           this.isSubmitting = false;
           if (response && response.success) {
@@ -1410,7 +1448,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   
   loadDataFallback() {
     // Méthode de fallback en cas d'erreur de validation
-    this.cp2iApi.getUserTexts().subscribe({
+    this.cp2iApi.getUserTexts(this.getEditionRef()).subscribe({
       next: (data) => {
         this.mesSoumissions = data.textes || [];
         

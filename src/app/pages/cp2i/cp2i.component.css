@@ -1,3 +1,31 @@
+/* Bannière 4ᵉ édition */
+.edition-banner {
+  background: linear-gradient(135deg, var(--primary-orange, #FF7F1A), #e67e22);
+  color: white;
+  text-align: center;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.edition-banner .banner-link {
+  color: white;
+  font-weight: 700;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+.edition-banner .banner-link:hover {
+  opacity: 0.85;
+}
+
 /* Variables */
 :root {
   --primary-blue: #0380C2;

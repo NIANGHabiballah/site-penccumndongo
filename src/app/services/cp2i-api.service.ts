@@ -116,16 +116,26 @@ export class Cp2iApiService {
     return this.currentUserSubject.value;
   }
 
-  submitText(texte: Texte): Observable<any> {
-    return this.http.post(`${this.baseUrl}/cp2i-textes.php`, texte, { headers: this.getHeaders() });
+  submitText(texte: Texte, editionId?: number): Observable<any> {
+    const data = editionId ? { ...texte, edition_id: editionId } : texte;
+    return this.http.post(`${this.baseUrl}/cp2i-textes.php`, data, { headers: this.getHeaders() });
   }
   
   updateText(texte: Texte): Observable<any> {
     return this.http.put(`${this.baseUrl}/cp2i-textes.php`, texte, { headers: this.getHeaders() });
   }
 
-  getUserTexts(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/cp2i-textes.php`, { headers: this.getHeaders() });
+  getUserTexts(editionId?: number): Observable<any> {
+    const params = editionId ? `?edition_id=${editionId}` : '';
+    return this.http.get(`${this.baseUrl}/cp2i-textes.php${params}`, { headers: this.getHeaders() });
+  }
+
+  getEditions(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-editions.php`, { headers: this.getHeaders() });
+  }
+
+  getActiveEdition(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cp2i-editions.php?action=active`, { headers: this.getHeaders() });
   }
 
   // Méthode améliorée pour récupérer les textes avec validation
@@ -137,8 +147,9 @@ export class Cp2iApiService {
     return this.getUserTexts();
   }
 
-  getAllTexts(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/cp2i-textes.php`, { headers: this.getHeaders() });
+  getAllTexts(editionId?: number): Observable<any> {
+    const params = editionId ? `?edition_id=${editionId}` : '';
+    return this.http.get(`${this.baseUrl}/cp2i-textes.php${params}`, { headers: this.getHeaders() });
   }
 
   updateTextStatus(id: number, statut: string, note?: number, commentaire?: string): Observable<any> {
