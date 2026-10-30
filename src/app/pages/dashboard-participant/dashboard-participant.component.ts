@@ -84,8 +84,8 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     ],
     anglais: [
       { code: 'mots_silence', nom: 'The words of silence' },
-      { code: 'taaru_senegal', nom: 'Taaru Sénégal' },
-      { code: 'flicage_couple', nom: 'Surveillance within the couple' },
+      { code: 'taaru_senegal', nom: 'The beauty of Senegal' },
+      { code: 'flicage_couple', nom: "Couple's high control" },
       { code: 'pression_sociale', nom: 'Social pressure and ruinous influence' }
     ],
     arabe: [
@@ -188,13 +188,13 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
         keywords: ['Silence', 'Introspection', 'Emotion', 'Language', 'Interiority']
       },
       {
-        title: '2. Taaru Sénégal',
+        title: '2. The beauty of Senegal',
         icon: 'fas fa-globe-africa',
         description: 'Celebrate the beauty, culture and identity of Senegal through poetry.',
         keywords: ['Senegal', 'Identity', 'Culture', 'Pride', 'Heritage']
       },
       {
-        title: '3. Surveillance within the couple',
+        title: "3. Couple's high control",
         icon: 'fas fa-heart-broken',
         description: 'Question surveillance, control and trust in romantic relationships.',
         keywords: ['Control', 'Trust', 'Freedom', 'Couple', 'Respect']
