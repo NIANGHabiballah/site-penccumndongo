@@ -79,26 +79,13 @@ export class Cp2iComponent implements OnInit {
   themesMultilingues = {
     francais: [
       { title: 'Les mots du silence', icon: 'fas fa-moon' },
-      { title: 'Taaru Sénégal', icon: 'fas fa-globe-africa' },
-      { title: 'Le flicage au sein du couple', icon: 'fas fa-heart-broken' },
-      { title: 'Pression sociale et influence ruineuse', icon: 'fas fa-users' }
-    ],
-    wolof: [
-      { title: 'Baat yu dëkk ci xol', icon: 'fas fa-moon' },
-      { title: 'Taaru Sénégal', icon: 'fas fa-globe-africa' },
-      { title: 'Suqali ak kontrole ci kër ga', icon: 'fas fa-heart-broken' },
-      { title: 'Pression bu dëkk ak influence bu xaw', icon: 'fas fa-users' }
-    ],
-    anglais: [
-      { title: 'The words of silence', icon: 'fas fa-moon' },
-      { title: 'Taaru Sénégal', icon: 'fas fa-globe-africa' },
-      { title: 'Surveillance within the couple', icon: 'fas fa-heart-broken' },
+      { title: 'La beauté du Sénégal', icon: 'fas fa-globe-africa' },
       { title: 'Social pressure and ruinous influence', icon: 'fas fa-users' }
     ],
     arabe: [
       { title: 'كلمات الصمت', icon: 'fas fa-moon' },
-      { title: 'تارو السنغال', icon: 'fas fa-globe-africa' },
-      { title: 'المراقبة داخل الزوجين', icon: 'fas fa-heart-broken' },
+      { title: 'جمال السنغال', icon: 'fas fa-globe-africa' },
+      { title: 'المراقبة المفرطة داخل العلاقة الزوجية', icon: 'fas fa-heart-broken' },
       { title: 'الضغط الاجتماعي والتأثير المدمر', icon: 'fas fa-users' }
     ]
   };

@@ -1709,7 +1709,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   getThemeLabel(theme: string): string {
     const themes = {
       'mots_silence': 'Les mots du silence',
-      'taaru_senegal': 'Taaru Sénégal',
+      'taaru_senegal': 'La beauté du Sénégal',
       'flicage_couple': 'Le flicage au sein du couple',
       'pression_sociale': 'Pression sociale et influence ruineuse',
       // Anciens thèmes (3ème édition) conservés pour l'historique

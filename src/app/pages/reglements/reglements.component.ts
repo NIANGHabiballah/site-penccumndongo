@@ -551,7 +551,7 @@ export class ReglementsComponent implements OnInit {
         periode_inscription: 'du 02 au 23 novembre 2026',
         date_limite_soumission: '23 novembre 2026 à 23h59',
         langues: ['français', 'wolof', 'anglais', 'arabe'],
-        themes: ['Les mots du silence', 'Taaru Sénégal', 'Le flicage au sein du couple', 'Pression sociale et influence ruineuse']
+        themes: ['Les mots du silence', 'La beauté du Sénégal', 'Le flicage au sein du couple', 'Pression sociale et influence ruineuse']
       },
       soumission: {
         format: 'Un seul poème par participant en format numérique',
@@ -578,7 +578,7 @@ export class ReglementsComponent implements OnInit {
         acceptation: 'La participation au concours implique l\'acceptation pleine et entière de ce règlement'
       },
       nouveautes_2026: {
-        themes_officiels: 'Les mots du silence, Taaru Sénégal, Le flicage au sein du couple, Pression sociale et influence ruineuse',
+        themes_officiels: 'Les mots du silence, La beauté du Sénégal, Le flicage au sein du couple, Pression sociale et influence ruineuse',
         limite_vers_augmentee: '40 vers maximum',
         periode_prolongee: 'Inscriptions du 02 au 23 novembre 2026',
         plateforme_numerique: 'Soumission entièrement numérique via le site web',
