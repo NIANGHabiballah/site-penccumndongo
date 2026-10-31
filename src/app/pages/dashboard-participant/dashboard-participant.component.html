@@ -11,8 +11,7 @@
       <p class="edition-selector-sub">Bienvenue, <strong>{{currentUser?.prenom}}</strong> ! Vous avez participé à plusieurs éditions.</p>
       <div class="edition-cards">
         <div class="edition-card" *ngFor="let ed of editions" (click)="selectEdition(ed)">
-          <div class="edition-card-badge" [class.active]="ed.is_active">{{ed.is_active ? 'En cours' : 'Archivée'}}</div>
-          <div class="edition-card-numero">{{ed.numero}}<sup>{{ed.numero === 1 ? 'ère' : 'ème'}}</sup></div>
+          <div class="edition-card-badge" [class.active]="ed.is_active">{{ed.is_active ? 'En cours' : 'Archives'}}</div>
           <div class="edition-card-label">{{ed.label}}</div>
           <div class="edition-card-arrow"><i class="fas fa-arrow-right"></i></div>
         </div>
