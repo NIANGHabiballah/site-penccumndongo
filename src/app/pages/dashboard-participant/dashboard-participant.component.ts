@@ -99,28 +99,32 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   // Thèmes édition 3 (2025) — pour affichage en lecture seule
   themesParLangueEdition3 = {
     francais: [
-      { code: 'theme1_ed3', nom: 'La femme africaine' },
-      { code: 'theme2_ed3', nom: 'L’Afrique que je veux' },
-      { code: 'theme3_ed3', nom: 'Le développement durable' },
-      { code: 'theme4_ed3', nom: 'La paix et la réconciliation' }
+      { code: 'patriotisme', nom: 'Patriotisme' },
+      { code: 'justice_dignite', nom: 'Justice et dignité' },
+      { code: 'beaute_africaine', nom: 'Beauté Africaine' },
+      { code: 'jeunesse_responsable', nom: 'Jeunesse responsable' },
+      { code: 'emprise_ecrans', nom: 'Sous l\'emprise des écrans' }
     ],
     wolof: [
-      { code: 'theme1_ed3', nom: 'Jiggéen bu Afrik' },
-      { code: 'theme2_ed3', nom: 'Afrik bu ma dëgg' },
-      { code: 'theme3_ed3', nom: 'Dévelopman bu dund' },
-      { code: 'theme4_ed3', nom: 'Jàmm ak rékonsiliasion' }
+      { code: 'patriotisme', nom: 'Patriotisme' },
+      { code: 'justice_dignite', nom: 'Justice et dignité' },
+      { code: 'beaute_africaine', nom: 'Beauté Africaine' },
+      { code: 'jeunesse_responsable', nom: 'Jeunesse responsable' },
+      { code: 'emprise_ecrans', nom: 'Sous l\'emprise des écrans' }
     ],
     anglais: [
-      { code: 'theme1_ed3', nom: 'The African woman' },
-      { code: 'theme2_ed3', nom: 'The Africa I want' },
-      { code: 'theme3_ed3', nom: 'Sustainable development' },
-      { code: 'theme4_ed3', nom: 'Peace and reconciliation' }
+      { code: 'patriotisme', nom: 'Patriotism' },
+      { code: 'justice_dignite', nom: 'Justice and dignity' },
+      { code: 'beaute_africaine', nom: 'African beauty' },
+      { code: 'jeunesse_responsable', nom: 'Responsible youth' },
+      { code: 'emprise_ecrans', nom: 'Under the grip of screens' }
     ],
     arabe: [
-      { code: 'theme1_ed3', nom: 'المرأة الأفريقية' },
-      { code: 'theme2_ed3', nom: 'أفريقيا التي أريد' },
-      { code: 'theme3_ed3', nom: 'التنمية المستدامة' },
-      { code: 'theme4_ed3', nom: 'السلام والمصالحة' }
+      { code: 'patriotisme', nom: 'الوطنية' },
+      { code: 'justice_dignite', nom: 'العدالة والكرامة' },
+      { code: 'beaute_africaine', nom: 'الجمال الأفريقي' },
+      { code: 'jeunesse_responsable', nom: 'الشباب المسؤول' },
+      { code: 'emprise_ecrans', nom: 'تحت سيطرة الشاشات' }
     ]
   };
   isSubmitting = false;
