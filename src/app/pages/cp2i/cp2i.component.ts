@@ -80,6 +80,19 @@ export class Cp2iComponent implements OnInit {
     francais: [
       { title: 'Les mots du silence', icon: 'fas fa-moon' },
       { title: 'La beauté du Sénégal', icon: 'fas fa-globe-africa' },
+      { title: 'Le flicage au sein du couple', icon: 'fas fa-heart-broken' },
+      { title: 'Pression sociale et influence ruineuse', icon: 'fas fa-users' }
+    ],
+    wolof: [
+      { title: 'Baat yu dëkk ci xol', icon: 'fas fa-moon' },
+      { title: 'Taaru Sénégal', icon: 'fas fa-globe-africa' },
+      { title: 'Suqali ak kontrole ci kër ga', icon: 'fas fa-heart-broken' },
+      { title: 'Pression bu dëkk ak influence bu xaw', icon: 'fas fa-users' }
+    ],
+    anglais: [
+      { title: 'The words of silence', icon: 'fas fa-moon' },
+      { title: 'The beauty of Senegal', icon: 'fas fa-globe-africa' },
+      { title: "Couple's high control", icon: 'fas fa-heart-broken' },
       { title: 'Social pressure and ruinous influence', icon: 'fas fa-users' }
     ],
     arabe: [
