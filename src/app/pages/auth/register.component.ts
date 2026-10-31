@@ -212,21 +212,21 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
     }
     .welcome-card {
       background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-      padding: 3rem;
+      padding: 2.5rem 1.5rem;
       color: white;
       text-align: center;
-      flex: 0 0 300px;
+      flex: 0 0 240px;
       display: flex;
       flex-direction: column;
       justify-content: center;
     }
-    .welcome-card h2 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; color: white; }
-    .welcome-card p { font-size: 1rem; line-height: 1.6; margin-bottom: 2rem; opacity: 0.9; color: white; }
-    .welcome-actions { display: flex; flex-direction: column; gap: 1rem; }
+    .welcome-card h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; color: white; }
+    .welcome-card p { font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.5rem; opacity: 0.9; color: white; }
+    .welcome-actions { display: flex; flex-direction: column; gap: 0.75rem; }
     .welcome-btn {
-      padding: 1rem 2rem; border-radius: 25px; font-weight: 700; font-size: 1.1rem;
+      padding: 0.75rem 1rem; border-radius: 25px; font-weight: 700; font-size: 1rem;
       transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;
-      gap: 0.5rem; border: none; cursor: pointer; min-height: 50px;
+      gap: 0.5rem; border: none; cursor: pointer; min-height: 44px;
     }
     .welcome-btn.primary { background: white; color: #f39c12; border: 2px solid white; }
     .welcome-btn.primary:hover { background: transparent; color: white; }
