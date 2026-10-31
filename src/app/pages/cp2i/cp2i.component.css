@@ -1,29 +1,45 @@
-/* Bannière 4ᵉ édition */
-.edition-banner {
-  background: linear-gradient(135deg, var(--primary-orange, #FF7F1A), #e67e22);
-  color: white;
-  text-align: center;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  display: flex;
+/* Badge 4ᵉ édition live */
+.edition-live-badge {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  position: sticky;
-  top: 0;
-  z-index: 999;
+  gap: 0.6rem;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  padding: 0.6rem 1.4rem;
+  border-radius: 50px;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  animation: badgePulse 2.5s ease-in-out infinite;
 }
 
-.edition-banner .banner-link {
-  color: white;
-  font-weight: 700;
-  text-decoration: underline;
-  white-space: nowrap;
+.live-dot {
+  width: 10px;
+  height: 10px;
+  background: #2ecc71;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: dotBlink 1.2s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.6);
 }
 
-.edition-banner .banner-link:hover {
-  opacity: 0.85;
+.live-text sup {
+  font-size: 0.6em;
+  vertical-align: super;
+}
+
+@keyframes dotBlink {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.6); }
+  50% { opacity: 0.5; box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
+}
+
+@keyframes badgePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.15); }
+  50% { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
 }
 
 /* Variables */
