@@ -205,48 +205,48 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
     }
     .auth-card {
       background: white;
-      padding: 3rem;
+      padding: 2.5rem;
       flex: 1;
       overflow-y: auto;
       max-height: 100vh;
     }
     .welcome-card {
       background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-      padding: 2.5rem 1.5rem;
+      padding: 3rem 2rem;
       color: white;
       text-align: center;
-      flex: 0 0 240px;
+      flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
     }
-    .welcome-card h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; color: white; }
-    .welcome-card p { font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.5rem; opacity: 0.9; color: white; }
-    .welcome-actions { display: flex; flex-direction: column; gap: 0.75rem; }
+    .welcome-card h2 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; color: white; }
+    .welcome-card p { font-size: 1rem; line-height: 1.6; margin-bottom: 2rem; opacity: 0.9; color: white; }
+    .welcome-actions { display: flex; flex-direction: column; gap: 1rem; }
     .welcome-btn {
-      padding: 0.75rem 1rem; border-radius: 25px; font-weight: 700; font-size: 1rem;
+      padding: 0.9rem 1.5rem; border-radius: 25px; font-weight: 700; font-size: 1rem;
       transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;
-      gap: 0.5rem; border: none; cursor: pointer; min-height: 44px;
+      gap: 0.5rem; border: none; cursor: pointer; min-height: 46px;
     }
     .welcome-btn.primary { background: white; color: #f39c12; border: 2px solid white; }
     .welcome-btn.primary:hover { background: transparent; color: white; }
     .welcome-btn.secondary { background: transparent; color: white; border: 2px solid rgba(255,255,255,0.5); }
     .welcome-btn.secondary:hover { background: rgba(255,255,255,0.1); border-color: white; }
 
-    .auth-header { text-align: center; margin-bottom: 2rem; }
+    .auth-header { text-align: center; margin-bottom: 1.5rem; }
     .auth-icon {
-      width: 70px; height: 70px;
+      width: 55px; height: 55px;
       background: linear-gradient(135deg, #f39c12, #e67e22);
       border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 1rem; color: white; font-size: 1.8rem;
+      margin: 0 auto 0.75rem; color: white; font-size: 1.5rem;
     }
-    .auth-header h1 { font-size: 1.8rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.3rem; }
-    .auth-header p { color: #7f8c8d; font-size: 0.95rem; }
+    .auth-header h1 { font-size: 1.5rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.2rem; }
+    .auth-header p { color: #7f8c8d; font-size: 0.85rem; }
 
     .already-account-banner {
       background: #fff3cd; border: 1px solid #ffc107; color: #856404;
-      padding: 0.6rem 1rem; border-radius: 8px; margin-top: 1rem;
-      font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.5rem 0.75rem; border-radius: 8px; margin-top: 0.75rem;
+      font-size: 0.82rem; display: flex; align-items: center; gap: 0.4rem;
       flex-wrap: wrap; justify-content: center;
     }
     .already-account-link { color: #f39c12; font-weight: 700; text-decoration: underline; cursor: pointer; }
