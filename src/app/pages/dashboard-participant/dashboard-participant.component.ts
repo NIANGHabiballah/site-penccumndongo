@@ -97,34 +97,59 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   };
 
   // Thèmes édition 3 (2025) — pour affichage en lecture seule
+  // Thèmes édition 3 (2025) — format unifié pour l'affichage
   themesParLangueEdition3 = {
     francais: [
-      { code: 'patriotisme', nom: 'Patriotisme' },
-      { code: 'justice_dignite', nom: 'Justice et dignité' },
-      { code: 'beaute_africaine', nom: 'Beauté Africaine' },
-      { code: 'jeunesse_responsable', nom: 'Jeunesse responsable' },
-      { code: 'emprise_ecrans', nom: 'Sous l\'emprise des écrans' }
+      { code: 'mots_silence', nom: 'Les mots du silence' },
+      { code: 'beaute_senegal', nom: 'La beauté du Sénégal' },
+      { code: 'flicage_couple', nom: 'Le flicage au sein du couple' },
+      { code: 'pression_sociale', nom: 'Pression sociale et influence ruineuse' }
     ],
     wolof: [
-      { code: 'patriotisme', nom: 'Patriotisme' },
-      { code: 'justice_dignite', nom: 'Justice et dignité' },
-      { code: 'beaute_africaine', nom: 'Beauté Africaine' },
-      { code: 'jeunesse_responsable', nom: 'Jeunesse responsable' },
-      { code: 'emprise_ecrans', nom: 'Sous l\'emprise des écrans' }
+      { code: 'mots_silence', nom: 'Kàdduy Noppi' },
+      { code: 'beaute_senegal', nom: 'Taaru Senegaal' },
+      { code: 'flicage_couple', nom: 'Saytu gu ëpp ci biir diggante' },
+      { code: 'pression_sociale', nom: 'Fitna askan wi ak ab jeexital biy yàq' }
     ],
     anglais: [
-      { code: 'patriotisme', nom: 'Patriotism' },
-      { code: 'justice_dignite', nom: 'Justice and dignity' },
-      { code: 'beaute_africaine', nom: 'African beauty' },
-      { code: 'jeunesse_responsable', nom: 'Responsible youth' },
-      { code: 'emprise_ecrans', nom: 'Under the grip of screens' }
+      { code: 'mots_silence', nom: 'The words of silence' },
+      { code: 'beaute_senegal', nom: 'The beauty of Senegal' },
+      { code: 'flicage_couple', nom: 'Excessive surveillance within the couple' },
+      { code: 'pression_sociale', nom: 'Social pressure and ruinous influence' }
     ],
     arabe: [
-      { code: 'patriotisme', nom: 'الوطنية' },
-      { code: 'justice_dignite', nom: 'العدالة والكرامة' },
-      { code: 'beaute_africaine', nom: 'الجمال الأفريقي' },
-      { code: 'jeunesse_responsable', nom: 'الشباب المسؤول' },
-      { code: 'emprise_ecrans', nom: 'تحت سيطرة الشاشات' }
+      { code: 'mots_silence', nom: 'كلمات الصمت' },
+      { code: 'beaute_senegal', nom: 'جمال السنغال' },
+      { code: 'flicage_couple', nom: 'المراقبة المفرطة داخل العلاقة الزوجية' },
+      { code: 'pression_sociale', nom: 'الضغط الاجتماعي والتأثير المدمر' }
+    ]
+  };
+
+  // Thèmes détaillés édition 3 — même format que themesDetailles (pré-calculé, pas de map())
+  themesDetaillesEdition3 = {
+    francais: [
+      { title: '1. Les mots du silence', icon: 'fas fa-moon' },
+      { title: '2. La beauté du Sénégal', icon: 'fas fa-globe-africa' },
+      { title: '3. Le flicage au sein du couple', icon: 'fas fa-heart-broken' },
+      { title: '4. Pression sociale et influence ruineuse', icon: 'fas fa-users' }
+    ],
+    wolof: [
+      { title: '1. Kàdduy Noppi', icon: 'fas fa-moon' },
+      { title: '2. Taaru Senegaal', icon: 'fas fa-globe-africa' },
+      { title: '3. Saytu gu ëpp ci biir diggante', icon: 'fas fa-heart-broken' },
+      { title: '4. Fitna askan wi ak ab jeexital biy yàq', icon: 'fas fa-users' }
+    ],
+    anglais: [
+      { title: '1. The words of silence', icon: 'fas fa-moon' },
+      { title: '2. The beauty of Senegal', icon: 'fas fa-globe-africa' },
+      { title: '3. Excessive surveillance within the couple', icon: 'fas fa-heart-broken' },
+      { title: '4. Social pressure and ruinous influence', icon: 'fas fa-users' }
+    ],
+    arabe: [
+      { title: '1. كلمات الصمت', icon: 'fas fa-moon' },
+      { title: '2. جمال السنغال', icon: 'fas fa-globe-africa' },
+      { title: '3. المراقبة المفرطة داخل العلاقة الزوجية', icon: 'fas fa-heart-broken' },
+      { title: '4. الضغط الاجتماعي والتأثير المدمر', icon: 'fas fa-users' }
     ]
   };
   isSubmitting = false;
@@ -157,6 +182,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   
   // Section thèmes
   selectedLanguage = 'francais';
+  themesAffiches: { title: string; icon: string }[] = [];
   
   // Thèmes détaillés par langue — 4ème édition 2026
   themesDetailles = {
@@ -169,6 +195,8 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
       },
       {
         title: '2. La beauté du Sénégal',
+        icon: 'fas fa-globe-africa',
+        description: 'Célébrez la beauté, la culture et l\'identité du Sénégal à travers la poésie.',
         keywords: ['Sénégal', 'Identité', 'Culture', 'Fierté', 'Héritage']
       },
       {
@@ -300,6 +328,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     
     this.currentUser = this.cp2iApi.getCurrentUser();
     this.loadEditions();
+    this.updateThemesAffiches();
 
     
     // Initialiser le service de messages
@@ -340,6 +369,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   selectEdition(edition: any) {
     this.editionActive = edition;
     this.showEditionSelector = false;
+    this.updateThemesAffiches();
     this.loadData();
   }
 
@@ -347,12 +377,12 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     if (edition.id === this.editionActive?.id) return;
     this.editionActive = edition;
     this.currentView = 'accueil';
-    // Réinitialiser les données avant de recharger
     this.mesSoumissions = [];
     this.stats = {};
     this.classement = {};
     this.certificats = [];
     this.historique = [];
+    this.updateThemesAffiches();
     this.loadData();
   }
 
@@ -1643,9 +1673,21 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     window.open('https://penccumndongo.com/verify', '_blank');
   }
   
-  // Méthode pour obtenir les thèmes selon la langue sélectionnée
+  // Met à jour la propriété themesAffiches (appelée à chaque changement de langue ou d'édition)
+  updateThemesAffiches() {
+    if (this.editionActive?.numero === 3) {
+      const langue = this.selectedLanguage as keyof typeof this.themesDetaillesEdition3;
+      this.themesAffiches = this.themesDetaillesEdition3[langue] || this.themesDetaillesEdition3.francais;
+    } else {
+      const langue = this.selectedLanguage as keyof typeof this.themesDetailles;
+      const themes = this.themesDetailles[langue] || this.themesDetailles.francais;
+      this.themesAffiches = themes.map(t => ({ title: t.title, icon: t.icon || 'fas fa-feather-alt' }));
+    }
+  }
+
+  // Méthode pour obtenir les thèmes selon la langue sélectionnée (adapté à l'édition active)
   getThemesForSelectedLanguage() {
-    return this.themesDetailles[this.selectedLanguage as keyof typeof this.themesDetailles] || this.themesDetailles.francais;
+    return this.themesAffiches;
   }
   
   // Vérifier si la période de soumission est clôturée
