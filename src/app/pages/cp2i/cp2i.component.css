@@ -50,6 +50,7 @@
   font-weight: 800;
   vertical-align: super;
   letter-spacing: 0;
+  text-transform: lowercase;
 }
 
 @keyframes badgeEntrance {
