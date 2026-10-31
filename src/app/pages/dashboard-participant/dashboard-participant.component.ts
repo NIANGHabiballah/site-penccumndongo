@@ -85,7 +85,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     anglais: [
       { code: 'mots_silence', nom: 'The words of silence' },
       { code: 'taaru_senegal', nom: 'The beauty of Senegal' },
-      { code: 'flicage_couple', nom: "Couple's high control" },
+      { code: 'flicage_couple', nom: 'Excessive surveillance within the couple' },
       { code: 'pression_sociale', nom: 'Social pressure and ruinous influence' }
     ],
     arabe: [
@@ -192,7 +192,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
         keywords: ['Senegal', 'Identity', 'Culture', 'Pride', 'Heritage']
       },
       {
-        title: "3. Couple's high control",
+        title: '3. Excessive surveillance within the couple',
         icon: 'fas fa-heart-broken',
         description: 'Question surveillance, control and trust in romantic relationships.',
         keywords: ['Control', 'Trust', 'Freedom', 'Couple', 'Respect']

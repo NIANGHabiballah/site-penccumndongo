@@ -92,7 +92,7 @@ export class Cp2iComponent implements OnInit {
     anglais: [
       { title: 'The words of silence', icon: 'fas fa-moon' },
       { title: 'The beauty of Senegal', icon: 'fas fa-globe-africa' },
-      { title: "Couple's high control", icon: 'fas fa-heart-broken' },
+      { title: 'Excessive surveillance within the couple', icon: 'fas fa-heart-broken' },
       { title: 'Social pressure and ruinous influence', icon: 'fas fa-users' }
     ],
     arabe: [
