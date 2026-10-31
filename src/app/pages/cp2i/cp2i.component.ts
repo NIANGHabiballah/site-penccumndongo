@@ -84,10 +84,10 @@ export class Cp2iComponent implements OnInit {
       { title: 'Pression sociale et influence ruineuse', icon: 'fas fa-users' }
     ],
     wolof: [
-      { title: 'Baat yu dëkk ci xol', icon: 'fas fa-moon' },
-      { title: 'Taaru Sénégal', icon: 'fas fa-globe-africa' },
-      { title: 'Suqali ak kontrole ci kër ga', icon: 'fas fa-heart-broken' },
-      { title: 'Pression bu dëkk ak influence bu xaw', icon: 'fas fa-users' }
+      { title: 'Kàdduy Noppi', icon: 'fas fa-moon' },
+      { title: 'Taaru Senegaal', icon: 'fas fa-globe-africa' },
+      { title: 'Saytu gu ëpp ci biir diggante', icon: 'fas fa-heart-broken' },
+      { title: 'Fitna askan wi ak ab jeexital biy yàq', icon: 'fas fa-users' }
     ],
     anglais: [
       { title: 'The words of silence', icon: 'fas fa-moon' },

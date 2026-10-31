@@ -77,10 +77,10 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
       { code: 'pression_sociale', nom: 'Pression sociale et influence ruineuse' }
     ],
     wolof: [
-      { code: 'mots_silence', nom: 'Baat yu dëkk ci xol' },
-      { code: 'taaru_senegal', nom: 'Taaru Sénégal' },
-      { code: 'flicage_couple', nom: 'Suqali ak kontrole ci kër ga' },
-      { code: 'pression_sociale', nom: 'Pression bu dëkk ak influence bu xaw' }
+      { code: 'mots_silence', nom: 'Kàdduy Noppi' },
+      { code: 'taaru_senegal', nom: 'Taaru Senegaal' },
+      { code: 'flicage_couple', nom: 'Saytu gu ëpp ci biir diggante' },
+      { code: 'pression_sociale', nom: 'Fitna askan wi ak ab jeexital biy yàq' }
     ],
     anglais: [
       { code: 'mots_silence', nom: 'The words of silence' },
@@ -154,25 +154,25 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     ],
     wolof: [
       {
-        title: '1. Baat yu dëkk ci xol',
+        title: '1. Kàdduy Noppi',
         icon: 'fas fa-moon',
         description: 'Xam-xam ci li xol wax bu mu dem, bu mu seet ak bu mu yëgël.',
         keywords: ['Xol', 'Baat', 'Dëkk', 'Xam-xam', 'Yëgël']
       },
       {
-        title: '2. Taaru Sénégal',
+        title: '2. Taaru Senegaal',
         icon: 'fas fa-globe-africa',
         description: 'Benn ci rafet, aada ak jikko yu Sénégal.',
         keywords: ['Sénégal', 'Aada', 'Rafet', 'Taaw', 'Jikko']
       },
       {
-        title: '3. Suqali ak kontrole ci kër ga',
+        title: '3. Saytu gu ëpp ci biir diggante',
         icon: 'fas fa-heart-broken',
         description: 'Laaj ci suqali, kontrole ak jëm ci kër ga.',
         keywords: ['Kontrole', 'Jëm', 'Kër', 'Yëgël', 'Ngor']
       },
       {
-        title: '4. Pression bu dëkk ak influence bu xaw',
+        title: '4. Fitna askan wi ak ab jeexital biy yàq',
         icon: 'fas fa-users',
         description: 'Xam-xam ci jafe pression bu dëkk ak influence bu xaw ci nit.',
         keywords: ['Pression', 'Influence', 'Dëkk', 'Nit', 'Xam-xam']
