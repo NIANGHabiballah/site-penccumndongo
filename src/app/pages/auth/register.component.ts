@@ -193,12 +193,12 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
       align-items: center;
       justify-content: center;
       background: #f8f9fa;
-      padding: 2rem;
+      padding: 1.5rem;
     }
     
     .auth-wrapper {
       display: flex;
-      max-width: 1000px;
+      max-width: 900px;
       width: 100%;
       border-radius: 20px;
       overflow: hidden;
@@ -207,16 +207,17 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
     
     .auth-card {
       background: white;
-      padding: 3rem;
+      padding: 2rem 2.5rem;
       flex: 1;
+      overflow-y: auto;
     }
     
     .welcome-card {
       background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-      padding: 3rem;
+      padding: 2.5rem 2rem;
       color: white;
       text-align: center;
-      flex: 1;
+      flex: 0 0 280px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -283,38 +284,38 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
     
     .auth-header {
       text-align: center;
-      margin-bottom: 2.5rem;
+      margin-bottom: 1.5rem;
     }
     
     .auth-icon {
-      width: 80px;
-      height: 80px;
+      width: 56px;
+      height: 56px;
       background: linear-gradient(135deg, #f39c12, #e67e22);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 1.5rem;
+      margin: 0 auto 1rem;
       color: white;
-      font-size: 2rem;
+      font-size: 1.4rem;
     }
     
     .auth-header h1 {
-      font-size: 2rem;
+      font-size: 1.6rem;
       font-weight: 700;
       color: #2c3e50;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.3rem;
     }
     
     .auth-header p {
       color: #7f8c8d;
-      font-size: 1rem;
+      font-size: 0.9rem;
     }
     
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
+      gap: 1rem;
       align-items: start;
     }
     
@@ -323,7 +324,7 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
     }
     
     .input-group {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
     
     .input-wrapper, .select-wrapper {
@@ -334,17 +335,18 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
     
     .input-icon {
       position: absolute;
-      left: 1rem;
+      left: 0.8rem;
       color: #7f8c8d;
       z-index: 2;
+      font-size: 0.9rem;
     }
     
     .input-wrapper input, .select-wrapper select {
       width: 100%;
-      padding: 1rem 1rem 1rem 3rem;
+      padding: 0.7rem 0.8rem 0.7rem 2.5rem;
       border: 2px solid #ecf0f1;
-      border-radius: 12px;
-      font-size: 1rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
       transition: all 0.3s ease;
       background: white;
     }
@@ -360,7 +362,7 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
       background: linear-gradient(135deg, #f39c12, #e67e22);
       color: white;
       border: none;
-      padding: 1rem 2rem;
+      padding: 0.85rem 2rem;
       border-radius: 25px;
       font-size: 1rem;
       font-weight: 600;
@@ -370,8 +372,8 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      margin-top: 1rem;
-      min-height: 50px;
+      margin-top: 0.75rem;
+      min-height: 46px;
     }
     
     .auth-btn:hover:not(:disabled) {
@@ -386,7 +388,7 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
     }
     
     .checkbox-group {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
     
     .checkbox-label {
@@ -444,8 +446,8 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
     
     .auth-footer {
       text-align: center;
-      margin-top: 2rem;
-      padding-top: 2rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
       border-top: 1px solid #ecf0f1;
     }
     
@@ -467,17 +469,17 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
     
     .field-label {
       display: block;
-      font-size: 0.9rem;
+      font-size: 0.82rem;
       font-weight: 600;
       color: #2c3e50;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.3rem;
     }
     
     .field-help {
       display: block;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: #7f8c8d;
-      margin-top: 0.3rem;
+      margin-top: 0.2rem;
       font-style: italic;
     }
     
