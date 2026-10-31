@@ -95,6 +95,34 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
       { code: 'pression_sociale', nom: 'الضغط الاجتماعي والتأثير المدمر' }
     ]
   };
+
+  // Thèmes édition 3 (2025) — pour affichage en lecture seule
+  themesParLangueEdition3 = {
+    francais: [
+      { code: 'theme1_ed3', nom: 'La femme africaine' },
+      { code: 'theme2_ed3', nom: 'L’Afrique que je veux' },
+      { code: 'theme3_ed3', nom: 'Le développement durable' },
+      { code: 'theme4_ed3', nom: 'La paix et la réconciliation' }
+    ],
+    wolof: [
+      { code: 'theme1_ed3', nom: 'Jiggéen bu Afrik' },
+      { code: 'theme2_ed3', nom: 'Afrik bu ma dëgg' },
+      { code: 'theme3_ed3', nom: 'Dévelopman bu dund' },
+      { code: 'theme4_ed3', nom: 'Jàmm ak rékonsiliasion' }
+    ],
+    anglais: [
+      { code: 'theme1_ed3', nom: 'The African woman' },
+      { code: 'theme2_ed3', nom: 'The Africa I want' },
+      { code: 'theme3_ed3', nom: 'Sustainable development' },
+      { code: 'theme4_ed3', nom: 'Peace and reconciliation' }
+    ],
+    arabe: [
+      { code: 'theme1_ed3', nom: 'المرأة الأفريقية' },
+      { code: 'theme2_ed3', nom: 'أفريقيا التي أريد' },
+      { code: 'theme3_ed3', nom: 'التنمية المستدامة' },
+      { code: 'theme4_ed3', nom: 'السلام والمصالحة' }
+    ]
+  };
   isSubmitting = false;
   showNotification = false;
   notificationMessage = '';
@@ -1148,7 +1176,11 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   
   // Obtenir les thèmes selon la langue sélectionnée
   getThemesForLanguage() {
-    return this.themesParLangue[this.texte.langue as keyof typeof this.themesParLangue] || this.themesParLangue.francais;
+    const langue = this.texte.langue as keyof typeof this.themesParLangue;
+    if (this.editionActive?.numero === 3) {
+      return this.themesParLangueEdition3[langue] || this.themesParLangueEdition3.francais;
+    }
+    return this.themesParLangue[langue] || this.themesParLangue.francais;
   }
 
   // Réinitialiser le thème quand la langue change
