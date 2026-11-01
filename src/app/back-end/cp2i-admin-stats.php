@@ -18,6 +18,10 @@ if (!$user || $user['role'] !== 'admin') {
     exit;
 }
 
+$edition_id = isset($_GET['edition_id']) ? (int)$_GET['edition_id'] : null;
+$ef = $edition_id ? 'WHERE edition_id = ' . $edition_id : '';
+$ef_and = $edition_id ? 'AND t.edition_id = ' . $edition_id : '';
+
 try {
     $db = getDB();
     
@@ -29,7 +33,7 @@ try {
             SUM(CASE WHEN statut = 'refuse' THEN 1 ELSE 0 END) as textes_refuses,
             SUM(CASE WHEN statut = 'en_attente' THEN 1 ELSE 0 END) as textes_en_attente,
             AVG(CASE WHEN note IS NOT NULL AND note > 0 THEN note ELSE NULL END) as note_moyenne
-        FROM cp2i_textes
+        FROM cp2i_textes $ef
     ");
     $stmt->execute();
     $stats = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -37,9 +41,9 @@ try {
     // Statistiques d'affectation
     $stmt = $db->prepare("
         SELECT 
-            (SELECT COUNT(*) FROM cp2i_affectations) as total_affectations,
-            (SELECT COUNT(*) FROM cp2i_affectations a JOIN cp2i_textes t ON a.texte_id = t.id WHERE t.statut IN ('accepte', 'refuse')) as affectations_terminees,
-            (SELECT COUNT(*) FROM cp2i_affectations a JOIN cp2i_textes t ON a.texte_id = t.id WHERE t.statut = 'en_attente') as affectations_restantes
+            (SELECT COUNT(*) FROM cp2i_affectations a JOIN cp2i_textes t ON a.texte_id = t.id WHERE 1=1 $ef_and) as total_affectations,
+            (SELECT COUNT(*) FROM cp2i_affectations a JOIN cp2i_textes t ON a.texte_id = t.id WHERE t.statut IN ('accepte', 'refuse') $ef_and) as affectations_terminees,
+            (SELECT COUNT(*) FROM cp2i_affectations a JOIN cp2i_textes t ON a.texte_id = t.id WHERE t.statut = 'en_attente' $ef_and) as affectations_restantes
     ");
     $stmt->execute();
     $affectation_stats = $stmt->fetch(PDO::FETCH_ASSOC);

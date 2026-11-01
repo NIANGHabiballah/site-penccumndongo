@@ -51,23 +51,25 @@ export class ChatSupportService {
   }
 
   // Créer une nouvelle conversation
-  createConversation(subject: string, initialMessage: string): Observable<any> {
+  createConversation(subject: string, initialMessage: string, editionId?: number): Observable<any> {
     const token = localStorage.getItem('cp2i_token');
     const headers = { 'Authorization': `Bearer ${token}` };
     return this.http.post(`${this.baseUrl}/chat-support.php?action=create`, {
       subject,
-      message: initialMessage
+      message: initialMessage,
+      edition_id: editionId ?? 4
     }, { headers });
   }
 
   // Obtenir toutes les conversations
-  getConversations(): Observable<ChatConversation[]> {
+  getConversations(editionId?: number): Observable<ChatConversation[]> {
     const token = localStorage.getItem('cp2i_token');
     const headers = { 
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     };
-    return this.http.get<ChatConversation[]>(`${this.baseUrl}/chat-support.php?action=conversations`, 
+    const params = editionId ? `&edition_id=${editionId}` : '';
+    return this.http.get<ChatConversation[]>(`${this.baseUrl}/chat-support.php?action=conversations${params}`, 
       { headers });
   }
 

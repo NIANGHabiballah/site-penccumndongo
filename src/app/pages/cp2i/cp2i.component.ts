@@ -41,13 +41,24 @@ export class Cp2iComponent implements OnInit {
     },
   ];
 
-  // Images de la galerie
+  // Images de la galerie (3ème édition)
   galleryImages: string[] = [];
 
+  // Images de la galerie (4ème édition)
+  gallery3Images: string[] = [];
+
+  // Images de la galerie (1ère édition)
+  gallery4Images: string[] = [];
+
   constructor() {
-    // Génération automatique des images de 0 à 48
     for (let i = 0; i <= 48; i++) {
       this.galleryImages.push(`cp2i/galerie/${i}.jpg`);
+    }
+    for (let i = 1; i <= 45; i++) {
+      this.gallery3Images.push(`cp2i/galerie3/${i}.JPG`);
+    }
+    for (let i = 1; i <= 39; i++) {
+      this.gallery4Images.push(`cp2i/galerie4/${i}.jpg`);
     }
   }
 
@@ -55,6 +66,8 @@ export class Cp2iComponent implements OnInit {
   showThanksLightbox = false;
   bookLightboxOpen = false;
   showGalleryModal = false;
+  showGallery3Modal = false;
+  showGallery4Modal = false;
   showClosedModal = false;
   inscriptionsClosed = false;
   
@@ -62,6 +75,10 @@ export class Cp2iComponent implements OnInit {
   currentBookImg = 0;
   galleryIndex = 0;
   selectedGalleryImage = '';
+  gallery3Index = 0;
+  selectedGallery3Image = '';
+  gallery4Index = 0;
+  selectedGallery4Image = '';
   countdown: any = {};
   nextEditionCountdown: any = {};
 
@@ -205,6 +222,68 @@ export class Cp2iComponent implements OnInit {
   closeGalleryModal() {
     this.showGalleryModal = false;
     this.selectedGalleryImage = '';
+    document.body.style.overflow = 'auto';
+  }
+
+  // Gestion galerie 1ère édition
+  prevGallery4Image() {
+    if (this.gallery4Index > 0) this.gallery4Index--;
+  }
+
+  nextGallery4Image() {
+    if (this.gallery4Index < this.gallery4Images.length - 1) this.gallery4Index++;
+  }
+
+  openGallery4Modal(imageSrc: string) {
+    this.selectedGallery4Image = imageSrc;
+    this.showGallery4Modal = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  prevGallery4Modal() {
+    const i = this.gallery4Images.indexOf(this.selectedGallery4Image);
+    if (i > 0) this.selectedGallery4Image = this.gallery4Images[i - 1];
+  }
+
+  nextGallery4Modal() {
+    const i = this.gallery4Images.indexOf(this.selectedGallery4Image);
+    if (i < this.gallery4Images.length - 1) this.selectedGallery4Image = this.gallery4Images[i + 1];
+  }
+
+  closeGallery4Modal() {
+    this.showGallery4Modal = false;
+    this.selectedGallery4Image = '';
+    document.body.style.overflow = 'auto';
+  }
+
+  // Gestion galerie 4ème édition
+  prevGallery3Image() {
+    if (this.gallery3Index > 0) this.gallery3Index--;
+  }
+
+  nextGallery3Image() {
+    if (this.gallery3Index < this.gallery3Images.length - 1) this.gallery3Index++;
+  }
+
+  openGallery3Modal(imageSrc: string) {
+    this.selectedGallery3Image = imageSrc;
+    this.showGallery3Modal = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  prevGallery3Modal() {
+    const i = this.gallery3Images.indexOf(this.selectedGallery3Image);
+    if (i > 0) this.selectedGallery3Image = this.gallery3Images[i - 1];
+  }
+
+  nextGallery3Modal() {
+    const i = this.gallery3Images.indexOf(this.selectedGallery3Image);
+    if (i < this.gallery3Images.length - 1) this.selectedGallery3Image = this.gallery3Images[i + 1];
+  }
+
+  closeGallery3Modal() {
+    this.showGallery3Modal = false;
+    this.selectedGallery3Image = '';
     document.body.style.overflow = 'auto';
   }
 

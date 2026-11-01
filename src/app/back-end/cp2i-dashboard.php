@@ -7,10 +7,11 @@ $method = $_SERVER['REQUEST_METHOD'];
 if ($method === 'GET') {
     $user = verifyToken();
     $action = $_GET['action'] ?? 'stats';
+    $edition_id = isset($_GET['edition_id']) ? (int)$_GET['edition_id'] : null;
     
     switch ($action) {
         case 'stats':
-            getStats($user);
+            getStats($user, $edition_id);
             break;
         case 'profile':
             getProfile($user);
@@ -18,7 +19,7 @@ if ($method === 'GET') {
         case 'users':
         case 'get_users':
             if ($user['role'] === 'admin') {
-                getUsers();
+                getUsers($edition_id);
             } else {
                 http_response_code(403);
                 echo json_encode(['error' => 'Accès refusé']);
@@ -43,7 +44,7 @@ if ($method === 'GET') {
     }
 }
 
-function getStats($user) {
+function getStats($user, $edition_id = null) {
     $db = getDB();
     
     if ($user['role'] === 'participant') {
@@ -73,6 +74,9 @@ function getStats($user) {
         
     } else {
         // Stats pour correcteur/admin
+        $edition_filter = $edition_id ? 'WHERE edition_id = ?' : '';
+        $edition_params = $edition_id ? [$edition_id] : [];
+
         $stmt = $db->prepare("
             SELECT 
                 COUNT(*) as total_textes,
@@ -80,39 +84,56 @@ function getStats($user) {
                 COUNT(CASE WHEN statut = 'refuse' THEN 1 END) as textes_refuses,
                 COUNT(CASE WHEN statut = 'en_attente' THEN 1 END) as textes_en_attente,
                 AVG(CASE WHEN note IS NOT NULL THEN note ELSE NULL END) as note_moyenne
-            FROM cp2i_textes
+            FROM cp2i_textes $edition_filter
         ");
-        $stmt->execute();
+        $stmt->execute($edition_params);
         $stats = $stmt->fetch(PDO::FETCH_ASSOC);
         
         // Stats par langue
         $stmt = $db->prepare("
             SELECT langue, COUNT(*) as count 
-            FROM cp2i_textes 
+            FROM cp2i_textes $edition_filter
             GROUP BY langue
         ");
-        $stmt->execute();
+        $stmt->execute($edition_params);
         $stats_langues = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Comptes utilisateurs
-        $stmt = $db->prepare("
-            SELECT 
-                COUNT(CASE WHEN role = 'participant' THEN 1 END) as total_participants,
-                COUNT(CASE WHEN role = 'correcteur' THEN 1 END) as total_correcteurs,
-                COUNT(CASE WHEN role = 'admin' THEN 1 END) as total_admins
-            FROM cp2i_users
-        ");
-        $stmt->execute();
+        // Comptes utilisateurs filtrés par édition
+        if ($edition_id) {
+            $stmt = $db->prepare("
+                SELECT 
+                    COUNT(DISTINCT CASE WHEN u.role = 'participant' THEN u.id END) as total_participants,
+                    COUNT(DISTINCT CASE WHEN u.role = 'correcteur' THEN u.id END) as total_correcteurs,
+                    COUNT(DISTINCT CASE WHEN u.role = 'admin' THEN u.id END) as total_admins
+                FROM cp2i_users u
+                WHERE u.role IN ('admin', 'correcteur')
+                   OR EXISTS (
+                       SELECT 1 FROM cp2i_textes t 
+                       WHERE t.user_id = u.id AND t.edition_id = ?
+                   )
+            ");
+            $stmt->execute([$edition_id]);
+        } else {
+            $stmt = $db->prepare("
+                SELECT 
+                    COUNT(CASE WHEN role = 'participant' THEN 1 END) as total_participants,
+                    COUNT(CASE WHEN role = 'correcteur' THEN 1 END) as total_correcteurs,
+                    COUNT(CASE WHEN role = 'admin' THEN 1 END) as total_admins
+                FROM cp2i_users
+            ");
+            $stmt->execute();
+        }
         $users_stats = $stmt->fetch(PDO::FETCH_ASSOC);
         
         // Stats d'affectation détaillées
+        $ef = $edition_id ? 'AND t.edition_id = ' . (int)$edition_id : '';
         $stmt = $db->prepare("
             SELECT 
-                (SELECT COUNT(*) FROM cp2i_affectations) as total_affectations,
-                (SELECT COUNT(*) FROM cp2i_affectations a JOIN cp2i_textes t ON a.texte_id = t.id WHERE t.statut IN ('accepte', 'refuse')) as affectations_terminees,
-                (SELECT COUNT(*) FROM cp2i_affectations a JOIN cp2i_textes t ON a.texte_id = t.id WHERE t.statut = 'en_attente') as affectations_restantes,
-                (SELECT COUNT(DISTINCT t.id) FROM cp2i_textes t JOIN cp2i_affectations a ON t.id = a.texte_id) as textes_affectes,
-                (SELECT COUNT(*) FROM cp2i_textes t LEFT JOIN cp2i_affectations a ON t.id = a.texte_id WHERE a.texte_id IS NULL) as textes_non_affectes
+                (SELECT COUNT(*) FROM cp2i_affectations a JOIN cp2i_textes t ON a.texte_id = t.id WHERE 1=1 $ef) as total_affectations,
+                (SELECT COUNT(*) FROM cp2i_affectations a JOIN cp2i_textes t ON a.texte_id = t.id WHERE t.statut IN ('accepte', 'refuse') $ef) as affectations_terminees,
+                (SELECT COUNT(*) FROM cp2i_affectations a JOIN cp2i_textes t ON a.texte_id = t.id WHERE t.statut = 'en_attente' $ef) as affectations_restantes,
+                (SELECT COUNT(DISTINCT t.id) FROM cp2i_textes t JOIN cp2i_affectations a ON t.id = a.texte_id WHERE 1=1 $ef) as textes_affectes,
+                (SELECT COUNT(*) FROM cp2i_textes t LEFT JOIN cp2i_affectations a ON t.id = a.texte_id WHERE a.texte_id IS NULL $ef) as textes_non_affectes
         ");
         $stmt->execute();
         $affectation_stats = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -150,6 +171,7 @@ function getStats($user) {
         }
         
         // Statistiques détaillées des affectations par texte avec noms complets
+        $where_edition = $edition_id ? 'WHERE t.edition_id = ?' : '';
         $stmt = $db->prepare("
             SELECT 
                 t.id as texte_id,
@@ -164,10 +186,11 @@ function getStats($user) {
             JOIN cp2i_users u ON t.user_id = u.id
             LEFT JOIN cp2i_affectations a ON t.id = a.texte_id
             LEFT JOIN cp2i_users c ON a.corrector_id = c.id AND c.role = 'correcteur'
+            $where_edition
             GROUP BY t.id, t.titre, t.statut, u.prenom, u.nom, u.email, t.created_at
             ORDER BY nb_correcteurs DESC, t.titre
         ");
-        $stmt->execute();
+        $stmt->execute($edition_id ? [$edition_id] : []);
         $textes_affectations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         // Log pour débogage
@@ -189,8 +212,9 @@ function getStats($user) {
                     COUNT(DISTINCT CASE WHEN EXISTS(SELECT 1 FROM cp2i_affectations a WHERE a.texte_id = cp2i_textes.id) AND statut = 'en_attente' THEN cp2i_textes.id END) as textes_en_attente,
                     AVG(CASE WHEN note IS NOT NULL AND note > 0 THEN note ELSE NULL END) as note_moyenne
                 FROM cp2i_textes
+                " . ($edition_id ? 'WHERE edition_id = ?' : '') . "
             ");
-            $stmt->execute();
+            $stmt->execute($edition_id ? [$edition_id] : []);
             $real_stats = $stmt->fetch(PDO::FETCH_ASSOC);
             
             // Utiliser les vraies données
@@ -270,20 +294,41 @@ if ($method === 'POST' && isset($_GET['action'])) {
     }
 }
 
-function getUsers() {
+function getUsers($edition_id = null) {
     $db = getDB();
-    
-    // Récupérer tous les utilisateurs avec leurs stats et informations complètes
-    $stmt = $db->prepare("
-        SELECT u.id, u.email, u.nom, u.prenom, u.role, u.created_at,
-               u.telephone, u.whatsapp, u.ville, u.last_login,
-               COUNT(t.id) as nb_textes,
-               AVG(t.note) as note_moyenne
-        FROM cp2i_users u
-        LEFT JOIN cp2i_textes t ON u.id = t.user_id
-        GROUP BY u.id
-        ORDER BY u.role, u.created_at DESC
-    ");
+
+    $edition_join = $edition_id ? 'AND t.edition_id = ' . (int)$edition_id : '';
+
+    // Filtrer les participants : seulement ceux ayant soumis dans cette édition
+    // Les correcteurs et admins sont toujours inclus
+    if ($edition_id) {
+        $stmt = $db->prepare("
+            SELECT u.id, u.email, u.nom, u.prenom, u.role, u.created_at,
+                   u.telephone, u.whatsapp, u.ville, u.last_login,
+                   COUNT(t.id) as nb_textes,
+                   AVG(t.note) as note_moyenne
+            FROM cp2i_users u
+            LEFT JOIN cp2i_textes t ON u.id = t.user_id $edition_join
+            WHERE u.role IN ('admin', 'correcteur')
+               OR EXISTS (
+                   SELECT 1 FROM cp2i_textes t2
+                   WHERE t2.user_id = u.id AND t2.edition_id = " . (int)$edition_id . "
+               )
+            GROUP BY u.id
+            ORDER BY u.role, u.created_at DESC
+        ");
+    } else {
+        $stmt = $db->prepare("
+            SELECT u.id, u.email, u.nom, u.prenom, u.role, u.created_at,
+                   u.telephone, u.whatsapp, u.ville, u.last_login,
+                   COUNT(t.id) as nb_textes,
+                   AVG(t.note) as note_moyenne
+            FROM cp2i_users u
+            LEFT JOIN cp2i_textes t ON u.id = t.user_id
+            GROUP BY u.id
+            ORDER BY u.role, u.created_at DESC
+        ");
+    }
     $stmt->execute();
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
@@ -310,6 +355,7 @@ function getUsers() {
     }
     
     // Récupérer les affectations existantes avec noms complets
+    $aff_edition = $edition_id ? 'AND t.edition_id = ' . (int)$edition_id : '';
     $stmt = $db->prepare("
         SELECT a.id as affectation_id,
                a.texte_id, 
@@ -323,6 +369,7 @@ function getUsers() {
         JOIN cp2i_textes t ON a.texte_id = t.id
         JOIN cp2i_users u ON t.user_id = u.id
         JOIN cp2i_users c ON a.corrector_id = c.id
+        WHERE 1=1 $aff_edition
         ORDER BY a.created_at DESC
     ");
     $stmt->execute();

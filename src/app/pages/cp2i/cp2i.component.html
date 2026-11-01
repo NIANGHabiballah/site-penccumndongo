@@ -217,12 +217,48 @@
   </div>
 </section>
 
-<!-- Gallery Section -->
+<!-- Gallery Section 3ème édition 2026 -->
+<section id="gallery3-section" class="gallery-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Galerie de la Cérémonie 2026</h2>
+      <p class="section-subtitle"><strong>3ᵉ Édition</strong> · Cérémonie de Remise des Prix du CP2i — <strong>10 janvier 2026</strong> · Centre Culturel Régional de Dakar Blaise Senghor</p>
+    </div>
+    <div class="gallery-carousel">
+      <button class="gallery-arrow left" (click)="prevGallery3Image()" [disabled]="gallery3Index === 0">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <div class="gallery-main" (click)="openGallery3Modal(gallery3Images[gallery3Index])">
+        <img [src]="gallery3Images[gallery3Index]" [alt]="'Photo cérémonie 2026 ' + (gallery3Index + 1)" class="gallery-image">
+        <div class="gallery-overlay">
+          <i class="fas fa-expand"></i>
+          <span>Voir en grand</span>
+        </div>
+      </div>
+      <button class="gallery-arrow right" (click)="nextGallery3Image()" [disabled]="gallery3Index === gallery3Images.length - 1">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+    <div class="gallery-counter">
+      <span>{{ gallery3Index + 1 }} / {{ gallery3Images.length }}</span>
+    </div>
+    <div class="gallery-thumbnails">
+      <div class="thumbnail"
+           *ngFor="let image of gallery3Images; let i = index"
+           [class.active]="i === gallery3Index"
+           (click)="gallery3Index = i">
+        <img [src]="image" [alt]="'Miniature 2026 ' + (i + 1)">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Gallery Section 2ème édition 2025 -->
 <section id="gallery-section" class="gallery-section">
   <div class="container">
     <div class="section-header">
       <h2 class="section-title">Galerie de la Cérémonie 2025</h2>
-      <p class="section-subtitle">Deuxième Édition du Concours de Poésie Inédit & Innovant</p>
+      <p class="section-subtitle"><strong>2ᵉ Édition</strong> · Cérémonie de Remise des Prix du CP2i — <strong>Mardi 14 mai 2025</strong> · Institut Français de Saint-Louis</p>
     </div>
     <div class="gallery-carousel">
       <button class="gallery-arrow left" (click)="prevGalleryImage()" [disabled]="galleryIndex === 0">
@@ -243,11 +279,47 @@
       <span>{{ galleryIndex + 1 }} / {{ galleryImages.length }}</span>
     </div>
     <div class="gallery-thumbnails">
-      <div class="thumbnail" 
-           *ngFor="let image of galleryImages; let i = index" 
+      <div class="thumbnail"
+           *ngFor="let image of galleryImages; let i = index"
            [class.active]="i === galleryIndex"
            (click)="galleryIndex = i">
         <img [src]="image" [alt]="'Miniature ' + (i + 1)">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Gallery Section 1ère édition 2024 -->
+<section id="gallery4-section" class="gallery-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Galerie de la Cérémonie 2024</h2>
+      <p class="section-subtitle"><strong>1ᵉʳᵉ Édition</strong> · Cérémonie de Remise des Prix du CP2i — <strong>Samedi 17 février 2024</strong> · Espace Numérique Ouvert de Saint-Louis (ENO UVS)</p>
+    </div>
+    <div class="gallery-carousel">
+      <button class="gallery-arrow left" (click)="prevGallery4Image()" [disabled]="gallery4Index === 0">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <div class="gallery-main" (click)="openGallery4Modal(gallery4Images[gallery4Index])">
+        <img [src]="gallery4Images[gallery4Index]" [alt]="'Photo cérémonie 2024 ' + (gallery4Index + 1)" class="gallery-image">
+        <div class="gallery-overlay">
+          <i class="fas fa-expand"></i>
+          <span>Voir en grand</span>
+        </div>
+      </div>
+      <button class="gallery-arrow right" (click)="nextGallery4Image()" [disabled]="gallery4Index === gallery4Images.length - 1">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+    <div class="gallery-counter">
+      <span>{{ gallery4Index + 1 }} / {{ gallery4Images.length }}</span>
+    </div>
+    <div class="gallery-thumbnails">
+      <div class="thumbnail"
+           *ngFor="let image of gallery4Images; let i = index"
+           [class.active]="i === gallery4Index"
+           (click)="gallery4Index = i">
+        <img [src]="image" [alt]="'Miniature 2024 ' + (i + 1)">
       </div>
     </div>
   </div>
@@ -376,6 +448,40 @@
         <i class="fas fa-chevron-left"></i>
       </button>
       <button class="nav-btn next" (click)="nextGalleryModal()" [disabled]="galleryImages.indexOf(selectedGalleryImage) === galleryImages.length - 1">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox-backdrop" *ngIf="showGallery3Modal" (click)="closeGallery3Modal()">
+  <div class="lightbox-content" (click)="$event.stopPropagation()">
+    <button class="lightbox-close" (click)="closeGallery3Modal()">
+      <i class="fas fa-times"></i>
+    </button>
+    <img [src]="selectedGallery3Image" alt="Image agrandie 2026" class="lightbox-image">
+    <div class="lightbox-nav">
+      <button class="nav-btn prev" (click)="prevGallery3Modal()" [disabled]="gallery3Images.indexOf(selectedGallery3Image) === 0">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="nav-btn next" (click)="nextGallery3Modal()" [disabled]="gallery3Images.indexOf(selectedGallery3Image) === gallery3Images.length - 1">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox-backdrop" *ngIf="showGallery4Modal" (click)="closeGallery4Modal()">
+  <div class="lightbox-content" (click)="$event.stopPropagation()">
+    <button class="lightbox-close" (click)="closeGallery4Modal()">
+      <i class="fas fa-times"></i>
+    </button>
+    <img [src]="selectedGallery4Image" alt="Image agrandie 2024" class="lightbox-image">
+    <div class="lightbox-nav">
+      <button class="nav-btn prev" (click)="prevGallery4Modal()" [disabled]="gallery4Images.indexOf(selectedGallery4Image) === 0">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="nav-btn next" (click)="nextGallery4Modal()" [disabled]="gallery4Images.indexOf(selectedGallery4Image) === gallery4Images.length - 1">
         <i class="fas fa-chevron-right"></i>
       </button>
     </div>

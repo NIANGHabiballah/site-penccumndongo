@@ -72,6 +72,52 @@ try {
         $steps[] = ['info', 'Index déjà présent'];
     }
 
+    // 7. Ajouter les colonnes de dates détaillées
+    $cols = $db->query("SHOW COLUMNS FROM cp2i_editions LIKE 'inscription_debut'")->fetchAll();
+    if (empty($cols)) {
+        $db->exec("
+            ALTER TABLE cp2i_editions
+                ADD COLUMN inscription_debut DATE NULL,
+                ADD COLUMN inscription_fin DATE NULL,
+                ADD COLUMN correction_debut DATE NULL,
+                ADD COLUMN correction_fin DATE NULL,
+                ADD COLUMN correction_prolongement DATE NULL,
+                ADD COLUMN deliberation DATE NULL,
+                ADD COLUMN ceremonie_remise DATE NULL
+        ");
+        $steps[] = ['ok', 'Colonnes de dates détaillées ajoutées'];
+    } else {
+        $steps[] = ['info', 'Colonnes de dates détaillées déjà présentes'];
+    }
+
+    // 8. Renseigner les dates de l'édition 3
+        $db->exec("
+            UPDATE cp2i_editions SET
+                inscription_debut       = '2025-11-03',
+                inscription_fin         = '2025-11-23',
+                correction_debut        = '2025-11-24',
+                correction_fin          = '2025-11-30',
+                correction_prolongement = '2025-11-30',
+                deliberation            = '2025-12-01',
+                ceremonie_remise        = '2026-01-10'
+            WHERE numero = 3 AND (inscription_debut IS NULL OR inscription_debut = '')
+        ");
+    $steps[] = ['ok', 'Dates détaillées édition 3 renseignées'];
+
+    // 9. Renseigner les dates de l'édition 4
+    $db->exec("
+        UPDATE cp2i_editions SET
+            inscription_debut       = '2026-11-02',
+            inscription_fin         = '2026-11-23',
+            correction_debut        = '2026-11-24',
+            correction_fin          = '2026-11-30',
+            correction_prolongement = '2026-12-10',
+            deliberation            = '2026-12-15',
+            ceremonie_remise        = '2026-12-26'
+        WHERE numero = 4 AND (inscription_debut IS NULL OR inscription_debut = '')
+    ");
+    $steps[] = ['ok', 'Dates détaillées édition 4 renseignées'];
+
     // Vérification finale
     $editions = $db->query("SELECT * FROM cp2i_editions ORDER BY numero")->fetchAll(PDO::FETCH_ASSOC);
     $counts = $db->query("SELECT edition_id, COUNT(*) as total FROM cp2i_textes GROUP BY edition_id")->fetchAll(PDO::FETCH_ASSOC);

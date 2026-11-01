@@ -1459,3 +1459,195 @@ body {
     align-items: flex-start;
   }
 }
+
+/* ===== SÉLECTEUR D'ÉDITION INITIAL ===== */
+.edition-selector-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.edition-selector-modal {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.edition-selector-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.edition-selector-header i {
+  font-size: 2.5rem;
+  color: #6f42c1;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.edition-selector-header h2 {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.edition-selector-header p {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.edition-selector-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.edition-option {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.edition-option:hover {
+  border-color: #6f42c1;
+  background: rgba(111, 66, 193, 0.05);
+  transform: translateX(4px);
+}
+
+.edition-option-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #6f42c1, #4a148c);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.edition-option-info {
+  flex: 1;
+}
+
+.edition-option-info h3 {
+  color: #2c3e50;
+  font-size: 1rem;
+  margin: 0 0 0.25rem;
+}
+
+.edition-badge {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  background: #e9ecef;
+  color: #6c757d;
+  font-weight: 600;
+}
+
+.edition-badge.active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.edition-option > i.fa-chevron-right {
+  color: #adb5bd;
+  transition: color 0.3s;
+}
+
+.edition-option:hover > i.fa-chevron-right {
+  color: #6f42c1;
+}
+
+/* ===== SWITCHER D'ÉDITION DANS LE HEADER ===== */
+.header {
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.edition-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.edition-switcher-label {
+  color: #6c757d;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.edition-tabs {
+  display: flex;
+  gap: 0.4rem;
+  background: #f8f9fa;
+  padding: 0.3rem;
+  border-radius: 10px;
+}
+
+.edition-tab {
+  padding: 0.4rem 0.9rem;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: #6c757d;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.edition-tab:hover {
+  background: white;
+  color: #6f42c1;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.edition-tab.active {
+  background: #6f42c1;
+  color: white;
+  box-shadow: 0 2px 8px rgba(111, 66, 193, 0.3);
+}
+
+.edition-tab-badge {
+  background: rgba(255,255,255,0.3);
+  font-size: 0.65rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.edition-tab.active .edition-tab-badge {
+  background: rgba(255,255,255,0.25);
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .edition-switcher {
+    width: 100%;
+    justify-content: center;
+  }
+}

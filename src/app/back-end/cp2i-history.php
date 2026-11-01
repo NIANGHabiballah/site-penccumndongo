@@ -14,15 +14,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
         $db = getDB();
         
-        $stmt = $db->prepare("
-            SELECT h.id, h.action, h.description, h.created_at, 
-                   u.prenom, u.nom, u.email
-            FROM cp2i_history h 
-            LEFT JOIN cp2i_users u ON h.user_id = u.id 
-            ORDER BY h.created_at DESC 
-            LIMIT 20
-        ");
-        $stmt->execute();
+        $edition_id = isset($_GET['edition_id']) ? (int)$_GET['edition_id'] : null;
+        
+        if ($edition_id) {
+            $stmt = $db->prepare("
+                SELECT h.id, h.action, h.description, h.created_at, 
+                       u.prenom, u.nom, u.email
+                FROM cp2i_history h 
+                LEFT JOIN cp2i_users u ON h.user_id = u.id 
+                WHERE h.edition_id = :edition_id
+                ORDER BY h.created_at DESC 
+                LIMIT 20
+            ");
+            $stmt->execute([':edition_id' => $edition_id]);
+        } else {
+            $stmt = $db->prepare("
+                SELECT h.id, h.action, h.description, h.created_at, 
+                       u.prenom, u.nom, u.email
+                FROM cp2i_history h 
+                LEFT JOIN cp2i_users u ON h.user_id = u.id 
+                ORDER BY h.created_at DESC 
+                LIMIT 20
+            ");
+            $stmt->execute();
+        }
         $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         echo json_encode([

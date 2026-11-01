@@ -1,3 +1,26 @@
+<!-- Sélecteur d'édition initial (si plusieurs éditions) -->
+<div class="edition-selector-overlay" *ngIf="showEditionSelector">
+  <div class="edition-selector-modal">
+    <div class="edition-selector-header">
+      <i class="fas fa-layer-group"></i>
+      <h2>Choisir une édition</h2>
+      <p>Sélectionnez l'édition pour laquelle vous souhaitez consulter vos textes assignés</p>
+    </div>
+    <div class="edition-selector-list">
+      <div class="edition-option" *ngFor="let edition of editions" (click)="selectEdition(edition)">
+        <div class="edition-option-icon">
+          <i class="fas fa-trophy"></i>
+        </div>
+        <div class="edition-option-info">
+          <h3>{{edition.label || (edition.numero + 'ᵉ édition')}}</h3>
+          <span class="edition-badge" [class.active]="edition.is_active">{{edition.is_active ? 'En cours' : 'Archivée'}}</span>
+        </div>
+        <i class="fas fa-chevron-right"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Notification Toast -->
 <div class="toast-notification" 
      [class.show]="showNotification" 
@@ -71,7 +94,21 @@
     <header class="header">
       <div class="welcome">
         <h1>Interface de Correction</h1>
-        <p>CP2i Édition 2025 - Évaluation en cours</p>
+        <p>CP2i {{editionActive?.label || ('Edition ' + (editionActive?.numero ?? ''))}} - Évaluation en cours</p>
+      </div>
+      <!-- Switcher d'édition -->
+      <div class="edition-switcher" *ngIf="editions.length > 1">
+        <span class="edition-switcher-label"><i class="fas fa-layer-group"></i> Édition :</span>
+        <div class="edition-tabs">
+          <button 
+            class="edition-tab" 
+            *ngFor="let edition of editions" 
+            [class.active]="edition.id === editionActive?.id"
+            (click)="switchEdition(edition)">
+            {{edition.numero}}ᵉ
+            <span class="edition-tab-badge" *ngIf="edition.is_active">En cours</span>
+          </button>
+        </div>
       </div>
     </header>
     

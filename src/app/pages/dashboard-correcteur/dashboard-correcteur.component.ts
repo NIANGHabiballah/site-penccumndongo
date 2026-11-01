@@ -19,6 +19,11 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
   desktopMenuHidden = false;
   currentUser: User | null = null;
   
+  // Multi-éditions
+  editions: any[] = [];
+  editionActive: any = null;
+  showEditionSelector = false;
+  
   // Données
   textesAssignes: any[] = [];
   stats = { assignes: 0, corriges: 0, enCours: 0, joursRestants: 0 };
@@ -64,7 +69,7 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
       return;
     }
     
-    this.loadData();
+    this.loadEditions();
   }
 
   ngOnDestroy() {
@@ -77,6 +82,40 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
     this.loadMessages();
     this.loadHistorique();
     this.calculateDeadline();
+  }
+
+  loadEditions() {
+    this.cp2iApi.getEditions().subscribe({
+      next: (data) => {
+        if (data.success) {
+          this.editions = data.editions || [];
+          if (this.editions.length > 1) {
+            this.showEditionSelector = true;
+          } else {
+            this.editionActive = this.editions[0] || null;
+            this.loadData();
+          }
+        } else {
+          this.loadData();
+        }
+      },
+      error: () => this.loadData()
+    });
+  }
+
+  selectEdition(edition: any) {
+    this.editionActive = edition;
+    this.showEditionSelector = false;
+    this.loadData();
+  }
+
+  switchEdition(edition: any) {
+    if (edition.id === this.editionActive?.id) return;
+    this.editionActive = edition;
+    this.textesAssignes = [];
+    this.messages = [];
+    this.historique = [];
+    this.loadData();
   }
 
   loadProfile() {
@@ -97,7 +136,8 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
   }
 
   loadTextesAssignes() {
-    this.cp2iApi.getCorrecteurTexts().subscribe({
+    const edNum = this.editionActive?.numero ?? undefined;
+    this.cp2iApi.getCorrecteurTexts(edNum).subscribe({
       next: (data) => {
         this.textesAssignes = data.textes || [];
         this.calculerStats();
@@ -115,7 +155,8 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
 
   loadMessages() {
     console.log('Loading correcteur messages...');
-    this.cp2iApi.getCorrecteurMessages().subscribe({
+    const edNum = this.editionActive?.numero ?? undefined;
+    this.cp2iApi.getCorrecteurMessages(edNum).subscribe({
       next: (data) => {
         console.log('Messages received:', data);
         this.messages = data.messages || [];
@@ -128,7 +169,8 @@ export class DashboardCorrecteurComponent implements OnInit, OnDestroy {
   }
 
   loadHistorique() {
-    this.cp2iApi.getCorrecteurHistory().subscribe({
+    const edNum = this.editionActive?.numero ?? undefined;
+    this.cp2iApi.getCorrecteurHistory(edNum).subscribe({
       next: (data) => {
         this.historique = data.history || [];
       },

@@ -1,3 +1,22 @@
+<!-- Écran de sélection d'édition -->
+<div class="edition-selector-overlay" *ngIf="showEditionSelector">
+  <div class="edition-selector-card">
+    <div class="edition-selector-header">
+      <h2>CP2i</h2>
+      <p>Concours de Poésie Inédit &amp; Innovant</p>
+    </div>
+    <h3>Choisissez une édition</h3>
+    <p class="edition-selector-sub">Bienvenue, <strong>{{currentUser?.prenom}}</strong> ! Sélectionnez l'édition à administrer.</p>
+    <div class="edition-cards">
+      <div class="edition-card" *ngFor="let ed of editions" (click)="selectEdition(ed)">
+        <div class="edition-card-badge" [class.active]="ed.is_active">{{ed.is_active ? 'En cours' : 'Archives'}}</div>
+        <div class="edition-card-label">{{ed.label}}</div>
+        <div class="edition-card-arrow"><i class="fas fa-arrow-right"></i></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Notification Toast -->
 <div class="toast-notification" 
      [class.show]="showNotification" 
@@ -18,6 +37,22 @@
       <h2>{{currentUser?.prenom}} {{currentUser?.nom}}</h2>
       <span>Concours de Poésie</span>
     </div>
+
+    <div class="edition-selector" *ngIf="editions.length > 1">
+      <span class="edition-label">Edition :</span>
+      <div class="edition-buttons">
+        <button *ngFor="let ed of editions"
+                class="edition-btn"
+                [class.active]="editionActive?.id === ed.id"
+                (click)="switchEdition(ed)">
+          {{ed.numero}}<sup>{{ed.numero === 1 ? 'ere' : 'eme'}}</sup>
+        </button>
+      </div>
+      <div class="edition-badge" *ngIf="isEditionArchivee()">
+        <i class="fas fa-archive"></i> Edition archivee
+      </div>
+    </div>
+
     <nav class="nav-menu">
       <div class="nav-item" [class.active]="currentView === 'dashboard'" (click)="setCurrentView('dashboard')">
         <i class="fas fa-chart-bar"></i> Tableau de bord
@@ -135,7 +170,7 @@
             <div class="calendar-title-wrapper">
               <i class="fas fa-calendar-alt calendar-icon"></i>
               <div class="calendar-text">
-                <h3>Calendrier CP2i 2026</h3>
+                <h3>Calendrier CP2i {{editionActive?.annee}}</h3>
                 <span class="subtitle">Concours de Poésie Inédit & Innovant</span>
               </div>
             </div>
@@ -149,49 +184,49 @@
             <div class="timeline">
               <div class="timeline-item active">
                 <div class="timeline-date">
-                  <span class="date-range">03 Nov - 23 Nov 2026</span>
-                  <span class="duration">20 jours</span>
+                  <span class="date-range">{{concoursSchedule.inscription_debut | date:'dd MMM'}} - {{concoursSchedule.inscription_fin | date:'dd MMM yyyy'}}</span>
+                  <span class="duration">{{getDurationDays(concoursSchedule.inscription_debut, concoursSchedule.inscription_fin)}} jours</span>
                 </div>
                 <div class="timeline-content">
                   <h5>Inscriptions & Soumissions</h5>
                   <p>Ouverture des inscriptions et dépôt des textes poétiques</p>
-                  <div class="countdown">{{getDaysRemaining('2026-11-23')}} jours restants</div>
+                  <div class="countdown">{{getDaysRemaining(concoursSchedule.inscription_fin)}} jours restants</div>
                 </div>
               </div>
               
               <div class="timeline-item">
                 <div class="timeline-date">
-                  <span class="date-range">24 Nov - 03 Déc 2026</span>
-                  <span class="duration">10 jours</span>
+                  <span class="date-range">{{concoursSchedule.correction_debut | date:'dd MMM'}} - {{concoursSchedule.correction_fin | date:'dd MMM yyyy'}}</span>
+                  <span class="duration">{{getDurationDays(concoursSchedule.correction_debut, concoursSchedule.correction_fin)}} jours</span>
                 </div>
                 <div class="timeline-content">
                   <h5>Évaluations & Corrections</h5>
                   <p>Analyse et notation des textes par le jury de correcteurs</p>
-                  <div class="countdown">{{getDaysRemaining('2026-12-03')}} jours restants</div>
+                  <div class="countdown">{{getDaysRemaining(concoursSchedule.correction_prolongement)}} jours restants</div>
                 </div>
               </div>
               
               <div class="timeline-item">
                 <div class="timeline-date">
-                  <span class="date-range">10 Décembre 2026</span>
+                  <span class="date-range">{{concoursSchedule.deliberation | date:'dd MMMM yyyy'}}</span>
                   <span class="duration">1 jour</span>
                 </div>
                 <div class="timeline-content">
                   <h5>Délibération du Jury</h5>
                   <p>Réunion officielle et sélection des lauréats</p>
-                  <div class="countdown">{{getDaysRemaining('2026-12-10')}} jours restants</div>
+                  <div class="countdown">{{getDaysRemaining(concoursSchedule.deliberation)}} jours restants</div>
                 </div>
               </div>
               
               <div class="timeline-item">
                 <div class="timeline-date">
-                  <span class="date-range">10 Janvier 2026</span>
+                  <span class="date-range">{{concoursSchedule.ceremonie_remise | date:'dd MMMM yyyy'}}</span>
                   <span class="duration">Événement</span>
                 </div>
                 <div class="timeline-content">
                   <h5>Cérémonie de Remise</h5>
                   <p>Célébration officielle et remise des prix aux gagnants</p>
-                  <div class="countdown">{{getDaysRemaining('2026-01-10')}} jours restants</div>
+                  <div class="countdown">{{getDaysRemaining(concoursSchedule.ceremonie_remise)}} jours restants</div>
                 </div>
               </div>
             </div>
@@ -200,9 +235,9 @@
               <div class="deadline-card-full">
                 <div class="deadline-content">
                   <span class="deadline-label">Prochaine Échéance</span>
-                  <h4>Début des inscriptions</h4>
+                  <h4>{{getProchaineEcheance().nom}}</h4>
                 </div>
-                <div class="big-countdown">{{getDaysRemaining('2026-11-23')}}<span>jours</span></div>
+                <div class="big-countdown">{{getProchaineEcheance().jours}}<span>jours</span></div>
               </div>
             </div>
           </div>
@@ -2393,7 +2428,7 @@
 
       <!-- Chat Support -->
       <div *ngSwitchCase="'chat-support'" class="chat-support-section">
-        <app-admin-chat></app-admin-chat>
+        <app-admin-chat [editionId]="editionActive?.numero ?? 4"></app-admin-chat>
       </div>
 
 

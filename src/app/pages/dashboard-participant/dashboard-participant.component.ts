@@ -177,7 +177,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     correction_fin: '2026-12-03',
     correction_prolongement: '2026-12-10',
     deliberation: '2026-12-15',
-    ceremonie_remise: '2027-01-15'
+    ceremonie_remise: '2026-12-26'
   };
   
   // Section thèmes

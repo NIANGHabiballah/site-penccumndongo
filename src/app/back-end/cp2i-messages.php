@@ -46,9 +46,10 @@ if ($method === 'POST') {
 function getMessages($user) {
     try {
         $pdo = getDB();
+        $edition_id = isset($_GET['edition_id']) ? (int)$_GET['edition_id'] : null;
+        $edition_filter = $edition_id ? ' AND m.edition_id = ' . $edition_id : '';
         
         if ($user['role'] === 'admin') {
-            // Pour les admins, retourner leurs messages envoyés avec statistiques
             $stmt = $pdo->prepare("
                 SELECT m.id, m.subject, m.content, m.created_at, m.send_to_all,
                        COUNT(mr.id) as total_recipients,
@@ -60,7 +61,7 @@ function getMessages($user) {
                 FROM cp2i_messages m
                 LEFT JOIN cp2i_message_recipients mr ON m.id = mr.message_id
                 LEFT JOIN cp2i_users u ON mr.recipient_id = u.id
-                WHERE m.sender_id = ?
+                WHERE m.sender_id = ?" . $edition_filter . "
                 GROUP BY m.id
                 ORDER BY m.created_at DESC
             ");
@@ -69,8 +70,11 @@ function getMessages($user) {
             
             echo json_encode(['success' => true, 'messages' => $messages]);
         } else {
-            // Pour les autres utilisateurs, retourner les messages reçus
-            // Inclure les messages collectifs ET les messages individuels
+            // Récupérer la date de création du compte du participant
+            $userStmt = $pdo->prepare("SELECT created_at FROM cp2i_users WHERE id = ?");
+            $userStmt->execute([$user['user_id']]);
+            $userCreatedAt = $userStmt->fetchColumn();
+
             $stmt = $pdo->prepare("
                 SELECT DISTINCT m.id, m.subject, m.content, m.created_at, m.send_to_all,
                        u.prenom as sender_prenom, u.nom as sender_nom, 
@@ -78,18 +82,19 @@ function getMessages($user) {
                        CASE WHEN mr.read_at IS NOT NULL THEN 1 ELSE 0 END as is_read
                 FROM cp2i_messages m
                 LEFT JOIN cp2i_users u ON m.sender_id = u.id
-                LEFT JOIN cp2i_message_recipients mr ON m.id = mr.message_id
+                LEFT JOIN cp2i_message_recipients mr ON m.id = mr.message_id AND mr.recipient_id = ?
                 WHERE (m.send_to_all = 1 OR mr.recipient_id = ?)
                   AND m.sender_id != ?
+                  AND m.created_at >= ?
+                  " . $edition_filter . "
                 ORDER BY m.created_at DESC
             ");
-            $stmt->execute([$user['user_id'], $user['user_id']]);
+            $stmt->execute([$user['user_id'], $user['user_id'], $user['user_id'], $userCreatedAt]);
             $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
             // Pour les messages collectifs, vérifier/créer l'entrée dans message_recipients
             foreach ($messages as &$message) {
                 if ($message['send_to_all'] == 1 && !$message['read_at']) {
-                    // Créer l'entrée si elle n'existe pas
                     $checkStmt = $pdo->prepare("SELECT id FROM cp2i_message_recipients WHERE message_id = ? AND recipient_id = ?");
                     $checkStmt->execute([$message['id'], $user['user_id']]);
                     
@@ -174,8 +179,9 @@ function sendMessage($user, $data) {
     
     try {
         // Insérer le message
-        $stmt = $db->prepare("INSERT INTO cp2i_messages (sender_id, subject, content, send_to_all) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$user['user_id'], $subject, $content, $send_to_all ? 1 : 0]);
+        $edition_id = (int)($data['edition_id'] ?? 4);
+        $stmt = $db->prepare("INSERT INTO cp2i_messages (sender_id, subject, content, send_to_all, edition_id) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$user['user_id'], $subject, $content, $send_to_all ? 1 : 0, $edition_id]);
         $message_id = $db->lastInsertId();
         
         error_log('Message inséré avec ID: ' . $message_id);
@@ -313,8 +319,9 @@ function sendMessageWithImages($user) {
         }
         
         // Insérer le message
-        $stmt = $db->prepare("INSERT INTO cp2i_messages (sender_id, subject, content, images, send_to_all) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$user['user_id'], $subject, $finalContent, json_encode($imageUrls), $send_to_all ? 1 : 0]);
+        $edition_id = (int)($_POST['edition_id'] ?? 4);
+        $stmt = $db->prepare("INSERT INTO cp2i_messages (sender_id, subject, content, images, send_to_all, edition_id) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$user['user_id'], $subject, $finalContent, json_encode($imageUrls), $send_to_all ? 1 : 0, $edition_id]);
         $message_id = $db->lastInsertId();
         
         $recipient_count = 0;

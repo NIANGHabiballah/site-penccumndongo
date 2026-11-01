@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatSupportService } from '../../services/chat-support.service';
@@ -11,6 +11,16 @@ import { ChatSupportService } from '../../services/chat-support.service';
   styleUrls: ['./admin-chat.component.css']
 })
 export class AdminChatComponent implements OnInit, OnDestroy {
+  @Input() set editionId(value: number) {
+    this._editionId = value;
+    if (this._initialized) {
+      this.loadConversations();
+      this.loadStats();
+    }
+  }
+  get editionId(): number { return this._editionId; }
+  private _editionId: number = 4;
+  private _initialized = false;
   activeTab = 'conversations';
   showAddReplyForm = false;
   isMobile = false;
@@ -47,6 +57,7 @@ export class AdminChatComponent implements OnInit, OnDestroy {
   constructor(private chatService: ChatSupportService) {}
 
   ngOnInit() {
+    this._initialized = true;
     this.checkMobile();
     this.loadAvailableAdmins();
     this.loadConversations();
@@ -85,8 +96,7 @@ export class AdminChatComponent implements OnInit, OnDestroy {
   }
 
   loadConversations() {
-    
-    this.chatService.getConversations().subscribe({
+    this.chatService.getConversations(this.editionId).subscribe({
       next: (conversations) => {
         this.conversations = conversations;
       },

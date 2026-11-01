@@ -14,18 +14,20 @@ if ($method === 'GET') {
         exit;
     }
     
+    $editionId = isset($_GET['edition_id']) ? (int)$_GET['edition_id'] : null;
+
     switch ($action) {
         case 'textes':
-            getCorrecteurTexts($user['user_id']);
+            getCorrecteurTexts($user['user_id'], $editionId);
             break;
         case 'messages':
-            getCorrecteurMessages($user['user_id']);
+            getCorrecteurMessages($user['user_id'], $editionId);
             break;
         case 'history':
-            getCorrecteurHistory($user['user_id']);
+            getCorrecteurHistory($user['user_id'], $editionId);
             break;
         case 'stats':
-            getCorrecteurStats($user['user_id']);
+            getCorrecteurStats($user['user_id'], $editionId);
             break;
         default:
             http_response_code(400);
@@ -52,10 +54,13 @@ if ($method === 'POST') {
     }
 }
 
-function getCorrecteurTexts($correcteurId) {
+function getCorrecteurTexts($correcteurId, $editionId = null) {
     try {
         $db = getDB();
         
+        $editionFilter = $editionId ? 'AND t.edition_id = ?' : '';
+        $params = $editionId ? [$correcteurId, $editionId] : [$correcteurId];
+
         // Récupérer les textes assignés à CE correcteur via cp2i_affectations
         $stmt = $db->prepare("
             SELECT DISTINCT t.id, t.titre, t.contenu, t.langue, t.theme, t.created_at, 
@@ -66,9 +71,10 @@ function getCorrecteurTexts($correcteurId) {
                 SELECT 1 FROM cp2i_affectations a 
                 WHERE a.texte_id = t.id AND a.corrector_id = ?
             )
+            $editionFilter
             ORDER BY t.created_at DESC
         ");
-        $stmt->execute([$correcteurId]);
+        $stmt->execute($params);
         $textes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         // Pour chaque texte, vérifier SEULEMENT l'évaluation de CE correcteur
@@ -121,19 +127,23 @@ function getCorrecteurTexts($correcteurId) {
     }
 }
 
-function getCorrecteurMessages($correcteurId) {
+function getCorrecteurMessages($correcteurId, $editionId = null) {
     try {
         $db = getDB();
         
+        $editionFilter = $editionId ? 'AND m.edition_id = ?' : '';
+        $params = $editionId ? [$correcteurId, $correcteurId, $editionId] : [$correcteurId, $correcteurId];
+
         $stmt = $db->prepare("
             SELECT m.*, u.prenom as sender_prenom, u.nom as sender_nom, mr.read_at
             FROM cp2i_messages m
             LEFT JOIN cp2i_users u ON m.sender_id = u.id
             LEFT JOIN cp2i_message_recipients mr ON m.id = mr.message_id AND mr.recipient_id = ?
-            WHERE m.send_to_all = 1 OR mr.recipient_id = ?
+            WHERE (m.send_to_all = 1 OR mr.recipient_id = ?)
+            $editionFilter
             ORDER BY m.created_at DESC
         ");
-        $stmt->execute([$correcteurId, $correcteurId]);
+        $stmt->execute($params);
         $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         echo json_encode([
@@ -147,10 +157,13 @@ function getCorrecteurMessages($correcteurId) {
     }
 }
 
-function getCorrecteurHistory($correcteurId) {
+function getCorrecteurHistory($correcteurId, $editionId = null) {
     try {
         $db = getDB();
         
+        $editionFilter = $editionId ? 'AND t.edition_id = ?' : '';
+        $params = $editionId ? [$correcteurId, $editionId] : [$correcteurId];
+
         // Historique des évaluations du correcteur
         $stmt = $db->prepare("
             SELECT t.titre, e.note_totale as note, e.remarques as commentaire, t.statut, e.created_at as updated_at, u.prenom, u.nom
@@ -158,10 +171,11 @@ function getCorrecteurHistory($correcteurId) {
             JOIN cp2i_textes t ON e.texte_id = t.id
             JOIN cp2i_users u ON t.user_id = u.id
             WHERE e.correcteur_id = ?
+            $editionFilter
             ORDER BY e.created_at DESC
             LIMIT 50
         ");
-        $stmt->execute([$correcteurId]);
+        $stmt->execute($params);
         $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         echo json_encode([
@@ -175,18 +189,26 @@ function getCorrecteurHistory($correcteurId) {
     }
 }
 
-function getCorrecteurStats($correcteurId) {
+function getCorrecteurStats($correcteurId, $editionId = null) {
     try {
         $db = getDB();
         
-        // Nombre total de textes assignés à CE correcteur
-        $stmt = $db->prepare("SELECT COUNT(*) FROM cp2i_affectations WHERE corrector_id = ?");
-        $stmt->execute([$correcteurId]);
+        if ($editionId) {
+            $stmt = $db->prepare("SELECT COUNT(*) FROM cp2i_affectations a JOIN cp2i_textes t ON a.texte_id = t.id WHERE a.corrector_id = ? AND t.edition_id = ?");
+            $stmt->execute([$correcteurId, $editionId]);
+        } else {
+            $stmt = $db->prepare("SELECT COUNT(*) FROM cp2i_affectations WHERE corrector_id = ?");
+            $stmt->execute([$correcteurId]);
+        }
         $totalAssignes = (int)$stmt->fetchColumn();
         
-        // Nombre de textes corrigés PAR CE correcteur uniquement
-        $stmt = $db->prepare("SELECT COUNT(*) FROM cp2i_evaluations WHERE correcteur_id = ?");
-        $stmt->execute([$correcteurId]);
+        if ($editionId) {
+            $stmt = $db->prepare("SELECT COUNT(*) FROM cp2i_evaluations e JOIN cp2i_textes t ON e.texte_id = t.id WHERE e.correcteur_id = ? AND t.edition_id = ?");
+            $stmt->execute([$correcteurId, $editionId]);
+        } else {
+            $stmt = $db->prepare("SELECT COUNT(*) FROM cp2i_evaluations WHERE correcteur_id = ?");
+            $stmt->execute([$correcteurId]);
+        }
         $corriges = (int)$stmt->fetchColumn();
         
         // Nombre à corriger pour CE correcteur

@@ -44,43 +44,78 @@ if ($method === 'POST') {
 
 function getEvaluations($user) {
     $db = getDB();
-    
-    // Récupérer tous les textes avec informations d'évaluation
-    $stmt = $db->prepare("
-        SELECT t.*, u.prenom, u.nom, u.email,
-               c.prenom as correcteur_prenom, c.nom as correcteur_nom,
-               a.corrector_id
-        FROM cp2i_textes t
-        JOIN cp2i_users u ON t.user_id = u.id
-        LEFT JOIN cp2i_affectations a ON u.id = a.participant_id
-        LEFT JOIN cp2i_users c ON a.corrector_id = c.id
-        ORDER BY 
-            CASE t.statut 
-                WHEN 'en_attente' THEN 1 
-                WHEN 'accepte' THEN 2 
-                WHEN 'refuse' THEN 3 
-            END,
-            t.created_at DESC
-    ");
-    $stmt->execute();
+    $edition_id = isset($_GET['edition_id']) ? (int)$_GET['edition_id'] : null;
+
+    if ($edition_id) {
+        $stmt = $db->prepare("
+            SELECT t.*, u.prenom, u.nom, u.email,
+                   c.prenom as correcteur_prenom, c.nom as correcteur_nom,
+                   a.corrector_id
+            FROM cp2i_textes t
+            JOIN cp2i_users u ON t.user_id = u.id
+            LEFT JOIN cp2i_affectations a ON u.id = a.participant_id AND a.edition_id = :edition_id
+            LEFT JOIN cp2i_users c ON a.corrector_id = c.id
+            WHERE t.edition_id = :edition_id
+            ORDER BY
+                CASE t.statut
+                    WHEN 'en_attente' THEN 1
+                    WHEN 'accepte' THEN 2
+                    WHEN 'refuse' THEN 3
+                END,
+                t.created_at DESC
+        ");
+        $stmt->execute([':edition_id' => $edition_id]);
+    } else {
+        $stmt = $db->prepare("
+            SELECT t.*, u.prenom, u.nom, u.email,
+                   c.prenom as correcteur_prenom, c.nom as correcteur_nom,
+                   a.corrector_id
+            FROM cp2i_textes t
+            JOIN cp2i_users u ON t.user_id = u.id
+            LEFT JOIN cp2i_affectations a ON u.id = a.participant_id
+            LEFT JOIN cp2i_users c ON a.corrector_id = c.id
+            ORDER BY
+                CASE t.statut
+                    WHEN 'en_attente' THEN 1
+                    WHEN 'accepte' THEN 2
+                    WHEN 'refuse' THEN 3
+                END,
+                t.created_at DESC
+        ");
+        $stmt->execute();
+    }
     $textes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Statistiques d'évaluation
-    $stmt = $db->prepare("
-        SELECT 
-            COUNT(*) as total,
-            SUM(CASE WHEN statut = 'en_attente' THEN 1 ELSE 0 END) as en_attente,
-            SUM(CASE WHEN statut = 'accepte' THEN 1 ELSE 0 END) as acceptes,
-            SUM(CASE WHEN statut = 'refuse' THEN 1 ELSE 0 END) as refuses,
-            AVG(CASE WHEN note IS NOT NULL THEN note ELSE NULL END) as note_moyenne
-        FROM cp2i_textes
-    ");
-    $stmt->execute();
+
+    // Statistiques filtrées par édition
+    if ($edition_id) {
+        $stmt = $db->prepare("
+            SELECT
+                COUNT(*) as total,
+                SUM(CASE WHEN statut = 'en_attente' THEN 1 ELSE 0 END) as en_attente,
+                SUM(CASE WHEN statut = 'accepte' THEN 1 ELSE 0 END) as acceptes,
+                SUM(CASE WHEN statut = 'refuse' THEN 1 ELSE 0 END) as refuses,
+                AVG(CASE WHEN note IS NOT NULL THEN note ELSE NULL END) as note_moyenne
+            FROM cp2i_textes
+            WHERE edition_id = :edition_id
+        ");
+        $stmt->execute([':edition_id' => $edition_id]);
+    } else {
+        $stmt = $db->prepare("
+            SELECT
+                COUNT(*) as total,
+                SUM(CASE WHEN statut = 'en_attente' THEN 1 ELSE 0 END) as en_attente,
+                SUM(CASE WHEN statut = 'accepte' THEN 1 ELSE 0 END) as acceptes,
+                SUM(CASE WHEN statut = 'refuse' THEN 1 ELSE 0 END) as refuses,
+                AVG(CASE WHEN note IS NOT NULL THEN note ELSE NULL END) as note_moyenne
+            FROM cp2i_textes
+        ");
+        $stmt->execute();
+    }
     $stats = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
     echo json_encode([
         'textes' => $textes,
-        'stats' => $stats
+        'stats'  => $stats
     ]);
 }
 

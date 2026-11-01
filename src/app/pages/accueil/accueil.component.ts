@@ -213,6 +213,28 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
   // --- Actualités ---
   articles: Article[] = [
     {
+      id: 24,
+      title: "4 thèmes, Une plume, Une voix !",
+      excerpt: "Pour sa 4ᵉ édition, le Concours de Poésie Inédit & Innovant (CP2i) vous invite à explorer : Les mots du silence • Taaru Sénégal • Le flicage au sein du couple • Pression sociale et influence ruineuse. Du 02 au 23 novembre 2026. Lequel fera vibrer votre plume ? À vous de choisir. #cp2i #penccumndongo #concours #poesie",
+      image: "cp2i_02.png",
+      date: new Date('2026-07-01'),
+      category: "CP2i",
+      author: "Penccum Ndongo",
+      linkedinUrl: "https://www.facebook.com/share/p/1EqrmeeSYw/",
+      featured: true
+    },
+    {
+      id: 23,
+      title: "Une langue, un message, une voix !",
+      excerpt: "La 4ᵉ édition du Concours de Poésie Inédit & Innovant (CP2i) vous laisse le choix entre français, anglais, arabe ou wolof — exprimez-vous dans la langue qui vous ressemble. Du 02 au 23 novembre 2026. Aiguisez vos plumes et laissez naître vos vers : l'odyssée des mots s'annonce bientôt. #cp2i #penccumndongo #concours #poesie",
+      image: "cp2i_03.png",
+      date: new Date('2026-06-25'),
+      category: "CP2i",
+      author: "Penccum Ndongo",
+      linkedinUrl: "https://www.facebook.com/share/p/1DWnZHMMKJ/",
+      featured: true
+    },
+    {
       id: 22,
       title: "Joyeuse fête de Tabaski 2026 !",
       excerpt: "Aïd Moubarak ! À l'occasion de cette fête bénie de Tabaski, l'équipe de Penccum Ndongo vous souhaite une excellente fête remplie de joie, de partage et de bénédictions. Que cette célébration vous apporte paix, bonheur et prospérité. Taqabal Allah minna wa minkoum ! #tabaski2026 #penccumndongo #aidmoubarak",

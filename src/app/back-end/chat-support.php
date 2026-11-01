@@ -65,34 +65,66 @@ switch ($method) {
 
 function getConversations($user) {
     $pdo = getDB();
-    
+    $edition_id = isset($_GET['edition_id']) ? (int)$_GET['edition_id'] : null;
+
     if ($user['role'] === 'admin') {
-        $stmt = $pdo->query("
-            SELECT c.*, u.nom, u.prenom, u.email,
-                   CONCAT(u.prenom, ' ', u.nom) as user_name,
-                   u.email as user_email,
-                   CONCAT(a.prenom, ' ', a.nom) as admin_name,
-                   COUNT(CASE WHEN m.read_status = 0 AND m.sender_type = 'participant' THEN 1 END) as unread_count
-            FROM chat_conversations c
-            JOIN cp2i_users u ON c.participant_id = u.id
-            LEFT JOIN cp2i_users a ON c.admin_id = a.id
-            LEFT JOIN chat_messages m ON c.id = m.conversation_id
-            GROUP BY c.id
-            ORDER BY c.updated_at DESC
-        ");
+        if ($edition_id) {
+            $stmt = $pdo->prepare("
+                SELECT c.*, u.nom, u.prenom, u.email,
+                       CONCAT(u.prenom, ' ', u.nom) as user_name,
+                       u.email as user_email,
+                       CONCAT(a.prenom, ' ', a.nom) as admin_name,
+                       COUNT(CASE WHEN m.read_status = 0 AND m.sender_type = 'participant' THEN 1 END) as unread_count
+                FROM chat_conversations c
+                JOIN cp2i_users u ON c.participant_id = u.id
+                LEFT JOIN cp2i_users a ON c.admin_id = a.id
+                LEFT JOIN chat_messages m ON c.id = m.conversation_id
+                WHERE c.edition_id = ? OR c.edition_id IS NULL
+                GROUP BY c.id
+                ORDER BY c.updated_at DESC
+            ");
+            $stmt->execute([$edition_id]);
+        } else {
+            $stmt = $pdo->query("
+                SELECT c.*, u.nom, u.prenom, u.email,
+                       CONCAT(u.prenom, ' ', u.nom) as user_name,
+                       u.email as user_email,
+                       CONCAT(a.prenom, ' ', a.nom) as admin_name,
+                       COUNT(CASE WHEN m.read_status = 0 AND m.sender_type = 'participant' THEN 1 END) as unread_count
+                FROM chat_conversations c
+                JOIN cp2i_users u ON c.participant_id = u.id
+                LEFT JOIN cp2i_users a ON c.admin_id = a.id
+                LEFT JOIN chat_messages m ON c.id = m.conversation_id
+                GROUP BY c.id
+                ORDER BY c.updated_at DESC
+            ");
+        }
     } else {
-        $stmt = $pdo->prepare("
-            SELECT c.*,
-                   COUNT(CASE WHEN m.read_status = 0 AND m.sender_type = 'admin' THEN 1 END) as unread_count
-            FROM chat_conversations c
-            LEFT JOIN chat_messages m ON c.id = m.conversation_id
-            WHERE c.participant_id = ?
-            GROUP BY c.id
-            ORDER BY c.updated_at DESC
-        ");
-        $stmt->execute([$user['user_id']]);
+        if ($edition_id) {
+            $stmt = $pdo->prepare("
+                SELECT c.*,
+                       COUNT(CASE WHEN m.read_status = 0 AND m.sender_type = 'admin' THEN 1 END) as unread_count
+                FROM chat_conversations c
+                LEFT JOIN chat_messages m ON c.id = m.conversation_id
+                WHERE c.participant_id = ? AND (c.edition_id = ? OR c.edition_id IS NULL)
+                GROUP BY c.id
+                ORDER BY c.updated_at DESC
+            ");
+            $stmt->execute([$user['user_id'], $edition_id]);
+        } else {
+            $stmt = $pdo->prepare("
+                SELECT c.*,
+                       COUNT(CASE WHEN m.read_status = 0 AND m.sender_type = 'admin' THEN 1 END) as unread_count
+                FROM chat_conversations c
+                LEFT JOIN chat_messages m ON c.id = m.conversation_id
+                WHERE c.participant_id = ?
+                GROUP BY c.id
+                ORDER BY c.updated_at DESC
+            ");
+            $stmt->execute([$user['user_id']]);
+        }
     }
-    
+
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
@@ -138,11 +170,12 @@ function createConversation($user, $data) {
         $pdo->beginTransaction();
         
         // Créer la conversation
+        $edition_id = (int)($data['edition_id'] ?? 4);
         $stmt = $pdo->prepare("
-            INSERT INTO chat_conversations (participant_id, subject, status, priority, created_at, updated_at)
-            VALUES (?, ?, 'open', 'medium', NOW(), NOW())
+            INSERT INTO chat_conversations (participant_id, subject, status, priority, edition_id, created_at, updated_at)
+            VALUES (?, ?, 'open', 'medium', ?, NOW(), NOW())
         ");
-        $stmt->execute([$userId, $data['subject']]);
+        $stmt->execute([$userId, $data['subject'], $edition_id]);
         $conversationId = $pdo->lastInsertId();
         
         // Ajouter le message initial
@@ -426,11 +459,12 @@ function createConversationWithImages($user) {
         $pdo->beginTransaction();
         
         // Créer la conversation
+        $edition_id = (int)($_POST['edition_id'] ?? 4);
         $stmt = $pdo->prepare("
-            INSERT INTO chat_conversations (participant_id, subject, status, priority, created_at, updated_at)
-            VALUES (?, ?, 'open', 'medium', NOW(), NOW())
+            INSERT INTO chat_conversations (participant_id, subject, status, priority, edition_id, created_at, updated_at)
+            VALUES (?, ?, 'open', 'medium', ?, NOW(), NOW())
         ");
-        $stmt->execute([$userId, $subject]);
+        $stmt->execute([$userId, $subject, $edition_id]);
         $conversationId = $pdo->lastInsertId();
         
         // Traiter les images

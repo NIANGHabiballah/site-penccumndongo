@@ -53,11 +53,10 @@ import { ApiService } from '../../services/api.service';
 
           <section class="reglement-section">
             <h2><i class="fas fa-search"></i> 4. PROCESSUS DE SÉLECTION</h2>
-            <p>{{reglements.selection.comite}}</p>
-            <p>{{reglements.selection.criteres}}</p>
-
-            <p>{{reglements.selection.publication}}</p>
-            <p><strong>Mention spéciale :</strong> {{reglements.selection.mention_speciale}}</p>
+            <ul>
+              <li *ngFor="let item of reglements.selection.items">{{item}}</li>
+            </ul>
+            <p><strong>Prix de la Voix du CP2i :</strong> {{reglements.selection.mention_speciale}}</p>
           </section>
 
           <section class="reglement-section">
@@ -544,27 +543,29 @@ export class ReglementsComponent implements OnInit {
       annee: '2026',
       organisation: {
         description: 'La 4ème édition du Concours de Poésie Inédit et Innovant (CP2i) est organisée par Penccum Ndongo, une agence de marketing et de communication digitale qui propose des solutions numériques et l\'accompagnement des initiatives culturelles et créatives.',
-        objectif: 'Cette année, le CP2i vise à offrir une plateforme d\'expression aux poètes, jeunes et confirmés, pour explorer et partager leur vision sur des thématiques d\'actualité.'
+        objectif: 'Cette année, le CP2i s\'affirme comme un concours panafricain de poésie et de slam, ouvert aux poètes et slameurs de tout le continent, jeunes et confirmés, pour explorer et partager leur vision sur des thématiques d\'actualité.'
       },
       participation: {
-        ouverture: 'Le concours est ouvert à toute personne résidant au Sénégal et à l\'international.',
+        ouverture: 'Le concours est ouvert à tout poète ou slameur africain, résidant sur le continent ou dans la diaspora, sans limite d\'\u00e2ge.',
         periode_inscription: 'du 02 au 23 novembre 2026',
         date_limite_soumission: '23 novembre 2026 à 23h59',
         langues: ['français', 'wolof', 'anglais', 'arabe'],
         themes: ['Les mots du silence', 'La beauté du Sénégal', 'Le flicage au sein du couple', 'Pression sociale et influence ruineuse']
       },
       soumission: {
-        format: 'Un seul poème par participant en format numérique',
+        format: 'Un seul poème par participant, soumis en format Word (.doc ou .docx), sans signature ni mention du nom de l\'auteur',
         limite_vers: '40 vers maximum',
         originalite: 'Le texte doit être inédit, jamais publié ni présenté dans d\'autres concours',
         informations_requises: ['nom', 'prénom', 'adresse', 'numéro de téléphone', 'email', 'texte']
       },
       selection: {
-        comite: 'Les poèmes seront évalués par un comité de lecture composé d\'\u00e9crivains, d\'universitaires et de professionnels du milieu artistique et littéraire.',
-        criteres: 'Les meilleurs textes dans chaque langue seront sélectionnés pour la finale.',
-
-        publication: 'Les poèmes finalistes seront publiés sur nos plateformes sociales pour une phase d\'appréciation publique.',
-        mention_speciale: 'Le poème le plus aimé et commenté recevra une mention spéciale.'
+        items: [
+          'Les po\u00e8mes seront \u00e9valu\u00e9s par un comit\u00e9 de lecture compos\u00e9 d\'\u00e9crivains, d\'universitaires et de professionnels du milieu artistique et litt\u00e9raire.',
+          'Le jury s\u00e9lectionne les meilleurs textes dans chaque langue, puis retient au total 5 finalistes issus de l\'ensemble des langues participantes.',
+          'Ces 5 finalistes seront prim\u00e9s lors de la c\u00e9r\u00e9monie officielle de remise des prix, qui se tiendra en pr\u00e9sentiel.',
+          'Phase facultative r\u00e9serv\u00e9e aux 5 finalistes : leurs po\u00e8mes seront publi\u00e9s sur nos plateformes sociales pour une phase d\'appr\u00e9ciation publique, en vue de l\'attribution du \u00ab Prix de la Voix du CP2i \u00bb.'
+        ],
+        mention_speciale: 'Le \u00ab Prix de la Voix du CP2i \u00bb sera remis au finaliste dont le po\u00e8me aura \u00e9t\u00e9 le plus aim\u00e9 et comment\u00e9 par le public lors de cette phase.'
       },
       recompenses: {
         prix_par_langue: 'Des prix seront attribués aux lauréats des différentes langues',

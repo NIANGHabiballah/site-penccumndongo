@@ -138,6 +138,10 @@ export class Cp2iApiService {
     return this.http.get(`${this.baseUrl}/cp2i-editions.php?action=active`, { headers: this.getHeaders() });
   }
 
+  updateEditionDates(editionNumero: number, schedule: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/cp2i-editions.php`, { numero: editionNumero, ...schedule }, { headers: this.getHeaders() });
+  }
+
   // Méthode améliorée pour récupérer les textes avec validation
   getUserTextsValidated(): Observable<any> {
     return this.getUserTexts();
@@ -159,8 +163,9 @@ export class Cp2iApiService {
     );
   }
 
-  getDashboardStats(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/cp2i-admin-stats.php`, { headers: this.getHeaders() });
+  getDashboardStats(editionId?: number): Observable<any> {
+    const params = editionId ? `?edition_id=${editionId}` : '';
+    return this.http.get(`${this.baseUrl}/cp2i-admin-stats.php${params}`, { headers: this.getHeaders() });
   }
 
   getProfile(): Observable<any> {
@@ -168,8 +173,9 @@ export class Cp2iApiService {
   }
 
   // Méthodes admin
-  getUsers(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/cp2i-dashboard.php?action=get_users`, { headers: this.getHeaders() });
+  getUsers(editionId?: number): Observable<any> {
+    const params = editionId ? `?action=get_users&edition_id=${editionId}` : '?action=get_users';
+    return this.http.get(`${this.baseUrl}/cp2i-dashboard.php${params}`, { headers: this.getHeaders() });
   }
 
   assignCorrector(texteId: number, correctorId: number): Observable<any> {
@@ -222,8 +228,9 @@ export class Cp2iApiService {
     }, { headers: this.getHeaders() });
   }
 
-  getHistory(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/cp2i-history.php`, { headers: this.getHeaders() });
+  getHistory(editionId?: number): Observable<any> {
+    const params = editionId ? `?edition_id=${editionId}` : '';
+    return this.http.get(`${this.baseUrl}/cp2i-history.php${params}`, { headers: this.getHeaders() });
   }
 
   requestPasswordReset(email: string): Observable<any> {
@@ -250,8 +257,9 @@ export class Cp2iApiService {
   }
 
   // Méthodes d'évaluation
-  getEvaluations(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/cp2i-evaluations.php?action=list`, { headers: this.getHeaders() });
+  getEvaluations(editionId?: number): Observable<any> {
+    const params = editionId ? `?action=list&edition_id=${editionId}` : '?action=list';
+    return this.http.get(`${this.baseUrl}/cp2i-evaluations.php${params}`, { headers: this.getHeaders() });
   }
 
   saveEvaluation(evaluationData: any): Observable<any> {
@@ -282,8 +290,9 @@ export class Cp2iApiService {
   }
 
   // Méthodes de messagerie
-  getMessages(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/cp2i-messages.php`, { headers: this.getHeaders() });
+  getMessages(editionId?: number): Observable<any> {
+    const params = editionId ? `?edition_id=${editionId}` : '';
+    return this.http.get(`${this.baseUrl}/cp2i-messages.php${params}`, { headers: this.getHeaders() });
   }
 
   getRecipients(): Observable<any> {
@@ -347,20 +356,24 @@ export class Cp2iApiService {
   }
 
   // Méthodes pour le correcteur
-  getCorrecteurTexts(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/cp2i-correcteur.php?action=textes`, { headers: this.getHeaders() });
+  getCorrecteurTexts(editionId?: number): Observable<any> {
+    const params = editionId ? `?action=textes&edition_id=${editionId}` : '?action=textes';
+    return this.http.get(`${this.baseUrl}/cp2i-correcteur.php${params}`, { headers: this.getHeaders() });
   }
 
-  getCorrecteurMessages(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/cp2i-correcteur.php?action=messages`, { headers: this.getHeaders() });
+  getCorrecteurMessages(editionId?: number): Observable<any> {
+    const params = editionId ? `?action=messages&edition_id=${editionId}` : '?action=messages';
+    return this.http.get(`${this.baseUrl}/cp2i-correcteur.php${params}`, { headers: this.getHeaders() });
   }
 
-  getCorrecteurHistory(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/cp2i-correcteur.php?action=history`, { headers: this.getHeaders() });
+  getCorrecteurHistory(editionId?: number): Observable<any> {
+    const params = editionId ? `?action=history&edition_id=${editionId}` : '?action=history';
+    return this.http.get(`${this.baseUrl}/cp2i-correcteur.php${params}`, { headers: this.getHeaders() });
   }
 
-  getCorrecteurStats(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/cp2i-correcteur.php?action=stats`, { headers: this.getHeaders() });
+  getCorrecteurStats(editionId?: number): Observable<any> {
+    const params = editionId ? `?action=stats&edition_id=${editionId}` : '?action=stats';
+    return this.http.get(`${this.baseUrl}/cp2i-correcteur.php${params}`, { headers: this.getHeaders() });
   }
 
   markMessageAsRead(messageId: number): Observable<any> {

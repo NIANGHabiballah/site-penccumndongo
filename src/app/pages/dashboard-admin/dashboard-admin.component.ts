@@ -22,6 +22,12 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   currentView = 'dashboard';
   currentUser: User | null = null;
   
+  // Multi-éditions
+  editions: any[] = [];
+  editionActive: any = null;
+  editionCourante: any = null;
+  showEditionSelector = false;
+
   stats: any = {};
   users: any[] = [];
   filteredUsers: any[] = [];
@@ -151,53 +157,67 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   // Gestion des paramètres
   currentSettingsTab = 'concours';
-  // Dates officielles du concours CP2i 2026 — 4ème édition
-  concoursSchedule = {
-    inscription_debut: '2026-11-02',
-    inscription_fin: '2026-11-23',
-    correction_debut: '2026-11-24',
-    correction_fin: '2026-11-30',
-    correction_prolongement: '2026-12-10',
-    deliberation: '2026-12-15',
-    ceremonie_remise: '2027-01-15'
-  };
-  
-  settings = {
-    start_date: '2026-11-02',
-    end_date: '2026-11-23',
-    evaluation_deadline: '2026-12-10',
-    results_date: '2026-12-15',
-    max_verses: 50,
-    max_texts_per_user: 3,
-    min_text_length: 100,
-    max_text_length: 5000,
-    min_score: 0,
-    max_score: 20,
-    passing_score: 10,
-    correctors_per_text: 1,
-    maintenance_mode: false,
-    allow_registration: true,
-    allow_submissions: true,
-    admin_email: 'admin@cp2i.com',
-    languages: {
-      francais: true,
-      wolof: true,
-      arabe: false,
-      anglais: false
+
+  private schedulesParEdition: Record<number, any> = {
+    3: {
+      inscription_debut: '2025-11-03',
+      inscription_fin: '2025-11-23',
+      correction_debut: '2025-11-24',
+      correction_fin: '2025-11-30',
+      correction_prolongement: '2025-11-30',
+      deliberation: '2025-12-01',
+      ceremonie_remise: '2026-01-10'
     },
-    notifications: {
-      new_registration: true,
-      new_submission: true,
-      evaluation_completed: true
-    },
-    password: {
-      min_length: 8,
-      validity_days: 90,
-      require_uppercase: false,
-      require_numbers: false,
-      require_special: false
+    4: {
+      inscription_debut: '2026-11-02',
+      inscription_fin: '2026-11-23',
+      correction_debut: '2026-11-24',
+      correction_fin: '2026-11-30',
+      correction_prolongement: '2026-11-30',
+      deliberation: '2026-12-01',
+      ceremonie_remise: '2026-12-26'
     }
   };
+
+  concoursSchedule = { ...this.schedulesParEdition[4] };
+  
+  settings: any = this.getDefaultSettings(4);
+
+  private getDefaultSettings(editionNumero: number): any {
+    const schedule = this.schedulesParEdition[editionNumero] ?? this.schedulesParEdition[4];
+    return {
+      start_date: schedule.inscription_debut,
+      end_date: schedule.inscription_fin,
+      evaluation_deadline: schedule.correction_prolongement,
+      results_date: schedule.deliberation,
+      max_verses: 50,
+      max_texts_per_user: 3,
+      min_text_length: 100,
+      max_text_length: 5000,
+      min_score: 0,
+      max_score: 20,
+      passing_score: 10,
+      correctors_per_text: 1,
+      maintenance_mode: false,
+      allow_registration: true,
+      allow_submissions: true,
+      admin_email: 'admin@cp2i.com',
+      languages: { francais: true, wolof: true, arabe: false, anglais: false },
+      notifications: { new_registration: true, new_submission: true, evaluation_completed: true },
+      password: { min_length: 8, validity_days: 90, require_uppercase: false, require_numbers: false, require_special: false }
+    };
+  }
+
+  private loadSettingsForEdition(editionNumero: number): void {
+    const key = `cp2i_settings_edition_${editionNumero}`;
+    const stored = localStorage.getItem(key);
+    this.settings = stored ? JSON.parse(stored) : this.getDefaultSettings(editionNumero);
+  }
+
+  private saveSettingsForEdition(editionNumero: number): void {
+    const key = `cp2i_settings_edition_${editionNumero}`;
+    localStorage.setItem(key, JSON.stringify(this.settings));
+  }
   
   // Modals
   showUserModal = false;
@@ -266,7 +286,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.filteredUsers = [];
     this.filteredAccounts = [];
     
-    this.loadData();
+    this.loadEditions();
     this.initializeVisibilityArrays();
   }
   
@@ -349,7 +369,90 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     }
   }
 
+  loadEditions() {
+    this.cp2iApi.getEditions().subscribe({
+      next: (data) => {
+        if (data.success) {
+          this.editions = data.editions || [];
+          this.editionCourante = this.editions.find((e: any) => e.is_active) || this.editions[this.editions.length - 1];
+          if (this.editions.length > 1) {
+            this.showEditionSelector = true;
+          } else {
+            this.editionActive = this.editionCourante;
+            this.applyEditionSchedule(this.editionActive);
+            this.loadSettingsForEdition(this.editionActive.numero);
+            this.loadData();
+          }
+        } else {
+          this.editionActive = { id: 4, numero: 4, annee: 2026, label: '4ᵉ édition (2026)', is_active: true };
+          this.applyEditionSchedule(this.editionActive);
+          this.loadSettingsForEdition(4);
+          this.loadData();
+        }
+      },
+      error: () => {
+        this.editionActive = { id: 4, numero: 4, annee: 2026, label: '4ᵉ édition (2026)', is_active: true };
+        this.applyEditionSchedule(this.editionActive);
+        this.loadSettingsForEdition(4);
+        this.loadData();
+      }
+    });
+  }
+
+  private applyEditionSchedule(edition: any): void {
+    const hardcoded = this.schedulesParEdition[edition.numero] ?? this.schedulesParEdition[4];
+    const fromApi = {
+      inscription_debut:       edition.inscription_debut,
+      inscription_fin:         edition.inscription_fin,
+      correction_debut:        edition.correction_debut,
+      correction_fin:          edition.correction_fin,
+      correction_prolongement: edition.correction_prolongement,
+      deliberation:            edition.deliberation,
+      ceremonie_remise:        edition.ceremonie_remise
+    };
+    // Prioriser le hardcode (source de vérité), fallback sur l'API si colonne absente
+    this.concoursSchedule = {
+      inscription_debut:       hardcoded.inscription_debut       || fromApi.inscription_debut,
+      inscription_fin:         hardcoded.inscription_fin         || fromApi.inscription_fin,
+      correction_debut:        hardcoded.correction_debut        || fromApi.correction_debut,
+      correction_fin:          hardcoded.correction_fin          || fromApi.correction_fin,
+      correction_prolongement: hardcoded.correction_prolongement || fromApi.correction_prolongement,
+      deliberation:            hardcoded.deliberation            || fromApi.deliberation,
+      ceremonie_remise:        hardcoded.ceremonie_remise        || fromApi.ceremonie_remise
+    };
+    this.schedulesParEdition[edition.numero] = { ...this.concoursSchedule };
+  }
+
+  selectEdition(edition: any) {
+    this.editionActive = edition;
+    this.applyEditionSchedule(edition);
+    this.loadSettingsForEdition(edition.numero);
+    this.showEditionSelector = false;
+    this.loadData();
+  }
+
+  switchEdition(edition: any) {
+    if (edition.id === this.editionActive?.id) return;
+    this.editionActive = edition;
+    this.applyEditionSchedule(edition);
+    this.loadSettingsForEdition(edition.numero);
+    this.textes = [];
+    this.users = [];
+    this.affectations = [];
+    this.stats = {};
+    this.loadData();
+  }
+
+  isEditionArchivee(): boolean {
+    return this.editionActive && !this.editionActive.is_active;
+  }
+
+  getEditionRef(): number | undefined {
+    return this.editionActive?.edition_ref ?? this.editionActive?.numero;
+  }
+
   loadData() {
+    const edNum = this.editionActive?.numero ?? null;
     // Charger le profil admin
     this.cp2iApi.getProfile().subscribe({
       next: (data) => {
@@ -367,7 +470,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     });
     
     // Charger les statistiques du dashboard (incluant les stats par langue)
-    this.http.get(`${this.cp2iApi['baseUrl']}/cp2i-dashboard.php?action=stats`, { headers: this.getHeaders() }).subscribe({
+    const statsUrl = `${this.cp2iApi['baseUrl']}/cp2i-dashboard.php?action=stats${edNum ? '&edition_id=' + edNum : ''}`;
+    this.http.get(statsUrl, { headers: this.getHeaders() }).subscribe({
       next: (data: any) => {
         console.log('Stats reçues du dashboard:', data);
         if (data.stats) {
@@ -386,7 +490,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.calculateStatsFromTexts();
     
     // Charger tous les utilisateurs
-    this.cp2iApi.getUsers().subscribe({
+    this.cp2iApi.getUsers(edNum).subscribe({
       next: (data) => {
         this.users = data?.users || [];
         this.filteredUsers = [...this.users];
@@ -413,7 +517,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     });
     
     // Charger tous les textes avec évaluations
-    this.cp2iApi.getAllTexts().subscribe({
+    this.cp2iApi.getAllTexts(edNum).subscribe({
       next: (data) => {
         this.textes = data.textes || [];
         // Le champ theme est maintenant supporté par l'API
@@ -458,7 +562,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     });
     
     // Charger l'historique
-    this.cp2iApi.getHistory().subscribe({
+    this.cp2iApi.getHistory(edNum).subscribe({
       next: (data) => {
         this.history = data.history || [];
       },
@@ -473,7 +577,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.loadRecipients();
     
     // Charger les statistiques d'affectation depuis l'API dédiée
-    this.cp2iApi.getDashboardStats().subscribe({
+    this.cp2iApi.getDashboardStats(edNum).subscribe({
       next: (data: any) => {
         console.log('Stats admin reçues:', data);
         if (data.stats) {
@@ -510,23 +614,19 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   checkUnreadChatMessages() {
     if (!this.currentUser?.id) return;
-    
-    this.chatService.getConversations().subscribe({
+    const edNum = this.editionActive?.numero ?? undefined;
+    this.chatService.getConversations(edNum).subscribe({
       next: (conversations) => {
         const unreadConversations = conversations.filter(conv => 
           conv.unread_count > 0
         );
-        
         const newCount = unreadConversations.length;
-        
-        // Ne notifier que si c'est une vraie augmentation (pas au démarrage)
         if (newCount > this.unreadChatMessages && this.unreadChatMessages > 0 && this.currentView !== 'chat-support') {
           this.showToast(`${newCount - this.unreadChatMessages} nouveau(x) message(s) de support`, 'success');
         }
-        
         this.unreadChatMessages = newCount;
       },
-      error: (error) => {
+      error: () => {
         this.unreadChatMessages = 0;
       }
     });
@@ -1234,7 +1334,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   // Méthodes de gestion des messages
   loadMessages() {
-    this.cp2iApi.getMessages().subscribe({
+    const edNum = this.editionActive?.numero ?? null;
+    this.cp2iApi.getMessages(edNum).subscribe({
       next: (data) => {
         this.messages = data.messages || [];
       },
@@ -1352,7 +1453,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         subject: this.messageForm.subject,
         content: this.messageForm.content,
         send_to_all: this.messageForm.sendToAll,
-        recipients: this.messageForm.sendToAll ? [] : this.recipients.filter(r => r.selected).map(r => r.id)
+        recipients: this.messageForm.sendToAll ? [] : this.recipients.filter(r => r.selected).map(r => r.id),
+        edition_id: this.editionActive?.numero ?? 4
       };
       
       this.cp2iApi.sendMessage(messageData).subscribe({
@@ -1455,49 +1557,18 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   saveSettings() {
-    // Simuler la sauvegarde des paramètres
+    const edNum = this.editionActive?.numero ?? 4;
+    this.saveSettingsForEdition(edNum);
+    // Sauvegarder aussi les dates du calendrier en BDD
+    this.cp2iApi.updateEditionDates(edNum, this.concoursSchedule).subscribe();
     this.showToast('Paramètres sauvegardés avec succès', 'success');
   }
   
   resetSettings() {
     if (confirm('Êtes-vous sûr de vouloir réinitialiser tous les paramètres ?')) {
-      // Réinitialiser aux valeurs par défaut
-      this.settings = {
-        start_date: '2025-01-01',
-        end_date: '2025-01-31',
-        evaluation_deadline: '2025-02-15',
-        results_date: '2025-02-28',
-        max_verses: 50,
-        max_texts_per_user: 3,
-        min_text_length: 100,
-        max_text_length: 5000,
-        min_score: 0,
-        max_score: 20,
-        passing_score: 10,
-        correctors_per_text: 1,
-        maintenance_mode: false,
-        allow_registration: true,
-        allow_submissions: true,
-        admin_email: 'admin@cp2i.com',
-        languages: {
-          francais: true,
-          wolof: true,
-          arabe: false,
-          anglais: false
-        },
-        notifications: {
-          new_registration: true,
-          new_submission: true,
-          evaluation_completed: true
-        },
-        password: {
-          min_length: 8,
-          validity_days: 90,
-          require_uppercase: false,
-          require_numbers: false,
-          require_special: false
-        }
-      };
+      const edNum = this.editionActive?.numero ?? 4;
+      this.settings = this.getDefaultSettings(edNum);
+      this.saveSettingsForEdition(edNum);
       this.showToast('Paramètres réinitialisés', 'success');
     }
   }
@@ -1537,7 +1608,13 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     const diffTime = date.getTime() - today.getTime();
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
-  
+
+  getDurationDays(dateDebut: string, dateFin: string): number {
+    const d1 = new Date(dateDebut);
+    const d2 = new Date(dateFin);
+    return Math.round(Math.abs(d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
+  }
+
   getDaysRemaining(dateString: string): number {
     return this.getJoursRestants(dateString);
   }
@@ -1634,11 +1711,11 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   loadDetailedEvaluations() {
-    // Charger les évaluations pour tous les textes en une seule fois
+    const edNum = this.editionActive?.numero ?? null;
     this.textes.forEach((texte, index) => {
-      // Ajouter un délai progressif pour éviter la surcharge du serveur
       setTimeout(() => {
-        this.http.get(`${this.cp2iApi['baseUrl']}/cp2i-evaluations.php?texte_id=${texte.id}`, { headers: this.getHeaders() }).subscribe({
+        const url = `${this.cp2iApi['baseUrl']}/cp2i-evaluations.php?texte_id=${texte.id}${edNum ? '&edition_id=' + edNum : ''}`;
+        this.http.get(url, { headers: this.getHeaders() }).subscribe({
           next: (data: any) => {
             if (data.evaluations && data.evaluations.length > 0) {
               texte.real_evaluations = data.evaluations;
@@ -1723,7 +1800,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   loadAffectationStats() {
-    this.cp2iApi.getDashboardStats().subscribe({
+    const edNum = this.editionActive?.numero ?? null;
+    this.cp2iApi.getDashboardStats(edNum).subscribe({
       next: (data) => {
         if (data.textes_affectations) {
           this.stats.textes_affectations = data.textes_affectations;
