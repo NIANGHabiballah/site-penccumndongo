@@ -306,7 +306,10 @@ function getUsers($edition_id = null) {
             SELECT u.id, u.email, u.nom, u.prenom, u.role, u.created_at,
                    u.telephone, u.whatsapp, u.ville, u.last_login,
                    COUNT(t.id) as nb_textes,
-                   AVG(t.note) as note_moyenne
+                   AVG(t.note) as note_moyenne,
+                   CASE WHEN u.created_at >= '2026-11-02 00:00:00' THEN 4
+                        WHEN u.created_at >= '2025-11-03 00:00:00' THEN 3
+                        ELSE NULL END as edition_id
             FROM cp2i_users u
             LEFT JOIN cp2i_textes t ON u.id = t.user_id $edition_join
             WHERE u.role IN ('admin', 'correcteur')
@@ -322,7 +325,10 @@ function getUsers($edition_id = null) {
             SELECT u.id, u.email, u.nom, u.prenom, u.role, u.created_at,
                    u.telephone, u.whatsapp, u.ville, u.last_login,
                    COUNT(t.id) as nb_textes,
-                   AVG(t.note) as note_moyenne
+                   AVG(t.note) as note_moyenne,
+                   CASE WHEN u.created_at >= '2026-11-02 00:00:00' THEN 4
+                        WHEN u.created_at >= '2025-11-03 00:00:00' THEN 3
+                        ELSE NULL END as edition_id
             FROM cp2i_users u
             LEFT JOIN cp2i_textes t ON u.id = t.user_id
             GROUP BY u.id

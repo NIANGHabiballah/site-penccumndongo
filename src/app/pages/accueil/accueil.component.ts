@@ -473,10 +473,23 @@ export class AccueilComponent implements OnInit, OnDestroy, AfterViewInit{
     },
   ];
 
+  showCp2iPopup = false;
+
   ngOnInit(): void {
     this.startAutoSlide();
     window.scrollTo({ top: 0, behavior: 'smooth' });
     this.loadArticles();
+    // Afficher le popup CP2i après 1.5s, une seule fois par session
+    if (!sessionStorage.getItem('cp2i_popup_shown')) {
+      setTimeout(() => {
+        this.showCp2iPopup = true;
+        sessionStorage.setItem('cp2i_popup_shown', 'true');
+      }, 1500);
+    }
+  }
+
+  closeCp2iPopup() {
+    this.showCp2iPopup = false;
   }
 
   /**

@@ -26,6 +26,62 @@
       <button class="login-btn" (click)="login()">
         <i class="fas fa-sign-in-alt"></i> Se connecter
       </button>
+
+      <div class="forgot-link">
+        <button type="button" (click)="showForgot = !showForgot; forgotStep = 1; forgotError = ''; forgotSuccess = ''">
+          <i class="fas fa-key"></i> Mot de passe oublié ?
+        </button>
+      </div>
+
+      <!-- Formulaire réinitialisation -->
+      <div class="forgot-form" *ngIf="showForgot">
+
+        <!-- Étape 1 : envoyer le code -->
+        <div *ngIf="forgotStep === 1">
+          <p>Un code à 6 chiffres sera envoyé à <strong>pencc.penccumndongo&#64;gmail.com</strong></p>
+          <div class="login-error" *ngIf="forgotError">
+            <i class="fas fa-exclamation-circle"></i> {{ forgotError }}
+          </div>
+          <button class="login-btn" (click)="sendResetCode()" [disabled]="forgotLoading">
+            <i class="fas" [class.fa-paper-plane]="!forgotLoading" [class.fa-spinner]="forgotLoading" [class.fa-spin]="forgotLoading"></i>
+            {{ forgotLoading ? 'Envoi...' : 'Envoyer le code par email' }}
+          </button>
+        </div>
+
+        <!-- Étape 2 : saisir le code + nouveau mot de passe -->
+        <div *ngIf="forgotStep === 2">
+          <div class="login-success" *ngIf="forgotSuccess">
+            <i class="fas fa-check-circle"></i> {{ forgotSuccess }}
+          </div>
+          <p>Saisissez le code reçu par email et votre nouveau mot de passe.</p>
+          <div class="login-field">
+            <label>Code reçu par email</label>
+            <input type="text" [(ngModel)]="forgotCode" placeholder="000000" maxlength="6" (keyup.enter)="resetWithCode()">
+          </div>
+          <div class="login-field">
+            <label>Nouveau mot de passe</label>
+            <input type="password" [(ngModel)]="forgotNewPw" placeholder="Min. 8 caractères" (keyup.enter)="resetWithCode()">
+          </div>
+          <div class="login-field">
+            <label>Confirmer</label>
+            <input type="password" [(ngModel)]="forgotConfirm" placeholder="Répétez le mot de passe" (keyup.enter)="resetWithCode()">
+          </div>
+          <div class="login-error" *ngIf="forgotError">
+            <i class="fas fa-exclamation-circle"></i> {{ forgotError }}
+          </div>
+          <button class="login-btn" (click)="resetWithCode()" [disabled]="forgotLoading">
+            <i class="fas" [class.fa-save]="!forgotLoading" [class.fa-spinner]="forgotLoading" [class.fa-spin]="forgotLoading"></i>
+            {{ forgotLoading ? 'Vérification...' : 'Réinitialiser le mot de passe' }}
+          </button>
+          <div style="text-align:center;margin-top:0.75rem;">
+            <button type="button" style="background:none;border:none;color:#0380C2;font-size:0.82rem;cursor:pointer;font-family:inherit;" (click)="forgotStep = 1; forgotError = ''">
+              <i class="fas fa-arrow-left"></i> Renvoyer un nouveau code
+            </button>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </div>
 

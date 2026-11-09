@@ -3801,3 +3801,216 @@ body {
     transform: scale(0.8);
   }
 }
+
+
+/* ══════════════════════════════════════════════════════════
+   POPUP CP2i
+══════════════════════════════════════════════════════════ */
+.cp2i-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeInOverlay 0.3s ease;
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.cp2i-popup {
+  background: white;
+  border-radius: 20px;
+  max-width: 460px;
+  width: 100%;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  position: relative;
+  animation: popupIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popupIn {
+  from { opacity: 0; transform: scale(0.85) translateY(20px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.cp2i-close {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: background 0.2s;
+}
+.cp2i-close:hover { background: rgba(255,255,255,0.35); }
+
+.cp2i-popup-header {
+  background: linear-gradient(135deg, #001B36 0%, #0380C2 100%);
+  padding: 2rem 1.5rem 1.5rem;
+  text-align: center;
+  color: white;
+  position: relative;
+}
+
+.cp2i-badge {
+  display: inline-block;
+  background: #FF7F1A;
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0.3rem 0.85rem;
+  border-radius: 20px;
+  margin-bottom: 1rem;
+}
+
+.cp2i-popup-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.1);
+  padding: 6px;
+  margin-bottom: 0.85rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cp2i-popup-header h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0 0 0.3rem;
+  line-height: 1.3;
+  color: white;
+}
+
+.cp2i-popup-header h2 span {
+  color: #FF7F1A;
+}
+
+.cp2i-subtitle {
+  font-size: 0.82rem;
+  opacity: 0.8;
+  margin: 0;
+  color: white;
+}
+
+.cp2i-popup-body {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.cp2i-info-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.88rem;
+  color: #444;
+}
+
+.cp2i-info-row i {
+  color: #0380C2;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.cp2i-themes {
+  background: #f0f7ff;
+  border-left: 4px solid #0380C2;
+  border-radius: 0 10px 10px 0;
+  padding: 0.85rem 1rem;
+}
+
+.cp2i-theme-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #0380C2;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cp2i-themes ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.cp2i-themes ul li {
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.cp2i-popup-footer {
+  padding: 1rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.cp2i-btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem;
+  background: linear-gradient(135deg, #0380C2, #001B36);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.2s;
+  font-family: inherit;
+}
+.cp2i-btn-primary:hover { opacity: 0.9; }
+
+.cp2i-btn-secondary {
+  background: none;
+  border: 2px solid #e9ecef;
+  color: #888;
+  border-radius: 12px;
+  padding: 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.cp2i-btn-secondary:hover { border-color: #ccc; color: #555; }
+
+@media (max-width: 480px) {
+  .cp2i-popup { border-radius: 16px; }
+  .cp2i-popup-header { padding: 1.5rem 1.25rem 1.25rem; }
+  .cp2i-popup-header h2 { font-size: 1.15rem; }
+  .cp2i-popup-body { padding: 1rem 1.25rem; }
+  .cp2i-popup-footer { padding: 0.75rem 1.25rem 1.25rem; }
+}

@@ -71,6 +71,31 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   // Filtres et recherche
   currentFilter = 'all';
   searchTerm = '';
+  editionFilter: number | 'all' = 'all'; // filtre par édition dans la section utilisateurs
+
+  get participantsEdition4() {
+    return this.users.filter(u => {
+      if (u.role !== 'participant') return false;
+      return u.created_at && new Date(u.created_at) >= new Date('2026-11-02');
+    });
+  }
+
+  get participantsEdition3() {
+    return this.users.filter(u => {
+      if (u.role !== 'participant') return false;
+      if (!u.created_at) return false;
+      const d = new Date(u.created_at);
+      return d >= new Date('2025-11-03') && d < new Date('2026-11-02');
+    });
+  }
+
+  // Participants de l'édition active (pour les KPIs du tableau de bord)
+  get participantsEditionActive() {
+    const num = this.editionActive?.numero ?? 4;
+    if (num === 4) return this.participantsEdition4;
+    if (num === 3) return this.participantsEdition3;
+    return this.participants;
+  }
   
   // Filtres pour la section Notes des Participants
   currentNotesFilter = 'all';
@@ -489,8 +514,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     
     this.calculateStatsFromTexts();
     
-    // Charger tous les utilisateurs
-    this.cp2iApi.getUsers(edNum).subscribe({
+    // Charger tous les utilisateurs SANS filtre d'édition pour la section utilisateurs
+    this.cp2iApi.getUsers().subscribe({
       next: (data) => {
         this.users = data?.users || [];
         this.filteredUsers = [...this.users];
@@ -718,6 +743,11 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.applyFilters();
   }
 
+  filterUsersByEdition(edition: number | 'all') {
+    this.editionFilter = edition;
+    this.applyFilters();
+  }
+
   onSearch(event: any) {
     this.searchTerm = event.target.value.toLowerCase();
     this.applyFilters();
@@ -725,21 +755,33 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
 
   applyFilters() {
     let filtered = [...this.users];
-    
+
+    // Filtrer par édition (participants uniquement)
+    if (this.editionFilter !== 'all') {
+      filtered = filtered.filter(user => {
+        if (user.role !== 'participant') return false; // exclure correcteurs/admins du filtre édition
+        if (!user.created_at) return false;
+        const d = new Date(user.created_at);
+        if (this.editionFilter === 4) return d >= new Date('2026-11-02');
+        if (this.editionFilter === 3) return d >= new Date('2025-11-03') && d < new Date('2026-11-02');
+        return false;
+      });
+    }
+
     // Filtrer par rôle
     if (this.currentFilter !== 'all') {
       filtered = filtered.filter(user => user.role === this.currentFilter);
     }
-    
+
     // Filtrer par recherche
     if (this.searchTerm) {
-      filtered = filtered.filter(user => 
+      filtered = filtered.filter(user =>
         user.prenom.toLowerCase().includes(this.searchTerm) ||
         user.nom.toLowerCase().includes(this.searchTerm) ||
         user.email.toLowerCase().includes(this.searchTerm)
       );
     }
-    
+
     this.filteredUsers = filtered;
   }
 

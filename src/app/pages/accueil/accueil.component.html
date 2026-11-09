@@ -553,3 +553,50 @@
     </div>
   </div>
 </section>
+
+<!-- ══════════════════════════════════════════════════════════
+     POPUP CP2i — 4ème Édition
+══════════════════════════════════════════════════════════ -->
+<div class="cp2i-overlay" *ngIf="showCp2iPopup" (click)="closeCp2iPopup()">
+  <div class="cp2i-popup" (click)="$event.stopPropagation()">
+    <button class="cp2i-close" (click)="closeCp2iPopup()">
+      <i class="fas fa-times"></i>
+    </button>
+
+    <div class="cp2i-popup-header">
+      <div class="cp2i-badge">4ème Édition</div>
+      <img src="cp2i_02.png" alt="CP2i" class="cp2i-popup-img" onerror="this.style.display='none'">
+      <h2>Concours de Poésie<br><span>Inédit &amp; Innovant</span></h2>
+      <p class="cp2i-subtitle">CP2i · Penccum Ndongo</p>
+    </div>
+
+    <div class="cp2i-popup-body">
+      <div class="cp2i-info-row">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Du <strong>02 au 23 novembre 2026</strong></span>
+      </div>
+      <div class="cp2i-info-row">
+        <i class="fas fa-language"></i>
+        <span>Français · Anglais · Arabe · Wolof</span>
+      </div>
+      <div class="cp2i-themes">
+        <div class="cp2i-theme-title"><i class="fas fa-feather-pointed"></i> Thèmes au choix</div>
+        <ul>
+          <li>Les mots du silence</li>
+          <li>Taaru Sénégal</li>
+          <li>Le flicage au sein du couple</li>
+          <li>Pression sociale et influence ruineuse</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cp2i-popup-footer">
+      <a routerLink="/cp2i" (click)="closeCp2iPopup()" class="cp2i-btn-primary">
+        <i class="fas fa-pen-nib"></i> Participer au concours
+      </a>
+      <button class="cp2i-btn-secondary" (click)="closeCp2iPopup()">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>

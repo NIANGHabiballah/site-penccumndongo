@@ -140,8 +140,8 @@
     <div class="stats-grid">
       <div class="stat-card">
         <h3>PARTICIPANTS</h3>
-        <div class="number">{{participants.length}}</div>
-        <div class="trend up">Inscrits</div>
+        <div class="number">{{participantsEditionActive.length}}</div>
+        <div class="trend up">Inscrits édition {{editionActive?.numero}}</div>
       </div>
       <div class="stat-card">
         <h3>CORRECTEURS</h3>
@@ -408,11 +408,27 @@
           </div>
         </div>
 
+        <!-- Filtre par édition -->
+        <div class="edition-filter-bar">
+          <span class="edition-filter-label"><i class="fas fa-layer-group"></i> Édition :</span>
+          <button class="edition-btn" [class.active]="editionFilter === 'all'" (click)="filterUsersByEdition('all')">
+            Toutes les éditions
+          </button>
+          <button class="edition-btn edition-4" [class.active]="editionFilter === 4" (click)="filterUsersByEdition(4)">
+            <i class="fas fa-star"></i> 4ᵉ édition 2026
+            <span class="edition-count">{{participantsEdition4.length}}</span>
+          </button>
+          <button class="edition-btn edition-3" [class.active]="editionFilter === 3" (click)="filterUsersByEdition(3)">
+            <i class="fas fa-history"></i> 3ᵉ édition 2025
+            <span class="edition-count">{{participantsEdition3.length}}</span>
+          </button>
+        </div>
+
         <!-- Filtres -->
         <div class="users-filters">
           <div class="filter-group">
-            <button class="filter-btn" [class.active]="currentFilter === 'all'" (click)="filterUsers('all')">Tous ({{users.length}})</button>
-            <button class="filter-btn" [class.active]="currentFilter === 'participant'" (click)="filterUsers('participant')">Participants ({{participants.length}})</button>
+            <button class="filter-btn" [class.active]="currentFilter === 'all'" (click)="filterUsers('all')">Tous ({{filteredUsers.length}})</button>
+            <button class="filter-btn" [class.active]="currentFilter === 'participant'" (click)="filterUsers('participant')">Participants ({{editionFilter === 'all' ? participants.length : (editionFilter === 4 ? participantsEdition4.length : participantsEdition3.length)}})</button>
             <button class="filter-btn" [class.active]="currentFilter === 'correcteur'" (click)="filterUsers('correcteur')">Correcteurs ({{correcteurs.length}})</button>
             <button class="filter-btn" [class.active]="currentFilter === 'admin'" (click)="filterUsers('admin')">Admins ({{usersAdminsCount}})</button>
           </div>
@@ -1456,6 +1472,42 @@
                      placeholder="Rechercher dans les statistiques..." 
                      [(ngModel)]="statsSearchTerm"
                      (input)="onStatsSearch($event)">
+            </div>
+          </div>
+        </div>
+
+        <!-- KPIs inscrits par édition -->
+        <div class="kpi-grid" [class.hidden]="!isStatsVisible('affectations')">
+          <div class="kpi-card primary">
+            <div class="kpi-icon"><i class="fas fa-users"></i></div>
+            <div class="kpi-content">
+              <h3>{{participants.length}}</h3>
+              <p>Total inscrits</p>
+              <span class="kpi-trend up">Toutes éditions</span>
+            </div>
+          </div>
+          <div class="kpi-card success">
+            <div class="kpi-icon"><i class="fas fa-star"></i></div>
+            <div class="kpi-content">
+              <h3>{{participantsEdition4.length}}</h3>
+              <p>4ᵉ édition 2026</p>
+              <span class="kpi-trend up">Depuis 02/11/2026</span>
+            </div>
+          </div>
+          <div class="kpi-card warning">
+            <div class="kpi-icon"><i class="fas fa-history"></i></div>
+            <div class="kpi-content">
+              <h3>{{participantsEdition3.length}}</h3>
+              <p>3ᵉ édition 2025</p>
+              <span class="kpi-trend up">03/11/2025 – 01/11/2026</span>
+            </div>
+          </div>
+          <div class="kpi-card info">
+            <div class="kpi-icon"><i class="fas fa-globe-africa"></i></div>
+            <div class="kpi-content">
+              <h3>{{getUniqueCountriesCount()}}</h3>
+              <p>Pays représentés</p>
+              <span class="kpi-trend up">Toutes éditions</span>
             </div>
           </div>
         </div>

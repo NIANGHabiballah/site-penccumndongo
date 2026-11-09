@@ -57,6 +57,59 @@ export class AdminFormationsComponent implements OnInit {
   emailSending = false;
   emailResult: { envoyes: number; echecs: string[]; message: string } | null = null;
 
+  // ── Mot de passe oublié ──────────────────────────────────────────────────
+  showForgot = false;
+  forgotStep: 1 | 2 = 1;
+  forgotCode = '';
+  forgotNewPw = '';
+  forgotConfirm = '';
+  forgotError = '';
+  forgotSuccess = '';
+  forgotLoading = false;
+
+  sendResetCode() {
+    this.forgotError = '';
+    this.forgotLoading = true;
+    this.http.post<any>(`${this.BASE}/admin-password.php?action=send_code`, {})
+      .subscribe({
+        next: (res) => {
+          this.forgotLoading = false;
+          if (res.success) {
+            this.forgotStep = 2;
+            this.forgotSuccess = res.message;
+          } else {
+            this.forgotError = res.error || 'Erreur lors de l\'envoi.';
+          }
+        },
+        error: () => { this.forgotLoading = false; this.forgotError = 'Erreur serveur. Réessayez.'; }
+      });
+  }
+
+  resetWithCode() {
+    this.forgotError = '';
+    if (!this.forgotCode) { this.forgotError = 'Veuillez saisir le code reçu par email.'; return; }
+    if (this.forgotNewPw.length < 8) { this.forgotError = 'Le mot de passe doit contenir au moins 8 caractères.'; return; }
+    if (this.forgotNewPw !== this.forgotConfirm) { this.forgotError = 'Les mots de passe ne correspondent pas.'; return; }
+    this.forgotLoading = true;
+    this.http.post<any>(`${this.BASE}/admin-password.php?action=verify_code`, {
+      code: this.forgotCode,
+      new_password: this.forgotNewPw
+    }).subscribe({
+      next: (res) => {
+        this.forgotLoading = false;
+        if (res.success) {
+          this.ADMIN_PASSWORD = this.forgotNewPw;
+          this.forgotSuccess = 'Mot de passe réinitialisé ! Vous pouvez maintenant vous connecter.';
+          this.forgotCode = ''; this.forgotNewPw = ''; this.forgotConfirm = '';
+          setTimeout(() => { this.showForgot = false; this.forgotSuccess = ''; this.forgotStep = 1; }, 3000);
+        } else {
+          this.forgotError = res.error || 'Code invalide ou expiré.';
+        }
+      },
+      error: () => { this.forgotLoading = false; this.forgotError = 'Erreur serveur. Réessayez.'; }
+    });
+  }
+
   // ── UI ──────────────────────────────────────────────────────────────────
   sidebarOpen = true;
 
@@ -147,9 +200,13 @@ export class AdminFormationsComponent implements OnInit {
   ngOnInit() {
     const saved = sessionStorage.getItem('admin_formations_auth');
     if (saved === 'true') this.authenticated = true;
-    const savedPw = sessionStorage.getItem('admin_formations_pw');
-    if (savedPw) this.ADMIN_PASSWORD = savedPw;
     this.loadMeetLinks();
+    this.loadPasswordFromServer();
+  }
+
+  loadPasswordFromServer() {
+    this.http.get<any>(`${this.BASE}/admin-password.php?action=get&admin_key=${this.ADMIN_KEY}`)
+      .subscribe({ next: (res) => { if (res.success) this.ADMIN_PASSWORD = res.password; } });
   }
 
   // ── Auth ──────────────────────────────────────────────────────────────────
@@ -441,10 +498,21 @@ export class AdminFormationsComponent implements OnInit {
     if (this.pwForm.newPw !== this.pwForm.confirm) {
       this.pwError = 'Les deux mots de passe ne correspondent pas.'; return;
     }
-    this.ADMIN_PASSWORD = this.pwForm.newPw;
-    sessionStorage.setItem('admin_formations_pw', this.pwForm.newPw);
-    this.pwSuccess = 'Mot de passe modifié avec succès !';
-    this.pwForm = { current: '', newPw: '', confirm: '' };
+    this.http.post<any>(`${this.BASE}/admin-password.php?action=reset`, {
+      secret: 'PenccumNdongo2026#',
+      new_password: this.pwForm.newPw
+    }).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.ADMIN_PASSWORD = this.pwForm.newPw;
+          this.pwSuccess = 'Mot de passe modifié avec succès !';
+          this.pwForm = { current: '', newPw: '', confirm: '' };
+        } else {
+          this.pwError = res.error || 'Erreur lors de la modification.';
+        }
+      },
+      error: () => { this.pwError = 'Erreur serveur. Réessayez.'; }
+    });
   }
 
   supprimerPresence(id: number) {

@@ -45,8 +45,8 @@ import { Cp2iApiService, AuthResponse } from '../../services/cp2i-api.service';
         <div *ngIf="inscriptionFermee" class="inscription-fermee">
           <div class="fermee-icon"><i class="fas fa-lock"></i></div>
           <h2>Inscriptions non ouvertes</h2>
-          <p>Les inscriptions au <strong>Concours CP2i 2026</strong> ouvriront officiellement le :</p>
-          <div class="fermee-date">02 Novembre 2026</div>
+          <p>Les inscriptions au <strong>Concours CP2i 2025</strong> ouvriront officiellement le :</p>
+          <div class="fermee-date">02 Novembre 2025</div>
           <p class="fermee-sub">Revenez à cette date pour vous inscrire. En attendant, suivez-nous sur nos réseaux sociaux !</p>
           <a routerLink="/auth/login" class="btn-login-fermee">
             <i class="fas fa-sign-in-alt"></i> Déjà inscrit ? Se connecter
@@ -680,7 +680,7 @@ export class RegisterComponent {
   fieldErrors: any = {};
   emailDejaUtilise = false;
 
-  readonly ouvertureInscription = new Date('2026-11-02');
+  readonly ouvertureInscription = new Date('2025-11-02');
   get inscriptionFermee(): boolean {
     return new Date() < this.ouvertureInscription;
   }
