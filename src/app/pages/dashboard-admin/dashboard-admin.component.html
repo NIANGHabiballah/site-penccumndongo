@@ -1486,20 +1486,12 @@
               <span class="kpi-trend up">Toutes éditions</span>
             </div>
           </div>
-          <div class="kpi-card success">
+          <div class="kpi-card success" *ngFor="let ed of getEditionsStats()">
             <div class="kpi-icon"><i class="fas fa-star"></i></div>
             <div class="kpi-content">
-              <h3>{{participantsEdition4.length}}</h3>
-              <p>4ᵉ édition 2026</p>
-              <span class="kpi-trend up">02/11/2026 – 25/11/2026</span>
-            </div>
-          </div>
-          <div class="kpi-card warning">
-            <div class="kpi-icon"><i class="fas fa-history"></i></div>
-            <div class="kpi-content">
-              <h3>{{participantsEdition3.length}}</h3>
-              <p>3ᵉ édition 2025</p>
-              <span class="kpi-trend up">03/11/2025 – 23/11/2025</span>
+              <h3>{{ed.count}}</h3>
+              <p>{{ed.label}}</p>
+              <span class="kpi-trend up">{{ed.debut}} – {{ed.fin}}</span>
             </div>
           </div>
           <div class="kpi-card danger">

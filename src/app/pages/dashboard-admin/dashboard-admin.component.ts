@@ -113,6 +113,18 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   get participantsEdition4() { return this.getParticipantsByEdition(4); }
   get participantsEdition3() { return this.getParticipantsByEdition(3); }
 
+  getEditionsStats() {
+    const ordinals: Record<number, string> = { 1: '1ᵉʳᵉ', 2: '2ᵉ', 3: '3ᵉ', 4: '4ᵉ', 5: '5ᵉ', 6: '6ᵉ' };
+    return Object.entries(this.schedulesParEdition)
+      .sort(([a], [b]) => Number(b) - Number(a))
+      .map(([num, s]) => ({
+        label: `${ordinals[Number(num)] ?? num + 'ᵉ'} édition ${new Date(s.inscription_debut).getFullYear()}`,
+        debut: new Date(s.inscription_debut).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+        fin:   new Date(s.inscription_fin).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+        count: this.getParticipantsByEdition(Number(num)).length
+      }));
+  }
+
   get participantsHorsEdition() {
     return this.users.filter(u => {
       if (u.role !== 'participant' || !u.created_at) return false;
