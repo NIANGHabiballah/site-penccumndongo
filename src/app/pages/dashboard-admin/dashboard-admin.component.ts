@@ -514,8 +514,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     
     this.calculateStatsFromTexts();
     
-    // Charger tous les utilisateurs SANS filtre d'édition pour la section utilisateurs
-    this.cp2iApi.getUsers().subscribe({
+    // Charger tous les utilisateurs filtrés par édition
+    this.cp2iApi.getUsers(edNum).subscribe({
       next: (data) => {
         this.users = data?.users || [];
         this.filteredUsers = [...this.users];
