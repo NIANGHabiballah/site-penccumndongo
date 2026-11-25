@@ -97,7 +97,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   };
 
   concoursSchedule = { ...this.schedulesParEdition[4] };
-  settings: any = this.getDefaultSettings(4);
+  settings: any = null;
   // ────────────────────────────────────────────────────────────────────────────
 
   getParticipantsByEdition(num: number) {
@@ -321,7 +321,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       this.router.navigate(['/cp2i']);
       return;
     }
-    
+    this.settings = this.getDefaultSettings(4);
     this.currentUser = this.cp2iApi.getCurrentUser();
     if (this.currentUser?.role !== 'admin') {
       this.router.navigate(['/cp2i']);
