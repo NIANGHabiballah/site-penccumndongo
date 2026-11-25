@@ -160,7 +160,16 @@
                 <div class="label">Texte soumis</div>
 
               </div>
-              <span class="status-badge status-progress">En cours</span>
+              <span class="status-badge"
+                [class.status-progress]="stats.textes_en_attente > 0"
+                [class.status-completed]="stats.textes_acceptes > 0"
+                [class.status-danger]="stats.textes_refuses > 0 && stats.textes_acceptes === 0"
+                [class.status-pending]="stats.total_textes === 0">
+                <span *ngIf="stats.total_textes === 0">Aucun texte</span>
+                <span *ngIf="stats.textes_en_attente > 0">Évaluation en cours</span>
+                <span *ngIf="stats.textes_acceptes > 0">Admis</span>
+                <span *ngIf="stats.textes_refuses > 0 && stats.textes_acceptes === 0">Non admis</span>
+              </span>
             </div>
           </div>
           
@@ -179,7 +188,7 @@
                 <div class="number">{{stats.note_moyenne ? (stats.note_moyenne | number:'1.1-1') + '/20' : 'N/A'}}</div>
                 <div class="label">Note moyenne</div>
               </div>
-              <span class="status-badge status-completed">Évalué</span>
+              <span class="status-badge status-progress">En cours</span>
             </div>
           </div>
           

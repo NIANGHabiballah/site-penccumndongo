@@ -69,7 +69,7 @@ export class Cp2iComponent implements OnInit {
   showGallery3Modal = false;
   showGallery4Modal = false;
   showClosedModal = false;
-  inscriptionsClosed = false;
+  inscriptionsClosed = true;
   
   // Index actuels
   currentBookImg = 0;

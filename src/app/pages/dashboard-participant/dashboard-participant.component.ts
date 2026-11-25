@@ -675,7 +675,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   }
   
   isSubmissionPeriodActive(): boolean {
-    return true; // Période de soumission ouverte
+    return false; // Soumissions clôturées le 23 novembre 2025
   }
   
   getSubmissionStatus(): string {
@@ -1548,10 +1548,11 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   }
 
   canModifyText(texte: any): { canModify: boolean, reason: string } {
-    // Un texte peut être modifié si :
-    // 1. Il est en brouillon
-    // 2. Il est en attente ET n'a pas encore été assigné à un correcteur
-    // 3. Il n'a pas encore été évalué
+    // Soumissions clôturées : aucune modification ni suppression possible
+    if (this.isSubmissionPeriodClosed()) {
+      const annee = this.editionActive?.numero === 3 ? '2025' : '2026';
+      return { canModify: false, reason: `Les soumissions sont clôturées depuis le 23 novembre ${annee}. Aucune modification ou suppression n'est possible.` };
+    }
     
     if (texte.statut === 'brouillon') {
       return { canModify: true, reason: '' };
@@ -1692,7 +1693,7 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   
   // Vérifier si la période de soumission est clôturée
   isSubmissionPeriodClosed(): boolean {
-    return false; // Soumissions ouvertes
+    return true; // Soumissions clôturées le 23 novembre 2025
   }
   
   // Fermer le modal de clôture des soumissions

@@ -564,35 +564,53 @@
     </button>
 
     <div class="cp2i-popup-header">
-      <div class="cp2i-badge">4ème Édition</div>
+      <div class="cp2i-badge" style="background: #dc3545;">Inscriptions Clôturées</div>
       <img src="cp2i_02.png" alt="CP2i" class="cp2i-popup-img" onerror="this.style.display='none'">
       <h2>Concours de Poésie<br><span>Inédit &amp; Innovant</span></h2>
-      <p class="cp2i-subtitle">CP2i · Penccum Ndongo</p>
+      <p class="cp2i-subtitle">CP2i · 4ᵉᵉ Édition · Penccum Ndongo</p>
     </div>
 
     <div class="cp2i-popup-body">
-      <div class="cp2i-info-row">
-        <i class="fas fa-calendar-alt"></i>
-        <span>Du <strong>02 au 23 novembre 2026</strong></span>
-      </div>
-      <div class="cp2i-info-row">
-        <i class="fas fa-language"></i>
-        <span>Français · Anglais · Arabe · Wolof</span>
+      <div class="cp2i-info-row" style="background: #fff3cd; border-radius: 8px; padding: 10px; margin-bottom: 10px;">
+        <i class="fas fa-lock" style="color: #dc3545;"></i>
+        <span style="color: #dc3545; font-weight: bold;">Inscriptions clôturées le 23 novembre 2025 à 23h59</span>
       </div>
       <div class="cp2i-themes">
-        <div class="cp2i-theme-title"><i class="fas fa-feather-pointed"></i> Thèmes au choix</div>
-        <ul>
-          <li>Les mots du silence</li>
-          <li>Taaru Sénégal</li>
-          <li>Le flicage au sein du couple</li>
-          <li>Pression sociale et influence ruineuse</li>
-        </ul>
+        <div class="cp2i-theme-title"><i class="fas fa-bell"></i> Ne ratez pas la prochaine édition !</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+        <a href="https://chat.whatsapp.com/JDkwJ791REJEfjUDzn4o7y?mode=hqrt3" target="_blank" style="display:flex; align-items:center; gap:8px; background:#25D366; color:#fff; padding:8px 12px; border-radius:8px; text-decoration:none; font-weight:600;">
+          <i class="fab fa-whatsapp"></i> Groupe WhatsApp Participants CP2i
+        </a>
+        <a href="https://whatsapp.com/channel/0029VasVCCY4dTnKoyeJK13Q" target="_blank" style="display:flex; align-items:center; gap:8px; background:#25D366; color:#fff; padding:8px 12px; border-radius:8px; text-decoration:none; font-weight:600;">
+          <i class="fab fa-whatsapp"></i> Chaîne WhatsApp PENCCUM NDONGO
+        </a>
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; margin-top:4px;">
+          <a href="https://www.facebook.com/share/1Ce2vCmuuV/?mibextid=wwXIfr" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:5px; background:#1877F2; color:#fff; padding:7px; border-radius:8px; text-decoration:none; font-size:0.85rem; font-weight:600;">
+            <i class="fab fa-facebook"></i> Facebook
+          </a>
+          <a href="https://www.instagram.com/penccumndongo" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:5px; background:#E1306C; color:#fff; padding:7px; border-radius:8px; text-decoration:none; font-size:0.85rem; font-weight:600;">
+            <i class="fab fa-instagram"></i> Instagram
+          </a>
+          <a href="https://www.tiktok.com/@penccum.ndongo" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:5px; background:#000; color:#fff; padding:7px; border-radius:8px; text-decoration:none; font-size:0.85rem; font-weight:600;">
+            <i class="fab fa-tiktok"></i> TikTok
+          </a>
+          <a href="https://www.linkedin.com/company/penccum-ndongo/" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:5px; background:#0A66C2; color:#fff; padding:7px; border-radius:8px; text-decoration:none; font-size:0.85rem; font-weight:600;">
+            <i class="fab fa-linkedin"></i> LinkedIn
+          </a>
+          <a href="https://x.com/penccumndongo" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:5px; background:#000; color:#fff; padding:7px; border-radius:8px; text-decoration:none; font-size:0.85rem; font-weight:600;">
+            <i class="fab fa-x-twitter"></i> X
+          </a>
+          <a href="https://youtube.com/@penccumndongo" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:5px; background:#FF0000; color:#fff; padding:7px; border-radius:8px; text-decoration:none; font-size:0.85rem; font-weight:600;">
+            <i class="fab fa-youtube"></i> YouTube
+          </a>
+        </div>
       </div>
     </div>
 
     <div class="cp2i-popup-footer">
-      <a routerLink="/cp2i" (click)="closeCp2iPopup()" class="cp2i-btn-primary">
-        <i class="fas fa-pen-nib"></i> Participer au concours
+      <a routerLink="/cp2i" (click)="closeCp2iPopup()" class="cp2i-btn-primary" style="background: #6c757d;">
+        <i class="fas fa-eye"></i> Voir le concours
       </a>
       <button class="cp2i-btn-secondary" (click)="closeCp2iPopup()">
         Fermer
