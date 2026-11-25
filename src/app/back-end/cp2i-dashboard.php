@@ -98,21 +98,22 @@ function getStats($user, $edition_id = null) {
         $stmt->execute($edition_params);
         $stats_langues = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Comptes utilisateurs filtrés par édition
-        if ($edition_id) {
+        // Comptes utilisateurs filtrés par édition (par date d'inscription)
+        $edition_dates = [
+            3 => ['debut' => '2025-11-03 00:00:00', 'fin' => '2025-11-23 23:59:59'],
+            4 => ['debut' => '2026-11-02 00:00:00', 'fin' => '2026-11-25 23:59:59']
+        ];
+        if ($edition_id && isset($edition_dates[$edition_id])) {
+            $debut = $edition_dates[$edition_id]['debut'];
+            $fin   = $edition_dates[$edition_id]['fin'];
             $stmt = $db->prepare("
                 SELECT 
-                    COUNT(DISTINCT CASE WHEN u.role = 'participant' THEN u.id END) as total_participants,
+                    COUNT(DISTINCT CASE WHEN u.role = 'participant' AND u.created_at >= '$debut' AND u.created_at <= '$fin' THEN u.id END) as total_participants,
                     COUNT(DISTINCT CASE WHEN u.role = 'correcteur' THEN u.id END) as total_correcteurs,
                     COUNT(DISTINCT CASE WHEN u.role = 'admin' THEN u.id END) as total_admins
                 FROM cp2i_users u
-                WHERE u.role IN ('admin', 'correcteur')
-                   OR EXISTS (
-                       SELECT 1 FROM cp2i_textes t 
-                       WHERE t.user_id = u.id AND t.edition_id = ?
-                   )
             ");
-            $stmt->execute([$edition_id]);
+            $stmt->execute();
         } else {
             $stmt = $db->prepare("
                 SELECT 
@@ -299,23 +300,29 @@ function getUsers($edition_id = null) {
 
     $edition_join = $edition_id ? 'AND t.edition_id = ' . (int)$edition_id : '';
 
-    // Filtrer les participants : seulement ceux ayant soumis dans cette édition
-    // Les correcteurs et admins sont toujours inclus
-    if ($edition_id) {
+    // Définir les plages de dates d'inscription par édition
+    $edition_dates = [
+        3 => ['debut' => '2025-11-03 00:00:00', 'fin' => '2025-11-23 23:59:59'],
+        4 => ['debut' => '2026-11-02 00:00:00', 'fin' => '2026-11-25 23:59:59']
+    ];
+
+    // Filtrer les participants par date d'inscription dans la plage de l'édition
+    if ($edition_id && isset($edition_dates[$edition_id])) {
+        $debut = $edition_dates[$edition_id]['debut'];
+        $fin   = $edition_dates[$edition_id]['fin'];
         $stmt = $db->prepare("
             SELECT u.id, u.email, u.nom, u.prenom, u.role, u.created_at,
                    u.telephone, u.whatsapp, u.ville, u.last_login,
                    COUNT(t.id) as nb_textes,
                    AVG(t.note) as note_moyenne,
-                   CASE WHEN u.created_at >= '2026-11-02 00:00:00' THEN 4
-                        WHEN u.created_at >= '2025-11-03 00:00:00' THEN 3
-                        ELSE NULL END as edition_id
+                   $edition_id as edition_id
             FROM cp2i_users u
             LEFT JOIN cp2i_textes t ON u.id = t.user_id $edition_join
             WHERE u.role IN ('admin', 'correcteur')
-               OR EXISTS (
-                   SELECT 1 FROM cp2i_textes t2
-                   WHERE t2.user_id = u.id AND t2.edition_id = " . (int)$edition_id . "
+               OR (
+                   u.role = 'participant'
+                   AND u.created_at >= '$debut'
+                   AND u.created_at <= '$fin'
                )
             GROUP BY u.id
             ORDER BY u.role, u.created_at DESC
