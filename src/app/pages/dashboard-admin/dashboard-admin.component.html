@@ -1740,7 +1740,7 @@
                 <div class="nationality-bar">
                   <div class="bar-fill" [style.width.%]="country.percentage"></div>
                 </div>
-                <span class="nationality-count">{{country.percentage}}%</span>
+                <span class="nationality-count">{{country.percentage}}% ({{country.count}})</span>
               </div>
             </div>
           </div>
@@ -1755,7 +1755,7 @@
                 <div class="city-progress">
                   <div class="progress-fill" [style.width.%]="city.percentage"></div>
                 </div>
-                <span class="city-count">{{city.percentage}}%</span>
+                <span class="city-count">{{city.percentage}}% ({{city.count}})</span>
               </div>
             </div>
           </div>
@@ -1772,7 +1772,7 @@
                      [class.low]="region.percentage >= 5 && region.percentage < 10"
                      [class.very-low]="region.percentage < 5">
                   <span class="region-name">{{region.name}}</span>
-                  <span class="region-count">{{region.percentage}}%</span>
+                  <span class="region-count">{{region.percentage}}% ({{region.count}})</span>
                 </div>
               </div>
             </div>
@@ -1888,9 +1888,38 @@
             <div class="panel-content">
               <div class="engagement-metrics">
                 <div class="metric-row">
-                  <span class="metric-label">Participants multi-textes:</span>
-                  <span class="metric-value">{{getMultiTextParticipants()}} ({{getMultiTextPercentage()}}%)</span>
+                  <span class="metric-label">Participants multi-éditions:</span>
+                  <span class="metric-value">
+                    {{getMultiTextParticipants()}} ({{getMultiTextPercentage()}}% de l'éd. courante)
+                    <button class="btn-toggle-list" (click)="showMultiEditionsList = !showMultiEditionsList" *ngIf="getMultiTextParticipants() > 0">
+                      <i class="fas" [class.fa-chevron-down]="!showMultiEditionsList" [class.fa-chevron-up]="showMultiEditionsList"></i>
+                      {{showMultiEditionsList ? 'Masquer' : 'Voir la liste'}}
+                    </button>
+                  </span>
                 </div>
+
+                <!-- Liste détaillée multi-éditions -->
+                <div class="multi-editions-list" *ngIf="showMultiEditionsList">
+                  <table class="multi-editions-table">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Prénom &amp; Nom</th>
+                        <th>Éditions participées</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let p of getMultiEditionsList(); let i = index">
+                        <td>{{i + 1}}</td>
+                        <td>{{p.prenom}} {{p.nom}}</td>
+                        <td>
+                          <span class="edition-badge" *ngFor="let ed of p.editions">Éd. {{ed}}</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
                 <div class="metric-row">
                   <span class="metric-label">Taux d'abandon:</span>
                   <span class="metric-value">{{getAbandonRate()}}%</span>

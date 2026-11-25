@@ -330,8 +330,9 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
       this.router.navigate(['/cp2i']);
       return;
     }
-    
+
     this.currentUser = this.cp2iApi.getCurrentUser();
+    // Pré-remplir depuis localStorage en attendant la réponse serveur
     this.profileForm = {
       nom:       this.currentUser?.nom       || '',
       prenom:    this.currentUser?.prenom    || '',
@@ -339,6 +340,23 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
       whatsapp:  this.currentUser?.whatsapp  || '',
       ville:     this.currentUser?.ville     || ''
     };
+    // Charger le profil frais depuis la base pour avoir toutes les données à jour
+    this.cp2iApi.getProfile().subscribe({
+      next: (res: any) => {
+        const p = res.profile;
+        if (p) {
+          this.currentUser = { ...this.currentUser, ...p };
+          this.cp2iApi.setCurrentUser(this.currentUser!);
+          this.profileForm = {
+            nom:       p.nom       || '',
+            prenom:    p.prenom    || '',
+            telephone: p.telephone || '',
+            whatsapp:  p.whatsapp  || '',
+            ville:     p.ville     || ''
+          };
+        }
+      }
+    });
     this.loadEditions();
     this.updateThemesAffiches();
 
@@ -1385,6 +1403,14 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
         if (res.user && this.currentUser) {
           this.currentUser = { ...this.currentUser, ...res.user };
           this.cp2iApi.setCurrentUser(this.currentUser!);
+          // Resynchroniser le formulaire avec les vraies valeurs retournées par le serveur
+          this.profileForm = {
+            nom:       res.user.nom       || this.profileForm.nom,
+            prenom:    res.user.prenom    || this.profileForm.prenom,
+            telephone: res.user.telephone || this.profileForm.telephone,
+            whatsapp:  res.user.whatsapp  || this.profileForm.whatsapp,
+            ville:     res.user.ville     || this.profileForm.ville
+          };
         }
         setTimeout(() => this.profileSuccess = false, 4000);
       },

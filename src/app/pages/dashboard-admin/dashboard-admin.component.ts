@@ -35,6 +35,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   correcteurs: any[] = [];
   affectations: any[] = [];
   textes: any[] = [];
+  allTextesAllEditions: any[] = [];
   allAccounts: any[] = [];
   history: any[] = [];
   
@@ -526,9 +527,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         if (data.stats_langues) {
           this.stats.stats_langues = data.stats_langues;
         }
-        if (data.affectation_stats) {
-          this.stats = { ...this.stats, ...data.affectation_stats };
-        }
+        // Ne pas écraser les stats d'affectation du backend — calculées localement par édition dans generateAffectationStats()
       },
       error: (error) => console.error('Erreur stats dashboard:', error)
     });
@@ -542,15 +541,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         this.filteredUsers = [...this.users];
         this.participants = this.users.filter(u => u.role === 'participant');
         this.correcteurs = this.users.filter(u => u.role === 'correcteur');
-        this.affectations = data?.affectations || [];
-        
-        // Initialiser les tableaux de visibilité
         this.initializeVisibilityArrays();
         this.updateCorrectorsVisibilityArray();
-        
-        // Générer les stats d'affectation après avoir chargé les données
-        this.generateAffectationStats();
-        setTimeout(() => this.generateAffectationStats(), 100);
       },
       error: (error) => {
         console.error('Erreur utilisateurs:', error);
@@ -558,10 +550,25 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
         this.filteredUsers = [];
         this.participants = [];
         this.correcteurs = [];
-        this.affectations = [];
       }
     });
+
+    // Charger les affectations filtrées par édition active
+    this.cp2iApi.getUsers(edNum).subscribe({
+      next: (data) => {
+        this.affectations = data?.affectations || [];
+        this.generateAffectationStats();
+        setTimeout(() => this.generateAffectationStats(), 100);
+      },
+      error: () => { this.affectations = []; }
+    });
     
+    // Charger tous les textes toutes éditions (pour stats multi-éditions)
+    this.cp2iApi.getAllTexts().subscribe({
+      next: (data) => { this.allTextesAllEditions = data.textes || []; },
+      error: () => { this.allTextesAllEditions = []; }
+    });
+
     // Charger tous les textes avec évaluations
     this.cp2iApi.getAllTexts(edNum).subscribe({
       next: (data) => {
@@ -1882,60 +1889,57 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   generateAffectationStats() {
     if (this.textes.length === 0) return;
-    
-    // Calculer les statistiques d'affectation depuis les données correcteurs
-    const totalAffectations = this.affectations.length;
-    let affectationsTerminees = 0;
-    let affectationsRestantes = 0;
-    
-    if (this.stats.correcteurs_stats) {
-      affectationsTerminees = this.stats.correcteurs_stats.reduce((sum: number, c: any) => sum + (c.textes_corriges || 0), 0);
-      affectationsRestantes = this.stats.correcteurs_stats.reduce((sum: number, c: any) => sum + (c.textes_restants || 0), 0);
-    } else {
-      // Fallback si pas de données backend
-      affectationsTerminees = this.affectations.filter(a => {
-        const texte = this.textes.find(t => t.id === a.texte_id);
-        return texte && (texte.statut === 'accepte' || texte.statut === 'refuse');
+
+    // Filtrer par édition active
+    const editionId = this.editionActive?.id;
+    const textesEdition = editionId ? this.textes.filter(t => t.edition_id === editionId) : this.textes;
+    const textesIds = new Set(textesEdition.map(t => t.id));
+    const affectationsEdition = this.affectations.filter(a => textesIds.has(a.texte_id));
+
+    this.stats.total_affectations = affectationsEdition.length;
+    this.stats.affectations_terminees = affectationsEdition.filter(a => {
+      const t = textesEdition.find(t => t.id === a.texte_id);
+      return t && (t.statut === 'accepte' || t.statut === 'refuse');
+    }).length;
+    this.stats.affectations_restantes = affectationsEdition.filter(a => {
+      const t = textesEdition.find(t => t.id === a.texte_id);
+      return t && t.statut === 'en_attente';
+    }).length;
+
+    // Recalculer correcteurs_stats localement par édition
+    this.stats.correcteurs_stats = this.correcteurs.map(c => {
+      const assignes = affectationsEdition.filter(a => a.corrector_id === c.id).length;
+      const corriges = affectationsEdition.filter(a => {
+        if (a.corrector_id !== c.id) return false;
+        const t = textesEdition.find(t => t.id === a.texte_id);
+        return t && (t.statut === 'accepte' || t.statut === 'refuse');
       }).length;
-      affectationsRestantes = this.affectations.filter(a => {
-        const texte = this.textes.find(t => t.id === a.texte_id);
-        return texte && texte.statut === 'en_attente';
-      }).length;
-    }
-    
-    // Mettre à jour les stats
-    this.stats.total_affectations = totalAffectations;
-    this.stats.affectations_terminees = affectationsTerminees;
-    this.stats.affectations_restantes = affectationsRestantes;
-    
-    const affectationsStats = this.textes.map(texte => {
-      // Utiliser seulement texte_id pour les affectations
-      const affectationsTexte = this.affectations.filter(a => a.texte_id === texte.id);
-      
-      const correcteursNoms = [...new Set(affectationsTexte.map(a => {
-        const correcteur = this.correcteurs.find(c => c.id === a.corrector_id);
-        return correcteur ? `${correcteur.prenom} ${correcteur.nom}` : null;
-      }).filter(nom => nom !== null))].join(', ');
-      
+      return {
+        id: c.id,
+        correcteur_nom_complet: `${c.prenom} ${c.nom}`,
+        correcteur_email: c.email,
+        textes_assignes: assignes,
+        textes_corriges: corriges,
+        textes_restants: assignes - corriges
+      };
+    });
+
+    this.stats.textes_affectations = textesEdition.map(texte => {
+      const aff = affectationsEdition.filter(a => a.texte_id === texte.id);
+      const correcteursNoms = [...new Set(aff.map(a => {
+        const c = this.correcteurs.find(c => c.id === a.corrector_id);
+        return c ? `${c.prenom} ${c.nom}` : null;
+      }).filter(n => n))].join(', ');
       return {
         texte_id: texte.id,
         titre: texte.titre,
         auteur_prenom: texte.prenom,
         auteur_nom: texte.nom,
         correcteurs_noms: correcteursNoms || '',
-        nb_correcteurs: affectationsTexte.length
+        nb_correcteurs: aff.length
       };
     });
-    
-    this.stats.textes_affectations = affectationsStats;
-    
-    console.log('Stats d\'affectation générées localement:', {
-      total_affectations: this.stats.total_affectations,
-      affectations_terminees: this.stats.affectations_terminees,
-      affectations_restantes: this.stats.affectations_restantes
-    });
-    
-    // Forcer la détection des changements
+
     this.cdr.detectChanges();
   }
   
@@ -1999,281 +2003,159 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     }
   }
   
-  // Classification par nationalité
+  private readonly COUNTRY_TABLE = [
+    { key: 'senegal',     name: 'Sénégal',        flag: '🇸🇳', dialCodes: ['+221', '221'], cityKeywords: ['sénégal','senegal','dakar','saint-louis','thiès','thies','rufisque','guédiawaye','guediawaye','kolda','mbour','louga','dahra','ugb','malika','pikine','tivaouane','kaolack','ziguinchor','touba','diourbel','fatick','tambacounda','matam','kédougou','kedougou','vélingara','velingara','kaffrine','sédhiou','sedhiou','bignona','oussouye','foundiougne','gossas','sokone','bambey','mbacké','mbacke','kanel','ranérou','ranerou','ourossogui','bakel','goudiry','nioro','guinguinéo','guinguineo','linguère','linguere','kebemer','ross-béthio','dagana'], telRegex: /^7\d{8}$/ },
+    { key: 'cote_ivoire', name: "Côte d'Ivoire",  flag: '🇨🇮', dialCodes: ['+225', '225'], cityKeywords: ['côte','cote','abidjan','daloa','bouaké','bouake','yamoussoukro'] },
+    { key: 'mali',        name: 'Mali',            flag: '🇲🇱', dialCodes: ['+223', '223'], cityKeywords: ['mali','bamako','sikasso','mopti','gao'] },
+    { key: 'niger',       name: 'Niger',           flag: '🇳🇪', dialCodes: ['+227', '227'], cityKeywords: ['niger','niamey','zinder','maradi','agadez'] },
+    { key: 'mauritanie',  name: 'Mauritanie',      flag: '🇲🇷', dialCodes: ['+222', '222'], cityKeywords: ['mauritanie','nouakchott','nouadhibou'] },
+    { key: 'togo',        name: 'Togo',            flag: '🇹🇬', dialCodes: ['+228', '228'], cityKeywords: ['togo','lomé','lome','kpalimé','kpalime','sokodé','sokode'] },
+    { key: 'congo',       name: 'Congo',           flag: '🇨🇬', dialCodes: ['+242', '242'], cityKeywords: ['congo','brazzaville','pointe-noire'] },
+    { key: 'rdc',         name: 'RDC',             flag: '🇨🇩', dialCodes: ['+243', '243'], cityKeywords: ['rdc','kinshasa','lubumbashi','goma','bukavu'] },
+    { key: 'burkina',     name: 'Burkina Faso',    flag: '🇧🇫', dialCodes: ['+226', '226'], cityKeywords: ['burkina','ouagadougou','bobo-dioulasso','koudougou'] },
+    { key: 'guinee',      name: 'Guinée',          flag: '🇬🇳', dialCodes: ['+224', '224'], cityKeywords: ['guinée','guinee','conakry','kankan','nzérékoré','nzerekore'] },
+    { key: 'gabon',       name: 'Gabon',           flag: '🇬🇦', dialCodes: ['+241', '241'], cityKeywords: ['gabon','libreville','port-gentil','franceville'] },
+    { key: 'cameroun',    name: 'Cameroun',        flag: '🇨🇲', dialCodes: ['+237', '237'], cityKeywords: ['cameroun','yaoundé','yaounde','douala','bafoussam'] },
+    { key: 'madagascar',  name: 'Madagascar',      flag: '🇲🇬', dialCodes: ['+261', '261'], cityKeywords: ['madagascar','antananarivo','analamanga','toamasina','fianarantsoa'] },
+    { key: 'france',      name: 'France',          flag: '🇫🇷', dialCodes: ['+33', '33'],   cityKeywords: ['france','paris','lyon','marseille','bordeaux','toulouse','strasbourg'] },
+  ];
+
   classifyNationality(ville: string, telephone: string): string {
     const villeLC = ville?.toLowerCase() || '';
     const tel = telephone?.replace(/\s/g, '') || '';
-    
-    // Sénégal
-    if (villeLC.includes('sénégal') || villeLC.includes('senegal') || 
-        villeLC.includes('dakar') || villeLC.includes('saint-louis') || 
-        villeLC.includes('thiès') || villeLC.includes('thies') ||
-        villeLC.includes('rufisque') || villeLC.includes('guédiawaye') ||
-        villeLC.includes('guediawaye') || villeLC.includes('kolda') ||
-        villeLC.includes('mbour') || villeLC.includes('louga') ||
-        villeLC.includes('dahra') || villeLC.includes('ugb') ||
-        villeLC.includes('malika') || tel.startsWith('+221') ||
-        tel.startsWith('221') || /^7\d{8}$/.test(tel)) {
-      return 'senegal';
+    for (const country of this.COUNTRY_TABLE) {
+      const cityMatch = country.cityKeywords.some(kw => villeLC.includes(kw));
+      const dialMatch = country.dialCodes.some(d => tel.startsWith(d));
+      const regexMatch = (country as any).telRegex?.test(tel) ?? false;
+      if (cityMatch || dialMatch || regexMatch) return country.key;
     }
-    
-    // Côte d'Ivoire
-    if (villeLC.includes('côte') || villeLC.includes('daloa') || villeLC.includes('abidjan') ||
-        tel.startsWith('+225') || tel.startsWith('225')) {
-      return 'cote_ivoire';
-    }
-    
-    // Mali
-    if (villeLC.includes('mali') || villeLC.includes('bamako') ||
-        tel.startsWith('+223') || tel.startsWith('223')) {
-      return 'mali';
-    }
-    
-    // Niger
-    if (villeLC.includes('niger') || villeLC.includes('niamey') ||
-        tel.startsWith('+227') || tel.startsWith('227')) {
-      return 'niger';
-    }
-    
-    // Mauritanie
-    if (villeLC.includes('mauritanie') || villeLC.includes('nouakchott') ||
-        tel.startsWith('+222') || tel.startsWith('222')) {
-      return 'mauritanie';
-    }
-    
-    // Togo
-    if (villeLC.includes('togo') || villeLC.includes('lomé') || villeLC.includes('lome') ||
-        tel.startsWith('+228') || tel.startsWith('228')) {
-      return 'togo';
-    }
-    
-    // Congo (République du Congo)
-    if (villeLC.includes('congo') || villeLC.includes('brazzaville') ||
-        tel.startsWith('+242') || tel.startsWith('242')) {
-      return 'congo';
-    }
-    
-    // RDC (République Démocratique du Congo)
-    if (villeLC.includes('rdc') || villeLC.includes('kinshasa') ||
-        tel.startsWith('+243') || tel.startsWith('243')) {
-      return 'rdc';
-    }
-    
-    // Burkina Faso
-    if (villeLC.includes('burkina') || villeLC.includes('ouagadougou') ||
-        tel.startsWith('+226') || tel.startsWith('226')) {
-      return 'burkina';
-    }
-    
-    // Guinée
-    if (villeLC.includes('guinée') || villeLC.includes('guinee') || villeLC.includes('conakry') ||
-        tel.startsWith('+224') || tel.startsWith('224')) {
-      return 'guinee';
-    }
-    
-    // France
-    if (tel.startsWith('+33') || tel.startsWith('33')) {
-      return 'france';
-    }
-    
     return 'autres';
   }
   
-  // Statistiques par nationalité
   getNationalityStats() {
-    if (this.users.length === 0) return { senegal: 0, cote_ivoire: 0, mali: 0, niger: 0, mauritanie: 0, togo: 0, congo: 0, rdc: 0, burkina: 0, guinee: 0, france: 0, autres: 0 };
-    
-    const countries = ['senegal', 'cote_ivoire', 'mali', 'niger', 'mauritanie', 'togo', 'congo', 'rdc', 'burkina', 'guinee', 'france', 'autres'];
-    const stats: any = {};
-    
-    countries.forEach(country => {
-      const count = this.users.filter(u => this.classifyNationality(u.ville, u.telephone) === country).length;
-      stats[country] = Math.round((count / this.users.length) * 100);
+    const users = this.participantsEditionCourante;
+    if (users.length === 0) return {};
+    const counts: any = {};
+    users.forEach((u: any) => {
+      const key = this.classifyNationality(u.ville, u.telephone);
+      counts[key] = (counts[key] || 0) + 1;
     });
-    
+    const stats: any = {};
+    Object.keys(counts).forEach(k => stats[k] = { count: counts[k], percentage: Math.round((counts[k] / users.length) * 100) });
     return stats;
   }
-  
-  // Top pays (affiche tous même avec 0%)
+
   getTopCountries() {
     const stats = this.getNationalityStats();
-    const countries = [
-      { name: 'Sénégal', flag: '🇸🇳', key: 'senegal', percentage: stats.senegal },
-      { name: 'Côte d\'Ivoire', flag: '🇮🇨', key: 'cote_ivoire', percentage: stats.cote_ivoire },
-      { name: 'Mali', flag: '🇲🇱', key: 'mali', percentage: stats.mali },
-      { name: 'Niger', flag: '🇳🇪', key: 'niger', percentage: stats.niger },
-      { name: 'Mauritanie', flag: '🇲🇷', key: 'mauritanie', percentage: stats.mauritanie },
-      { name: 'France', flag: '🇫🇷', key: 'france', percentage: stats.france }
-    ];
-    
-    return countries.sort((a, b) => b.percentage - a.percentage);
+    return this.COUNTRY_TABLE
+      .map(c => ({ name: c.name, flag: c.flag, key: c.key, count: stats[c.key]?.count || 0, percentage: stats[c.key]?.percentage || 0 }))
+      .filter(c => c.percentage > 0)
+      .sort((a, b) => b.percentage - a.percentage);
   }
   
   // Extraction et normalisation des villes
+  private readonly CITY_KEYWORDS: { name: string; keywords: string[] }[] = [
+    { name: 'Dakar',        keywords: ['dakar'] },
+    { name: 'Thiès',        keywords: ['thiès', 'thies'] },
+    { name: 'Saint-Louis',  keywords: ['saint-louis', 'ugb'] },
+    { name: 'Kaolack',      keywords: ['kaolack'] },
+    { name: 'Ziguinchor',   keywords: ['ziguinchor'] },
+    { name: 'Rufisque',     keywords: ['rufisque'] },
+    { name: 'Guédiawaye',   keywords: ['guédiawaye', 'guediawaye'] },
+    { name: 'Kolda',        keywords: ['kolda'] },
+    { name: 'Mbour',        keywords: ['mbour'] },
+    { name: 'Louga',        keywords: ['louga'] },
+    { name: 'Pikine',       keywords: ['pikine'] },
+    { name: 'Malika',       keywords: ['malika'] },
+    { name: 'Tivaouane',    keywords: ['tivaouane'] },
+    { name: 'Touba',        keywords: ['touba'] },
+    { name: 'Diourbel',     keywords: ['diourbel'] },
+    { name: 'Fatick',       keywords: ['fatick'] },
+    { name: 'Tambacounda',  keywords: ['tambacounda'] },
+    { name: 'Matam',        keywords: ['matam'] },
+    { name: 'Kédougou',     keywords: ['kédougou', 'kedougou'] },
+    { name: 'Sédhiou',      keywords: ['sédhiou', 'sedhiou'] },
+    { name: 'Kaffrine',     keywords: ['kaffrine'] },
+    { name: 'Abidjan',      keywords: ['abidjan'] },
+    { name: 'Daloa',        keywords: ['daloa'] },
+    { name: 'Bamako',       keywords: ['bamako'] },
+    { name: 'Conakry',      keywords: ['conakry'] },
+    { name: 'Lomé',         keywords: ['lomé', 'lome'] },
+    { name: 'Ouagadougou',  keywords: ['ouagadougou'] },
+    { name: 'Niamey',       keywords: ['niamey'] },
+    { name: 'Kinshasa',     keywords: ['kinshasa'] },
+    { name: 'Brazzaville',  keywords: ['brazzaville'] },
+    { name: 'Libreville',   keywords: ['libreville'] },
+    { name: 'Yaoundé',      keywords: ['yaoundé', 'yaounde'] },
+    { name: 'Douala',       keywords: ['douala'] },
+    { name: 'Antananarivo', keywords: ['antananarivo'] },
+    { name: 'Paris',        keywords: ['paris'] },
+    { name: 'Nouakchott',   keywords: ['nouakchott'] },
+  ];
+
   extractCity(ville: string): string {
     if (!ville) return 'Non spécifiée';
-    
     const villeLC = ville.toLowerCase().trim();
-    
-    // Extraction des villes principales du Sénégal
-    if (villeLC.includes('dakar')) return 'Dakar';
-    if (villeLC.includes('thiès') || villeLC.includes('thies')) return 'Thiès';
-    if (villeLC.includes('saint-louis')) return 'Saint-Louis';
-    if (villeLC.includes('kaolack')) return 'Kaolack';
-    if (villeLC.includes('ziguinchor')) return 'Ziguinchor';
-    if (villeLC.includes('rufisque')) return 'Rufisque';
-    if (villeLC.includes('guédiawaye') || villeLC.includes('guediawaye')) return 'Guédiawaye';
-    if (villeLC.includes('kolda')) return 'Kolda';
-    if (villeLC.includes('mbour')) return 'Mbour';
-    if (villeLC.includes('louga')) return 'Louga';
-    if (villeLC.includes('ugb')) return 'Saint-Louis'; // UGB = Université Gaston Berger à Saint-Louis
-    
-    // Villes internationales
-    if (villeLC.includes('daloa')) return 'Daloa';
-    if (villeLC.includes('abidjan')) return 'Abidjan';
-    
-    return 'Autres';
+    const match = this.CITY_KEYWORDS.find(c => c.keywords.some(kw => villeLC.includes(kw)));
+    return match ? match.name : ville.trim(); // retourne la valeur brute si non reconnue
   }
-  
-  // Statistiques des villes
+
   getCityStats() {
-    if (this.users.length === 0) return [];
-    
+    const users = this.participantsEditionCourante;
+    if (users.length === 0) return [];
     const cityCount: { [key: string]: number } = {};
-    
-    this.users.forEach(user => {
+    users.forEach((user: any) => {
       const city = this.extractCity(user.ville);
       cityCount[city] = (cityCount[city] || 0) + 1;
     });
-    
-    const total = this.users.length;
-    const cities = Object.entries(cityCount)
-      .map(([city, count]) => ({
-        name: city,
-        count: count,
-        percentage: Math.round((count / total) * 100)
-      }))
+    const total = users.length;
+    return Object.entries(cityCount)
+      .map(([name, count]) => ({ name, count, percentage: Math.round((count / total) * 100) }))
       .sort((a, b) => b.count - a.count);
-    
-    // Garder le top 5 sans "Autres" existant + regrouper le reste
-    const top5 = cities.filter(c => c.name !== 'Autres').slice(0, 5);
-    const others = cities.filter(c => c.name !== 'Autres').slice(5);
-    const existingOthers = cities.find(c => c.name === 'Autres');
-    
-    if (others.length > 0 || existingOthers) {
-      const othersCount = others.reduce((sum, city) => sum + city.count, 0) + (existingOthers?.count || 0);
-      const othersPercentage = Math.round((othersCount / total) * 100);
-      
-      if (othersPercentage > 0) {
-        top5.push({
-          name: 'Autres',
-          count: othersCount,
-          percentage: othersPercentage
-        });
-      }
-    }
-    
-    return top5;
   }
   
-  // Classification par région
+  private readonly REGION_TABLE: { name: string; keywords: string[] }[] = [
+    { name: 'Dakar',        keywords: ['dakar','rufisque','guédiawaye','guediawaye','malika','pikine','bargny','diamniadio','presqu\'île','presquile','cap-vert','cap vert'] },
+    { name: 'Thiès',        keywords: ['thiès','thies','mbour','tivaouane','joal','saly','pout','khombole','petite côte','petite cote'] },
+    { name: 'Saint-Louis',  keywords: ['saint-louis','ugb','ross-béthio','ross-bethio','dagana','podor','ndioum'] },
+    { name: 'Ziguinchor',   keywords: ['ziguinchor','bignona','oussouye','cap skirring','casamance','basse casamance'] },
+    { name: 'Kaolack',      keywords: ['kaolack','nioro','guinguinéo','guinguineo','ndoffane'] },
+    { name: 'Louga',        keywords: ['louga','dahra','linguère','linguere','kebemer','kébémer','ndiambour'] },
+    { name: 'Kolda',        keywords: ['kolda','vélingara','velingara','médina yoro foulah','medina yoro foulah','haute casamance'] },
+    { name: 'Tambacounda',  keywords: ['tambacounda','tamba','bakel','goudiry','koumpentoum','sénégal oriental','senegal oriental'] },
+    { name: 'Fatick',       keywords: ['fatick','foundiougne','gossas','sokone','karang'] },
+    { name: 'Diourbel',     keywords: ['diourbel','touba','mbacké','mbacke','bambey','baol'] },
+    { name: 'Matam',        keywords: ['matam','kanel','ranérou','ranerou','ourossogui','thilogne'] },
+    { name: 'Kédougou',     keywords: ['kédougou','kedougou','saraya','salémata','salemata'] },
+    { name: 'Sédhiou',      keywords: ['sédhiou','sedhiou','goudomp','bounkiling','moyenne casamance'] },
+    { name: 'Kaffrine',     keywords: ['kaffrine','birkelane','koungheul','malem hodar'] },
+  ];
+
   extractRegion(ville: string): string {
     if (!ville) return 'Non spécifiée';
-    
     const villeLC = ville.toLowerCase().trim();
-    
-    // Région de Dakar
-    if (villeLC.includes('dakar') || villeLC.includes('rufisque') || 
-        villeLC.includes('guédiawaye') || villeLC.includes('guediawaye') ||
-        villeLC.includes('malika') || villeLC.includes('pikine')) {
-      return 'Dakar';
-    }
-    
-    // Région de Thiès
-    if (villeLC.includes('thiès') || villeLC.includes('thies') || 
-        villeLC.includes('mbour') || villeLC.includes('tivaouane')) {
-      return 'Thiès';
-    }
-    
-    // Région de Saint-Louis
-    if (villeLC.includes('saint-louis') || villeLC.includes('ugb') ||
-        villeLC.includes('ross-béthio') || villeLC.includes('dagana')) {
-      return 'Saint-Louis';
-    }
-    
-    // Région de Casamance (Ziguinchor + Sédhiou)
-    if (villeLC.includes('ziguinchor') || villeLC.includes('sédhiou') ||
-        villeLC.includes('sedhiou') || villeLC.includes('bignona') ||
-        villeLC.includes('oussouye')) {
-      return 'Casamance';
-    }
-    
-    // Région de Kaolack
-    if (villeLC.includes('kaolack') || villeLC.includes('kaffrine') ||
-        villeLC.includes('nioro') || villeLC.includes('guinguinéo')) {
-      return 'Kaolack';
-    }
-    
-    // Région de Louga
-    if (villeLC.includes('louga') || villeLC.includes('dahra') ||
-        villeLC.includes('linguère') || villeLC.includes('kebemer')) {
-      return 'Louga';
-    }
-    
-    // Région de Kolda
-    if (villeLC.includes('kolda') || villeLC.includes('vélingara') ||
-        villeLC.includes('médina yoro foulah')) {
-      return 'Kolda';
-    }
-    
-    // Région de Tambacounda
-    if (villeLC.includes('tambacounda') || villeLC.includes('kédougou') ||
-        villeLC.includes('bakel') || villeLC.includes('goudiry')) {
-      return 'Tambacounda';
-    }
-    
-    // Région de Fatick
-    if (villeLC.includes('fatick') || villeLC.includes('foundiougne') ||
-        villeLC.includes('gossas') || villeLC.includes('sokone')) {
-      return 'Fatick';
-    }
-    
-    // Région de Diourbel
-    if (villeLC.includes('diourbel') || villeLC.includes('touba') ||
-        villeLC.includes('mbacké') || villeLC.includes('bambey')) {
-      return 'Diourbel';
-    }
-    
-    // Région de Matam
-    if (villeLC.includes('matam') || villeLC.includes('kanel') ||
-        villeLC.includes('ranérou') || villeLC.includes('ourossogui')) {
-      return 'Matam';
-    }
-    
-    return 'Autres';
+    const match = this.REGION_TABLE.find(r => r.keywords.some(kw => villeLC.includes(kw)));
+    return match ? match.name : 'Hors Sénégal';
   }
-  
-  // Statistiques des régions
+
   getRegionStats() {
-    if (this.users.length === 0) return [];
-    
+    const users = this.participantsEditionCourante;
+    if (users.length === 0) return [];
     const regionCount: { [key: string]: number } = {};
-    
-    this.users.forEach(user => {
+    users.forEach((user: any) => {
       const region = this.extractRegion(user.ville);
       regionCount[region] = (regionCount[region] || 0) + 1;
     });
-    
-    const total = this.users.length;
-    const regions = Object.entries(regionCount)
-      .map(([region, count]) => ({
-        name: region,
-        count: count,
-        percentage: Math.round((count / total) * 100)
-      }))
-      .sort((a, b) => b.count - a.count);
-    
-    return regions.slice(0, 6);
+    const total = users.length;
+    // Afficher toutes les 14 régions (même à 0) + Hors Sénégal si présent
+    const allRegions = this.REGION_TABLE.map(r => r.name);
+    const result = allRegions
+      .map(name => ({ name, count: regionCount[name] || 0, percentage: Math.round(((regionCount[name] || 0) / total) * 100) }))
+      .filter(r => r.count > 0);
+    if (regionCount['Hors Sénégal']) {
+      result.push({ name: 'Hors Sénégal', count: regionCount['Hors Sénégal'], percentage: Math.round((regionCount['Hors Sénégal'] / total) * 100) });
+    }
+    return result.sort((a, b) => b.count - a.count);
   }
   
   getAcceptanceRate() {
@@ -2690,51 +2572,112 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     }).filter((c: any) => c.assignes > 0).sort((a: any, b: any) => b.completion - a.completion);
   }
   
-  // Statistiques de délais
   getAverageCorrectionTime(): string {
-    const textesCorrigés = this.textes.filter(t => t.statut === 'accepte' || t.statut === 'refuse');
-    if (textesCorrigés.length === 0) return '0';
-    
+    const textesCorrigés = this.textes.filter(t =>
+      (t.statut === 'accepte' || t.statut === 'refuse') &&
+      t.updated_at && t.created_at &&
+      new Date(t.updated_at).getTime() > new Date(t.created_at).getTime()
+    );
+    if (textesCorrigés.length === 0) return 'N/A';
     const totalDays = textesCorrigés.reduce((sum, texte) => {
-      const soumission = new Date(texte.created_at);
-      const correction = new Date(texte.updated_at || texte.created_at);
-      const diffDays = Math.ceil((correction.getTime() - soumission.getTime()) / (1000 * 60 * 60 * 24));
-      return sum + Math.max(0, diffDays);
+      const diffDays = Math.ceil(
+        (new Date(texte.updated_at).getTime() - new Date(texte.created_at).getTime()) / (1000 * 60 * 60 * 24)
+      );
+      return sum + diffDays;
     }, 0);
-    
-    return Math.round(totalDays / textesCorrigés.length).toString();
+    const avg = Math.round(totalDays / textesCorrigés.length);
+    return avg === 0 ? '< 1' : avg.toString();
   }
-  
+
   getOverdueTexts(): number {
+    const correctionDebut = new Date(this.concoursSchedule?.correction_debut);
+    const correctionFin = new Date(this.concoursSchedule?.correction_prolongement);
+    const today = new Date();
+    // Hors période de correction : pas de retard
+    if (today < correctionDebut || today > correctionFin) return 0;
     const delaiMax = 7;
     return this.textes.filter(t => {
       if (t.statut !== 'en_attente') return false;
       const soumission = new Date(t.created_at);
-      const maintenant = new Date();
-      const diffDays = Math.ceil((maintenant.getTime() - soumission.getTime()) / (1000 * 60 * 60 * 24));
+      const diffDays = Math.ceil((today.getTime() - soumission.getTime()) / (1000 * 60 * 60 * 24));
       return diffDays > delaiMax;
     }).length;
   }
-  
+
   getFastestCorrector(): string {
-    const performance = this.getCorrectorPerformance();
-    if (performance.length === 0) return 'Aucun';
-    const fastest = performance.reduce((prev: any, current: any) => current.completion > prev.completion ? current : prev);
-    return fastest && fastest.nom ? fastest.nom.split(' ')[0] : 'Aucun';
+    const textesCorrigés = this.textes.filter(t =>
+      (t.statut === 'accepte' || t.statut === 'refuse') &&
+      t.updated_at && t.created_at &&
+      new Date(t.updated_at).getTime() > new Date(t.created_at).getTime()
+    );
+    if (textesCorrigés.length === 0) return 'Aucun';
+
+    // Calculer le temps moyen par correcteur via les affectations
+    const tempsParCorrecteur: { [id: number]: number[] } = {};
+    textesCorrigés.forEach(texte => {
+      const affectation = this.affectations.find(a => a.texte_id === texte.id);
+      if (!affectation) return;
+      const jours = Math.ceil(
+        (new Date(texte.updated_at).getTime() - new Date(texte.created_at).getTime()) / (1000 * 60 * 60 * 24)
+      );
+      if (!tempsParCorrecteur[affectation.corrector_id]) tempsParCorrecteur[affectation.corrector_id] = [];
+      tempsParCorrecteur[affectation.corrector_id].push(jours);
+    });
+
+    let bestId = -1, bestAvg = Infinity;
+    Object.entries(tempsParCorrecteur).forEach(([id, jours]) => {
+      if (jours.length < 2) return; // ignorer si moins de 2 textes corrigés
+      const avg = jours.reduce((s, j) => s + j, 0) / jours.length;
+      if (avg < bestAvg) { bestAvg = avg; bestId = +id; }
+    });
+
+    if (bestId === -1) return 'Aucun';
+    const correcteur = this.correcteurs.find(c => c.id === bestId);
+    return correcteur ? `${correcteur.prenom} ${correcteur.nom} (${Math.round(bestAvg)}j moy.)` : 'Aucun';
   }
   
   // Statistiques d'engagement
-  getMultiTextParticipants(): number {
-    const participantTextes = new Map<string, number>();
-    this.textes.forEach(texte => {
-      const key = `${texte.prenom}_${texte.nom}`;
-      participantTextes.set(key, (participantTextes.get(key) || 0) + 1);
-    });
-    return Array.from(participantTextes.values()).filter(count => count > 1).length;
+  showMultiEditionsList = false;
+
+  private getMultiEditionsKey(t: any): string {
+    return (t.email || `${t.prenom}_${t.nom}`).toLowerCase();
   }
-  
+
+  getMultiTextParticipants(): number {
+    const editionActive = this.editionActive?.numero ?? 4;
+    const emailsCourants = new Set(this.textes.map(t => this.getMultiEditionsKey(t)));
+    if (emailsCourants.size === 0) return 0;
+    const autresEditions = this.allTextesAllEditions.filter(t => t.edition_id !== editionActive);
+    return Array.from(emailsCourants).filter(key =>
+      autresEditions.some(t => this.getMultiEditionsKey(t) === key)
+    ).length;
+  }
+
+  getMultiEditionsList(): { nom: string; prenom: string; editions: number[] }[] {
+    const editionActive = this.editionActive?.numero ?? 4;
+    const autresEditions = this.allTextesAllEditions.filter(t => t.edition_id !== editionActive);
+    const seen = new Set<string>();
+    return this.textes
+      .filter(t => {
+        const key = this.getMultiEditionsKey(t);
+        return autresEditions.some(a => this.getMultiEditionsKey(a) === key);
+      })
+      .reduce((acc: { nom: string; prenom: string; editions: number[] }[], t) => {
+        const key = this.getMultiEditionsKey(t);
+        if (seen.has(key)) return acc;
+        seen.add(key);
+        const editionsAutres = autresEditions
+          .filter(a => this.getMultiEditionsKey(a) === key)
+          .map(a => a.edition_id)
+          .filter((v: number, i: number, arr: number[]) => arr.indexOf(v) === i);
+        acc.push({ nom: t.nom, prenom: t.prenom, editions: [...editionsAutres, editionActive].sort((a, b) => a - b) });
+        return acc;
+      }, [])
+      .sort((a, b) => a.nom.localeCompare(b.nom));
+  }
+
   getMultiTextPercentage(): number {
-    const total = this.participants.length;
+    const total = this.textes.length;
     if (total === 0) return 0;
     return Math.round((this.getMultiTextParticipants() / total) * 100);
   }
@@ -2848,13 +2791,17 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   getUniqueRegionsCount(): number {
-    const regions = new Set(this.users.map(u => this.extractRegion(u.ville)));
+    const regions = new Set(this.participantsEditionCourante.map((u: any) => this.extractRegion(u.ville)));
     regions.delete('Non spécifiée'); regions.delete('Autres');
     return regions.size;
   }
   
+  get participantsEditionCourante(): any[] {
+    return this.getParticipantsByEdition(this.editionActive?.numero ?? 4);
+  }
+
   getUniqueCountriesCount(): number {
-    const countries = new Set(this.users.map(u => this.classifyNationality(u.ville, u.telephone)));
+    const countries = new Set(this.participantsEditionCourante.map((u: any) => this.classifyNationality(u.ville, u.telephone)));
     countries.delete('autres');
     return countries.size;
   }

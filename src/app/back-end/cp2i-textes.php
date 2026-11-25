@@ -134,25 +134,29 @@ function getUserTexts($userId, $editionId = null) {
 function getAllTexts($editionId = null) {
     $db = getDB();
 
-    $stmtEd = $db->prepare("SELECT numero FROM cp2i_editions WHERE is_active = TRUE LIMIT 1");
-    $stmtEd->execute();
-    $activeEd = $stmtEd->fetch(PDO::FETCH_ASSOC);
-    $activeEditionNum = $activeEd ? (int)$activeEd['numero'] : 4;
+    if ($editionId === null) {
+        // Retourner tous les textes de toutes éditions (pour stats multi-éditions)
+        $stmt = $db->prepare("
+            SELECT t.id, t.titre, t.contenu, t.langue, t.theme, t.nb_vers, t.statut, t.note, t.commentaire, t.created_at, t.edition_id,
+                   u.nom, u.prenom, u.email
+            FROM cp2i_textes t
+            JOIN cp2i_users u ON t.user_id = u.id
+            ORDER BY t.edition_id ASC, t.created_at DESC
+        ");
+        $stmt->execute();
+    } else {
+        $stmt = $db->prepare("
+            SELECT t.id, t.titre, t.contenu, t.langue, t.theme, t.nb_vers, t.statut, t.note, t.commentaire, t.created_at, t.edition_id,
+                   u.nom, u.prenom, u.email
+            FROM cp2i_textes t
+            JOIN cp2i_users u ON t.user_id = u.id
+            WHERE t.edition_id = ?
+            ORDER BY t.created_at DESC
+        ");
+        $stmt->execute([(int)$editionId]);
+    }
 
-    // edition_id reçu = numéro directement (3 ou 4), pas l'id de la table
-    $editionNumero = $editionId ? (int)$editionId : $activeEditionNum;
-
-    $stmt = $db->prepare("
-        SELECT t.id, t.titre, t.contenu, t.langue, t.theme, t.nb_vers, t.statut, t.note, t.commentaire, t.created_at, t.edition_id,
-               u.nom, u.prenom, u.email
-        FROM cp2i_textes t 
-        JOIN cp2i_users u ON t.user_id = u.id
-        WHERE t.edition_id = ?
-        ORDER BY t.created_at DESC
-    ");
-    $stmt->execute([$editionNumero]);
     $textes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
     echo json_encode(['textes' => $textes, 'edition_id' => $editionId]);
 }
 

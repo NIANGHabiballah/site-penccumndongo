@@ -273,6 +273,15 @@ if ($method === 'PUT' && isset($_GET['action']) && $_GET['action'] === 'update_p
         exit;
     }
 
+    // Récupérer les valeurs actuelles en base pour ne pas écraser avec du vide
+    $stmtCurrent = $db->prepare("SELECT telephone, whatsapp, ville FROM cp2i_users WHERE id=?");
+    $stmtCurrent->execute([$user['user_id']]);
+    $current = $stmtCurrent->fetch(PDO::FETCH_ASSOC);
+
+    $telephone = $telephone !== '' ? $telephone : ($current['telephone'] ?? '');
+    $whatsapp  = $whatsapp  !== '' ? $whatsapp  : ($current['whatsapp']  ?? '');
+    $ville     = $ville     !== '' ? $ville     : ($current['ville']     ?? '');
+
     $stmt = $db->prepare("UPDATE cp2i_users SET nom=?, prenom=?, telephone=?, whatsapp=?, ville=? WHERE id=?");
     $stmt->execute([$nom, $prenom, $telephone, $whatsapp, $ville, $user['user_id']]);
 
