@@ -76,7 +76,9 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   get participantsEdition4() {
     return this.users.filter(u => {
       if (u.role !== 'participant') return false;
-      return u.created_at && new Date(u.created_at) >= new Date('2026-11-02');
+      if (!u.created_at) return false;
+      const d = new Date(u.created_at);
+      return d >= new Date('2025-11-02') && d <= new Date('2025-11-25T23:59:59');
     });
   }
 
@@ -85,7 +87,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       if (u.role !== 'participant') return false;
       if (!u.created_at) return false;
       const d = new Date(u.created_at);
-      return d >= new Date('2025-11-03') && d < new Date('2026-11-02');
+      return d >= new Date('2024-11-03') && d <= new Date('2024-11-23T23:59:59');
     });
   }
 
