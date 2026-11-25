@@ -100,8 +100,8 @@ function getStats($user, $edition_id = null) {
         
         // Comptes utilisateurs filtrés par édition (par date d'inscription)
         $edition_dates = [
-            3 => ['debut' => '2024-11-03 00:00:00', 'fin' => '2024-11-23 23:59:59'],
-            4 => ['debut' => '2025-11-02 00:00:00', 'fin' => '2025-11-25 23:59:59']
+            3 => ['debut' => '2025-11-03 00:00:00', 'fin' => '2025-11-23 23:59:59'],
+            4 => ['debut' => '2026-11-02 00:00:00', 'fin' => '2026-11-25 23:59:59']
         ];
         if ($edition_id && isset($edition_dates[$edition_id])) {
             $debut = $edition_dates[$edition_id]['debut'];
@@ -328,8 +328,8 @@ function getUsers($edition_id = null) {
 
     // Définir les plages de dates d'inscription par édition
     $edition_dates = [
-        3 => ['debut' => '2024-11-03 00:00:00', 'fin' => '2024-11-23 23:59:59'],
-        4 => ['debut' => '2025-11-02 00:00:00', 'fin' => '2025-11-25 23:59:59']
+        3 => ['debut' => '2025-11-03 00:00:00', 'fin' => '2025-11-23 23:59:59'],
+        4 => ['debut' => '2026-11-02 00:00:00', 'fin' => '2026-11-25 23:59:59']
     ];
 
     // Filtrer les participants par date d'inscription dans la plage de l'édition
@@ -359,8 +359,8 @@ function getUsers($edition_id = null) {
                    u.telephone, u.whatsapp, u.ville, u.last_login,
                    COUNT(t.id) as nb_textes,
                    AVG(t.note) as note_moyenne,
-                   CASE WHEN u.created_at >= '2025-11-02 00:00:00' THEN 4
-                        WHEN u.created_at >= '2024-11-03 00:00:00' THEN 3
+                   CASE WHEN u.created_at >= '2026-11-02 00:00:00' THEN 4
+                        WHEN u.created_at >= '2025-11-03 00:00:00' THEN 3
                         ELSE NULL END as edition_id
             FROM cp2i_users u
             LEFT JOIN cp2i_textes t ON u.id = t.user_id

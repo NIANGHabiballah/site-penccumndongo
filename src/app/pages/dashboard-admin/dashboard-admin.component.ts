@@ -73,21 +73,53 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   searchTerm = '';
   editionFilter: number | 'all' = 'all'; // filtre par édition dans la section utilisateurs
 
-  get participantsEdition4() {
+  // ─── SOURCE DE VÉRITÉ UNIQUE ───────────────────────────────────────────────
+  // Pour ajouter une édition : ajouter une entrée ici, tout le reste s'adapte.
+  private schedulesParEdition: Record<number, any> = {
+    3: {
+      inscription_debut: '2025-11-03',
+      inscription_fin: '2025-11-23',
+      correction_debut: '2025-11-24',
+      correction_fin: '2025-11-30',
+      correction_prolongement: '2025-11-30',
+      deliberation: '2025-12-01',
+      ceremonie_remise: '2026-01-10'
+    },
+    4: {
+      inscription_debut: '2026-11-02',
+      inscription_fin: '2026-11-25',
+      correction_debut: '2026-11-26',
+      correction_fin: '2026-12-05',
+      correction_prolongement: '2026-12-10',
+      deliberation: '2026-12-15',
+      ceremonie_remise: '2026-12-26'
+    }
+  };
+
+  concoursSchedule = { ...this.schedulesParEdition[4] };
+  settings: any = this.getDefaultSettings(4);
+  // ────────────────────────────────────────────────────────────────────────────
+
+  getParticipantsByEdition(num: number) {
+    const s = this.schedulesParEdition[num];
+    if (!s) return [];
     return this.users.filter(u => {
-      if (u.role !== 'participant') return false;
-      if (!u.created_at) return false;
+      if (u.role !== 'participant' || !u.created_at) return false;
       const d = new Date(u.created_at);
-      return d >= new Date('2025-11-02') && d <= new Date('2025-11-25T23:59:59');
+      return d >= new Date(s.inscription_debut) && d <= new Date(s.inscription_fin + 'T23:59:59');
     });
   }
 
-  get participantsEdition3() {
+  get participantsEdition4() { return this.getParticipantsByEdition(4); }
+  get participantsEdition3() { return this.getParticipantsByEdition(3); }
+
+  get participantsHorsEdition() {
     return this.users.filter(u => {
-      if (u.role !== 'participant') return false;
-      if (!u.created_at) return false;
-      const d = new Date(u.created_at);
-      return d >= new Date('2024-11-03') && d <= new Date('2024-11-23T23:59:59');
+      if (u.role !== 'participant' || !u.created_at) return false;
+      return !Object.values(this.schedulesParEdition).some((s: any) => {
+        const d = new Date(u.created_at);
+        return d >= new Date(s.inscription_debut) && d <= new Date(s.inscription_fin + 'T23:59:59');
+      });
     });
   }
 
@@ -184,31 +216,6 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   
   // Gestion des paramètres
   currentSettingsTab = 'concours';
-
-  private schedulesParEdition: Record<number, any> = {
-    3: {
-      inscription_debut: '2025-11-03',
-      inscription_fin: '2025-11-23',
-      correction_debut: '2025-11-24',
-      correction_fin: '2025-11-30',
-      correction_prolongement: '2025-11-30',
-      deliberation: '2025-12-01',
-      ceremonie_remise: '2026-01-10'
-    },
-    4: {
-      inscription_debut: '2026-11-02',
-      inscription_fin: '2026-11-23',
-      correction_debut: '2026-11-24',
-      correction_fin: '2026-11-30',
-      correction_prolongement: '2026-11-30',
-      deliberation: '2026-12-01',
-      ceremonie_remise: '2026-12-26'
-    }
-  };
-
-  concoursSchedule = { ...this.schedulesParEdition[4] };
-  
-  settings: any = this.getDefaultSettings(4);
 
   private getDefaultSettings(editionNumero: number): any {
     const schedule = this.schedulesParEdition[editionNumero] ?? this.schedulesParEdition[4];
@@ -761,12 +768,12 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     // Filtrer par édition (participants uniquement)
     if (this.editionFilter !== 'all') {
       filtered = filtered.filter(user => {
-        if (user.role !== 'participant') return false; // exclure correcteurs/admins du filtre édition
+        if (user.role !== 'participant') return false;
         if (!user.created_at) return false;
         const d = new Date(user.created_at);
-        if (this.editionFilter === 4) return d >= new Date('2026-11-02');
-        if (this.editionFilter === 3) return d >= new Date('2025-11-03') && d < new Date('2026-11-02');
-        return false;
+        const s = this.schedulesParEdition[this.editionFilter as number];
+        if (!s) return false;
+        return d >= new Date(s.inscription_debut) && d <= new Date(s.inscription_fin + 'T23:59:59');
       });
     }
 
@@ -2865,14 +2872,15 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   private getDaysFromStart(): number {
-    const startDate = new Date('2026-11-02');
-    const today = new Date();
-    return Math.max(1, Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+    const s = this.schedulesParEdition[this.editionActive?.numero ?? 4];
+    const startDate = new Date(s?.inscription_debut ?? this.concoursSchedule.inscription_debut);
+    return Math.max(1, Math.ceil((new Date().getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
   }
-  
+
   private getTotalDays(): number {
-    const startDate = new Date('2026-11-02');
-    const endDate = new Date('2026-11-23');
+    const s = this.schedulesParEdition[this.editionActive?.numero ?? 4];
+    const startDate = new Date(s?.inscription_debut ?? this.concoursSchedule.inscription_debut);
+    const endDate = new Date(s?.inscription_fin ?? this.concoursSchedule.inscription_fin);
     return Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
   }
 
