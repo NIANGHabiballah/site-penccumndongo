@@ -10,6 +10,9 @@ export interface User {
   nom: string;
   prenom: string;
   role: string;
+  telephone?: string;
+  whatsapp?: string;
+  ville?: string;
 }
 
 export interface AuthResponse {
