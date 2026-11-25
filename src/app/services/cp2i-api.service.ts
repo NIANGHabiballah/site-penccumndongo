@@ -82,6 +82,11 @@ export class Cp2iApiService {
     this.currentUserSubject.next(user);
   }
 
+  setCurrentUser(user: User): void {
+    localStorage.setItem('cp2i_user', JSON.stringify(user));
+    this.currentUserSubject.next(user);
+  }
+
   logout(): void {
     localStorage.removeItem('cp2i_token');
     localStorage.removeItem('cp2i_user');
@@ -170,6 +175,10 @@ export class Cp2iApiService {
 
   getProfile(): Observable<any> {
     return this.http.get(`${this.baseUrl}/cp2i-dashboard.php?action=profile`, { headers: this.getHeaders() });
+  }
+
+  updateProfile(data: { nom: string; prenom: string; telephone: string; whatsapp: string; ville: string }): Observable<any> {
+    return this.http.put(`${this.baseUrl}/cp2i-dashboard.php?action=update_profile`, data, { headers: this.getHeaders() });
   }
 
   // Méthodes admin

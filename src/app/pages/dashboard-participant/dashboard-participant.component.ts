@@ -33,6 +33,11 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
   chatOpen = false;
   currentView = 'accueil';
   currentGuideSection = 'steps';
+
+  profileForm = { nom: '', prenom: '', telephone: '', whatsapp: '', ville: '' };
+  profileSaving = false;
+  profileSuccess = false;
+  profileError = '';
   currentHistoryFilter = 'all';
   openFaq: number | null = null;
 
@@ -327,6 +332,13 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     }
     
     this.currentUser = this.cp2iApi.getCurrentUser();
+    this.profileForm = {
+      nom:       this.currentUser?.nom       || '',
+      prenom:    this.currentUser?.prenom    || '',
+      telephone: this.currentUser?.telephone || '',
+      whatsapp:  this.currentUser?.whatsapp  || '',
+      ville:     this.currentUser?.ville     || ''
+    };
     this.loadEditions();
     this.updateThemesAffiches();
 
@@ -1356,6 +1368,31 @@ export class DashboardParticipantComponent implements OnInit, OnDestroy, AfterVi
     setTimeout(() => {
       this.showNotification = false;
     }, 4000);
+  }
+
+  saveProfile() {
+    if (!this.profileForm.nom.trim() || !this.profileForm.prenom.trim()) {
+      this.profileError = 'Nom et prénom sont obligatoires';
+      return;
+    }
+    this.profileSaving = true;
+    this.profileSuccess = false;
+    this.profileError = '';
+    this.cp2iApi.updateProfile(this.profileForm).subscribe({
+      next: (res: any) => {
+        this.profileSaving = false;
+        this.profileSuccess = true;
+        if (res.user && this.currentUser) {
+          this.currentUser = { ...this.currentUser, ...res.user };
+          this.cp2iApi.setCurrentUser(this.currentUser!);
+        }
+        setTimeout(() => this.profileSuccess = false, 4000);
+      },
+      error: (err: any) => {
+        this.profileSaving = false;
+        this.profileError = err?.error?.error || 'Erreur lors de la mise à jour';
+      }
+    });
   }
 
   setCurrentView(view: string) {

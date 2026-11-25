@@ -256,6 +256,32 @@ function getProfile($user) {
 }
 
 // Nouvelle fonction pour gérer les utilisateurs (admin seulement)
+if ($method === 'PUT' && isset($_GET['action']) && $_GET['action'] === 'update_profile') {
+    $user = verifyToken();
+    $input = json_decode(file_get_contents('php://input'), true);
+    $db = getDB();
+
+    $nom       = trim($input['nom'] ?? '');
+    $prenom    = trim($input['prenom'] ?? '');
+    $telephone = trim($input['telephone'] ?? '');
+    $whatsapp  = trim($input['whatsapp'] ?? '');
+    $ville     = trim($input['ville'] ?? '');
+
+    if (!$nom || !$prenom) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Nom et prénom sont obligatoires']);
+        exit;
+    }
+
+    $stmt = $db->prepare("UPDATE cp2i_users SET nom=?, prenom=?, telephone=?, whatsapp=?, ville=? WHERE id=?");
+    $stmt->execute([$nom, $prenom, $telephone, $whatsapp, $ville, $user['user_id']]);
+
+    $stmt = $db->prepare("SELECT id, email, nom, prenom, role, telephone, whatsapp, ville, created_at FROM cp2i_users WHERE id=?");
+    $stmt->execute([$user['user_id']]);
+    echo json_encode(['success' => true, 'user' => $stmt->fetch(PDO::FETCH_ASSOC)]);
+    exit;
+}
+
 if ($method === 'POST' && isset($_GET['action'])) {
     $user = verifyToken();
     if ($user['role'] !== 'admin') {

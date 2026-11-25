@@ -335,14 +335,13 @@
       <!-- Mon Profil -->
       <div *ngSwitchCase="'profil'" class="profile-section">
         <h2><i class="fas fa-user-circle"></i> Mon Profil</h2>
-        
+
         <div class="profile-card">
           <div class="profile-info">
             <h3>{{currentUser?.prenom}} {{currentUser?.nom}}</h3>
             <p class="profile-email">{{currentUser?.email}}</p>
             <span class="role-badge">{{currentUser?.role | titlecase}}</span>
           </div>
-          
           <div class="profile-stats">
             <div class="stat-item">
               <span class="stat-number">{{stats.total_textes || 0}}</span>
@@ -357,6 +356,52 @@
               <span class="stat-label">Classement</span>
             </div>
           </div>
+        </div>
+
+        <!-- Formulaire de modification du profil -->
+        <div class="profile-edit-card">
+          <div class="profile-edit-header">
+            <h3><i class="fas fa-edit"></i> Modifier mes informations</h3>
+          </div>
+          <form class="profile-form" (ngSubmit)="saveProfile()">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Prénom *</label>
+                <input type="text" [(ngModel)]="profileForm.prenom" name="prenom" required placeholder="Votre prénom" />
+              </div>
+              <div class="form-group">
+                <label>Nom *</label>
+                <input type="text" [(ngModel)]="profileForm.nom" name="nom" required placeholder="Votre nom" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Téléphone</label>
+                <input type="tel" [(ngModel)]="profileForm.telephone" name="telephone" placeholder="+221 XX XXX XX XX" />
+              </div>
+              <div class="form-group">
+                <label>WhatsApp</label>
+                <input type="tel" [(ngModel)]="profileForm.whatsapp" name="whatsapp" placeholder="+221 XX XXX XX XX" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Ville / Pays</label>
+              <input type="text" [(ngModel)]="profileForm.ville" name="ville" placeholder="Ex: Dakar, Sénégal" />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" [value]="currentUser?.email" disabled class="input-disabled" />
+              <small>L'email ne peut pas être modifié</small>
+            </div>
+            <div class="profile-form-actions">
+              <button type="submit" class="btn btn-primary" [disabled]="profileSaving">
+                <i class="fas" [class.fa-save]="!profileSaving" [class.fa-spinner]="profileSaving" [class.fa-spin]="profileSaving"></i>
+                {{profileSaving ? 'Enregistrement...' : 'Enregistrer les modifications'}}
+              </button>
+            </div>
+            <div class="profile-msg success" *ngIf="profileSuccess"><i class="fas fa-check-circle"></i> Profil mis à jour avec succès !</div>
+            <div class="profile-msg error" *ngIf="profileError"><i class="fas fa-exclamation-circle"></i> {{profileError}}</div>
+          </form>
         </div>
       </div>
       
