@@ -575,16 +575,22 @@
             <p>Système d'assignation des correcteurs aux textes soumis</p>
           </div>
           <div class="header-actions">
-            <button class="btn btn-success" (click)="autoAssignAll()">
-              <i class="fas fa-magic"></i> Affectation automatique
-            </button>
-            <button class="btn btn-warning" (click)="rebalanceAssignments()">
-              <i class="fas fa-balance-scale"></i> Rééquilibrer
-            </button>
-            <button class="btn btn-danger" (click)="removeAllAssignments()">
-              <i class="fas fa-trash-alt"></i> Supprimer toutes
-            </button>
-
+            <ng-container *ngIf="!isEditionArchivee(); else archiveNotice">
+              <button class="btn btn-warning" (click)="rebalanceAssignments()">
+                <i class="fas fa-balance-scale"></i> Rééquilibrer
+              </button>
+              <button class="btn btn-info" (click)="restoreAffectations()" title="Restaurer les affectations depuis les évaluations existantes">
+                <i class="fas fa-undo"></i> Restaurer
+              </button>
+              <button class="btn btn-danger" (click)="removeAllAssignments()" [disabled]="hasAnyEvaluatedText()">
+                <i class="fas fa-trash-alt"></i> Supprimer toutes
+              </button>
+            </ng-container>
+            <ng-template #archiveNotice>
+              <button class="btn btn-archive-readonly" disabled>
+                <i class="fas fa-lock"></i> Édition archivée — lecture seule
+              </button>
+            </ng-template>
           </div>
         </div>
 
@@ -621,7 +627,7 @@
         </div>
 
         <!-- Section de suppression pour toutes les affectations -->
-        <div style="background: #fff3cd; padding: 15px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #ffc107;">
+        <div *ngIf="!isEditionArchivee()" style="background: #fff3cd; padding: 15px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #ffc107;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h4>Suppression d'assignations individuelles</h4>
             <button class="btn btn-sm btn-outline" (click)="showAssignmentsList = !showAssignmentsList">
@@ -667,13 +673,9 @@
                 <br>
                 <small>Correcteur: {{getCorrecteurName(affectation.corrector_id)}}</small>
               </div>
-              <button class="btn btn-sm" 
-                      [class.btn-danger]="canUnassignCorrector(affectation.texte_id, affectation.corrector_id)"
-                      [class.btn-secondary]="!canUnassignCorrector(affectation.texte_id, affectation.corrector_id)"
-                      [disabled]="!canUnassignCorrector(affectation.texte_id, affectation.corrector_id)"
+              <button class="btn btn-sm btn-danger"
                       (click)="unassignCorrector(affectation.texte_id, affectation.corrector_id)">
-                <span *ngIf="canUnassignCorrector(affectation.texte_id, affectation.corrector_id)">SUPPRIMER</span>
-                <span *ngIf="!canUnassignCorrector(affectation.texte_id, affectation.corrector_id)">DÉJÀ CORRIGÉ</span>
+                SUPPRIMER
               </button>
             </div>
             
@@ -714,8 +716,22 @@
                 <option value="arabe">Arabe</option>
               </select>
             </div>
-            <div class="search-results" *ngIf="textSearchTerm || languageFilter">
-              <span>{{getFilteredTexts().length}} texte(s) trouvé(s)</span>
+            <div class="assignment-status-filter">
+              <button class="filter-pill" [class.active]="assignmentStatusFilter === 'all'" (click)="assignmentStatusFilter = 'all'; filterTexts()">
+                Tous <span class="pill-count">{{textes.length}}</span>
+              </button>
+              <button class="filter-pill warning" [class.active]="assignmentStatusFilter === 'unassigned'" (click)="assignmentStatusFilter = 'unassigned'; filterTexts()">
+                <i class="fas fa-exclamation-circle"></i> Non assignés <span class="pill-count">{{getTextsWithoutAssignments()}}</span>
+              </button>
+              <button class="filter-pill partial" [class.active]="assignmentStatusFilter === 'partial'" (click)="assignmentStatusFilter = 'partial'; filterTexts()">
+                <i class="fas fa-adjust"></i> Partiels <span class="pill-count">{{getTextsPartiallyAssigned()}}</span>
+              </button>
+              <button class="filter-pill success" [class.active]="assignmentStatusFilter === 'full'" (click)="assignmentStatusFilter = 'full'; filterTexts()">
+                <i class="fas fa-check-circle"></i> Complets <span class="pill-count">{{getTextsWithFullAssignments()}}</span>
+              </button>
+            </div>
+            <div class="search-results">
+              <span>{{getFilteredTexts().length}} texte(s) affiché(s)</span>
             </div>
           </div>
           
@@ -789,21 +805,32 @@
                         <i class="fas fa-user"></i>
                         <span>{{assignment.correcteur_prenom}} {{assignment.correcteur_nom}}</span>
                       </div>
+                      <button *ngIf="!isEditionArchivee()"
+                              class="btn btn-sm btn-danger"
+                              style="padding: 3px 10px; font-size: 12px;"
+                              (click)="unassignCorrector(+assignment.texte_id, +assignment.corrector_id)">
+                        <i class="fas fa-times"></i> Retirer
+                      </button>
                     </div>
                   </div>
-
                 </div>
                 
-                <div class="quick-assign" *ngIf="getCorrectorsCount(texte.id) < 3">
-                  <div class="quick-assign-form">
-                    <select [(ngModel)]="quickAssignCorrector[texte.id]" class="form-control-sm">
-                      <option value="0">Ajouter un correcteur...</option>
-                      <option *ngFor="let correcteur of getAvailableCorrectorsForText(texte.id)" [value]="correcteur.id">
-                        {{correcteur.prenom}} {{correcteur.nom}}
-                      </option>
-                    </select>
-                    <button class="btn btn-sm btn-primary" (click)="quickAssignToText(texte.id)" [disabled]="!quickAssignCorrector[texte.id]">
-                      <i class="fas fa-plus"></i>
+                <div class="quick-assign" *ngIf="getCorrectorsCount(texte.id) < 3 && !isEditionArchivee()">
+                  <div class="bulk-assign-form">
+                    <p class="bulk-assign-label"><i class="fas fa-user-plus"></i> Sélectionner les correcteurs à affecter :</p>
+                    <div class="bulk-assign-list">
+                      <label class="bulk-assign-item" *ngFor="let correcteur of getAvailableCorrectorsForText(texte.id)">
+                        <input type="checkbox"
+                               [checked]="isBulkSelected(texte.id, correcteur.id)"
+                               (change)="toggleBulkSelect(texte.id, correcteur.id)">
+                        <span>{{correcteur.prenom}} {{correcteur.nom}}</span>
+                        <small class="correcteur-load">({{getCorrecteurAssignmentsCount(correcteur.id)}} textes)</small>
+                      </label>
+                    </div>
+                    <button class="btn btn-sm btn-primary bulk-confirm-btn"
+                            (click)="bulkAssignToText(texte.id)"
+                            [disabled]="getBulkCount(texte.id) === 0">
+                      <i class="fas fa-check"></i> Confirmer ({{getBulkCount(texte.id)}} sélectionné(s))
                     </button>
                   </div>
                 </div>
@@ -843,7 +870,7 @@
                 </div>
               </div>
               
-              <div class="corrector-details" *ngIf="correctorDetailsVisible[j]">
+              <div class="corrector-detail-panel" *ngIf="correctorDetailsVisible[j]">
                 <div class="corrector-load">
                   <div class="load-bar">
                     <div class="load-fill" [style.width.%]="getCorrecteurLoadPercentage(correcteur.id)"></div>
@@ -3254,3 +3281,5 @@
     </div>
   </div>
 </div>
+
+

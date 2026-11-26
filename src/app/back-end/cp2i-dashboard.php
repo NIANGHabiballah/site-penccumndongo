@@ -321,6 +321,9 @@ if ($method === 'POST' && isset($_GET['action'])) {
         case 'direct_unassign':
             directUnassign($input);
             break;
+        case 'bulk_assign':
+            bulkAssignCorrecteurs($input);
+            break;
         case 'send_message':
             sendMessage($user, $input);
             break;
@@ -713,15 +716,40 @@ function removeAllAssignments() {
 
 function resetAllAssignments() {
     $db = getDB();
+    $input = json_decode(file_get_contents('php://input'), true);
+    $edition_id = isset($input['edition_id']) ? (int)$input['edition_id'] : null;
     
     try {
-        $stmt = $db->prepare("DELETE FROM cp2i_affectations");
-        $result = $stmt->execute();
+        // Bloquer si des évaluations existent pour cette édition
+        $check_sql = $edition_id
+            ? "SELECT COUNT(*) FROM cp2i_evaluations e JOIN cp2i_textes t ON e.texte_id = t.id WHERE t.edition_id = ?"
+            : "SELECT COUNT(*) FROM cp2i_evaluations";
+        $stmt = $db->prepare($check_sql);
+        $stmt->execute($edition_id ? [$edition_id] : []);
+        $eval_count = (int)$stmt->fetchColumn();
+        
+        if ($eval_count > 0) {
+            http_response_code(403);
+            echo json_encode([
+                'error' => "Impossible : $eval_count évaluations existent déjà pour cette édition. Les affectations ne peuvent pas être supprimées.",
+                'eval_count' => $eval_count
+            ]);
+            return;
+        }
+        
+        // Supprimer uniquement les affectations de l'édition concernée
+        if ($edition_id) {
+            $stmt = $db->prepare("DELETE a FROM cp2i_affectations a JOIN cp2i_textes t ON a.texte_id = t.id WHERE t.edition_id = ?");
+            $stmt->execute([$edition_id]);
+        } else {
+            $stmt = $db->prepare("DELETE FROM cp2i_affectations");
+            $stmt->execute();
+        }
         $count = $stmt->rowCount();
         
         echo json_encode([
             'success' => true, 
-            'message' => "RESET: $count affectations supprimées",
+            'message' => "RESET: $count affectations supprimées" . ($edition_id ? " (edition $edition_id)" : ''),
             'count' => $count
         ]);
         
@@ -734,21 +762,130 @@ function resetAllAssignments() {
 function directUnassign($data) {
     $db = getDB();
     
-    $texte_id = $data['texte_id'] ?? 0;
-    $corrector_id = $data['corrector_id'] ?? 0;
+    $texte_id     = isset($data['texte_id'])     ? (int)$data['texte_id']     : 0;
+    $corrector_id = isset($data['corrector_id']) ? (int)$data['corrector_id'] : 0;
     
+    if (!$texte_id || !$corrector_id) {
+        http_response_code(400);
+        echo json_encode(['error' => 'texte_id et corrector_id requis']);
+        return;
+    }
+
     try {
+        // Bloquer si ce correcteur a déjà soumis une évaluation pour ce texte
+        $stmt = $db->prepare("
+            SELECT COUNT(*) FROM cp2i_evaluations
+            WHERE texte_id = ? AND correcteur_id = ?
+        ");
+        $stmt->execute([$texte_id, $corrector_id]);
+        if ((int)$stmt->fetchColumn() > 0) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Impossible : ce correcteur a déjà soumis une évaluation pour ce texte']);
+            return;
+        }
+
         $stmt = $db->prepare("DELETE FROM cp2i_affectations WHERE texte_id = ? AND corrector_id = ?");
-        $result = $stmt->execute([$texte_id, $corrector_id]);
+        $stmt->execute([$texte_id, $corrector_id]);
         $count = $stmt->rowCount();
-        
-        echo json_encode([
-            'success' => true, 
-            'message' => "Affectation supprimée",
-            'count' => $count
-        ]);
-        
+
+        if ($count === 0) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Affectation introuvable']);
+            return;
+        }
+
+        echo json_encode(['success' => true, 'message' => 'Affectation supprimée', 'count' => $count]);
+
     } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Erreur: ' . $e->getMessage()]);
+    }
+}
+
+function bulkAssignCorrecteurs($data) {
+    $db = getDB();
+
+    $texte_id     = isset($data['texte_id'])      ? (int)$data['texte_id']      : 0;
+    $corrector_ids = isset($data['corrector_ids']) ? $data['corrector_ids']       : [];
+
+    if (!$texte_id || empty($corrector_ids)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'texte_id et corrector_ids requis']);
+        return;
+    }
+
+    // Vérifier que le texte existe
+    $stmt = $db->prepare("SELECT id FROM cp2i_textes WHERE id = ?");
+    $stmt->execute([$texte_id]);
+    if (!$stmt->fetch()) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Texte inexistant']);
+        return;
+    }
+
+    // Nombre d'affectations actuelles
+    $stmt = $db->prepare("SELECT COUNT(*) FROM cp2i_affectations WHERE texte_id = ?");
+    $stmt->execute([$texte_id]);
+    $current_count = (int)$stmt->fetchColumn();
+
+    $places_restantes = 3 - $current_count;
+    if ($places_restantes <= 0) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Ce texte a déjà 3 correcteurs assignés']);
+        return;
+    }
+
+    $assigned = 0;
+    $skipped  = 0;
+    $errors   = [];
+
+    try {
+        $db->beginTransaction();
+
+        foreach ($corrector_ids as $corrector_id) {
+            $corrector_id = (int)$corrector_id;
+            if (!$corrector_id) continue;
+
+            // Vérifier rôle correcteur
+            $stmt = $db->prepare("SELECT role FROM cp2i_users WHERE id = ?");
+            $stmt->execute([$corrector_id]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$user || $user['role'] !== 'correcteur') {
+                $errors[] = "Utilisateur $corrector_id n'est pas un correcteur";
+                continue;
+            }
+
+            // Vérifier doublon
+            $stmt = $db->prepare("SELECT id FROM cp2i_affectations WHERE texte_id = ? AND corrector_id = ?");
+            $stmt->execute([$texte_id, $corrector_id]);
+            if ($stmt->fetch()) {
+                $skipped++;
+                continue;
+            }
+
+            // Vérifier limite 3
+            if ($assigned + $current_count >= 3) {
+                $errors[] = "Limite de 3 correcteurs atteinte";
+                break;
+            }
+
+            $stmt = $db->prepare("INSERT INTO cp2i_affectations (texte_id, corrector_id, created_at) VALUES (?, ?, NOW())");
+            $stmt->execute([$texte_id, $corrector_id]);
+            $assigned++;
+        }
+
+        $db->commit();
+
+        echo json_encode([
+            'success' => true,
+            'assigned' => $assigned,
+            'skipped'  => $skipped,
+            'errors'   => $errors,
+            'message'  => "$assigned correcteur(s) affecté(s) avec succès"
+        ]);
+
+    } catch (Exception $e) {
+        $db->rollBack();
         http_response_code(500);
         echo json_encode(['error' => 'Erreur: ' . $e->getMessage()]);
     }

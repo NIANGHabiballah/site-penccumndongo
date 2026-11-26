@@ -203,6 +203,13 @@ export class Cp2iApiService {
     );
   }
 
+  bulkAssignCorrecteurs(texteId: number, correctorIds: number[]): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cp2i-dashboard.php?action=bulk_assign`,
+      { texte_id: texteId, corrector_ids: correctorIds },
+      { headers: this.getHeaders() }
+    );
+  }
+
   unassignCorrector(texteId: number, correctorId: number): Observable<any> {
     return this.http.post(`${this.baseUrl}/cp2i-dashboard.php?action=unassign_corrector`, 
       { texte_id: texteId, corrector_id: correctorId }, 

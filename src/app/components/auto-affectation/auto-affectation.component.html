@@ -1,0 +1,230 @@
+<div class="aa-container">
+
+  <!-- ── Toast ─────────────────────────────────────────────────────────────── -->
+  <div *ngIf="toast" class="aa-toast" [class.aa-toast--success]="toast.type==='success'" [class.aa-toast--error]="toast.type==='error'">
+    <i class="fas" [class.fa-check-circle]="toast.type==='success'" [class.fa-exclamation-circle]="toast.type==='error'"></i>
+    {{ toast.message }}
+  </div>
+
+  <!-- ── Modal confirmation suppression ────────────────────────────────────── -->
+  <div *ngIf="confirmDelete" class="aa-overlay" (click)="cancelDelete()">
+    <div class="aa-modal" (click)="$event.stopPropagation()">
+      <div class="aa-modal__icon aa-modal__icon--danger">
+        <i class="fas fa-trash-alt"></i>
+      </div>
+      <h3 class="aa-modal__title">Supprimer cette affectation ?</h3>
+      <div class="aa-modal__body">
+        <p><strong>Texte :</strong> {{ confirmDelete.texte_titre }}</p>
+        <p><strong>Correcteur :</strong> {{ confirmDelete.correcteur_nom }}</p>
+        <p class="aa-modal__warning">
+          <i class="fas fa-info-circle"></i>
+          Le correcteur pourra être réaffecté à ce texte ou à un autre.
+        </p>
+      </div>
+      <div class="aa-modal__actions">
+        <button class="aa-btn aa-btn--ghost" (click)="cancelDelete()">Annuler</button>
+        <button class="aa-btn aa-btn--danger" (click)="confirmDeleteAction()">
+          <i class="fas fa-trash-alt"></i> Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Onglets ────────────────────────────────────────────────────────────── -->
+  <div class="aa-tabs">
+    <button class="aa-tab" [class.aa-tab--active]="activeTab==='form'" (click)="activeTab='form'">
+      <i class="fas fa-magic"></i> Affectation automatique
+    </button>
+    <button class="aa-tab" [class.aa-tab--active]="activeTab==='list'" (click)="activeTab='list'; loadAffectations()">
+      <i class="fas fa-list-ul"></i> Gérer les affectations
+      <span class="aa-badge">{{ affectations.length }}</span>
+    </button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       ONGLET 1 — FORMULAIRE AUTO-AFFECTATION
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <div *ngIf="activeTab==='form'" class="aa-panel">
+
+    <!-- Résumé langues disponibles -->
+    <div class="aa-langue-grid" *ngIf="languesDisponibles.length > 0">
+      <div *ngFor="let l of languesDisponibles" class="aa-langue-card"
+           [class.aa-langue-card--selected]="isLangueSelected(l.langue)"
+           (click)="toggleLangue(l.langue)">
+        <span class="aa-langue-card__icon">{{ getLangueIcon(l.langue) }}</span>
+        <span class="aa-langue-card__name">{{ getLangueLabel(l.langue) }}</span>
+        <span class="aa-langue-card__count">{{ l.textes_sans_affectation }} dispo.</span>
+        <div class="aa-langue-card__check" *ngIf="isLangueSelected(l.langue)">
+          <i class="fas fa-check"></i>
+        </div>
+      </div>
+    </div>
+    <p *ngIf="languesDisponibles.length === 0" class="aa-empty">
+      <i class="fas fa-inbox"></i> Aucun texte disponible pour cette édition.
+    </p>
+
+    <!-- Formulaire -->
+    <form class="aa-form" (ngSubmit)="submitAutoAffectation()">
+
+      <!-- Correcteur -->
+      <div class="aa-field">
+        <label class="aa-label">
+          <i class="fas fa-user-tie"></i> Correcteur cible <span class="aa-required">*</span>
+        </label>
+        <select class="aa-select" [(ngModel)]="form.correcteur_id" name="correcteur_id" required>
+          <option [value]="0" disabled>— Sélectionner un correcteur —</option>
+          <option *ngFor="let c of correcteurs" [value]="c.id">
+            {{ c.prenom }} {{ c.nom }} ({{ c.nb_affectations_actuelles || 0 }} affectation(s))
+          </option>
+        </select>
+      </div>
+
+      <!-- Nombre de textes -->
+      <div class="aa-field">
+        <label class="aa-label">
+          <i class="fas fa-hashtag"></i> Nombre de textes à affecter <span class="aa-required">*</span>
+        </label>
+        <div class="aa-number-row">
+          <input type="number" class="aa-input" [(ngModel)]="form.nb_textes" name="nb_textes"
+                 min="1" max="200" required />
+          <span class="aa-hint" *ngIf="form.langues.length > 0">
+            {{ getTextesDispo() }} texte(s) disponible(s) dans les langues sélectionnées
+          </span>
+        </div>
+      </div>
+
+      <!-- Stratégie -->
+      <div class="aa-field">
+        <label class="aa-label"><i class="fas fa-random"></i> Stratégie de sélection</label>
+        <div class="aa-radio-group">
+          <label class="aa-radio" [class.aa-radio--active]="form.strategie==='equilibre'">
+            <input type="radio" name="strategie" value="equilibre" [(ngModel)]="form.strategie" />
+            <i class="fas fa-balance-scale"></i>
+            <span>Équilibrée</span>
+            <small>Textes avec le moins de correcteurs en priorité</small>
+          </label>
+          <label class="aa-radio" [class.aa-radio--active]="form.strategie==='aleatoire'">
+            <input type="radio" name="strategie" value="aleatoire" [(ngModel)]="form.strategie" />
+            <i class="fas fa-dice"></i>
+            <span>Aléatoire</span>
+            <small>Sélection au hasard parmi les textes disponibles</small>
+          </label>
+        </div>
+      </div>
+
+      <!-- Langues sélectionnées -->
+      <div class="aa-field" *ngIf="form.langues.length === 0">
+        <p class="aa-warning"><i class="fas fa-exclamation-triangle"></i> Sélectionnez au moins une langue ci-dessus.</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="aa-form-actions">
+        <button type="button" class="aa-btn aa-btn--ghost" (click)="resetForm()">
+          <i class="fas fa-undo"></i> Réinitialiser
+        </button>
+        <button type="submit" class="aa-btn aa-btn--primary" [disabled]="!canSubmit()">
+          <span *ngIf="!loading"><i class="fas fa-magic"></i> Lancer l'affectation</span>
+          <span *ngIf="loading"><i class="fas fa-spinner fa-spin"></i> En cours…</span>
+        </button>
+      </div>
+    </form>
+
+    <!-- Résultat -->
+    <div *ngIf="lastResult" class="aa-result">
+      <div class="aa-result__header">
+        <i class="fas fa-check-circle"></i>
+        <strong>{{ lastResult.assigned }} / {{ lastResult.requested }} texte(s) affecté(s)</strong>
+        <span class="aa-result__sub">({{ lastResult.available }} disponible(s) au total)</span>
+      </div>
+      <ul class="aa-result__list">
+        <li *ngFor="let d of lastResult.details">
+          <span class="aa-result__langue">{{ getLangueIcon(d.langue) }}</span>
+          {{ d.titre }}
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════
+       ONGLET 2 — LISTE & SUPPRESSION
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <div *ngIf="activeTab==='list'" class="aa-panel">
+
+    <!-- Filtres -->
+    <div class="aa-filters">
+      <input class="aa-input aa-input--search" type="text" placeholder="🔍 Rechercher…"
+             [(ngModel)]="searchTerm" (ngModelChange)="applySearch()" />
+
+      <select class="aa-select aa-select--sm" [(ngModel)]="filterCorrecteur" (change)="onFilterChange()">
+        <option [value]="0">Tous les correcteurs</option>
+        <option *ngFor="let c of correcteurs" [value]="c.id">{{ c.prenom }} {{ c.nom }}</option>
+      </select>
+
+      <select class="aa-select aa-select--sm" [(ngModel)]="filterLangue" (change)="onFilterChange()">
+        <option value="">Toutes les langues</option>
+        <option *ngFor="let l of languesDisponibles" [value]="l.langue">{{ getLangueLabel(l.langue) }}</option>
+      </select>
+
+      <button class="aa-btn aa-btn--ghost aa-btn--sm" (click)="loadAffectations()">
+        <i class="fas fa-sync-alt" [class.fa-spin]="loadingList"></i>
+      </button>
+    </div>
+
+    <!-- Tableau -->
+    <div class="aa-table-wrap" *ngIf="!loadingList">
+      <table class="aa-table" *ngIf="filteredAffectations.length > 0">
+        <thead>
+          <tr>
+            <th>Texte</th>
+            <th>Langue</th>
+            <th>Auteur</th>
+            <th>Correcteur</th>
+            <th>Statut</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let a of filteredAffectations; trackBy: trackByAffectation"
+              [class.aa-row--evaluated]="a.a_evalue">
+            <td class="aa-cell--title" [title]="a.texte_titre">{{ a.texte_titre }}</td>
+            <td>
+              <span class="aa-langue-pill">
+                {{ getLangueIcon(a.texte_langue) }} {{ getLangueLabel(a.texte_langue) }}
+              </span>
+            </td>
+            <td>{{ a.auteur_nom }}</td>
+            <td>
+              <span class="aa-correcteur-name">{{ a.correcteur_nom }}</span>
+            </td>
+            <td>
+              <span class="aa-badge" [ngClass]="getStatutClass(a.texte_statut)">
+                {{ getStatutLabel(a.texte_statut) }}
+              </span>
+            </td>
+            <td class="aa-cell--date">{{ a.date_affectation | date:'dd/MM/yy HH:mm' }}</td>
+            <td>
+              <button *ngIf="!a.a_evalue" class="aa-btn aa-btn--danger aa-btn--icon"
+                      (click)="askDelete(a)" title="Supprimer cette affectation">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+              <span *ngIf="a.a_evalue" class="aa-evaluated-badge" title="Évaluation soumise — suppression impossible">
+                <i class="fas fa-lock"></i>
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="filteredAffectations.length === 0" class="aa-empty">
+        <i class="fas fa-inbox"></i>
+        <p>Aucune affectation trouvée.</p>
+      </div>
+    </div>
+
+    <div *ngIf="loadingList" class="aa-loading">
+      <i class="fas fa-spinner fa-spin"></i> Chargement…
+    </div>
+  </div>
+
+</div>

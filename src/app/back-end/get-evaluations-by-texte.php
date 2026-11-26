@@ -1,5 +1,9 @@
 <?php
-require_once 'config.php';
+$backendDir = __DIR__ . '/back-end/';
+if (!file_exists($backendDir . 'config.php')) {
+    $backendDir = __DIR__ . '/';
+}
+require_once $backendDir . 'config.php';
 setCorsHeaders();
 
 $db = getDB();

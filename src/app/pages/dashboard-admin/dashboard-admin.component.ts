@@ -47,9 +47,11 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   assignmentLangueFilter = '';
   assignmentStatutFilter = '';
   showAssignmentsList = false;
+  assignmentStatusFilter: 'all' | 'unassigned' | 'partial' | 'full' = 'all';
   quickAssignCorrector: {[key: number]: number} = {};
-  
-  // Nouvelles propriétés pour la gestion améliorée des affectations
+  bulkAssignSelected: {[texteId: number]: number[]} = {};
+
+
   assignmentStats = {
     totalTexts: 0,
     fullyAssigned: 0,
@@ -352,14 +354,21 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
   
   toggleTextDetails(index: number) {
-    this.textDetailsVisible[index] = !this.textDetailsVisible[index];
+    const arr = this.textDetailsVisible.length === this.textes.length
+      ? [...this.textDetailsVisible]
+      : new Array(this.textes.length).fill(false);
+    arr[index] = !arr[index];
+    this.textDetailsVisible = arr;
+    this.cdr.detectChanges();
   }
   
   toggleCorrectorDetails(index: number) {
-    if (!this.correctorDetailsVisible) {
-      this.correctorDetailsVisible = new Array(this.correcteurs.length).fill(true);
-    }
-    this.correctorDetailsVisible[index] = !this.correctorDetailsVisible[index];
+    const arr = this.correctorDetailsVisible.length === this.correcteurs.length
+      ? [...this.correctorDetailsVisible]
+      : new Array(this.correcteurs.length).fill(false);
+    arr[index] = !arr[index];
+    this.correctorDetailsVisible = arr;
+    this.cdr.detectChanges();
   }
   
   toggleLanguageDetails(langue: string) {
@@ -376,29 +385,38 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     return textes;
   }
   
+  getTextsPartiallyAssigned(): number {
+    return this.textes.filter(t => {
+      const c = this.getCorrectorsCount(t.id);
+      return c > 0 && c < 3;
+    }).length;
+  }
+
   filterTexts() {
     let filtered = [...this.textes];
-    
-    // Filtrer par langue
     if (this.languageFilter) {
-      filtered = filtered.filter(texte => 
-        texte.langue?.toLowerCase() === this.languageFilter.toLowerCase() ||
-        (this.languageFilter === 'francais' && texte.langue?.toLowerCase() === 'français')
+      filtered = filtered.filter(t =>
+        t.langue?.toLowerCase() === this.languageFilter.toLowerCase() ||
+        (this.languageFilter === 'francais' && t.langue?.toLowerCase() === 'français')
       );
     }
-    
-    // Filtrer par recherche textuelle
     if (this.textSearchTerm.trim()) {
-      const searchTerm = this.textSearchTerm.toLowerCase().trim();
-      filtered = filtered.filter(texte => 
-        texte.titre?.toLowerCase().includes(searchTerm) ||
-        texte.prenom?.toLowerCase().includes(searchTerm) ||
-        texte.nom?.toLowerCase().includes(searchTerm) ||
-        `${texte.prenom} ${texte.nom}`.toLowerCase().includes(searchTerm) ||
-        texte.langue?.toLowerCase().includes(searchTerm)
+      const s = this.textSearchTerm.toLowerCase().trim();
+      filtered = filtered.filter(t =>
+        t.titre?.toLowerCase().includes(s) ||
+        t.prenom?.toLowerCase().includes(s) ||
+        t.nom?.toLowerCase().includes(s) ||
+        `${t.prenom} ${t.nom}`.toLowerCase().includes(s) ||
+        t.langue?.toLowerCase().includes(s)
       );
     }
-    
+    if (this.assignmentStatusFilter === 'unassigned') {
+      filtered = filtered.filter(t => this.getCorrectorsCount(t.id) === 0);
+    } else if (this.assignmentStatusFilter === 'partial') {
+      filtered = filtered.filter(t => { const c = this.getCorrectorsCount(t.id); return c > 0 && c < 3; });
+    } else if (this.assignmentStatusFilter === 'full') {
+      filtered = filtered.filter(t => this.getCorrectorsCount(t.id) === 3);
+    }
     this.filteredTexts = filtered;
   }
   
@@ -557,8 +575,8 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
     this.cp2iApi.getUsers(edNum).subscribe({
       next: (data) => {
         this.affectations = data?.affectations || [];
-        this.generateAffectationStats();
-        setTimeout(() => this.generateAffectationStats(), 100);
+        // Attendre que textes soit aussi chargé avant de générer les stats
+        if (this.textes.length > 0) this.generateAffectationStats();
       },
       error: () => { this.affectations = []; }
     });
@@ -720,7 +738,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
 
   getCorrectorsCount(texteId: number): number {
-    return this.affectations.filter(a => a.texte_id == texteId).length;
+    return this.affectations.filter(a => Number(a.texte_id) === Number(texteId)).length;
   }
 
   getAssignedCorrectorsNames(texteId: number): string {
@@ -1890,9 +1908,9 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   generateAffectationStats() {
     if (this.textes.length === 0) return;
 
-    // Filtrer par édition active
-    const editionId = this.editionActive?.id;
-    const textesEdition = editionId ? this.textes.filter(t => t.edition_id === editionId) : this.textes;
+    // Filtrer par numéro d'édition (edition_id dans cp2i_textes = numéro, pas l'ID BDD)
+    const editionNumero = this.editionActive?.numero;
+    const textesEdition = editionNumero ? this.textes.filter(t => Number(t.edition_id) === Number(editionNumero)) : this.textes;
     const textesIds = new Set(textesEdition.map(t => t.id));
     const affectationsEdition = this.affectations.filter(a => textesIds.has(a.texte_id));
 
@@ -2957,11 +2975,13 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   // Nouvelles méthodes pour la gestion des affectations
   getAssignedCorrectorsForText(texteId: number): any[] {
     return this.affectations
-      .filter(a => a.texte_id == texteId)
+      .filter(a => Number(a.texte_id) === Number(texteId))
       .map(affectation => {
-        const correcteur = this.correcteurs.find(c => c.id === affectation.corrector_id);
+        const correcteur = this.correcteurs.find(c => Number(c.id) === Number(affectation.corrector_id));
         return {
           ...affectation,
+          texte_id: Number(affectation.texte_id),
+          corrector_id: Number(affectation.corrector_id),
           correcteur_prenom: correcteur?.prenom,
           correcteur_nom: correcteur?.nom
         };
@@ -2970,9 +2990,9 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
 
   getAvailableCorrectorsForText(texteId: number): any[] {
     const assignedIds = this.affectations
-      .filter(a => a.texte_id === texteId)
-      .map(a => a.corrector_id);
-    return this.correcteurs.filter(c => !assignedIds.includes(c.id));
+      .filter(a => Number(a.texte_id) === Number(texteId))
+      .map(a => Number(a.corrector_id));
+    return this.correcteurs.filter(c => !assignedIds.includes(Number(c.id)));
   }
 
   getTextsAssignedToCorrector(correcteurId: number): any[] {
@@ -3032,6 +3052,43 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.showToast('Erreur lors de l\'assignation: ' + (error.error?.error || 'Erreur inconnue'), 'error');
+      }
+    });
+  }
+
+  getBulkCount(texteId: number): number {
+    return (this.bulkAssignSelected[texteId] || []).length;
+  }
+
+  toggleBulkSelect(texteId: number, correcteurId: number): void {
+    if (!this.bulkAssignSelected[texteId]) this.bulkAssignSelected[texteId] = [];
+    const idx = this.bulkAssignSelected[texteId].indexOf(correcteurId);
+    if (idx === -1) this.bulkAssignSelected[texteId].push(correcteurId);
+    else this.bulkAssignSelected[texteId].splice(idx, 1);
+  }
+
+  isBulkSelected(texteId: number, correcteurId: number): boolean {
+    return (this.bulkAssignSelected[texteId] || []).includes(correcteurId);
+  }
+
+  bulkAssignToText(texteId: number): void {
+    const ids = this.bulkAssignSelected[texteId] || [];
+    if (ids.length === 0) {
+      this.showToast('Cochez au moins un correcteur', 'error');
+      return;
+    }
+    this.cp2iApi.bulkAssignCorrecteurs(texteId, ids).subscribe({
+      next: (res: any) => {
+        if (res.success) {
+          this.showToast(`${res.assigned} correcteur(s) affecté(s) avec succès!`, 'success');
+          this.bulkAssignSelected[texteId] = [];
+          this.loadData();
+        } else {
+          this.showToast(res.error || 'Erreur lors de l\'affectation', 'error');
+        }
+      },
+      error: (err) => {
+        this.showToast('Erreur: ' + (err.error?.error || 'Erreur inconnue'), 'error');
       }
     });
   }
@@ -3100,77 +3157,99 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   }
 
   canUnassignCorrector(texteId: number, correcteurId: number): boolean {
-    const texte = this.textes.find(t => t.id === texteId);
-    if (texte && texte.real_evaluations) {
-      const evaluation = texte.real_evaluations.find((e: any) => e.correcteur_id === correcteurId);
-      return !(evaluation && evaluation.note !== null && evaluation.note !== undefined);
-    }
-    return true; // Par défaut, on peut désaffecter
+    // Le backend protège contre la suppression si évaluation existe.
+    // Côté Angular on bloque uniquement si l'édition est archivée.
+    return !this.isEditionArchivee();
   }
 
   unassignCorrector(texteId: number, correcteurId: number): void {
-    if (!texteId || !correcteurId) {
+    const tId = Number(texteId);
+    const cId = Number(correcteurId);
+
+    if (!tId || !cId) {
       this.showToast('Erreur: IDs manquants', 'error');
       return;
     }
-    
-    // Vérifier si ce correcteur a déjà corrigé ce texte
-    const texte = this.textes.find(t => t.id === texteId);
-    if (texte && texte.real_evaluations) {
-      const evaluation = texte.real_evaluations.find((e: any) => e.correcteur_id === correcteurId);
-      if (evaluation && evaluation.note !== null && evaluation.note !== undefined) {
-        this.showToast('Impossible de désaffecter : ce correcteur a déjà corrigé ce texte', 'error');
-        return;
-      }
-    }
-    
-    this.http.post(`${this.cp2iApi['baseUrl']}/cp2i-dashboard.php?action=direct_unassign`, 
-      { texte_id: texteId, corrector_id: correcteurId }, 
+
+    this.http.post(
+      `${this.cp2iApi['baseUrl']}/cp2i-dashboard.php?action=direct_unassign`,
+      { texte_id: tId, corrector_id: cId },
       { headers: this.getHeaders() }
     ).subscribe({
-      next: (response) => {
-        this.showToast('Correcteur désassigné avec succès', 'success');
-        this.loadData();
+      next: (res: any) => {
+        if (res?.success) {
+          this.showToast('Correcteur retiré avec succès', 'success');
+          this.loadData();
+        } else {
+          this.showToast(res?.error || 'Erreur lors du retrait', 'error');
+        }
       },
-      error: (error) => {
-        this.showToast('Erreur lors de la désassignation', 'error');
+      error: (err) => {
+        this.showToast(err.error?.error || 'Impossible de retirer ce correcteur', 'error');
       }
     });
   }
 
 
 
+  restoreAffectations(): void {
+    if (!confirm('Restaurer les affectations depuis les évaluations existantes ?')) return;
+    this.http.post(
+      `${this.cp2iApi['baseUrl']}/cp2i-restore-affectations.php`,
+      {},
+      { headers: this.getHeaders() }
+    ).subscribe({
+      next: (res: any) => {
+        if (res?.success) {
+          this.showToast(`✅ ${res.restored} affectations restaurées (total: ${res.total_affectations})`, 'success');
+          this.loadData();
+        } else {
+          this.showToast(res?.error || 'Erreur lors de la restauration', 'error');
+        }
+      },
+      error: (err) => this.showToast('Erreur: ' + (err.error?.error || err.message), 'error')
+    });
+  }
+
+  hasAnyEvaluatedText(): boolean {
+    return this.textes.some(t => t.statut === 'accepte' || t.statut === 'refuse');
+  }
+
   removeAllAssignments(): void {
+    if (this.isEditionArchivee()) {
+      this.showToast('Action impossible : édition archivée', 'error');
+      return;
+    }
+    if (this.hasAnyEvaluatedText()) {
+      this.showToast('Impossible : des textes ont déjà été corrigés dans cette édition', 'error');
+      return;
+    }
     if (this.affectations.length === 0) {
       this.showToast('Aucune assignation à supprimer', 'error');
       return;
     }
-
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer toutes les ${this.affectations.length} assignations ?`)) {
+    if (!confirm(`Supprimer les ${this.affectations.length} assignations de l'édition ${this.editionActive?.numero} ?`)) {
       return;
     }
-
-    console.log('🔥 Début suppression de', this.affectations.length, 'assignations');
-    
-    // Utiliser l'action reset dans l'API existante
-    this.http.post(`${this.cp2iApi['baseUrl']}/cp2i-dashboard.php?action=reset_all_assignments`, {}, { headers: this.getHeaders() }).subscribe({
+    const editionNumero = this.editionActive?.numero;
+    this.http.post(
+      `${this.cp2iApi['baseUrl']}/cp2i-dashboard.php?action=reset_all_assignments`,
+      { edition_id: editionNumero },
+      { headers: this.getHeaders() }
+    ).subscribe({
       next: (response) => {
-        console.log('✅ Réponse script direct:', response);
         const res = response as any;
-        if (res && res.success) {
-          this.showToast(`${res.count} assignations supprimées définitivement`, 'success');
-          this.logAdminAction('suppression_toutes_assignations', `Suppression directe de ${res.count} assignations`);
-          // Vider immédiatement les affectations locales
+        if (res?.success) {
+          this.showToast(`${res.count} assignations supprimées (edition ${editionNumero})`, 'success');
+          this.logAdminAction('suppression_toutes_assignations', `Suppression de ${res.count} assignations edition ${editionNumero}`);
           this.affectations = [];
-          // Recharger toutes les données
           this.loadData();
         } else {
-          this.showToast('Erreur lors de la suppression directe', 'error');
+          this.showToast(res?.error || 'Erreur lors de la suppression', 'error');
         }
       },
       error: (error) => {
-        console.error('🚨 Erreur script direct:', error);
-        this.showToast('Erreur lors de la suppression: ' + (error.error?.error || error.message || 'Erreur inconnue'), 'error');
+        this.showToast(error.error?.error || 'Erreur lors de la suppression', 'error');
       }
     });
   }
@@ -3813,6 +3892,7 @@ export class DashboardAdminComponent implements OnInit, OnDestroy {
   closeFinalistesModal() {
     this.showFinalistesModal = false;
   }
+
 
   getCurrentDate(): string {
     return new Date().toLocaleDateString();
